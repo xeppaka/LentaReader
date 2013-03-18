@@ -1,5 +1,9 @@
 package cz.fit.lentaruand.data;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
 public enum Rubrics {
 	ROOT("root", "", null), 
 	RUSSIA("russia", "/russia", ROOT),
@@ -80,6 +84,14 @@ public enum Rubrics {
 	LIFE_STUFF("life_stuff", "/life/stuff", LIFE);
 
 	private static final String RSS_PATH = "/rss";
+	private static Map<Rubrics, Collection<Rubrics>> rubricToSubrubrics = new HashMap<Rubrics, Collection<Rubrics>>();
+	
+	static {
+		for (Rubrics rubric : Rubrics.values()) {
+			if (rubric.getParent() != null)
+		}
+	}
+	
 	private String name;
 	private String path;
 	private String[] rssPaths = new String[NewsType.values().length];
@@ -110,5 +122,9 @@ public enum Rubrics {
 
 	public String getRssPath(NewsType type) {
 		return rssPaths[type.ordinal()];
+	}
+	
+	public static Rubrics[] getSubrubrics(Rubrics rubric) {
+		
 	}
 }
