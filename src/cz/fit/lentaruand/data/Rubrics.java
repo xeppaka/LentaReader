@@ -1,8 +1,11 @@
 package cz.fit.lentaruand.data;
 
-import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 public enum Rubrics {
 	ROOT("root", "", null), 
@@ -84,11 +87,25 @@ public enum Rubrics {
 	LIFE_STUFF("life_stuff", "/life/stuff", LIFE);
 
 	private static final String RSS_PATH = "/rss";
-	private static Map<Rubrics, Collection<Rubrics>> rubricToSubrubrics = new HashMap<Rubrics, Collection<Rubrics>>();
+	private static Map<Rubrics, Set<Rubrics>> rubricToSubrubrics = new HashMap<Rubrics, Set<Rubrics>>();
 	
 	static {
 		for (Rubrics rubric : Rubrics.values()) {
-			if (rubric.getParent() != null)
+			Rubrics parent = rubric.getParent();
+			if (rubric.getParent() != null) {
+				Set<Rubrics> subRubrics = rubricToSubrubrics.get(parent);
+				
+				if (subRubrics == null) {
+					subRubrics = new HashSet<Rubrics>();
+					rubricToSubrubrics.put(parent, subRubrics);
+				}
+				
+				subRubrics.add(rubric);
+			}
+		}
+		
+		for (Entry<Rubrics, Set<Rubrics>> entry : rubricToSubrubrics.entrySet()) {
+			entry.setValue(Collections.unmodifiableSet(entry.getValue()));
 		}
 	}
 	
@@ -124,7 +141,7 @@ public enum Rubrics {
 		return rssPaths[type.ordinal()];
 	}
 	
-	public static Rubrics[] getSubrubrics(Rubrics rubric) {
-		
+	public static Set<Rubrics> getSubrubrics(Rubrics rubric) {
+		return rubricToSubrubrics.get(rubric);
 	}
 }

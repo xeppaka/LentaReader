@@ -3,6 +3,8 @@ package cz.fit.lentaruand;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.xpath.XPathExpressionException;
 
@@ -33,7 +35,8 @@ public class Main extends Activity {
 		b.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				new DownloadRssTask().execute(new DownloadRssTaskData(Rubrics.RUSSIA, NewsType.NEWS));
+				//new DownloadRssTask().execute(new DownloadRssTaskData(Rubrics.RUSSIA, NewsType.NEWS));
+				//Logger.getLogger("ANDAND").log(Level.INFO, String.valueOf(Thread.currentThread().getId()));
 			}
 		});
 	}
