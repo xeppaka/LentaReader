@@ -2,7 +2,7 @@ package cz.fit.lentaruand.data;
 
 import java.util.Date;
 
-import cz.fit.lentaruand.rss.RssItem;
+import cz.fit.lentaruand.rss.LentaRssItem;
 
 public class News {
 	private String guid;
@@ -12,11 +12,15 @@ public class News {
 	private String fullText;
 	private Date pubDate;
 	private String imageLink;
+	private String imageCaption;
+	private String imageCredits;
 	private Rubrics rubric;
 	private Rubrics subRubric;
 	
-	public News(String guid, String title, String link, String briefText, String fullText,
-			Date pubDate, String imageLink, Rubrics rubric, Rubrics subRubric) {
+	public News(String guid, String title, String link, String briefText,
+			String fullText, Date pubDate, String imageLink,
+			String imageCaption, String imageCredits, Rubrics rubric,
+			Rubrics subRubric) {
 		setGuid(guid);
 		setTitle(title);
 		setLink(link);
@@ -24,10 +28,26 @@ public class News {
 		setFullText(fullText);
 		setPubDate(pubDate);
 		setImageLink(imageLink);
+		setImageCaption(imageCaption);
+		setImageCredits(imageCredits);
 		setRubric(rubric);
 		setSubRubric(subRubric);
 	}
 
+	public News(LentaRssItem rssItem) {
+		setGuid(rssItem.getGuid());
+		setTitle(rssItem.getTitle());
+		setLink(rssItem.getLink());
+		setBriefText(rssItem.getDescription());
+		setFullText(null);
+		setPubDate(rssItem.getPubDate());
+		setImageLink(rssItem.getImageLink());
+		setImageCaption(null);
+		setImageCredits(null);
+		setRubric(rssItem.getRubric());
+		setSubRubric(null);
+	}
+	
 	public String getGuid() {
 		return guid;
 	}
@@ -99,6 +119,22 @@ public class News {
 		this.imageLink = imageLink;
 	}
 
+	public String getImageCaption() {
+		return imageCaption;
+	}
+
+	public void setImageCaption(String imageCaption) {
+		this.imageCaption = imageCaption;
+	}
+
+	public String getImageCredits() {
+		return imageCredits;
+	}
+
+	public void setImageCredits(String imageCredits) {
+		this.imageCredits = imageCredits;
+	}
+
 	public Rubrics getRubric() {
 		return rubric;
 	}
@@ -118,15 +154,7 @@ public class News {
 		this.subRubric = subRubric;
 	}
 	
-	public static News fromRssItem(RssItem item) {
-		return new News(item.getGuid(),
-				item.getTitle(),
-				item.getLink(),
-				item.getDescription(),
-				null,
-				item.getPubDate(),
-				item.getImageLink(),
-				item.getRubric(),
-				null);
+	public boolean isFull() {
+		return fullText != null && !fullText.isEmpty();
 	}
 }

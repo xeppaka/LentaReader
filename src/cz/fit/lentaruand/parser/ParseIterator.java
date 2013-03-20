@@ -6,12 +6,12 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.regex.Matcher;
 
-public class GeneralParserIterator implements Iterator<List<String>> {
+public class ParseIterator implements Iterator<List<String>> {
 	private Matcher matcher;
 	private int groups;
 	private boolean next;
 	
-	public GeneralParserIterator(Matcher matcher, int groups) {
+	public ParseIterator(Matcher matcher, int groups) {
 		if (matcher == null)
 			throw new IllegalArgumentException("Argument matcher must not be null.");
 

@@ -5,12 +5,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class GeneralParser implements Iterable<List<String>> {
+public class ParseHelper implements Iterable<List<String>> {
 	private String text;
 	private Pattern pattern;
 	private int groups;
 	
-	private GeneralParser(String text, Pattern pattern, int groups) {
+	private ParseHelper(String text, Pattern pattern, int groups) {
 		this.text = text;
 		this.pattern = pattern;
 		this.groups = groups;
@@ -26,7 +26,7 @@ public class GeneralParser implements Iterable<List<String>> {
 		if (groups <= 0)
 			throw new IllegalArgumentException("Argument groups must be greather than 0.");
 		
-		return new GeneralParser(text, pattern, groups);
+		return new ParseHelper(text, pattern, groups);
 	}
 
 	@Override
@@ -36,6 +36,6 @@ public class GeneralParser implements Iterable<List<String>> {
 			return emptyList.iterator();
 		}
 		
-		return new GeneralParserIterator(pattern.matcher(text), groups);
+		return new ParseIterator(pattern.matcher(text), groups);
 	}
 }

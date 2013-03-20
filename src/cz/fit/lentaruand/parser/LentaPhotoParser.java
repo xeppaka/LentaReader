@@ -1,7 +1,7 @@
 package cz.fit.lentaruand.parser;
 
-import cz.fit.lentaruand.Page;
 import cz.fit.lentaruand.data.Photo;
+import cz.fit.lentaruand.site.Page;
 
 
 public class LentaPhotoParser implements NewsParser<Photo> {

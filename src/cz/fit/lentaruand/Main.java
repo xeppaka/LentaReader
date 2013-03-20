@@ -3,10 +3,12 @@ package cz.fit.lentaruand;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 
 import javax.xml.xpath.XPathExpressionException;
 
 import android.app.Activity;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
@@ -18,8 +20,8 @@ import cz.fit.lentaruand.data.NewsType;
 import cz.fit.lentaruand.data.Rubrics;
 import cz.fit.lentaruand.data.dao.NewsDao;
 import cz.fit.lentaruand.data.db.LentaDbHelper;
-import cz.fit.lentaruand.rss.RssItem;
-import cz.fit.lentaruand.rss.RssReader;
+import cz.fit.lentaruand.parser.exceptions.MobileNewsParseException;
+import cz.fit.lentaruand.site.LentaNewsDownloader;
 
 public class Main extends Activity {
 
@@ -74,14 +76,24 @@ public class Main extends Activity {
 		}
 	}
 	
-	private class DownloadRssTask extends AsyncTask<DownloadRssTaskData, Integer, Collection<RssItem>> {
+	private class DownloadRssTask extends AsyncTask<DownloadRssTaskData, Integer, Collection<News>> {
 		@Override
-		protected Collection<RssItem> doInBackground(DownloadRssTaskData... params) {
+		protected Collection<News> doInBackground(DownloadRssTaskData... params) {
+			LentaNewsDownloader lnd = new LentaNewsDownloader();
+			
 			try {
-				return RssReader.readItems(params[0].getRubric(), params[0].getNewsType());
+				Collection<News> news = lnd.downloadRubricBrief(Rubrics.WORLD);
+				Iterator<News> it = news.iterator();
+				
+				while (it.hasNext()) {
+					lnd.downloadFull(it.next());
+				}
+				
 			} catch (XPathExpressionException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (MobileNewsParseException e) {
 				e.printStackTrace();
 			}
 			
@@ -89,13 +101,14 @@ public class Main extends Activity {
 		}
 
 		@Override
-		protected void onPostExecute(Collection<RssItem> result) {
-			RssItem item = result.iterator().next();
+		protected void onPostExecute(Collection<News> result) {
+			Iterator<News> it = result.iterator();
+
+			SQLiteDatabase db = new LentaDbHelper(Main.this.getApplicationContext()).getWritableDatabase();
 			
-			LentaDbHelper db = new LentaDbHelper(Main.this.getApplicationContext());
-			
-			News news = News.fromRssItem(item);
-			NewsDao.create(db.getWritableDatabase(), news);
+			while (it.hasNext()) {
+				NewsDao.create(db, it.next());
+			}
 			
 			tv.setText("Finished");
 		}

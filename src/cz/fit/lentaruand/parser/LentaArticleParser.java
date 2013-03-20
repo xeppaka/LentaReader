@@ -1,7 +1,7 @@
 package cz.fit.lentaruand.parser;
 
-import cz.fit.lentaruand.Page;
 import cz.fit.lentaruand.data.Article;
+import cz.fit.lentaruand.site.Page;
 
 public class LentaArticleParser implements NewsParser<Article> {
 	@Override

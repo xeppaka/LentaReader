@@ -5,7 +5,7 @@ import java.util.Date;
 import cz.fit.lentaruand.data.NewsType;
 import cz.fit.lentaruand.data.Rubrics;
 
-public class RssItem {
+public class LentaRssItem {
 	private String guid;
 	private NewsType type;
 	private String title;
@@ -15,12 +15,12 @@ public class RssItem {
 	private String imageLink;
 	private Rubrics rubric;
 
-	public RssItem(String guid, String title, String link,
+	public LentaRssItem(String guid, String title, String link,
 			String description, Date pubDate, String imageLink) {
 		this(guid, null, title, link, description, pubDate, imageLink, null);
 	}
 	
-	public RssItem(String guid, NewsType type, String title, String link,
+	public LentaRssItem(String guid, NewsType type, String title, String link,
 			String description, Date pubDate, String imageLink, Rubrics rubric) {
 		if (guid == null || guid.isEmpty())
 			throw new IllegalArgumentException("Argument guid must not be null or empty");

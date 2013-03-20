@@ -33,4 +33,9 @@ public class PageParseException extends ParseException {
 	public void setRegex(String regex) {
 		this.regex = regex;
 	}
+
+	@Override
+	public String toString() {
+		return "[url: " + url.toExternalForm() + ", regex: " + regex + "]";
+	}
 }
