@@ -95,7 +95,7 @@ public class Main extends Activity {
 			LentaDbHelper db = new LentaDbHelper(Main.this.getApplicationContext());
 			
 			News news = News.fromRssItem(item);
-			NewsDao.createNews(db, news);
+			NewsDao.create(db.getWritableDatabase(), news);
 			
 			tv.setText("Finished");
 		}

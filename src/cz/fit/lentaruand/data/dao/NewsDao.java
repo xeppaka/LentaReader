@@ -8,13 +8,10 @@ import android.database.sqlite.SQLiteDatabase;
 import cz.fit.lentaruand.data.News;
 import cz.fit.lentaruand.data.Rubrics;
 import cz.fit.lentaruand.data.dao.exceptions.InconsistentDatastoreException;
-import cz.fit.lentaruand.data.db.LentaDbHelper;
 import cz.fit.lentaruand.data.db.NewsEntry;
 
 public class NewsDao {
-	public static News getNews(LentaDbHelper dbHelper, String guid) {
-		SQLiteDatabase db = dbHelper.getReadableDatabase();
-		
+	public static News read(SQLiteDatabase db, String guid) {
 		String[] projection = {
 				NewsEntry.COLUMN_NAME_GUID,
 				NewsEntry.COLUMN_NAME_TITLE,
@@ -27,17 +24,17 @@ public class NewsDao {
 				NewsEntry.COLUMN_NAME_FULLTEXT
 		};
 		
-		String selection = NewsEntry.COLUMN_NAME_GUID + " = ?";
+		String where = NewsEntry.COLUMN_NAME_GUID + " LIKE ?";
 		
-		String[] selectionArgs = {
+		String[] whereArgs = {
 				guid
 		};
 		
 		Cursor cur = db.query(
 				NewsEntry.TABLE_NAME, 
 				projection, 
-				selection,
-				selectionArgs, 
+				where,
+				whereArgs, 
 				null, 
 				null, 
 				null
@@ -71,9 +68,31 @@ public class NewsDao {
 		}
 	}
 	
-	public static void createNews(LentaDbHelper dbHelper, News news) {
-		SQLiteDatabase db = dbHelper.getWritableDatabase();
+	public static long create(SQLiteDatabase db, News news) {
+		return db.insert(NewsEntry.TABLE_NAME, null, prepareContentValues(news));
+	}
+	
+	public static void remove(SQLiteDatabase db, String guid) {
+		String where = NewsEntry.COLUMN_NAME_GUID + " LIKE ?";
 		
+		String[] whereArgs = {
+				guid
+		};
+		
+		db.delete(NewsEntry.TABLE_NAME, where, whereArgs);
+	}
+	
+	public static void update(SQLiteDatabase db, News news) {
+		String where = NewsEntry.COLUMN_NAME_GUID + " LIKE ?";
+		
+		String[] whereArgs = {
+				news.getGuid()
+		};
+		
+		db.update(NewsEntry.TABLE_NAME, prepareContentValues(news), where, whereArgs);
+	}
+	
+	private static ContentValues prepareContentValues(News news) {
 		ContentValues values = new ContentValues();
 		
 		values.put(NewsEntry.COLUMN_NAME_GUID, news.getGuid());
@@ -100,6 +119,6 @@ public class NewsDao {
 		else
 			values.put(NewsEntry.COLUMN_NAME_FULLTEXT, news.getFullText());
 		
-		db.insert(NewsEntry.TABLE_NAME, null, values);
+		return values;
 	}
 }

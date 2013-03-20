@@ -24,8 +24,12 @@ public class LentaDbHelper extends SQLiteOpenHelper {
 		onCreate(db);
 	}
 
-//	@Override
-//	public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-//		onUpgrade(db, oldVersion, newVersion);
-//	}
+/*
+ * this method is available in the next versions of Android.
+ * 
+	@Override
+	public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+		onUpgrade(db, oldVersion, newVersion);
+	}
+ */
 }
