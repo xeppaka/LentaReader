@@ -24,8 +24,8 @@ public class LentaDbHelper extends SQLiteOpenHelper {
 		onCreate(db);
 	}
 
-	@Override
-	public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		onUpgrade(db, oldVersion, newVersion);
-	}
+//	@Override
+//	public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+//		onUpgrade(db, oldVersion, newVersion);
+//	}
 }

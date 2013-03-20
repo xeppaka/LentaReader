@@ -24,8 +24,8 @@ public abstract class NewsEntry implements BaseColumns {
 				COLUMN_NAME_LINK + " TEXT, " +
 				COLUMN_NAME_IMAGELINK + " TEXT, " +
 				COLUMN_NAME_PUBDATE + " INTEGER, " +
-				COLUMN_NAME_RUBRIC + " INTEGER, " +
-				COLUMN_NAME_SUBRUBRIC + " INTEGER, " +
+				COLUMN_NAME_RUBRIC + " TEXT, " +
+				COLUMN_NAME_SUBRUBRIC + " TEXT, " +
 				COLUMN_NAME_BRIEFTEXT + " TEXT, " +
 				COLUMN_NAME_FULLTEXT + " TEXT)";
 	
