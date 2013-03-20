@@ -13,15 +13,19 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import cz.fit.lentaruand.data.News;
 import cz.fit.lentaruand.data.NewsType;
 import cz.fit.lentaruand.data.Rubrics;
+import cz.fit.lentaruand.data.dao.NewsDao;
+import cz.fit.lentaruand.data.db.LentaDbHelper;
 import cz.fit.lentaruand.rss.RssItem;
 import cz.fit.lentaruand.rss.RssReader;
 
 public class Main extends Activity {
 
 	private TextView tv;
-	private Button b;
+	private Button createNews;
+	private Button deleteNews;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -29,12 +33,18 @@ public class Main extends Activity {
 		setContentView(R.layout.main);
 		
 		tv = (TextView) findViewById(R.id.textView1);
-		b = (Button) findViewById(R.id.button1);
-		b.setOnClickListener(new View.OnClickListener() {
+		createNews = (Button) findViewById(R.id.button1);
+		createNews.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				//new DownloadRssTask().execute(new DownloadRssTaskData(Rubrics.RUSSIA, NewsType.NEWS));
-				//Logger.getLogger("ANDAND").log(Level.INFO, String.valueOf(Thread.currentThread().getId()));
+				new DownloadRssTask().execute(new DownloadRssTaskData(Rubrics.RUSSIA, NewsType.NEWS));
+			}
+		});
+		
+		deleteNews = (Button) findViewById(R.id.button2);
+		deleteNews.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
 			}
 		});
 	}
@@ -80,12 +90,14 @@ public class Main extends Activity {
 
 		@Override
 		protected void onPostExecute(Collection<RssItem> result) {
-			StringBuilder sb = new StringBuilder();
-			for (RssItem item : result) {
-				sb.append(item.getLink()).append("\n");
-			}
+			RssItem item = result.iterator().next();
 			
-			tv.setText(sb.toString());
+			LentaDbHelper db = new LentaDbHelper(Main.this.getApplicationContext());
+			
+			News news = News.fromRssItem(item);
+			NewsDao.createNews(db, news);
+			
+			tv.setText("Finished");
 		}
 	}
 }
