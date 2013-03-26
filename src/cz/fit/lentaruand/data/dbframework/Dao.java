@@ -1,4 +1,4 @@
-package cz.fit.lentaruand.data.db.unfinishedStupidity;
+package cz.fit.lentaruand.data.dbframework;
 
 public interface Dao<T extends DataObject> {
 	long create(T object);

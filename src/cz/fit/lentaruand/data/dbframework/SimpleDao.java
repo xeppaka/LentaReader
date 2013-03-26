@@ -1,7 +1,6 @@
-package cz.fit.lentaruand.data.db.unfinishedStupidity;
+package cz.fit.lentaruand.data.dbframework;
 
 import java.util.Map;
-
 
 public abstract class SimpleDao<T extends DataObject> implements Dao<T> {
 

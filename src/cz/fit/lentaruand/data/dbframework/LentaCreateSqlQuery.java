@@ -1,11 +1,11 @@
-package cz.fit.lentaruand.data.db.unfinishedStupidity;
+package cz.fit.lentaruand.data.dbframework;
 
 import android.database.sqlite.SQLiteDatabase;
 
-public class LentaSqlQuery implements SqlQuery {
+public class LentaCreateSqlQuery implements SqlQuery {
 	private String fullQuery;
 	
-	public LentaSqlQuery(String fullQuery) {
+	public LentaCreateSqlQuery(String fullQuery) {
 		this.fullQuery = fullQuery;
 	}
 	

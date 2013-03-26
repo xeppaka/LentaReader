@@ -1,4 +1,4 @@
-package cz.fit.lentaruand.data.db.unfinishedStupidity;
+package cz.fit.lentaruand.data.dbframework;
 
 import android.database.sqlite.SQLiteDatabase;
 

@@ -1,17 +1,24 @@
-package cz.fit.lentaruand.data.db.unfinishedStupidity;
+package cz.fit.lentaruand.data.dbframework;
 
 import java.util.Collection;
 
 
 public class SqlQueryBuilder {
 	private TableDefinition tableDefinition;
+	private String tableName;
 	
-	public SqlQueryBuilder forTable(TableDefinition tableDefinition) {
+	public SqlQueryBuilder forDefinition(TableDefinition tableDefinition) {
 		this.tableDefinition = tableDefinition;
 		
 		return this;
 	}
 
+	public SqlQueryBuilder forTable(String tableName) {
+		this.tableName = tableName;		
+		
+		return this;
+	}
+	
 	public <T extends DataObject> SqlQueryWithResult<T> buildSelect() {
 		return null;
 	}
@@ -40,7 +47,7 @@ public class SqlQueryBuilder {
 		
 		sb.append(")");
 		
-		return new LentaSqlQuery(sb.toString());
+		return new LentaCreateSqlQuery(sb.toString());
 	}
 
 }
