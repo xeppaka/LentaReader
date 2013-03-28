@@ -2,7 +2,7 @@ package cz.fit.lentaruand.data.dbframework;
 
 import android.database.sqlite.SQLiteDatabase;
 
-public class LentaCreateSqlQuery implements SqlQuery {
+public class LentaCreateSqlQuery implements SqlQuery<Long> {
 	private String fullQuery;
 	
 	public LentaCreateSqlQuery(String fullQuery) {
@@ -10,7 +10,7 @@ public class LentaCreateSqlQuery implements SqlQuery {
 	}
 	
 	@Override
-	public void execute(SQLiteDatabase db) {
-		db.execSQL(fullQuery);
+	public Long execute(SQLiteDatabase db) {
+		return db.insert(table, nullColumnHack, values)
 	}
 }

@@ -2,6 +2,8 @@ package cz.fit.lentaruand.data.dbframework;
 
 import java.util.Collection;
 
+import cz.fit.lentaruand.data.dbframework.sqlite.SQLiteDataObject;
+
 
 public class SqlQueryBuilder {
 	private TableDefinition tableDefinition;
@@ -19,7 +21,7 @@ public class SqlQueryBuilder {
 		return this;
 	}
 	
-	public <T extends DataObject> SqlQueryWithResult<T> buildSelect() {
+	public <T extends SQLiteDataObject> SqlQueryWithResult<T> buildSelect() {
 		return null;
 	}
 

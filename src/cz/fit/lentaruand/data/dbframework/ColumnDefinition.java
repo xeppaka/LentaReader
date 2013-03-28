@@ -15,7 +15,9 @@ public interface ColumnDefinition {
 	 * Get the type of the column. This type can be used in SQL statements for defining tables.
 	 * @return column SQL type.
 	 */
-	String getType();
+	String getSqlType();
+
+	Enum<?> getType();
 	
 	/**
 	 * States if that column is a key.

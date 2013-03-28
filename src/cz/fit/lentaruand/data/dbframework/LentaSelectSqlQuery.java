@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
+import cz.fit.lentaruand.data.dbframework.sqlite.DataObject;
+
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
