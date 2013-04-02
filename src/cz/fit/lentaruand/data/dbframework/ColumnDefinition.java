@@ -4,7 +4,7 @@ package cz.fit.lentaruand.data.dbframework;
  * 
  * @author kacpa01
  */
-public interface ColumnDefinition {
+public interface ColumnDefinition<E extends Enum<E>> {
 	/**
 	 * Gets the name of the column.
 	 * @return column name.
@@ -17,7 +17,7 @@ public interface ColumnDefinition {
 	 */
 	String getSqlType();
 
-	Enum<?> getType();
+	E getType();
 	
 	/**
 	 * States if that column is a key.

@@ -11,31 +11,52 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import cz.fit.lentaruand.data.dbframework.ColumnDefinition;
 import cz.fit.lentaruand.data.dbframework.Dao;
+import cz.fit.lentaruand.data.dbframework.DataObject;
 import cz.fit.lentaruand.data.dbframework.DataObjectValue;
+import cz.fit.lentaruand.data.dbframework.TableDefinition;
 
-public abstract class SQLiteDao<T extends SQLiteDataObject> implements Dao<T> {
+public abstract class SQLiteDao implements Dao<DataObject<SQLiteDataType>, SQLiteDataType> {
 	private SQLiteDatabase db;
-	private SQLiteTableDefinition table;
+	private TableDefinition<SQLiteDataType> table;
 	private final String[] columnsAll;
 	
-	private create
+	private DataObjectValue<?> createDataObjectValue(Cursor c, SQLiteDataType type, int column) {
+		switch (type) {
+		case INTEGER:
+			DataObjectValue<Integer> intRes = new SQLiteDataObjectValue<Integer>();
+			intRes.setValue(c.getInt(column));
+			return intRes;
+		case REAL:
+			DataObjectValue<Float> floatRes = new SQLiteDataObjectValue<Float>();
+			floatRes.setValue(c.getFloat(column));
+			return floatRes;
+		case TEXT:
+			DataObjectValue<String> stringRes = new SQLiteDataObjectValue<String>();
+			stringRes.setValue(c.getString(column));
+			return stringRes;
+		case BLOB:
+			break;
+		}
+		
+		return null;
+	}
 	
-	public SQLiteDao(SQLiteDatabase db, SQLiteTableDefinition table) {
+	public SQLiteDao(SQLiteDatabase db, TableDefinition<SQLiteDataType> table) {
 		this.db = db;
 		this.table = table;
 		
-		Collection<SQLiteColumnDefinition> columns = table.getColumns();
+		Collection<ColumnDefinition<SQLiteDataType>> columns = table.getColumns();
 		columnsAll = new String[columns.size()];
 		
 		int i = 0;
-		for (ColumnDefinition column : columns) {
+		for (ColumnDefinition<SQLiteDataType> column : columns) {
 			columnsAll[i] = column.getName();
 			++i;
 		}
 	}
 
 	@Override
-	public long create(T object) {
+	public long create(DataObject<SQLiteDataType> object) {
 		try {
 			return createOrThrow(object);
 		} catch (SQLException e) {
@@ -44,13 +65,13 @@ public abstract class SQLiteDao<T extends SQLiteDataObject> implements Dao<T> {
 	}
 	
 	@Override
-	public long createOrThrow(T object) {
-		Map<ColumnDefinition, DataObjectValue<?>> values = object.getValues();
+	public long createOrThrow(DataObject<SQLiteDataType> object) {
+		Map<ColumnDefinition<SQLiteDataType>, DataObjectValue<?>> values = object.getValues();
 		
 		ContentValues content = new ContentValues();
-		Set<Entry<ColumnDefinition, DataObjectValue<?>>> entries = values.entrySet();
+		Set<Entry<ColumnDefinition<SQLiteDataType>, DataObjectValue<?>>> entries = values.entrySet();
 		
-		for (Entry<ColumnDefinition, DataObjectValue<?>> entry : entries) {
+		for (Entry<ColumnDefinition<SQLiteDataType>, DataObjectValue<?>> entry : entries) {
 			if (!entry.getKey().isKey())
 				content.put(entry.getKey().getName(), entry.getValue().toSqlString());
 		}
@@ -59,42 +80,47 @@ public abstract class SQLiteDao<T extends SQLiteDataObject> implements Dao<T> {
 	}
 
 	@Override
-	public T read(String id, Class<T> clazz) {
-		
+	public DataObject<SQLiteDataType> read(String id, Class<DataObject<SQLiteDataType>> clazz) {
+		try {
+			return readOrThrow(id, clazz);
+		} catch (InstantiationException e) {
+			return null;
+		} catch (IllegalAccessException e) {
+			return null;
+		} catch (SQLException e) {
+			return null;
+		}
 	}
 
 	@Override
-	public T readOrThrow(String id, Class<T> clazz) throws InstantiationException, IllegalAccessException {
+	public DataObject<SQLiteDataType> readOrThrow(String id, Class<DataObject<SQLiteDataType>> clazz) throws InstantiationException, IllegalAccessException {
 		Cursor c = db.query(table.getTableName(), columnsAll, "id = " + id, null, null, null, null);
 		
 		try {
-			T object = clazz.newInstance();
+			DataObject<SQLiteDataType> object = clazz.newInstance();
 			if (c.moveToFirst()) {
 				int colIndex = -1;
 				
-				Collection<ColumnDefinition> columns = table.getColumns();
-				for (ColumnDefinition column : columns) {
+				Collection<ColumnDefinition<SQLiteDataType>> columns = table.getColumns();
+				for (ColumnDefinition<SQLiteDataType> column : columns) {
 					colIndex = c.getColumnIndexOrThrow(column.getName());
-					
+					SQLiteDataType colType = column.getType();
+					object.setValue(column, createDataObjectValue(c, colType, colIndex));
 				}
 			}
+			
+			return object;
 		} finally {
 			if (c != null)
 				c.close();
 		}
-		
-		return null;
 	}
 
 	@Override
-	public void update(T object) {
-		// TODO Auto-generated method stub
-		
+	public void update(DataObject<SQLiteDataType> object) {
 	}
 
 	@Override
-	public void delete(T object) {
-		// TODO Auto-generated method stub
-		
+	public void delete(DataObject<SQLiteDataType> object) {
 	}
 }

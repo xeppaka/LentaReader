@@ -1,9 +1,13 @@
 package cz.fit.lentaruand.data.dbframework.sqlite;
 
-import cz.fit.lentaruand.data.dbframework.DataConverter;
+import cz.fit.lentaruand.data.dbframework.DataObjectValue;
 
-public interface SQLiteDataObjectValue<T> {
-	T getValue();
-	String toSqlString();
-	void setConverter(DataConverter<T> converter);
+public class SQLiteDataObjectValue<T> extends DataObjectValue<T> {
+	@Override
+	public String toSqlString() {
+		if (getConverter() != null)
+			return getConverter().convert(getValue());
+		else
+			return getValue().toString();
+	}
 }

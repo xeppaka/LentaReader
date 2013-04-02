@@ -76,7 +76,7 @@ public class NewsDao {
 		return db.insert(NewsEntry.TABLE_NAME, null, prepareContentValues(news));
 	}
 	
-	public static void remove(SQLiteDatabase db, String guid) {
+	public static void delete(SQLiteDatabase db, String guid) {
 		String where = NewsEntry.COLUMN_NAME_GUID + " LIKE ?";
 		
 		String[] whereArgs = {

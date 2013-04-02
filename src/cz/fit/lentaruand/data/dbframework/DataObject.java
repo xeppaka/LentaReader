@@ -4,7 +4,7 @@ import java.util.Map;
 
 import cz.fit.lentaruand.data.dbframework.ColumnDefinition;
 
-public interface DataObject {
-	Map<ColumnDefinition, DataObjectValue<?>> getValues();
-	void setValue(ColumnDefinition column, DataObjectValue<?> value);
+public interface DataObject<E extends Enum<E>> {
+	Map<ColumnDefinition<E>, DataObjectValue<?>> getValues();
+	void setValue(ColumnDefinition<E> column, DataObjectValue<?> value);
 }
