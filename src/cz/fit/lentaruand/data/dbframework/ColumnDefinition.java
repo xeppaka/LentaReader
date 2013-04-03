@@ -17,6 +17,10 @@ public interface ColumnDefinition<E extends Enum<E>> {
 	 */
 	String getSqlType();
 
+	/**
+	 * Get type of the column.
+	 * @return Value from the Enum specified in generic.
+	 */
 	E getType();
 	
 	/**
