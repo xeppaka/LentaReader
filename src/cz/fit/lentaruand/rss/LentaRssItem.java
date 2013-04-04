@@ -10,17 +10,18 @@ public class LentaRssItem {
 	private NewsType type;
 	private String title;
 	private String link;
+	private String author;
 	private String description;
 	private Date pubDate;
 	private String imageLink;
 	private Rubrics rubric;
 
-	public LentaRssItem(String guid, String title, String link,
+	public LentaRssItem(String guid, String title, String link, String author,
 			String description, Date pubDate, String imageLink) {
-		this(guid, null, title, link, description, pubDate, imageLink, null);
+		this(guid, null, title, link, author, description, pubDate, imageLink, null);
 	}
 	
-	public LentaRssItem(String guid, NewsType type, String title, String link,
+	public LentaRssItem(String guid, NewsType type, String title, String link, String author,
 			String description, Date pubDate, String imageLink, Rubrics rubric) {
 		if (guid == null || guid.isEmpty())
 			throw new IllegalArgumentException("Argument guid must not be null or empty");
@@ -41,6 +42,7 @@ public class LentaRssItem {
 		this.type = type;
 		this.title = title;
 		this.link = link;
+		this.author = author;
 		this.description = description;
 		this.pubDate = pubDate;
 		this.imageLink = imageLink;
@@ -63,6 +65,10 @@ public class LentaRssItem {
 		return link;
 	}
 	
+	public String getAuthor() {
+		return author;
+	}
+	
 	public String getDescription() {
 		return description;
 	}
@@ -77,5 +83,12 @@ public class LentaRssItem {
 	
 	public Rubrics getRubric() {
 		return rubric;
+	}
+	
+	public boolean isRubricUpdateNeed() {
+		if (rubric == null)
+			return true;
+		
+		return rubric.isRubricUpdateNeed();
 	}
 }

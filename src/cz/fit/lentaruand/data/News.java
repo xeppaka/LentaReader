@@ -15,12 +15,12 @@ public class News {
 	private String imageCaption;
 	private String imageCredits;
 	private Rubrics rubric;
-	private Rubrics subRubric;
+	private boolean rubricUpdateNeed;
 	
 	public News(String guid, String title, String link, String briefText,
 			String fullText, Date pubDate, String imageLink,
-			String imageCaption, String imageCredits, Rubrics rubric,
-			Rubrics subRubric) {
+			String imageCaption, String imageCredits, Rubrics rubric, 
+			boolean rubricUpdateNeed) {
 		setGuid(guid);
 		setTitle(title);
 		setLink(link);
@@ -31,7 +31,7 @@ public class News {
 		setImageCaption(imageCaption);
 		setImageCredits(imageCredits);
 		setRubric(rubric);
-		setSubRubric(subRubric);
+		setRubricUpdateNeed(rubricUpdateNeed);
 	}
 
 	public News(LentaRssItem rssItem) {
@@ -45,7 +45,7 @@ public class News {
 		setImageCaption(null);
 		setImageCredits(null);
 		setRubric(rssItem.getRubric());
-		setSubRubric(null);
+		setRubricUpdateNeed(rssItem.isRubricUpdateNeed());
 	}
 	
 	public String getGuid() {
@@ -146,15 +146,15 @@ public class News {
 		this.rubric = rubric;
 	}
 
-	public Rubrics getSubRubric() {
-		return subRubric;
+	public boolean isContentFull() {
+		return fullText != null && !fullText.isEmpty();
 	}
 
-	public void setSubRubric(Rubrics subRubric) {
-		this.subRubric = subRubric;
+	public boolean isRubricUpdateNeed() {
+		return rubricUpdateNeed;
 	}
-	
-	public boolean isFull() {
-		return fullText != null && !fullText.isEmpty();
+
+	public void setRubricUpdateNeed(boolean rubricUpdateNeed) {
+		this.rubricUpdateNeed = rubricUpdateNeed;
 	}
 }

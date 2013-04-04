@@ -11,32 +11,30 @@ import cz.fit.lentaruand.data.dao.exceptions.InconsistentDatastoreException;
 import cz.fit.lentaruand.data.db.NewsEntry;
 
 public class NewsDao {
+	private static final String[] projection = {
+		NewsEntry.COLUMN_NAME_GUID,
+		NewsEntry.COLUMN_NAME_TITLE,
+		NewsEntry.COLUMN_NAME_LINK,
+		NewsEntry.COLUMN_NAME_IMAGELINK,
+		NewsEntry.COLUMN_NAME_IMAGECAPTION,
+		NewsEntry.COLUMN_NAME_IMAGECREDITS,
+		NewsEntry.COLUMN_NAME_PUBDATE,
+		NewsEntry.COLUMN_NAME_RUBRIC,
+		NewsEntry.COLUMN_NAME_RUBRIC_UPDATE,
+		NewsEntry.COLUMN_NAME_BRIEFTEXT,
+		NewsEntry.COLUMN_NAME_FULLTEXT
+	};
+	
+	private static final String guidWhere = NewsEntry.COLUMN_NAME_GUID + " LIKE ?";
+	
 	public static News read(SQLiteDatabase db, String guid) {
-		String[] projection = {
-				NewsEntry.COLUMN_NAME_GUID,
-				NewsEntry.COLUMN_NAME_TITLE,
-				NewsEntry.COLUMN_NAME_LINK,
-				NewsEntry.COLUMN_NAME_IMAGELINK,
-				NewsEntry.COLUMN_NAME_IMAGECAPTION,
-				NewsEntry.COLUMN_NAME_IMAGECREDITS,
-				NewsEntry.COLUMN_NAME_PUBDATE,
-				NewsEntry.COLUMN_NAME_RUBRIC,
-				NewsEntry.COLUMN_NAME_SUBRUBRIC,
-				NewsEntry.COLUMN_NAME_BRIEFTEXT,
-				NewsEntry.COLUMN_NAME_FULLTEXT
-		};
-		
-		String where = NewsEntry.COLUMN_NAME_GUID + " LIKE ?";
-		
-		String[] whereArgs = {
-				guid
-		};
+		String[] guidWhereArgs = { guid };
 		
 		Cursor cur = db.query(
 				NewsEntry.TABLE_NAME, 
 				projection, 
-				where,
-				whereArgs, 
+				guidWhere,
+				guidWhereArgs, 
 				null, 
 				null, 
 				null
@@ -56,19 +54,14 @@ public class NewsDao {
 			String imageCredits = cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_IMAGECREDITS));
 			Date pubDate = new Date(cur.getLong(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_PUBDATE)));
 			Rubrics rubric = Rubrics.valueOf(cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_RUBRIC)));
-			
-			String subRubricStr = cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_SUBRUBRIC));
-			Rubrics subRubric = null;
-			if (subRubricStr != null && !subRubricStr.isEmpty())
-				subRubric = Rubrics.valueOf(subRubricStr);
+			boolean rubricUpdateNeed = cur.getInt(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_RUBRIC_UPDATE)) > 0;
 			
 			String briefText = cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_BRIEFTEXT));
 			String fullText = cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_FULLTEXT));
 			
-			return new News(guidDb, title, link, briefText, fullText, pubDate, imageLink, imageCaption, imageCredits, rubric, subRubric);
+			return new News(guidDb, title, link, briefText, fullText, pubDate, imageLink, imageCaption, imageCredits, rubric, rubricUpdateNeed);
 		} finally {
-			if (cur != null)
-				cur.close();
+			cur.close();
 		}
 	}
 	
@@ -120,13 +113,8 @@ public class NewsDao {
 		
 		values.put(NewsEntry.COLUMN_NAME_PUBDATE, news.getPubDate().getTime());
 		values.put(NewsEntry.COLUMN_NAME_RUBRIC, news.getRubric().name());
-		
-		if (news.getSubRubric() == null)
-			values.putNull(NewsEntry.COLUMN_NAME_SUBRUBRIC);
-		else
-			values.put(NewsEntry.COLUMN_NAME_SUBRUBRIC, news.getSubRubric().name());
-		
 		values.put(NewsEntry.COLUMN_NAME_BRIEFTEXT, news.getBriefText());
+		values.put(NewsEntry.COLUMN_NAME_RUBRIC_UPDATE, news.isRubricUpdateNeed() ? 1 : 0);
 		
 		if (news.getFullText() == null)
 			values.putNull(NewsEntry.COLUMN_NAME_FULLTEXT);

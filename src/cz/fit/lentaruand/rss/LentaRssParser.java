@@ -26,6 +26,7 @@ public class LentaRssParser {
 	private final static String GUID = "guid";
 	private final static String TITLE = "title";
 	private final static String LINK = "link";
+	private final static String AUTHOR = "author";
 	private final static String DESCRIPTION = "description";
 	private final static String PUBDATE = "pubDate";
 	private final static String IMAGEURL = "enclosure/@url";
@@ -34,6 +35,7 @@ public class LentaRssParser {
 	private final XPathExpression guid;
 	private final XPathExpression title;
 	private final XPathExpression link;
+	private final XPathExpression author;
 	private final XPathExpression description;
 	private final XPathExpression pubDate;
 	private final XPathExpression imageUrl;
@@ -66,6 +68,13 @@ public class LentaRssParser {
 		} catch (XPathExpressionException e) {
 			e.printStackTrace();
 			throw new RuntimeException("Error compiling XPath expression: " + LINK);
+		}
+		
+		try {
+			author = xp.compile(AUTHOR);
+		} catch (XPathExpressionException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Error compiling XPath expression: " + AUTHOR);
 		}
 		
 		try {
@@ -103,6 +112,7 @@ public class LentaRssParser {
 				String guidStr = (String) guid.evaluate(itemNode, XPathConstants.STRING);
 				String titleStr = (String) title.evaluate(itemNode, XPathConstants.STRING);
 				String linkStr = (String) link.evaluate(itemNode, XPathConstants.STRING);
+				String authorStr = (String) author.evaluate(itemNode, XPathConstants.STRING);
 				String descriptionStr = (String) description.evaluate(itemNode, XPathConstants.STRING);
 				String pubDateStr = (String) pubDate.evaluate(itemNode, XPathConstants.STRING);
 				String imageUrlStr = (String) imageUrl.evaluate(itemNode, XPathConstants.STRING);
@@ -115,7 +125,7 @@ public class LentaRssParser {
 					continue;
 				}
 				
-				resultItems.add(new LentaRssItem(guidStr, newsType, titleStr, linkStr, descriptionStr, date, imageUrlStr, rubric));
+				resultItems.add(new LentaRssItem(guidStr, newsType, titleStr, linkStr, authorStr, descriptionStr, date, imageUrlStr, rubric));
 			}
 			
 			return resultItems;
