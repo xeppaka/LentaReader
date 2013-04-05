@@ -20,7 +20,7 @@ import cz.fit.lentaruand.data.NewsType;
 import cz.fit.lentaruand.data.Rubrics;
 import cz.fit.lentaruand.data.dao.NewsDao;
 import cz.fit.lentaruand.data.db.LentaDbHelper;
-import cz.fit.lentaruand.parser.exceptions.MobileNewsParseException;
+import cz.fit.lentaruand.parser.exceptions.PageParseException;
 import cz.fit.lentaruand.site.LentaNewsDownloader;
 
 public class Main extends Activity {
@@ -93,7 +93,7 @@ public class Main extends Activity {
 				e.printStackTrace();
 			} catch (IOException e) {
 				e.printStackTrace();
-			} catch (MobileNewsParseException e) {
+			} catch (PageParseException e) {
 				e.printStackTrace();
 			}
 			

@@ -16,6 +16,7 @@ public class ArticleDao {
 	private static final String[] projection = {
 		ArticleEntry.COLUMN_NAME_GUID,
 		ArticleEntry.COLUMN_NAME_TITLE,
+		ArticleEntry.COLUMN_NAME_SECOND_TITLE,
 		ArticleEntry.COLUMN_NAME_LINK,
 		ArticleEntry.COLUMN_NAME_AUTHOR,
 		ArticleEntry.COLUMN_NAME_IMAGELINK,
@@ -51,6 +52,7 @@ public class ArticleDao {
 			
 			String guidDb = cur.getString(cur.getColumnIndexOrThrow(ArticleEntry.COLUMN_NAME_GUID));
 			String title = cur.getString(cur.getColumnIndexOrThrow(ArticleEntry.COLUMN_NAME_TITLE));
+			String secondTitle = cur.getString(cur.getColumnIndexOrThrow(ArticleEntry.COLUMN_NAME_SECOND_TITLE));
 			String link = cur.getString(cur.getColumnIndexOrThrow(ArticleEntry.COLUMN_NAME_LINK));
 			String author = cur.getString(cur.getColumnIndexOrThrow(ArticleEntry.COLUMN_NAME_AUTHOR));
 			String imageLink = cur.getString(cur.getColumnIndexOrThrow(ArticleEntry.COLUMN_NAME_IMAGELINK));
@@ -63,7 +65,7 @@ public class ArticleDao {
 			String briefText = cur.getString(cur.getColumnIndexOrThrow(ArticleEntry.COLUMN_NAME_BRIEFTEXT));
 			String fullText = cur.getString(cur.getColumnIndexOrThrow(ArticleEntry.COLUMN_NAME_FULLTEXT));
 			
-			return new Article(guidDb, title, link, author, briefText, fullText, pubDate, imageLink, imageCaption, imageCredits, rubric, rubricUpdateNeed);
+			return new Article(guidDb, title, secondTitle, link, author, briefText, fullText, pubDate, imageLink, imageCaption, imageCredits, rubric, rubricUpdateNeed);
 		} finally {
 			cur.close();
 		}

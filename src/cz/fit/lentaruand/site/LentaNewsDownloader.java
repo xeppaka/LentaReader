@@ -14,6 +14,7 @@ import cz.fit.lentaruand.parser.LentaMobileNewsParser;
 import cz.fit.lentaruand.parser.MobileNews;
 import cz.fit.lentaruand.parser.NewsParser;
 import cz.fit.lentaruand.parser.exceptions.MobileNewsParseException;
+import cz.fit.lentaruand.parser.exceptions.PageParseException;
 import cz.fit.lentaruand.rss.LentaRssItem;
 import cz.fit.lentaruand.rss.LentaRssParser;
 
@@ -35,7 +36,7 @@ public class LentaNewsDownloader {
 		return result;
 	}
 
-	public void downloadFull(News brief) throws IOException, MobileNewsParseException {
+	public void downloadFull(News brief) throws IOException, PageParseException {
 		URL url = URLHelper.createMobileUrl(brief.getLink());
 		Page mobilePage = PageDownloader.downloadPage(url);
 		

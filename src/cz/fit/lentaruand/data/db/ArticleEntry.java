@@ -9,6 +9,7 @@ public abstract class ArticleEntry implements BaseColumns {
 	
 	public static final String COLUMN_NAME_GUID = "guid";
 	public static final String COLUMN_NAME_TITLE = "title";
+	public static final String COLUMN_NAME_SECOND_TITLE = "secondtitle";
 	public static final String COLUMN_NAME_LINK = "link";
 	public static final String COLUMN_NAME_AUTHOR = "author";
 	public static final String COLUMN_NAME_BRIEFTEXT = "brieftext";
@@ -24,6 +25,7 @@ public abstract class ArticleEntry implements BaseColumns {
 				_ID + " INTEGER PRIMARY KEY, " +
 				COLUMN_NAME_GUID + " TEXT, " +
 				COLUMN_NAME_TITLE + " TEXT, " +
+				COLUMN_NAME_SECOND_TITLE + " TEXT, " +
 				COLUMN_NAME_LINK + " TEXT, " +
 				COLUMN_NAME_IMAGELINK + " TEXT, " +
 				COLUMN_NAME_IMAGECAPTION + " TEXT, " +
