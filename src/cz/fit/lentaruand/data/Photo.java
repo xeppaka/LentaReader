@@ -1,5 +1,22 @@
 package cz.fit.lentaruand.data;
 
-public class Photo {
+import java.util.Date;
 
+import cz.fit.lentaruand.rss.LentaRssItem;
+
+public class Photo extends NewsObject<Photo>  {
+
+	public Photo(String guid, String title, String link, Date pubDate,
+			Rubrics rubric, boolean rubricUpdateNeed) {
+		super(guid, title, link, pubDate, rubric, rubricUpdateNeed);
+	}
+	
+	public Photo(LentaRssItem rssItem) {
+		super(rssItem);
+	}
+
+	@Override
+	public NewsType getType() {
+		return NewsType.PHOTO;
+	}
 }

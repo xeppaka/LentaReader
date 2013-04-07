@@ -44,4 +44,9 @@ public class Article extends News {
 	public void setAuthor(String author) {
 		this.author = author;
 	}
+	
+	@Override
+	public NewsType getType() {
+		return NewsType.ARTICLE;
+	}
 }

@@ -2,9 +2,9 @@
 <resources>
 
     <string name="app_name">lentaruAnd</string>
-    <string name="create_news">Create news</string>
-    <string name="delete_news">Delete news</string>
+    <string name="create_news">Load news</string>
     <string name="menu_settings">Settings</string>
+    <string name="title_activity_test">Test News Activity</string>
+    <string name="action_settings">Settings</string>
     
-
 </resources>

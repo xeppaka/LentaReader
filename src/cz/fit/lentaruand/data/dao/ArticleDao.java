@@ -6,7 +6,6 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import cz.fit.lentaruand.data.Article;
-import cz.fit.lentaruand.data.News;
 import cz.fit.lentaruand.data.Rubrics;
 import cz.fit.lentaruand.data.dao.exceptions.InconsistentDatastoreException;
 import cz.fit.lentaruand.data.db.ArticleEntry;
@@ -71,61 +70,61 @@ public class ArticleDao {
 		}
 	}
 	
-	public static long create(SQLiteDatabase db, News news) {
-		return db.insert(NewsEntry.TABLE_NAME, null, prepareContentValues(news));
+	public static long create(SQLiteDatabase db, Article article) {
+		return db.insert(ArticleEntry.TABLE_NAME, null, prepareContentValues(article));
 	}
 	
 	public static void delete(SQLiteDatabase db, String guid) {
+		String where = ArticleEntry.COLUMN_NAME_GUID + " LIKE ?";
+		
+		String[] whereArgs = { guid };
+		
+		db.delete(ArticleEntry.TABLE_NAME, where, whereArgs);
+	}
+	
+	public static void update(SQLiteDatabase db, Article article) {
 		String where = NewsEntry.COLUMN_NAME_GUID + " LIKE ?";
 		
 		String[] whereArgs = {
-				guid
+				article.getGuid()
 		};
 		
-		db.delete(NewsEntry.TABLE_NAME, where, whereArgs);
+		db.update(NewsEntry.TABLE_NAME, prepareContentValues(article), where, whereArgs);
 	}
 	
-	public static void update(SQLiteDatabase db, News news) {
-		String where = NewsEntry.COLUMN_NAME_GUID + " LIKE ?";
-		
-		String[] whereArgs = {
-				news.getGuid()
-		};
-		
-		db.update(NewsEntry.TABLE_NAME, prepareContentValues(news), where, whereArgs);
-	}
-	
-	private static ContentValues prepareContentValues(News news) {
+	private static ContentValues prepareContentValues(Article article) {
 		ContentValues values = new ContentValues();
 		
-		values.put(NewsEntry.COLUMN_NAME_GUID, news.getGuid());
-		values.put(NewsEntry.COLUMN_NAME_TITLE, news.getTitle());
-		values.put(NewsEntry.COLUMN_NAME_LINK, news.getLink());
+		values.put(ArticleEntry.COLUMN_NAME_GUID, article.getGuid());
+		values.put(ArticleEntry.COLUMN_NAME_TITLE, article.getTitle());
+		values.put(ArticleEntry.COLUMN_NAME_SECOND_TITLE, article.getSecondTitle());
+		values.put(ArticleEntry.COLUMN_NAME_AUTHOR, article.getAuthor());
+		values.put(ArticleEntry.COLUMN_NAME_LINK, article.getLink());
 		
-		if (news.getImageLink() == null)
+		if (article.getImageLink() == null)
 			values.putNull(NewsEntry.COLUMN_NAME_IMAGELINK);
 		else
-			values.put(NewsEntry.COLUMN_NAME_IMAGELINK, news.getImageLink());
+			values.put(NewsEntry.COLUMN_NAME_IMAGELINK, article.getImageLink());
 		
-		if (news.getImageCaption() == null)
+		if (article.getImageCaption() == null)
 			values.putNull(NewsEntry.COLUMN_NAME_IMAGECAPTION);
 		else
-			values.put(NewsEntry.COLUMN_NAME_IMAGECAPTION, news.getImageCaption());
+			values.put(NewsEntry.COLUMN_NAME_IMAGECAPTION, article.getImageCaption());
 		
-		if (news.getImageCredits() == null)
+		if (article.getImageCredits() == null)
 			values.putNull(NewsEntry.COLUMN_NAME_IMAGECREDITS);
 		else
-			values.put(NewsEntry.COLUMN_NAME_IMAGECREDITS, news.getImageCredits());
+			values.put(NewsEntry.COLUMN_NAME_IMAGECREDITS, article.getImageCredits());
 		
-		values.put(NewsEntry.COLUMN_NAME_PUBDATE, news.getPubDate().getTime());
-		values.put(NewsEntry.COLUMN_NAME_RUBRIC, news.getRubric().name());
-		values.put(NewsEntry.COLUMN_NAME_BRIEFTEXT, news.getBriefText());
-		values.put(NewsEntry.COLUMN_NAME_RUBRIC_UPDATE, news.isRubricUpdateNeed() ? 1 : 0);
+		values.put(NewsEntry.COLUMN_NAME_PUBDATE, article.getPubDate().getTime());
+		values.put(NewsEntry.COLUMN_NAME_RUBRIC, article.getRubric().name());
+		values.put(NewsEntry.COLUMN_NAME_BRIEFTEXT, article.getBriefText());
+		values.put(NewsEntry.COLUMN_NAME_RUBRIC_UPDATE, article.isRubricUpdateNeed() ? 1 : 0);
 		
-		if (news.getFullText() == null)
+		if (article.getFullText() == null)
 			values.putNull(NewsEntry.COLUMN_NAME_FULLTEXT);
 		else
-			values.put(NewsEntry.COLUMN_NAME_FULLTEXT, news.getFullText());
+			values.put(NewsEntry.COLUMN_NAME_FULLTEXT, article.getFullText());
 		
 		return values;
 	}
