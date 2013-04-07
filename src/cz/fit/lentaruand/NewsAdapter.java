@@ -14,7 +14,6 @@ import cz.fit.lentaruand.data.News;
 public class NewsAdapter extends BaseAdapter {
 	
 	private List<News> news;
-	//private Context context;
 	private LayoutInflater inflater;
 	
 	private static class ViewHolder {
@@ -77,7 +76,7 @@ public class NewsAdapter extends BaseAdapter {
 
 		News news = getItem(position);
 		
-		newsTitle.setText(news.getTitle());
+		newsTitle.setText(news.getFullText());
 		return view;
 	}
 

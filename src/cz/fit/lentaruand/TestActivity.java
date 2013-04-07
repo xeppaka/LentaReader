@@ -1,8 +1,6 @@
 package cz.fit.lentaruand;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import android.os.Bundle;

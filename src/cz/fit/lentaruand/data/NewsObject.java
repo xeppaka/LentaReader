@@ -102,7 +102,7 @@ public abstract class NewsObject<T extends NewsObject<T>> implements Comparable<
 	 */
 	@Override
 	public int compareTo(T another) {
-		return getPubDate().compareTo(another.getPubDate());
+		return another.getPubDate().compareTo(getPubDate());
 	}
 	
 	@Override
