@@ -5,7 +5,7 @@
     tools:context=".Main" >
 
     <TextView
-        android:id="@+id/textView1"
+        android:id="@+id/newsTitleBrief"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/button1"

@@ -2,7 +2,7 @@ package cz.fit.lentaruand.data;
 
 import java.util.Date;
 
-import cz.fit.lentaruand.rss.LentaRssItem;
+import cz.fit.lentaruand.parser.rss.LentaRssItem;
 
 public abstract class NewsObject<T extends NewsObject<T>> implements Comparable<T> {
 	private String guid;

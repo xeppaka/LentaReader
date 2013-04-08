@@ -1,4 +1,4 @@
-package cz.fit.lentaruand.site;
+package cz.fit.lentaruand.downloader;
 
 import java.io.BufferedReader;
 import java.io.IOException;

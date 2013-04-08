@@ -1,4 +1,4 @@
-package cz.fit.lentaruand.site;
+package cz.fit.lentaruand.downloader;
 
 import java.net.URL;
 

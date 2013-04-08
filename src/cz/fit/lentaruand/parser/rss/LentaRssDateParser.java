@@ -1,4 +1,4 @@
-package cz.fit.lentaruand.rss;
+package cz.fit.lentaruand.parser.rss;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

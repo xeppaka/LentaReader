@@ -10,8 +10,8 @@ import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
 import cz.fit.lentaruand.data.News;
 import cz.fit.lentaruand.data.Rubrics;
+import cz.fit.lentaruand.downloader.LentaNewsDownloader;
 import cz.fit.lentaruand.parser.exceptions.PageParseException;
-import cz.fit.lentaruand.site.LentaNewsDownloader;
 
 public class AsyncNewsLoader extends AsyncTaskLoader<List<News>> {
 

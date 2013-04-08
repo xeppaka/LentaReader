@@ -1,4 +1,4 @@
-package cz.fit.lentaruand.site;
+package cz.fit.lentaruand.downloader;
 
 import java.io.IOException;
 import java.net.URL;
@@ -12,8 +12,9 @@ import javax.xml.xpath.XPathExpressionException;
 import cz.fit.lentaruand.data.NewsObject;
 import cz.fit.lentaruand.data.NewsType;
 import cz.fit.lentaruand.data.Rubrics;
-import cz.fit.lentaruand.rss.LentaRssItem;
-import cz.fit.lentaruand.rss.LentaRssParser;
+import cz.fit.lentaruand.parser.rss.LentaRssItem;
+import cz.fit.lentaruand.parser.rss.LentaRssParser;
+import cz.fit.lentaruand.site.URLHelper;
 
 public abstract class LentaNewsObjectDownloader<T extends NewsObject<T>> implements NewsObjectDownloader<T> {
 	private final LentaRssParser rssParser = new LentaRssParser();

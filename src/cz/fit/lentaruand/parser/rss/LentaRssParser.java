@@ -1,4 +1,4 @@
-package cz.fit.lentaruand.rss;
+package cz.fit.lentaruand.parser.rss;
 
 import java.io.StringReader;
 import java.text.ParseException;
@@ -19,7 +19,7 @@ import org.xml.sax.InputSource;
 
 import cz.fit.lentaruand.data.NewsType;
 import cz.fit.lentaruand.data.Rubrics;
-import cz.fit.lentaruand.site.Page;
+import cz.fit.lentaruand.downloader.Page;
 
 public class LentaRssParser {
 	private final static String ITEM_PATH = "/rss/channel/item";

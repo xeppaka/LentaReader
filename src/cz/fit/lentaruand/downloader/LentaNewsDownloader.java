@@ -1,4 +1,4 @@
-package cz.fit.lentaruand.site;
+package cz.fit.lentaruand.downloader;
 
 import java.io.IOException;
 import java.net.URL;
@@ -9,7 +9,8 @@ import cz.fit.lentaruand.parser.LentaMobileNewsParser;
 import cz.fit.lentaruand.parser.MobileNews;
 import cz.fit.lentaruand.parser.NewsParser;
 import cz.fit.lentaruand.parser.exceptions.PageParseException;
-import cz.fit.lentaruand.rss.LentaRssItem;
+import cz.fit.lentaruand.parser.rss.LentaRssItem;
+import cz.fit.lentaruand.site.URLHelper;
 
 public class LentaNewsDownloader extends LentaNewsObjectDownloader<News> {
 

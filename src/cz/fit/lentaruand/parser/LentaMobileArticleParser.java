@@ -6,8 +6,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import cz.fit.lentaruand.downloader.Page;
 import cz.fit.lentaruand.parser.exceptions.MobileArticleParseException;
-import cz.fit.lentaruand.site.Page;
 
 public class LentaMobileArticleParser implements NewsParser<MobileArticle> {
 	private static final Logger logger = Logger.getLogger(LentaMobileArticleParser.class.getName());
