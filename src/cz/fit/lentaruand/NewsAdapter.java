@@ -10,7 +10,6 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 import cz.fit.lentaruand.data.News;
 
-
 public class NewsAdapter extends BaseAdapter {
 	
 	private List<News> news;
@@ -76,7 +75,7 @@ public class NewsAdapter extends BaseAdapter {
 
 		News news = getItem(position);
 		
-		newsTitle.setText(news.getFullText());
+		newsTitle.setText(news.getBriefText());
 		return view;
 	}
 
