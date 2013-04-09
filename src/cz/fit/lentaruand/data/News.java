@@ -4,7 +4,7 @@ import java.util.Date;
 
 import cz.fit.lentaruand.parser.rss.LentaRssItem;
 
-public class News extends NewsObject<News> {
+public class News extends NewsObject {
 	private String briefText;
 	private String fullText;
 	private String imageLink;

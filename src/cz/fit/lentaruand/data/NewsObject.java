@@ -4,7 +4,7 @@ import java.util.Date;
 
 import cz.fit.lentaruand.parser.rss.LentaRssItem;
 
-public abstract class NewsObject<T extends NewsObject<T>> implements Comparable<T> {
+public abstract class NewsObject implements Comparable<NewsObject> {
 	private String guid;
 	private String title;
 	private String link;
@@ -101,7 +101,7 @@ public abstract class NewsObject<T extends NewsObject<T>> implements Comparable<
 	 * sorter by date.
 	 */
 	@Override
-	public int compareTo(T another) {
+	public int compareTo(NewsObject another) {
 		return another.getPubDate().compareTo(getPubDate());
 	}
 	
@@ -110,10 +110,10 @@ public abstract class NewsObject<T extends NewsObject<T>> implements Comparable<
 		if (this == other)
 			return true;
 		
-		if (!(other instanceof NewsObject<?>))
+		if (!(other instanceof NewsObject))
 			return false;
 		
-		return getGuid().equals(((NewsObject<?>)other).getGuid());
+		return getGuid().equals(((NewsObject)other).getGuid());
 	}
 
 	@Override

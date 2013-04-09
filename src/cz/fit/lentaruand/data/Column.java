@@ -4,7 +4,7 @@ import java.util.Date;
 
 import cz.fit.lentaruand.parser.rss.LentaRssItem;
 
-public class Column extends NewsObject<Column> {
+public class Column extends NewsObject {
 	
 	public Column(String guid, String title, String link, Date pubDate,
 			Rubrics rubric, boolean rubricUpdateNeed) {

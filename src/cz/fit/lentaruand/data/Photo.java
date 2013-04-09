@@ -4,7 +4,7 @@ import java.util.Date;
 
 import cz.fit.lentaruand.parser.rss.LentaRssItem;
 
-public class Photo extends NewsObject<Photo>  {
+public class Photo extends NewsObject {
 
 	public Photo(String guid, String title, String link, Date pubDate,
 			Rubrics rubric, boolean rubricUpdateNeed) {

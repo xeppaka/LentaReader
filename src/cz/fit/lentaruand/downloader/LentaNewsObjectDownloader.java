@@ -16,7 +16,7 @@ import cz.fit.lentaruand.parser.rss.LentaRssItem;
 import cz.fit.lentaruand.parser.rss.LentaRssParser;
 import cz.fit.lentaruand.site.URLHelper;
 
-public abstract class LentaNewsObjectDownloader<T extends NewsObject<T>> implements NewsObjectDownloader<T> {
+public abstract class LentaNewsObjectDownloader<T extends NewsObject> implements NewsObjectDownloader<T> {
 	private final LentaRssParser rssParser = new LentaRssParser();
 	
 	public List<T> downloadRubricBrief(Rubrics rubric) throws XPathExpressionException, IOException {
