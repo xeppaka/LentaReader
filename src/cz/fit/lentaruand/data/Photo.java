@@ -17,6 +17,6 @@ public class Photo extends NewsObject {
 
 	@Override
 	public NewsType getType() {
-		return NewsType.PHOTO;
+		return NewsType.NEWS;
 	}
 }
