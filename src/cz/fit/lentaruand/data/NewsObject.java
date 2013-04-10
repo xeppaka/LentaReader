@@ -2,9 +2,10 @@ package cz.fit.lentaruand.data;
 
 import java.util.Date;
 
+import cz.fit.lentaruand.data.dao.DaoObject;
 import cz.fit.lentaruand.parser.rss.LentaRssItem;
 
-public abstract class NewsObject implements Comparable<NewsObject> {
+public abstract class NewsObject implements Comparable<NewsObject>, DaoObject {
 	private String guid;
 	private String title;
 	private String link;
@@ -119,5 +120,10 @@ public abstract class NewsObject implements Comparable<NewsObject> {
 	@Override
 	public int hashCode() {
 		return getGuid().hashCode();
+	}
+
+	@Override
+	public String getKeyValue() {
+		return getGuid();
 	}
 }

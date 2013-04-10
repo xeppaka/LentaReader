@@ -4,14 +4,12 @@ import java.sql.Date;
 
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import cz.fit.lentaruand.data.News;
 import cz.fit.lentaruand.data.Rubrics;
-import cz.fit.lentaruand.data.dao.exceptions.InconsistentDatastoreException;
 import cz.fit.lentaruand.data.db.NewsEntry;
 
-public class NewsDao {
-	private static final String[] projection = {
+public class NewsDao extends DefaultDao<News> {
+	private static final String[] projectionAll = {
 		NewsEntry.COLUMN_NAME_GUID,
 		NewsEntry.COLUMN_NAME_TITLE,
 		NewsEntry.COLUMN_NAME_LINK,
@@ -25,71 +23,8 @@ public class NewsDao {
 		NewsEntry.COLUMN_NAME_FULLTEXT
 	};
 	
-	private static final String guidWhere = NewsEntry.COLUMN_NAME_GUID + " LIKE ?";
-	
-	public static News read(SQLiteDatabase db, String guid) {
-		String[] guidWhereArgs = { guid };
-		
-		Cursor cur = db.query(
-				NewsEntry.TABLE_NAME, 
-				projection, 
-				guidWhere,
-				guidWhereArgs, 
-				null, 
-				null, 
-				null
-				);
-		
-		try {
-			if (cur.getCount() > 1)
-				throw new InconsistentDatastoreException("There are more than one news in the database with guid = '" + guid + "'.");
-			
-			cur.moveToFirst();
-			
-			String guidDb = cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_GUID));
-			String title = cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_TITLE));
-			String link = cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_LINK));
-			String imageLink = cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_IMAGELINK));
-			String imageCaption = cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_IMAGECAPTION));
-			String imageCredits = cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_IMAGECREDITS));
-			Date pubDate = new Date(cur.getLong(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_PUBDATE)));
-			Rubrics rubric = Rubrics.valueOf(cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_RUBRIC)));
-			boolean rubricUpdateNeed = cur.getInt(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_RUBRIC_UPDATE)) > 0;
-			
-			String briefText = cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_BRIEFTEXT));
-			String fullText = cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_FULLTEXT));
-			
-			return new News(guidDb, title, link, briefText, fullText, pubDate, imageLink, imageCaption, imageCredits, rubric, rubricUpdateNeed);
-		} finally {
-			cur.close();
-		}
-	}
-	
-	public static long create(SQLiteDatabase db, News news) {
-		return db.insert(NewsEntry.TABLE_NAME, null, prepareContentValues(news));
-	}
-	
-	public static void delete(SQLiteDatabase db, String guid) {
-		String where = NewsEntry.COLUMN_NAME_GUID + " LIKE ?";
-		
-		String[] whereArgs = {
-				guid
-		};
-		
-		db.delete(NewsEntry.TABLE_NAME, where, whereArgs);
-	}
-	
-	public static void update(SQLiteDatabase db, News news) {
-		String where = NewsEntry.COLUMN_NAME_GUID + " LIKE ?";
-		
-		String[] whereArgs = {
-				news.getGuid()
-		};
-		
-		db.update(NewsEntry.TABLE_NAME, prepareContentValues(news), where, whereArgs);
-	}
-	
-	private static ContentValues prepareContentValues(News news) {
+	@Override
+	protected ContentValues prepareContentValues(News news) {
 		ContentValues values = new ContentValues();
 		
 		values.put(NewsEntry.COLUMN_NAME_GUID, news.getGuid());
@@ -122,5 +57,38 @@ public class NewsDao {
 			values.put(NewsEntry.COLUMN_NAME_FULLTEXT, news.getFullText());
 		
 		return values;
+	}
+
+	@Override
+	protected News createDaoObject(Cursor cur) {
+		String guidDb = cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_GUID));
+		String title = cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_TITLE));
+		String link = cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_LINK));
+		String imageLink = cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_IMAGELINK));
+		String imageCaption = cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_IMAGECAPTION));
+		String imageCredits = cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_IMAGECREDITS));
+		Date pubDate = new Date(cur.getLong(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_PUBDATE)));
+		Rubrics rubric = Rubrics.valueOf(cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_RUBRIC)));
+		boolean rubricUpdateNeed = cur.getInt(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_RUBRIC_UPDATE)) > 0;
+		
+		String briefText = cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_BRIEFTEXT));
+		String fullText = cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_FULLTEXT));
+		
+		return new News(guidDb, title, link, briefText, fullText, pubDate, imageLink, imageCaption, imageCredits, rubric, rubricUpdateNeed);
+	}
+
+	@Override
+	protected String getTableName() {
+		return NewsEntry.TABLE_NAME;
+	}
+
+	@Override
+	protected String getKeyColumnName() {
+		return NewsEntry.COLUMN_NAME_GUID;
+	}
+
+	@Override
+	protected String[] getProjectionAll() {
+		return projectionAll;
 	}
 }
