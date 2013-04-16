@@ -10,9 +10,15 @@ import java.util.regex.Pattern;
 
 import cz.fit.lentaruand.data.PhotoObject;
 import cz.fit.lentaruand.downloader.Page;
-import cz.fit.lentaruand.parser.exceptions.MobileArticleParseException;
 import cz.fit.lentaruand.parser.exceptions.MobilePhotoParseException;
 
+/**
+ * LentaMobilePhotoParser is NewsParser implementation that can parse mobile
+ * version of the photo news page.
+ * 
+ * @author kacpa01
+ * 
+ */
 public class LentaMobilePhotoParser implements NewsParser<MobilePhoto> {
 	private static final Logger logger = Logger.getLogger(LentaMobilePhotoParser.class.getName());
 	
@@ -87,23 +93,6 @@ public class LentaMobilePhotoParser implements NewsParser<MobilePhoto> {
 			
 			photos.add(new PhotoObject(index, url, caption, description, credits));
 		}
-
-//		it = ParseHelper.createParser(page.getText(), ARTICLE_IMAGE_CREDITS, ARTICLE_IMAGE_CREDITS_GROUPS).iterator();
-//
-//		if (it.hasNext()) {
-//			List<String> val = it.next();
-//			imageCredits = val.get(1);
-//		}
-//
-//		it = ParseHelper.createParser(page.getText(), ARTICLE_BODY, ARTICLE_BODY_GROUPS).iterator();
-//
-//		if (it.hasNext()) {
-//			List<String> val = it.next();
-//			text = val.get(1);
-//		} else {
-//			logger.log(Level.SEVERE, "Error parsing url='" + page.getUrl().toExternalForm() + "'");
-//			throw new MobileArticleParseException(page.getUrl(), ARTICLE_BODY.pattern());
-//		}
 		
 		return new MobilePhoto(secondTitle, photos);
 	}

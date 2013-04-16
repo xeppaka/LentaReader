@@ -21,6 +21,13 @@ import cz.fit.lentaruand.data.NewsType;
 import cz.fit.lentaruand.data.Rubrics;
 import cz.fit.lentaruand.downloader.Page;
 
+/**
+ * LentaRssParser is used for parsing RSS page from Lenta.ru site. It could be
+ * any type of the news: news, photo, article, etc.
+ * 
+ * @author kacpa01
+ * 
+ */
 public class LentaRssParser {
 	private final static String ITEM_PATH = "/rss/channel/item";
 	private final static String GUID = "guid";
@@ -39,7 +46,10 @@ public class LentaRssParser {
 	private final XPathExpression description;
 	private final XPathExpression pubDate;
 	private final XPathExpression imageUrl;
-	
+
+	/**
+	 * Default constructor. Instantiates all internal XPath related objects.
+	 */
 	public LentaRssParser() {
 		XPath xp = XPathFactory.newInstance().newXPath();
 		try {
@@ -99,6 +109,23 @@ public class LentaRssParser {
 		}
 	}
 	
+	/**
+	 * Read and parse all items from RSS page.
+	 * 
+	 * @param page
+	 *            is the page to parse.
+	 * @param rubric
+	 *            is the value from Rubrics enum. Specifies to which rubric
+	 *            parsed page is related.
+	 * @param newsType
+	 *            is the value from NewsType enum. Specifies the type of the
+	 *            parsed news.
+	 * @return Collection of the parsed LentaRssItem objects. Some fields in
+	 *         that objects can be null. For example if Article RSS is parsed,
+	 *         then Author field is set, but for News RSS Author field will be
+	 *         null.
+	 * @throws XPathExpressionException if some error occurred during parsing with XPath.
+	 */
 	public Collection<LentaRssItem> parseItems(Page page, Rubrics rubric, NewsType newsType) throws XPathExpressionException {
 		StringReader sr = new StringReader(page.getText());
 		List<LentaRssItem> resultItems = new ArrayList<LentaRssItem>();
