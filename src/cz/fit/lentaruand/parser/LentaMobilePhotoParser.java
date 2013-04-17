@@ -55,7 +55,7 @@ public class LentaMobilePhotoParser implements NewsParser<MobilePhoto> {
 //			logger.log(Level.SEVERE, "Error parsing url='" + page.getUrl().toExternalForm() + "'");
 //			throw new MobileArticleParseException(page.getUrl(), ARTICLE_BODY.pattern());
 //		}
-		
-		return new MobilePhoto(secondTitle, photos);
+		return null;
+		//return new MobilePhoto(secondTitle, photos);
 	}
 }

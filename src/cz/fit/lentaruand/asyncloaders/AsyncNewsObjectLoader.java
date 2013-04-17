@@ -15,6 +15,12 @@ import cz.fit.lentaruand.data.Rubrics;
 import cz.fit.lentaruand.downloader.LentaNewsObjectDownloader;
 import cz.fit.lentaruand.parser.exceptions.PageParseException;
 
+/**
+ * 
+ * @author nnm
+ *
+ * @param <T>
+ */
 public abstract class AsyncNewsObjectLoader<T extends NewsObject> extends AsyncTaskLoader<List<T>> {
 
 	private Set<String> skipGuids;

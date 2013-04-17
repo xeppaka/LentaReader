@@ -1,6 +1,9 @@
 package cz.fit.lentaruand.data;
 
-public class PhotoObject {
+import cz.fit.lentaruand.data.dao.Dao;
+import cz.fit.lentaruand.data.dao.DaoObject;
+
+public class PhotoObject implements DaoObject {
 	private int index;
 	private String url;
 	private String caption;
@@ -13,6 +16,11 @@ public class PhotoObject {
 		this.credits = credits;
 	}
 	
+	@Override
+	public String getKeyValue() {
+		
+	}
+
 	public int getIndex() {
 		return index;
 	}
