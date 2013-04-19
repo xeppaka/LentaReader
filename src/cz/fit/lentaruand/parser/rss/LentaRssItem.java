@@ -5,6 +5,12 @@ import java.util.Date;
 import cz.fit.lentaruand.data.NewsType;
 import cz.fit.lentaruand.data.Rubrics;
 
+/**
+ * LentaRssItem is the data holder for the parsed RSS page.
+ * 
+ * @author kacpa01
+ * 
+ */
 public class LentaRssItem {
 	private String guid;
 	private NewsType type;
@@ -16,11 +22,36 @@ public class LentaRssItem {
 	private String imageLink;
 	private Rubrics rubric;
 
+	/**
+	 * Parameterized constructor. Initializes all fields except rubric and news
+	 * type. Rubric and News type can be set later.
+	 * 
+	 * @param guid must not be null or empty.
+	 * @param title must not be null or empty.
+	 * @param link must not be null or empty.
+	 * @param author can be null or empty.
+	 * @param description must not be null or empty.
+	 * @param pubDate must not be null.
+	 * @param imageLink can be null or empty.
+	 */
 	public LentaRssItem(String guid, String title, String link, String author,
 			String description, Date pubDate, String imageLink) {
 		this(guid, null, title, link, author, description, pubDate, imageLink, null);
 	}
-	
+
+	/**
+	 * Parameterized constructor. Initializes all fields.
+	 * 
+	 * @param guid must not be null or empty.
+	 * @param type can be null.
+	 * @param title must not be null or empty.
+	 * @param link must not be null or empty.
+	 * @param author can be null or empty.
+	 * @param description must not be null or empty.
+	 * @param pubDate must not be null.
+	 * @param imageLink can be null or empty.
+	 * @param rubric can be null or empty.
+	 */
 	public LentaRssItem(String guid, NewsType type, String title, String link, String author,
 			String description, Date pubDate, String imageLink, Rubrics rubric) {
 		if (guid == null || guid.isEmpty())

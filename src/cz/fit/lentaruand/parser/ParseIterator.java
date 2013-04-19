@@ -11,6 +11,10 @@ public class ParseIterator implements Iterator<List<String>> {
 	private int groups;
 	private boolean next;
 	
+	private void tryFind() {
+		next = matcher.find();
+	}
+	
 	public ParseIterator(Matcher matcher, int groups) {
 		if (matcher == null)
 			throw new IllegalArgumentException("Argument matcher must not be null.");
@@ -48,9 +52,5 @@ public class ParseIterator implements Iterator<List<String>> {
 	@Override
 	public void remove() {
 		throw new UnsupportedOperationException("This method is not impemented.");
-	}
-	
-	private void tryFind() {
-		next = matcher.find();
 	}
 }
