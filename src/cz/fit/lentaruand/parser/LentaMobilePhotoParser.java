@@ -8,7 +8,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
-import cz.fit.lentaruand.data.PhotoObject;
 import cz.fit.lentaruand.downloader.Page;
 import cz.fit.lentaruand.parser.exceptions.MobilePhotoParseException;
 
@@ -38,7 +37,7 @@ public class LentaMobilePhotoParser implements NewsParser<MobilePhoto> {
 	@Override
 	public MobilePhoto parse(Page page) throws MobilePhotoParseException {
 		String secondTitle = null;
-		Collection<PhotoObject> photos = new ArrayList<PhotoObject>();
+		Collection<MobilePhotoImage> photos = new ArrayList<MobilePhotoImage>();
 		
 		Iterator<List<String>> it = ParseHelper.createParser(page.getText(), PHOTO_SECOND_TITLE, PHOTO_SECOND_TITLE_GROUPS).iterator();
 
@@ -47,33 +46,6 @@ public class LentaMobilePhotoParser implements NewsParser<MobilePhoto> {
 			secondTitle = val.get(1);
 		}
 		
-<<<<<<< HEAD
-//		it = ParseHelper.createParser(page.getText(), ARTICLE_IMAGE_CAPTION, ARTICLE_IMAGE_CAPTION_GROUPS).iterator();
-//
-//		if (it.hasNext()) {
-//			List<String> val = it.next();
-//			imageCaption = val.get(1);
-//		}
-//
-//		it = ParseHelper.createParser(page.getText(), ARTICLE_IMAGE_CREDITS, ARTICLE_IMAGE_CREDITS_GROUPS).iterator();
-//
-//		if (it.hasNext()) {
-//			List<String> val = it.next();
-//			imageCredits = val.get(1);
-//		}
-//
-//		it = ParseHelper.createParser(page.getText(), ARTICLE_BODY, ARTICLE_BODY_GROUPS).iterator();
-//
-//		if (it.hasNext()) {
-//			List<String> val = it.next();
-//			text = val.get(1);
-//		} else {
-//			logger.log(Level.SEVERE, "Error parsing url='" + page.getUrl().toExternalForm() + "'");
-//			throw new MobileArticleParseException(page.getUrl(), ARTICLE_BODY.pattern());
-//		}
-		return null;
-		//return new MobilePhoto(secondTitle, photos);
-=======
 		it = ParseHelper.createParser(page.getText(), PHOTO_OBJECT, PHOTO_OBJECT_GROUPS).iterator();
 
 		while(it.hasNext()) {
@@ -82,7 +54,7 @@ public class LentaMobilePhotoParser implements NewsParser<MobilePhoto> {
 			
 			int index = 0;
 			String url = null;
-			String caption = null;
+			String title = null;
 			String description = null;
 			String credits = null;
 			
@@ -101,7 +73,7 @@ public class LentaMobilePhotoParser implements NewsParser<MobilePhoto> {
 			
 			if (photoObjIt.hasNext()) {
 				List<String> photoObjVal = photoObjIt.next();
-				caption = photoObjVal.get(1);
+				title = photoObjVal.get(1);
 			}
 			
 			photoObjIt = ParseHelper.createParser(photoObjectStr, PHOTO_CREDITS, PHOTO_CREDITS_GROUPS).iterator();
@@ -118,10 +90,9 @@ public class LentaMobilePhotoParser implements NewsParser<MobilePhoto> {
 				description = photoObjVal.get(1);
 			}
 			
-			photos.add(new PhotoObject(index, url, caption, description, credits));
+			photos.add(new MobilePhotoImage(index, url, title, description, credits));
 		}
 		
 		return new MobilePhoto(secondTitle, photos);
->>>>>>> 27f2455f683d88594f65c11df2556ad84d6b0458
 	}
 }

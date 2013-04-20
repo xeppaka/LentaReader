@@ -10,4 +10,13 @@ public abstract class NewsObjectEntry implements BaseColumns {
 	public static final String COLUMN_NAME_IMAGELINK = "imagelink";
 	public static final String COLUMN_NAME_RUBRIC = "rubric";
 	public static final String COLUMN_NAME_RUBRIC_UPDATE = "rubric_update";
+	
+	public static final String SQL_CREATE_TABLE_COLUMNS = _ID + " INTEGER PRIMARY KEY, " +
+			COLUMN_NAME_GUID + " TEXT, " +
+			COLUMN_NAME_TITLE + " TEXT, " +
+			COLUMN_NAME_LINK + " TEXT, " +
+			COLUMN_NAME_IMAGELINK + " TEXT, " +
+			COLUMN_NAME_PUBDATE + " INTEGER, " +
+			COLUMN_NAME_RUBRIC + " TEXT, " +
+			COLUMN_NAME_RUBRIC_UPDATE + " INTEGER ";
 }

@@ -9,10 +9,10 @@ public class Photo extends NewsObject {
 
 	private String secondTitle;
 	private String description;
-	private Collection<PhotoObject> photos;
+	private Collection<PhotoImage> photos;
 	
 	public Photo(String guid, String title, String secondTitle,
-			String description, Collection<PhotoObject> photos, String link,
+			String description, Collection<PhotoImage> photos, String link,
 			Date pubDate, Rubrics rubric, boolean rubricUpdateNeed) {
 		super(guid, title, link, pubDate, rubric, rubricUpdateNeed);
 		
@@ -42,11 +42,11 @@ public class Photo extends NewsObject {
 		this.description = description;
 	}
 
-	public Collection<PhotoObject> getPhotos() {
+	public Collection<PhotoImage> getPhotos() {
 		return photos;
 	}
 
-	public void setPhotos(Collection<PhotoObject> photos) {
+	public void setPhotos(Collection<PhotoImage> photos) {
 		if (photos == null)
 			throw new IllegalArgumentException("Argument photos must not be null.");
 			

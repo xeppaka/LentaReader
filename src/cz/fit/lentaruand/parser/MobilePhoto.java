@@ -2,13 +2,11 @@ package cz.fit.lentaruand.parser;
 
 import java.util.Collection;
 
-import cz.fit.lentaruand.data.PhotoObject;
-
 public class MobilePhoto {
 	private String secondTitle;
-	private Collection<PhotoObject> photos;
+	private Collection<MobilePhotoImage> photos;
 	
-	public MobilePhoto(String secondTitle, Collection<PhotoObject> photos) {
+	public MobilePhoto(String secondTitle, Collection<MobilePhotoImage> photos) {
 		this.secondTitle = secondTitle;
 		this.photos = photos;
 	}
@@ -21,11 +19,11 @@ public class MobilePhoto {
 		this.secondTitle = secondTitle;
 	}
 
-	public Collection<PhotoObject> getPhotos() {
+	public Collection<MobilePhotoImage> getPhotos() {
 		return photos;
 	}
 
-	public void setPhotos(Collection<PhotoObject> photos) {
+	public void setPhotos(Collection<MobilePhotoImage> photos) {
 		this.photos = photos;
 	}
 }

@@ -12,8 +12,13 @@ import cz.fit.lentaruand.data.db.NewsEntry;
 public abstract class DefaultDao<T extends DaoObject> implements Dao<T> {
 	private final String keyWhere;
 	
-	public DefaultDao() {
-		keyWhere = getKeyColumnName() + " LIKE ?";
+	public DefaultDao(Class<?> keyClass) {
+		if (keyClass == String.class)
+			keyWhere = getKeyColumnName() + " LIKE ?";
+		else if (keyClass == Integer.class)
+			keyWhere = getKeyColumnName() + " = ?";
+		else
+			throw new IllegalArgumentException("Argument keyClass must be Integer or String class type only.");
 	}
 	
 	@Override

@@ -26,6 +26,10 @@ public class ArticleDao extends DefaultDao<Article> {
 		ArticleEntry.COLUMN_NAME_FULLTEXT
 	};
 	
+	public ArticleDao() {
+		super(String.class);
+	}
+	
 	@Override
 	protected ContentValues prepareContentValues(Article article) {
 		ContentValues values = new ContentValues();

@@ -23,6 +23,10 @@ public class NewsDao extends DefaultDao<News> {
 		NewsEntry.COLUMN_NAME_FULLTEXT
 	};
 	
+	public NewsDao() {
+		super(String.class);
+	}
+	
 	@Override
 	protected ContentValues prepareContentValues(News news) {
 		ContentValues values = new ContentValues();
