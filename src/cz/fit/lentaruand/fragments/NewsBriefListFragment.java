@@ -11,7 +11,7 @@ import android.support.v4.content.Loader;
 import android.view.View;
 import android.widget.ListView;
 import cz.fit.lentaruand.NewsAdapter;
-import cz.fit.lentaruand.asyncloaders.AsyncNewsLoader;
+import cz.fit.lentaruand.asyncloaders.AsyncBriefNewsLoader;
 import cz.fit.lentaruand.data.News;
 
 public class NewsBriefListFragment extends ListFragment implements LoaderManager.LoaderCallbacks<List<News>> {
@@ -58,7 +58,7 @@ public class NewsBriefListFragment extends ListFragment implements LoaderManager
 	
 	@Override
 	public Loader<List<News>> onCreateLoader(int id, Bundle args) {
-		return new AsyncNewsLoader(context);
+		return new AsyncBriefNewsLoader(context);
 	}
 
 	@Override
