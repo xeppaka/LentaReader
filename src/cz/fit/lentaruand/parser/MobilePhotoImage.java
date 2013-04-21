@@ -6,12 +6,14 @@ public class MobilePhotoImage {
 	private String url;
 	private String title;
 	private String credits;
+	private String description;
 	
-	public MobilePhotoImage(int index, String url, String title, String credits) {
+	public MobilePhotoImage(int index, String url, String title, String credits, String description) {
 		this.index = index;
 		this.url = url;
 		this.title = title;
 		this.credits = credits;
+		this.description = description;
 	}
 	
 	public int getIndex() {
@@ -44,5 +46,13 @@ public class MobilePhotoImage {
 	
 	public void setCredits(String credits) {
 		this.credits = credits;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 }

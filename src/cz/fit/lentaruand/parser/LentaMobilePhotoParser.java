@@ -90,7 +90,7 @@ public class LentaMobilePhotoParser implements NewsParser<MobilePhoto> {
 				description = photoObjVal.get(1);
 			}
 			
-			photos.add(new MobilePhotoImage(index, url, title, description, credits));
+			photos.add(new MobilePhotoImage(index, url, title, credits, description));
 		}
 		
 		return new MobilePhoto(secondTitle, photos);

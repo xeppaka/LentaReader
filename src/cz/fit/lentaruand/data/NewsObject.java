@@ -6,21 +6,28 @@ import cz.fit.lentaruand.data.dao.DaoObject;
 import cz.fit.lentaruand.parser.rss.LentaRssItem;
 
 public abstract class NewsObject implements Comparable<NewsObject>, DaoObject {
+	private long id;
 	private String guid;
 	private String title;
 	private String link;
 	private Date pubDate;
 	private Rubrics rubric;
 	private boolean rubricUpdateNeed;
-	
-	public NewsObject(String guid, String title, String link, Date pubDate,
+
+	public NewsObject(long id, String guid, String title, String link, Date pubDate,
 			Rubrics rubric, boolean rubricUpdateNeed) {
+		setId(id);
 		setGuid(guid);
 		setTitle(title);
 		setLink(link);
 		setPubDate(pubDate);
 		setRubric(rubric);
 		setRubricUpdateNeed(rubricUpdateNeed);
+	}
+	
+	public NewsObject(String guid, String title, String link, Date pubDate,
+			Rubrics rubric, boolean rubricUpdateNeed) {
+		this(ID_NONE, guid, title, link, pubDate, rubric, rubricUpdateNeed);
 	}
 	
 	public NewsObject(LentaRssItem rssItem) {
@@ -33,7 +40,15 @@ public abstract class NewsObject implements Comparable<NewsObject>, DaoObject {
 	}
 	
 	public abstract NewsType getType();
-	
+
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
+
 	public String getGuid() {
 		return guid;
 	}

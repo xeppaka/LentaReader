@@ -1,7 +1,12 @@
 package cz.fit.lentaruand.data.dao;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import cz.fit.lentaruand.data.PhotoImage;
 import cz.fit.lentaruand.data.db.PhotoImageEntry;
 
@@ -13,6 +18,7 @@ public class PhotoImageDao extends DefaultDao<PhotoImage> {
 		PhotoImageEntry.COLUMN_NAME_TITLE,
 		PhotoImageEntry.COLUMN_NAME_URL,
 		PhotoImageEntry.COLUMN_NAME_CREDITS,
+		PhotoImageEntry.COLUMN_NAME_DESCRIPTION
 	};
 	
 	public PhotoImageDao() {
@@ -38,6 +44,11 @@ public class PhotoImageDao extends DefaultDao<PhotoImage> {
 		else
 			values.put(PhotoImageEntry.COLUMN_NAME_CREDITS, photoImage.getCredits());
 		
+		if (photoImage.getDescription() == null)
+			values.putNull(PhotoImageEntry.COLUMN_NAME_DESCRIPTION);
+		else
+			values.put(PhotoImageEntry.COLUMN_NAME_DESCRIPTION, photoImage.getDescription());
+		
 		return values;
 	}
 
@@ -49,8 +60,9 @@ public class PhotoImageDao extends DefaultDao<PhotoImage> {
 		String title = cur.getString(cur.getColumnIndexOrThrow(PhotoImageEntry.COLUMN_NAME_TITLE));
 		String url = cur.getString(cur.getColumnIndexOrThrow(PhotoImageEntry.COLUMN_NAME_URL));
 		String credits = cur.getString(cur.getColumnIndexOrThrow(PhotoImageEntry.COLUMN_NAME_CREDITS));
+		String description = cur.getString(cur.getColumnIndexOrThrow(PhotoImageEntry.COLUMN_NAME_DESCRIPTION));
 		
-		return new PhotoImage(id, photoid, index, url, title, credits);
+		return new PhotoImage(id, photoid, index, url, title, credits, description);
 	}
 
 	@Override
@@ -66,5 +78,34 @@ public class PhotoImageDao extends DefaultDao<PhotoImage> {
 	@Override
 	protected String[] getProjectionAll() {
 		return projectionAll;
+	}
+	
+	public Collection<PhotoImage> readForPhoto(SQLiteDatabase db, long photoKey) {
+		List<PhotoImage> result = new ArrayList<PhotoImage>();
+		
+		String[] keyWhereArgs = { String.valueOf(photoKey) };
+		String keyWhere = PhotoImageEntry.COLUMN_NAME_PHOTO_ID + " = ?";
+		
+		Cursor cur = db.query(
+				getTableName(), 
+				getProjectionAll(), 
+				keyWhere,
+				keyWhereArgs, 
+				null, 
+				null, 
+				null
+				);
+		
+		try {
+			if (cur.moveToFirst()) {
+				do {
+					result.add(createDaoObject(cur));
+				} while (cur.moveToNext());
+			}
+			
+			return result;
+		} finally {
+			cur.close();
+		}
 	}
 }

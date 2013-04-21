@@ -7,6 +7,7 @@ public abstract class PhotoEntry extends NewsObjectEntry {
 	public static final String TABLE_NAME = "Photo";
 	
 	public static final String COLUMN_NAME_SECOND_TITLE = "secondtitle";
+	public static final String COLUMN_NAME_DESCRIPTION = "description";
 	
 	public static final String SQL_CREATE_TABLE_COLUMNS = NewsObjectEntry.SQL_CREATE_TABLE_COLUMNS + ", " +
 			COLUMN_NAME_SECOND_TITLE + " TEXT";

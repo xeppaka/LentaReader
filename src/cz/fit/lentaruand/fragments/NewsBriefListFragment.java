@@ -6,19 +6,30 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.view.View;
 import android.widget.ListView;
 import cz.fit.lentaruand.NewsAdapter;
+import cz.fit.lentaruand.asyncloaders.AsyncNewsLoader;
 import cz.fit.lentaruand.data.News;
 
-public class NewsBriefListFragment extends ListFragment {
+public class NewsBriefListFragment extends ListFragment implements LoaderManager.LoaderCallbacks<List<News>> {
 	
 	private NewsAdapter newsAdapter;
+	private Context context;
 	
 	public NewsBriefListFragment(Context context, List<News> news) {
 		newsAdapter = new NewsAdapter(context, news);
+		this.context = context;
 	}
 	
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+		getLoaderManager().initLoader(0, null, this).forceLoad();
+	}
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -43,5 +54,19 @@ public class NewsBriefListFragment extends ListFragment {
 	public void showNews(List<News> news) {
 		newsAdapter.setNews(news);
 		newsAdapter.notifyDataSetChanged();
+	}
+	
+	@Override
+	public Loader<List<News>> onCreateLoader(int id, Bundle args) {
+		return new AsyncNewsLoader(context);
+	}
+
+	@Override
+	public void onLoadFinished(Loader<List<News>> loader, List<News> data) {
+		showNews(data);
+	}
+
+	@Override
+	public void onLoaderReset(Loader<List<News>> loader) {
 	}
 }

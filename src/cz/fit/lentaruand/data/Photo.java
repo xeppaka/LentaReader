@@ -1,6 +1,7 @@
 package cz.fit.lentaruand.data;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 
 import cz.fit.lentaruand.parser.rss.LentaRssItem;
@@ -15,15 +16,15 @@ public class Photo extends NewsObject {
 			String description, Collection<PhotoImage> photos, String link,
 			Date pubDate, Rubrics rubric, boolean rubricUpdateNeed) {
 		super(guid, title, link, pubDate, rubric, rubricUpdateNeed);
-		
-		this.secondTitle = secondTitle;
-		this.description = description;
-		this.photos = photos;
+		setSecondTitle(secondTitle);
+		setDescription(description);
+		setPhotos(photos);
 	}
 	
 	public Photo(LentaRssItem rssItem) {
 		super(rssItem);
 		setDescription(rssItem.getDescription());
+		photos = Collections.emptyList();
 	}
 
 	public String getSecondTitle() {

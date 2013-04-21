@@ -1,22 +1,33 @@
 package cz.fit.lentaruand.data;
 
 import cz.fit.lentaruand.data.dao.DaoObject;
+import cz.fit.lentaruand.parser.MobilePhotoImage;
 
 public class PhotoImage implements DaoObject {
-	private int id;
-	private int photoId;
+	private long id;
+	private long photoId;
 	private int index;
 	private String url;
 	private String title;
 	private String credits;
+	private String description;
 	
-	public PhotoImage(int id, int photoId, int index, String url, String title, String credits) {
+	public PhotoImage(int id, int photoId, int index, String url, String title, String credits, String description) {
 		setId(id);
 		setPhotoId(photoId);
 		setIndex(index);
 		setUrl(url);
 		setTitle(title);
 		setCredits(credits);
+		setDescription(description);
+	}
+	
+	public PhotoImage(MobilePhotoImage mobilePhotoImage) {
+		setIndex(mobilePhotoImage.getIndex());
+		setUrl(mobilePhotoImage.getUrl());
+		setTitle(mobilePhotoImage.getTitle());
+		setCredits(mobilePhotoImage.getCredits());
+		setDescription(mobilePhotoImage.getDescription());
 	}
 	
 	@Override
@@ -24,19 +35,19 @@ public class PhotoImage implements DaoObject {
 		return String.valueOf(id);
 	}
 
-	public int getId() {
+	public long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 
-	public int getPhotoId() {
+	public long getPhotoId() {
 		return photoId;
 	}
 
-	public void setPhotoId(int photoId) {
+	public void setPhotoId(long photoId) {
 		this.photoId = photoId;
 	}
 
@@ -73,5 +84,13 @@ public class PhotoImage implements DaoObject {
 	
 	public void setCredits(String credits) {
 		this.credits = credits;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 }
