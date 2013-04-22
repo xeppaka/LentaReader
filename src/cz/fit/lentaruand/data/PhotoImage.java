@@ -3,7 +3,7 @@ package cz.fit.lentaruand.data;
 import cz.fit.lentaruand.data.dao.DaoObject;
 import cz.fit.lentaruand.parser.MobilePhotoImage;
 
-public class PhotoImage implements DaoObject {
+public class PhotoImage implements DaoObject, Comparable<PhotoImage> {
 	private long id;
 	private long photoId;
 	private int index;
@@ -92,5 +92,16 @@ public class PhotoImage implements DaoObject {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	@Override
+	public int compareTo(PhotoImage another) {
+		if (another.getIndex() < getIndex())
+			return -1;
+		
+		if (another.getIndex() > getIndex())
+			return 1;
+		
+		return 0;
 	}
 }

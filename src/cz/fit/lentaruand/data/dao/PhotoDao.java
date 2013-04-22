@@ -1,8 +1,10 @@
 package cz.fit.lentaruand.data.dao;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -88,7 +90,8 @@ public class PhotoDao extends DefaultDao<Photo> {
 	@Override
 	public Photo read(SQLiteDatabase db, String key) {
 		Photo photo = super.read(db, key);
-		Collection<PhotoImage> images = photoImageDao.readForPhoto(db, photo.getId());
+		List<PhotoImage> images = new ArrayList<PhotoImage>(photoImageDao.readForPhoto(db, photo.getId()));
+		Collections.sort(images);
 		
 		photo.setPhotos(images);
 		return photo;

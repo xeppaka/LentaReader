@@ -2,6 +2,8 @@ package cz.fit.lentaruand.data.dao;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -10,6 +12,7 @@ import cz.fit.lentaruand.data.dao.exceptions.InconsistentDatastoreException;
 import cz.fit.lentaruand.data.db.NewsEntry;
 
 public abstract class DefaultDao<T extends DaoObject> implements Dao<T> {
+	private final Logger logger = Logger.getLogger(DefaultDao.class.getName());
 	private final String keyWhere;
 	
 	public DefaultDao(Class<?> keyClass) {
@@ -37,14 +40,15 @@ public abstract class DefaultDao<T extends DaoObject> implements Dao<T> {
 		
 		try {
 			if (cur.getCount() > 1)
-				throw new InconsistentDatastoreException("There are more than one dao object in the database with key = '" + key + "'.");
+				logger.log(Level.WARNING, "There are more than one dao object in the database with key = '" + key + "'.");
 			
-			cur.moveToFirst();
-			
-			return createDaoObject(cur);
+			if (cur.moveToFirst())
+				return createDaoObject(cur);
 		} finally {
 			cur.close();
 		}
+		
+		return null;
 	}
 	
 	public long create(SQLiteDatabase db, T daoObject) {
