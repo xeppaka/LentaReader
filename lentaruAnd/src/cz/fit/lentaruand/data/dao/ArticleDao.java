@@ -68,6 +68,7 @@ public class ArticleDao extends DefaultDao<Article> {
 
 	@Override
 	protected Article createDaoObject(Cursor cur) {
+		long id = cur.getLong(cur.getColumnIndexOrThrow(NewsEntry._ID));
 		String guidDb = cur.getString(cur.getColumnIndexOrThrow(ArticleEntry.COLUMN_NAME_GUID));
 		String title = cur.getString(cur.getColumnIndexOrThrow(ArticleEntry.COLUMN_NAME_TITLE));
 		String secondTitle = cur.getString(cur.getColumnIndexOrThrow(ArticleEntry.COLUMN_NAME_SECOND_TITLE));
@@ -83,7 +84,7 @@ public class ArticleDao extends DefaultDao<Article> {
 		String briefText = cur.getString(cur.getColumnIndexOrThrow(ArticleEntry.COLUMN_NAME_BRIEFTEXT));
 		String fullText = cur.getString(cur.getColumnIndexOrThrow(ArticleEntry.COLUMN_NAME_FULLTEXT));
 		
-		return new Article(guidDb, title, secondTitle, link, author, briefText, fullText, pubDate, imageLink, imageCaption, imageCredits, rubric, rubricUpdateNeed);
+		return new Article(id, guidDb, title, secondTitle, author, link, briefText, fullText, pubDate, imageLink, imageCaption, imageCredits, rubric, rubricUpdateNeed);
 	}
 
 	@Override

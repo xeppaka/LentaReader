@@ -2,6 +2,7 @@ package cz.fit.lentaruand.parser.rss;
 
 import java.io.StringReader;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -47,6 +48,9 @@ public class LentaRssParser {
 	private final XPathExpression pubDate;
 	private final XPathExpression imageUrl;
 
+	private final String datePattern = "EEE, dd MMM yyyy HH:mm:ss Z";
+	private final SimpleDateFormat lentaDateSDF = new SimpleDateFormat(datePattern);
+	
 	/**
 	 * Default constructor. Instantiates all internal XPath related objects.
 	 */
@@ -144,9 +148,9 @@ public class LentaRssParser {
 				String pubDateStr = (String) pubDate.evaluate(itemNode, XPathConstants.STRING);
 				String imageUrlStr = (String) imageUrl.evaluate(itemNode, XPathConstants.STRING);
 				
-				Date date;
+				Date date; 
 				try {
-					date = LentaRssDateParser.parseDate(pubDateStr);
+					date = lentaDateSDF.parse(pubDateStr);
 				} catch (ParseException e) {
 					e.printStackTrace();
 					continue;

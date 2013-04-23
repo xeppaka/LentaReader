@@ -87,7 +87,7 @@ public class NewsDao extends DefaultDao<News> {
 
 	@Override
 	protected String getIdColumnName() {
-		return NewsEntry.COLUMN_NAME_GUID;
+		return NewsEntry._ID;
 	}
 
 	@Override

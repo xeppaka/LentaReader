@@ -13,6 +13,7 @@ public abstract class ArticleEntry extends NewsObjectEntry {
 	public static final String COLUMN_NAME_IMAGECREDITS = "imagecredits";
 	
 	public static final String SQL_CREATE_TABLE_COLUMNS = NewsObjectEntry.SQL_CREATE_TABLE_COLUMNS + ", " +
+			COLUMN_NAME_AUTHOR + " TEXT, " +
 			COLUMN_NAME_SECOND_TITLE + " TEXT, " +
 			COLUMN_NAME_IMAGECAPTION + " TEXT, " +
 			COLUMN_NAME_IMAGECREDITS + " TEXT, " +

@@ -95,10 +95,20 @@ public abstract class DefaultDao<T extends DaoObject> implements Dao<T> {
 	}
 
 	public void update(SQLiteDatabase db, T daoObject) {
-		String[] whereArgs = { daoObject.getKeyValue() };
-		String where = String.format(getWhereFromSQLiteType(getKeyColumnType()), getKeyColumnName());
+		long id = daoObject.getId();
 		
-		db.update(NewsEntry.TABLE_NAME, prepareContentValues(daoObject), where, whereArgs);
+		String[] whereArgs;
+		String where;
+		
+		if (id != DaoObject.ID_NONE) {
+			whereArgs = new String[]{ String.valueOf(daoObject.getId()) };
+			where = String.format(getWhereFromSQLiteType(SQLiteType.INTEGER), getIdColumnName());
+		} else {
+			whereArgs = new String[]{ daoObject.getKeyValue() };
+			where = String.format(getWhereFromSQLiteType(getKeyColumnType()), getKeyColumnName());
+		}
+		
+		db.update(getTableName(), prepareContentValues(daoObject), where, whereArgs);
 	}
 	
 	public Collection<String> readAllKeys(SQLiteDatabase db) {

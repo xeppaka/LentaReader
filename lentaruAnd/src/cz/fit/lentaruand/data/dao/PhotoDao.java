@@ -80,7 +80,7 @@ public class PhotoDao extends DefaultDao<Photo> {
 
 	@Override
 	protected String getIdColumnName() {
-		return PhotoEntry.COLUMN_NAME_GUID;
+		return PhotoEntry._ID;
 	}
 	
 	@Override
