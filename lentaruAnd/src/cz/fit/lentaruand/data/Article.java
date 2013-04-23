@@ -8,6 +8,17 @@ public class Article extends News {
 	private String secondTitle;
 	private String author;
 
+	public Article(long id, String guid, String title, String secondTitle,
+			String author, String link, String briefText, String fullText,
+			Date pubDate, String imageLink, String imageCaption,
+			String imageCredits, Rubrics rubric, boolean rubricUpdateNeed) {
+		super(id, guid, title, link, briefText, fullText, pubDate, imageLink, imageCaption,
+				imageCredits, rubric, rubricUpdateNeed);
+		
+		setSecondTitle(secondTitle);
+		setAuthor(author);
+	}
+
 	public Article(String guid, String title, String secondTitle,
 			String author, String link, String briefText, String fullText,
 			Date pubDate, String imageLink, String imageCaption,
@@ -18,7 +29,7 @@ public class Article extends News {
 		setSecondTitle(secondTitle);
 		setAuthor(author);
 	}
-
+	
 	public Article(LentaRssItem rssItem) {
 		super(rssItem.getGuid(), rssItem.getTitle(), rssItem.getLink(), rssItem
 				.getDescription(), null, rssItem.getPubDate(), rssItem

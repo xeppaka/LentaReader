@@ -13,9 +13,11 @@ import cz.fit.lentaruand.data.Photo;
 import cz.fit.lentaruand.data.PhotoImage;
 import cz.fit.lentaruand.data.Rubrics;
 import cz.fit.lentaruand.data.db.PhotoEntry;
+import cz.fit.lentaruand.data.db.SQLiteType;
 
 public class PhotoDao extends DefaultDao<Photo> {
 	private static final String[] projectionAll = {
+		PhotoEntry._ID,
 		PhotoEntry.COLUMN_NAME_GUID,
 		PhotoEntry.COLUMN_NAME_TITLE,
 		PhotoEntry.COLUMN_NAME_SECOND_TITLE,
@@ -29,7 +31,6 @@ public class PhotoDao extends DefaultDao<Photo> {
 	private PhotoImageDao photoImageDao;
 	
 	public PhotoDao() {
-		super(String.class);
 		photoImageDao = new PhotoImageDao();
 	}
 	
@@ -78,8 +79,18 @@ public class PhotoDao extends DefaultDao<Photo> {
 	}
 
 	@Override
+	protected String getIdColumnName() {
+		return PhotoEntry.COLUMN_NAME_GUID;
+	}
+	
+	@Override
 	protected String getKeyColumnName() {
 		return PhotoEntry.COLUMN_NAME_GUID;
+	}
+
+	@Override
+	protected SQLiteType getKeyColumnType() {
+		return SQLiteType.TEXT;
 	}
 
 	@Override

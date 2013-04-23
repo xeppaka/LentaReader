@@ -9,6 +9,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import cz.fit.lentaruand.data.PhotoImage;
 import cz.fit.lentaruand.data.db.PhotoImageEntry;
+import cz.fit.lentaruand.data.db.SQLiteType;
 
 public class PhotoImageDao extends DefaultDao<PhotoImage> {
 	private static final String[] projectionAll = {
@@ -20,10 +21,6 @@ public class PhotoImageDao extends DefaultDao<PhotoImage> {
 		PhotoImageEntry.COLUMN_NAME_CREDITS,
 		PhotoImageEntry.COLUMN_NAME_DESCRIPTION
 	};
-	
-	public PhotoImageDao() {
-		super(Integer.class);
-	}
 	
 	@Override
 	protected ContentValues prepareContentValues(PhotoImage photoImage) {
@@ -71,8 +68,18 @@ public class PhotoImageDao extends DefaultDao<PhotoImage> {
 	}
 
 	@Override
+	protected String getIdColumnName() {
+		return PhotoImageEntry._ID;
+	}
+	
+	@Override
 	protected String getKeyColumnName() {
 		return PhotoImageEntry._ID;
+	}
+	
+	@Override
+	protected SQLiteType getKeyColumnType() {
+		return SQLiteType.INTEGER;
 	}
 
 	@Override

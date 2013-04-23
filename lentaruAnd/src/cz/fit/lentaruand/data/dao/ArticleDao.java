@@ -8,9 +8,11 @@ import cz.fit.lentaruand.data.Article;
 import cz.fit.lentaruand.data.Rubrics;
 import cz.fit.lentaruand.data.db.ArticleEntry;
 import cz.fit.lentaruand.data.db.NewsEntry;
+import cz.fit.lentaruand.data.db.SQLiteType;
 
 public class ArticleDao extends DefaultDao<Article> {
 	private static final String[] projectionAll = {
+		ArticleEntry._ID,
 		ArticleEntry.COLUMN_NAME_GUID,
 		ArticleEntry.COLUMN_NAME_TITLE,
 		ArticleEntry.COLUMN_NAME_SECOND_TITLE,
@@ -25,10 +27,6 @@ public class ArticleDao extends DefaultDao<Article> {
 		ArticleEntry.COLUMN_NAME_BRIEFTEXT,
 		ArticleEntry.COLUMN_NAME_FULLTEXT
 	};
-	
-	public ArticleDao() {
-		super(String.class);
-	}
 	
 	@Override
 	protected ContentValues prepareContentValues(Article article) {
@@ -96,6 +94,16 @@ public class ArticleDao extends DefaultDao<Article> {
 	@Override
 	protected String getKeyColumnName() {
 		return ArticleEntry.COLUMN_NAME_GUID;
+	}
+
+	@Override
+	protected String getIdColumnName() {
+		return ArticleEntry._ID;
+	}
+
+	@Override
+	protected SQLiteType getKeyColumnType() {
+		return SQLiteType.TEXT;
 	}
 
 	@Override

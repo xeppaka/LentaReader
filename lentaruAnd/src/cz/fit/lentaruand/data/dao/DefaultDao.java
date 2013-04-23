@@ -8,31 +8,50 @@ import java.util.logging.Logger;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import cz.fit.lentaruand.data.dao.exceptions.InconsistentDatastoreException;
 import cz.fit.lentaruand.data.db.NewsEntry;
+import cz.fit.lentaruand.data.db.SQLiteType;
 
 public abstract class DefaultDao<T extends DaoObject> implements Dao<T> {
 	private final Logger logger = Logger.getLogger(DefaultDao.class.getName());
-	private final String keyWhere;
+	private final String textKeyWhere;
+	private final String intKeyWhere;
 	
-	public DefaultDao(Class<?> keyClass) {
-		if (keyClass == String.class)
-			keyWhere = getKeyColumnName() + " LIKE ?";
-		else if (keyClass == Integer.class)
-			keyWhere = getKeyColumnName() + " = ?";
-		else
-			throw new IllegalArgumentException("Argument keyClass must be Integer or String class type only.");
+	private String getWhereFromSQLiteType(SQLiteType type) {
+		switch (type) {
+		case TEXT:
+			return textKeyWhere;
+		case INTEGER:
+			return intKeyWhere;
+		default:
+			throw new IllegalArgumentException("Only TEXT and INTEGER are supported as key types in database.");
+		}
+	}
+	
+	public DefaultDao() {
+			textKeyWhere = "%1s LIKE ?";
+			intKeyWhere = "%1s = ?";
 	}
 	
 	@Override
+	public T read(SQLiteDatabase db, long id) {
+		return read(db, SQLiteType.INTEGER, getIdColumnName(), String.valueOf(id));
+	}
+
+	@Override
 	public T read(SQLiteDatabase db, String key) {
-		String[] keyWhereArgs = { key };
+		return read(db, getKeyColumnType(), getKeyColumnName(), key);
+	}
+	
+	@Override
+	public T read(SQLiteDatabase db, SQLiteType keyType, String keyColumnName, String keyValue) {
+		String[] whereArgs = { keyValue };
+		String where = String.format(getWhereFromSQLiteType(keyType), keyColumnName);
 		
 		Cursor cur = db.query(
-				getTableName(), 
-				getProjectionAll(), 
-				keyWhere,
-				keyWhereArgs, 
+				getTableName(),
+				getProjectionAll(),
+				where,
+				whereArgs, 
 				null, 
 				null, 
 				null
@@ -40,7 +59,7 @@ public abstract class DefaultDao<T extends DaoObject> implements Dao<T> {
 		
 		try {
 			if (cur.getCount() > 1)
-				logger.log(Level.WARNING, "There are more than one dao object in the database with key = '" + key + "'.");
+				logger.log(Level.WARNING, "There are more than one dao object in the database table '" + getTableName() + "' with key = '" + keyValue + "'.");
 			
 			if (cur.moveToFirst())
 				return createDaoObject(cur);
@@ -51,20 +70,35 @@ public abstract class DefaultDao<T extends DaoObject> implements Dao<T> {
 		return null;
 	}
 	
+	@Override
 	public long create(SQLiteDatabase db, T daoObject) {
 		return db.insert(getTableName(), null, prepareContentValues(daoObject));
 	}
+	
+	@Override
+	public void delete(SQLiteDatabase db, long id) {
+		delete(db, SQLiteType.INTEGER, getIdColumnName(), String.valueOf(id));
+	}
 
-	public void delete(SQLiteDatabase db, String key) {
-		String[] keyWhereArgs = { key };
-		
-		db.delete(getTableName(), keyWhere, keyWhereArgs);
+	@Override
+	public void delete(SQLiteDatabase db, String keyValue) {
+		delete(db, getKeyColumnType(), getKeyColumnName(), keyValue);
 	}
 	
-	public void update(SQLiteDatabase db, T daoObject) {
-		String[] keyWhereArgs = { daoObject.getKeyValue() };
+	@Override
+	public void delete(SQLiteDatabase db, SQLiteType keyType,
+			String keyColumnName, String keyValue) {
+		String[] whereArgs = { keyValue };
+		String where = String.format(getWhereFromSQLiteType(keyType), keyColumnName);
 		
-		db.update(NewsEntry.TABLE_NAME, prepareContentValues(daoObject), keyWhere, keyWhereArgs);
+		db.delete(getTableName(), where, whereArgs);
+	}
+
+	public void update(SQLiteDatabase db, T daoObject) {
+		String[] whereArgs = { daoObject.getKeyValue() };
+		String where = String.format(getWhereFromSQLiteType(getKeyColumnType()), getKeyColumnName());
+		
+		db.update(NewsEntry.TABLE_NAME, prepareContentValues(daoObject), where, whereArgs);
 	}
 	
 	public Collection<String> readAllKeys(SQLiteDatabase db) {
@@ -97,5 +131,7 @@ public abstract class DefaultDao<T extends DaoObject> implements Dao<T> {
 	protected abstract T createDaoObject(Cursor cur);
 	protected abstract String getTableName();
 	protected abstract String getKeyColumnName();
+	protected abstract SQLiteType getKeyColumnType();
+	protected abstract String getIdColumnName();
 	protected abstract String[] getProjectionAll();
 }

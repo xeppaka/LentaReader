@@ -10,6 +10,19 @@ public class News extends NewsObject {
 	private String imageLink;
 	private String imageCaption;
 	private String imageCredits;
+
+	public News(long id, String guid, String title, String link, String briefText,
+			String fullText, Date pubDate, String imageLink,
+			String imageCaption, String imageCredits, Rubrics rubric, 
+			boolean rubricUpdateNeed) {
+		super(id, guid, title, link, pubDate, rubric, rubricUpdateNeed);
+		
+		setBriefText(briefText);
+		setFullText(fullText);
+		setImageLink(imageLink);
+		setImageCaption(imageCaption);
+		setImageCredits(imageCredits);
+	}
 	
 	public News(String guid, String title, String link, String briefText,
 			String fullText, Date pubDate, String imageLink,

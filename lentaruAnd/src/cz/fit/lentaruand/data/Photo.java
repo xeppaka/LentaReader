@@ -12,6 +12,15 @@ public class Photo extends NewsObject {
 	private String description;
 	private Collection<PhotoImage> photos;
 	
+	public Photo(long id, String guid, String title, String secondTitle,
+			String description, Collection<PhotoImage> photos, String link,
+			Date pubDate, Rubrics rubric, boolean rubricUpdateNeed) {
+		super(id, guid, title, link, pubDate, rubric, rubricUpdateNeed);
+		setSecondTitle(secondTitle);
+		setDescription(description);
+		setPhotos(photos);
+	}
+	
 	public Photo(String guid, String title, String secondTitle,
 			String description, Collection<PhotoImage> photos, String link,
 			Date pubDate, Rubrics rubric, boolean rubricUpdateNeed) {

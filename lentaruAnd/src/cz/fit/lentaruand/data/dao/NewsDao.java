@@ -7,9 +7,11 @@ import android.database.Cursor;
 import cz.fit.lentaruand.data.News;
 import cz.fit.lentaruand.data.Rubrics;
 import cz.fit.lentaruand.data.db.NewsEntry;
+import cz.fit.lentaruand.data.db.SQLiteType;
 
 public class NewsDao extends DefaultDao<News> {
 	private static final String[] projectionAll = {
+		NewsEntry._ID,
 		NewsEntry.COLUMN_NAME_GUID,
 		NewsEntry.COLUMN_NAME_TITLE,
 		NewsEntry.COLUMN_NAME_LINK,
@@ -22,10 +24,6 @@ public class NewsDao extends DefaultDao<News> {
 		NewsEntry.COLUMN_NAME_BRIEFTEXT,
 		NewsEntry.COLUMN_NAME_FULLTEXT
 	};
-	
-	public NewsDao() {
-		super(String.class);
-	}
 	
 	@Override
 	protected ContentValues prepareContentValues(News news) {
@@ -65,6 +63,7 @@ public class NewsDao extends DefaultDao<News> {
 
 	@Override
 	protected News createDaoObject(Cursor cur) {
+		long id = cur.getLong(cur.getColumnIndexOrThrow(NewsEntry._ID));
 		String guidDb = cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_GUID));
 		String title = cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_TITLE));
 		String link = cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_LINK));
@@ -78,7 +77,7 @@ public class NewsDao extends DefaultDao<News> {
 		String briefText = cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_BRIEFTEXT));
 		String fullText = cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_FULLTEXT));
 		
-		return new News(guidDb, title, link, briefText, fullText, pubDate, imageLink, imageCaption, imageCredits, rubric, rubricUpdateNeed);
+		return new News(id, guidDb, title, link, briefText, fullText, pubDate, imageLink, imageCaption, imageCredits, rubric, rubricUpdateNeed);
 	}
 
 	@Override
@@ -87,8 +86,18 @@ public class NewsDao extends DefaultDao<News> {
 	}
 
 	@Override
+	protected String getIdColumnName() {
+		return NewsEntry.COLUMN_NAME_GUID;
+	}
+
+	@Override
 	protected String getKeyColumnName() {
 		return NewsEntry.COLUMN_NAME_GUID;
+	}
+	
+	@Override
+	protected SQLiteType getKeyColumnType() {
+		return SQLiteType.TEXT;
 	}
 
 	@Override
