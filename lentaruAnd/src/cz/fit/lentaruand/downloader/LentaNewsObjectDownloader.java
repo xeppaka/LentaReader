@@ -1,7 +1,6 @@
 package cz.fit.lentaruand.downloader;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -14,16 +13,14 @@ import cz.fit.lentaruand.data.NewsType;
 import cz.fit.lentaruand.data.Rubrics;
 import cz.fit.lentaruand.parser.rss.LentaRssItem;
 import cz.fit.lentaruand.parser.rss.LentaRssParser;
-import cz.fit.lentaruand.site.URLHelper;
 
 public abstract class LentaNewsObjectDownloader<T extends NewsObject> implements NewsObjectDownloader<T> {
 	private final LentaRssParser rssParser = new LentaRssParser();
 	
 	public List<T> downloadRubricBrief(Rubrics rubric) throws XPathExpressionException, IOException {
-		URL url = URLHelper.getRssForRubric(rubric, getNewsType());
-		Page xmlPage = PageDownloader.downloadPage(url);
+		Page xmlPage = PageDownloader.downloadPage(rubric, getNewsType());
 		
-		Collection<LentaRssItem> items = rssParser.parseItems(xmlPage, rubric, getNewsType());
+		Collection<LentaRssItem> items = rssParser.parseItems(xmlPage);
 		List<T> result = new ArrayList<T>();
 		
 		for (LentaRssItem item : items) {
