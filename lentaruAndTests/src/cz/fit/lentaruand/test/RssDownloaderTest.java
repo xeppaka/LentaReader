@@ -8,15 +8,15 @@ import java.util.logging.Logger;
 import javax.xml.xpath.XPathExpressionException;
 
 import android.test.AndroidTestCase;
+import android.test.suitebuilder.annotation.MediumTest;
 import cz.fit.lentaruand.data.NewsType;
 import cz.fit.lentaruand.data.Rubrics;
-import cz.fit.lentaruand.data.dao.DefaultDao;
 import cz.fit.lentaruand.downloader.Page;
 import cz.fit.lentaruand.downloader.PageDownloader;
 import cz.fit.lentaruand.parser.rss.LentaRssParser;
 
-public class RssParserTest extends AndroidTestCase {
-	private final Logger logger = Logger.getLogger(RssParserTest.class.getName());
+public class RssDownloaderTest extends AndroidTestCase {
+	private final Logger logger = Logger.getLogger(RssDownloaderTest.class.getName());
 	private LentaRssParser rssParser;
 	
 	@Override
@@ -25,14 +25,17 @@ public class RssParserTest extends AndroidTestCase {
 		rssParser = new LentaRssParser();
 	}
 
-	public void testSimpleParsing() throws MalformedURLException, IOException, XPathExpressionException {
+	@MediumTest
+	public void testSimpleRssParsing() throws MalformedURLException, IOException, XPathExpressionException {
 		for (Rubrics rubric : Rubrics.values()) {
-			logger.log(Level.INFO, "Downloading rubric: " + rubric.getName());
-			Page rssPage = PageDownloader.downloadPage(rubric, NewsType.NEWS);
-			logger.log(Level.INFO, "Rubric downloaded.");
-			logger.log(Level.INFO, "Parsing rubric: " + rubric.getName());
-			rssParser.parseItems(rssPage);
-			logger.log(Level.INFO, "Rubric parsed.");
+			for (NewsType newsType : NewsType.values()) {
+				logger.log(Level.INFO, "Downloading rubric: " + rubric.name() + ", news type: " + newsType + "...");
+				Page rssPage = PageDownloader.downloadPage(rubric, newsType);
+				logger.log(Level.INFO, "Downloaded.");
+				logger.log(Level.INFO, "Parsing...");
+				rssParser.parseItems(rssPage);
+				logger.log(Level.INFO, "Finished.");
+			}
 		}
 	}
 	

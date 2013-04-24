@@ -45,8 +45,7 @@ public class LentaMobileNewsParser implements NewsParser<MobileNews> {
 			List<String> val = it.next();
 			text = val.get(1);
 		} else {
-			logger.log(Level.SEVERE, "Error parsing url='" + page.getUrl().toExternalForm() + "'");
-			throw new MobileNewsParseException(page.getUrl(), NEWS_BODY.pattern());
+			logger.log(Level.WARNING, "Unable to find news body at URL address: " + page.getUrl().toExternalForm());
 		}
 		
 		return new MobileNews(imageCaption, imageCredits, text);

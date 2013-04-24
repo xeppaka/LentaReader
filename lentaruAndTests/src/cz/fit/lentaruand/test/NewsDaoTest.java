@@ -9,6 +9,7 @@ import java.util.List;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.test.AndroidTestCase;
+import android.test.suitebuilder.annotation.SmallTest;
 import cz.fit.lentaruand.data.News;
 import cz.fit.lentaruand.data.NewsType;
 import cz.fit.lentaruand.data.Rubrics;
@@ -44,6 +45,7 @@ public class NewsDaoTest extends AndroidTestCase {
 		}
 	}
 
+	@SmallTest
 	public void testReadNewsUseId() {
 		long id = createNews("guid1");
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -70,6 +72,7 @@ public class NewsDaoTest extends AndroidTestCase {
 		}
 	}
 	
+	@SmallTest
 	public void testReadNewsUseGuid() {
 		long id = createNews("guid1");
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -96,6 +99,7 @@ public class NewsDaoTest extends AndroidTestCase {
 		}
 	}
 	
+	@SmallTest
 	public void testDeleteNewsUseGuid() {
 		createNews("guid1");
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -109,6 +113,7 @@ public class NewsDaoTest extends AndroidTestCase {
 		}
 	}
 	
+	@SmallTest
 	public void testDeleteNewsUseId() {
 		long id = createNews("guid1");
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -122,6 +127,7 @@ public class NewsDaoTest extends AndroidTestCase {
 		}
 	}
 	
+	@SmallTest
 	public void testUpdateNews() {
 		long id = createNews("guid1");
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -168,6 +174,7 @@ public class NewsDaoTest extends AndroidTestCase {
 		}
 	}
 	
+	@SmallTest
 	public void testMoreNewsInDb() {
 		List<String> ids = new ArrayList<String>();
 		ids.add("guid1");
