@@ -9,6 +9,7 @@ import java.util.List;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.test.AndroidTestCase;
+import android.test.suitebuilder.annotation.SmallTest;
 import cz.fit.lentaruand.data.Article;
 import cz.fit.lentaruand.data.NewsType;
 import cz.fit.lentaruand.data.Rubrics;
@@ -42,7 +43,8 @@ public class ArticleDaoTest extends AndroidTestCase {
 			db.close();
 		}
 	}
-	
+
+	@SmallTest
 	public void testReadArticleUseId() {
 		long id = createArticle("guid1");
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -71,6 +73,7 @@ public class ArticleDaoTest extends AndroidTestCase {
 		}
 	}
 	
+	@SmallTest
 	public void testReadArticleUseGuid() {
 		long id = createArticle("guid1");
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -99,6 +102,7 @@ public class ArticleDaoTest extends AndroidTestCase {
 		}
 	}
 	
+	@SmallTest
 	public void testDeleteArticleUseGuid() {
 		createArticle("guid1");
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -125,6 +129,7 @@ public class ArticleDaoTest extends AndroidTestCase {
 		}
 	}
 	
+	@SmallTest
 	public void testUpdateArticle() {
 		long id = createArticle("guid1");
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -174,6 +179,7 @@ public class ArticleDaoTest extends AndroidTestCase {
 		}
 	}
 	
+	@SmallTest
 	public void testMoreNewsInDb() {
 		List<String> ids = new ArrayList<String>();
 		ids.add("guid1");

@@ -65,8 +65,8 @@ public class LentaMobilePhotoParser implements NewsParser<MobilePhoto> {
 				url = photoObjVal.get(1);
 				index = Integer.valueOf(photoObjVal.get(2));
 			} else {
-				logger.log(Level.SEVERE, "Error parsing mobile photo url='" + page.getUrl().toExternalForm() + "'. Image URL and index is not found.");
-				throw new MobilePhotoParseException(page.getUrl(), PHOTO_URL.pattern());
+				logger.log(Level.WARNING, "Error parsing mobile photo url: " + page.getUrl().toExternalForm() + ". Image URL and index not found.");
+				continue;
 			}
 			
 			photoObjIt = ParseHelper.createParser(photoObjectStr, PHOTO_CAPTION, PHOTO_CAPTION_GROUPS).iterator();
