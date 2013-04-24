@@ -8,7 +8,6 @@ import java.util.logging.Logger;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import cz.fit.lentaruand.data.db.NewsEntry;
 import cz.fit.lentaruand.data.db.SQLiteType;
 
 public abstract class DefaultDao<T extends DaoObject> implements Dao<T> {

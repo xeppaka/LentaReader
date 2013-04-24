@@ -58,9 +58,9 @@ public class Photo extends NewsObject {
 
 	public void setPhotos(Collection<PhotoImage> photos) {
 		if (photos == null)
-			throw new IllegalArgumentException("Argument photos must not be null.");
-			
-		this.photos = photos;
+			this.photos = Collections.emptyList();
+		else
+			this.photos = photos;
 	}
 
 	@Override
