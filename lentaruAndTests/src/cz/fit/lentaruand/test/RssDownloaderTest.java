@@ -28,14 +28,15 @@ public class RssDownloaderTest extends AndroidTestCase {
 	@MediumTest
 	public void testSimpleRssParsing() throws MalformedURLException, IOException, XPathExpressionException {
 		for (Rubrics rubric : Rubrics.values()) {
-			for (NewsType newsType : NewsType.values()) {
+			NewsType newsType = NewsType.NEWS;
+//			for (NewsType newsType : NewsType.values()) {
 				logger.log(Level.INFO, "Downloading rubric: " + rubric.name() + ", news type: " + newsType + "...");
 				Page rssPage = PageDownloader.downloadPage(rubric, newsType);
 				logger.log(Level.INFO, "Downloaded.");
 				logger.log(Level.INFO, "Parsing...");
 				rssParser.parseItems(rssPage);
 				logger.log(Level.INFO, "Finished.");
-			}
+//			}
 		}
 	}
 	

@@ -9,6 +9,7 @@ import java.util.List;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.test.AndroidTestCase;
+import android.test.suitebuilder.annotation.SmallTest;
 import cz.fit.lentaruand.data.NewsType;
 import cz.fit.lentaruand.data.Photo;
 import cz.fit.lentaruand.data.PhotoImage;
@@ -45,6 +46,7 @@ public class PhotoDaoTest extends AndroidTestCase {
 		}
 	}
 	
+	@SmallTest
 	public void testReadPhotoUseId() {
 		long id = createPhoto("guid1");
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -68,6 +70,7 @@ public class PhotoDaoTest extends AndroidTestCase {
 		}
 	}
 	
+	@SmallTest
 	public void testReadPhotoUseGuid() {
 		long id = createPhoto("guid1");
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -91,6 +94,7 @@ public class PhotoDaoTest extends AndroidTestCase {
 		}
 	}
 	
+	@SmallTest
 	public void testDeletePhotoUseGuid() {
 		createPhoto("guid1");
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -104,6 +108,7 @@ public class PhotoDaoTest extends AndroidTestCase {
 		}
 	}
 	
+	@SmallTest
 	public void testDeletePhotoUseId() {
 		long id = createPhoto("guid1");
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -117,6 +122,7 @@ public class PhotoDaoTest extends AndroidTestCase {
 		}
 	}
 	
+	@SmallTest
 	public void testUpdatePhoto() {
 //		long id = createPhoto("guid1");
 //		SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -166,6 +172,7 @@ public class PhotoDaoTest extends AndroidTestCase {
 //		}
 	}
 	
+	@SmallTest
 	public void testMoreNewsInDb() {
 		List<String> ids = new ArrayList<String>();
 		ids.add("guid1");

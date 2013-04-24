@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -52,7 +53,7 @@ public class LentaRssParser {
 //	private final XPathExpression imageUrl;
 
 	private final String datePattern = "EEE, dd MMM yyyy HH:mm:ss Z";
-	private final SimpleDateFormat lentaDateSDF = new SimpleDateFormat(datePattern);
+	private final SimpleDateFormat lentaDateSDF = new SimpleDateFormat(datePattern, Locale.US);
 	
 	/**
 	 * Default constructor. Instantiates all internal XPath related objects.
