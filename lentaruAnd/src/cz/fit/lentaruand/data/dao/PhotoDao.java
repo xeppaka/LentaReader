@@ -61,6 +61,7 @@ public class PhotoDao extends DefaultDao<Photo> {
 
 	@Override
 	protected Photo createDaoObject(Cursor cur) {
+		long id = cur.getLong(cur.getColumnIndexOrThrow(PhotoEntry._ID));
 		String guidDb = cur.getString(cur.getColumnIndexOrThrow(PhotoEntry.COLUMN_NAME_GUID));
 		String title = cur.getString(cur.getColumnIndexOrThrow(PhotoEntry.COLUMN_NAME_TITLE));
 		String secondTitle = cur.getString(cur.getColumnIndexOrThrow(PhotoEntry.COLUMN_NAME_SECOND_TITLE));
@@ -70,7 +71,7 @@ public class PhotoDao extends DefaultDao<Photo> {
 		Rubrics rubric = Rubrics.valueOf(cur.getString(cur.getColumnIndexOrThrow(PhotoEntry.COLUMN_NAME_RUBRIC)));
 		boolean rubricUpdateNeed = cur.getInt(cur.getColumnIndexOrThrow(PhotoEntry.COLUMN_NAME_RUBRIC_UPDATE)) > 0;
 		
-		return new Photo(guidDb, title, secondTitle, description, Collections.<PhotoImage>emptyList(), link, pubDate, rubric, rubricUpdateNeed);
+		return new Photo(id, guidDb, title, secondTitle, description, Collections.<PhotoImage>emptyList(), link, pubDate, rubric, rubricUpdateNeed);
 	}
 
 	@Override
@@ -101,6 +102,10 @@ public class PhotoDao extends DefaultDao<Photo> {
 	@Override
 	public Photo read(SQLiteDatabase db, String key) {
 		Photo photo = super.read(db, key);
+		
+		if (photo == null)
+			return photo;
+			
 		List<PhotoImage> images = new ArrayList<PhotoImage>(photoImageDao.readForPhoto(db, photo.getId()));
 		Collections.sort(images);
 		
@@ -114,6 +119,7 @@ public class PhotoDao extends DefaultDao<Photo> {
 		Collection<PhotoImage> images = photo.getPhotos();
 		
 		for (PhotoImage image : images) {
+			image.setPhotoId(photoId);
 			photoImageDao.create(db, image);
 		}
 		

@@ -71,7 +71,10 @@ public abstract class DefaultDao<T extends DaoObject> implements Dao<T> {
 	
 	@Override
 	public long create(SQLiteDatabase db, T daoObject) {
-		return db.insert(getTableName(), null, prepareContentValues(daoObject));
+		long id = db.insert(getTableName(), null, prepareContentValues(daoObject));
+		daoObject.setId(id);
+		
+		return id;
 	}
 	
 	@Override

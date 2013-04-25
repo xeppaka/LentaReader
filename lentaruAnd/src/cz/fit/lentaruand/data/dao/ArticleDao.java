@@ -68,7 +68,7 @@ public class ArticleDao extends DefaultDao<Article> {
 
 	@Override
 	protected Article createDaoObject(Cursor cur) {
-		long id = cur.getLong(cur.getColumnIndexOrThrow(NewsEntry._ID));
+		long id = cur.getLong(cur.getColumnIndexOrThrow(ArticleEntry._ID));
 		String guidDb = cur.getString(cur.getColumnIndexOrThrow(ArticleEntry.COLUMN_NAME_GUID));
 		String title = cur.getString(cur.getColumnIndexOrThrow(ArticleEntry.COLUMN_NAME_TITLE));
 		String secondTitle = cur.getString(cur.getColumnIndexOrThrow(ArticleEntry.COLUMN_NAME_SECOND_TITLE));

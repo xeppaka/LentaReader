@@ -21,7 +21,7 @@ public class PhotoImageDao extends DefaultDao<PhotoImage> {
 		PhotoImageEntry.COLUMN_NAME_CREDITS,
 		PhotoImageEntry.COLUMN_NAME_DESCRIPTION
 	};
-	
+
 	@Override
 	protected ContentValues prepareContentValues(PhotoImage photoImage) {
 		ContentValues values = new ContentValues();
@@ -71,12 +71,12 @@ public class PhotoImageDao extends DefaultDao<PhotoImage> {
 	protected String getIdColumnName() {
 		return PhotoImageEntry._ID;
 	}
-	
+
 	@Override
 	protected String getKeyColumnName() {
 		return PhotoImageEntry._ID;
 	}
-	
+
 	@Override
 	protected SQLiteType getKeyColumnType() {
 		return SQLiteType.INTEGER;
@@ -86,7 +86,7 @@ public class PhotoImageDao extends DefaultDao<PhotoImage> {
 	protected String[] getProjectionAll() {
 		return projectionAll;
 	}
-	
+
 	public Collection<PhotoImage> readForPhoto(SQLiteDatabase db, long photoKey) {
 		List<PhotoImage> result = new ArrayList<PhotoImage>();
 		

@@ -30,8 +30,17 @@ public class PhotoDaoTest extends AndroidTestCase {
 		context = getContext();
 		context.deleteDatabase(LentaDbHelper.DATABASE_NAME);
 		date = new Date();
-		testPhoto = new Photo("guid1", "Photo1", "PhotoPhoto2", "House", Collections.<PhotoImage>emptyList(), 
+		photoImages = new ArrayList<PhotoImage>();
+		
+		photoImages.add(new PhotoImage(4, "http://www.mishki.ru/image.jpg", "image4", "Photo by: NNM", "Description"));
+		photoImages.add(new PhotoImage(3, "http://www.mishki.ru/image.jpg", "image3", "Photo by: NNM", "Description"));
+		photoImages.add(new PhotoImage(2, "http://www.mishki.ru/image.jpg", "image2", "Photo by: NNM", "Description"));
+		photoImages.add(new PhotoImage(5, "http://www.mishki.ru/image.jpg", "image5", "Photo by: NNM", "Description"));
+		photoImages.add(new PhotoImage(1, "http://www.mishki.ru/image.jpg", "image1", "Photo by: NNM", "Description"));
+		
+		testPhoto = new Photo("guid1", "Photo1", "PhotoPhoto2", "House", photoImages, 
 				"http://www.mishki.ru", date, Rubrics.CULTURE_KINO, true);
+		
 		dbHelper = new LentaDbHelper(context);
 	}
 
@@ -63,6 +72,7 @@ public class PhotoDaoTest extends AndroidTestCase {
 			assertEquals(date, n.getPubDate());
 			assertEquals(Rubrics.CULTURE_KINO, n.getRubric());
 			assertEquals(true, n.isRubricUpdateNeed());
+			assertEquals(photoImages.size(), n.getPhotos().size());
 			
 			photoDao.delete(db, id);
 		} finally {
@@ -87,6 +97,7 @@ public class PhotoDaoTest extends AndroidTestCase {
 			assertEquals(date, n.getPubDate());
 			assertEquals(Rubrics.CULTURE_KINO, n.getRubric());
 			assertEquals(true, n.isRubricUpdateNeed());
+			assertEquals(photoImages.size(), n.getPhotos().size());
 			
 			photoDao.delete(db, "guid1");
 		} finally {
@@ -173,7 +184,7 @@ public class PhotoDaoTest extends AndroidTestCase {
 	}
 	
 	@SmallTest
-	public void testMoreNewsInDb() {
+	public void testMorePhotosInDb() {
 		List<String> ids = new ArrayList<String>();
 		ids.add("guid1");
 		ids.add("guid2");

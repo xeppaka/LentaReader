@@ -8,7 +8,7 @@ public abstract class PhotoImageEntry implements BaseColumns {
 	public static final String TABLE_NAME = "photoimage";
 	
 	public static final String COLUMN_NAME_PHOTO_ID = "photoid";
-	public static final String COLUMN_NAME_INDEX = "index";
+	public static final String COLUMN_NAME_INDEX = "idx";
 	public static final String COLUMN_NAME_TITLE = "title";
 	public static final String COLUMN_NAME_URL = "url";
 	public static final String COLUMN_NAME_CREDITS = "credits";

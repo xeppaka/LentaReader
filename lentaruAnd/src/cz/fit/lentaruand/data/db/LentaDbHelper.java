@@ -17,10 +17,14 @@ public class LentaDbHelper extends SQLiteOpenHelper {
 	public void onCreate(SQLiteDatabase db) {
 		db.execSQL(NewsEntry.SQL_CREATE_TABLE);
 		db.execSQL(ArticleEntry.SQL_CREATE_TABLE);
+		db.execSQL(PhotoEntry.SQL_CREATE_TABLE);
+		db.execSQL(PhotoImageEntry.SQL_CREATE_TABLE);
 	}
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+		db.execSQL(PhotoImageEntry.SQL_DELETE_TABLE);
+		db.execSQL(PhotoEntry.SQL_DELETE_TABLE);
 		db.execSQL(ArticleEntry.SQL_DELETE_TABLE);
 		db.execSQL(NewsEntry.SQL_DELETE_TABLE);
 		onCreate(db);

@@ -22,6 +22,26 @@ public class PhotoImage implements DaoObject, Comparable<PhotoImage> {
 		setDescription(description);
 	}
 	
+	public PhotoImage(int photoId, int index, String url, String title, String credits, String description) {
+		setId(ID_NONE);
+		setPhotoId(photoId);
+		setIndex(index);
+		setUrl(url);
+		setTitle(title);
+		setCredits(credits);
+		setDescription(description);
+	}
+	
+	public PhotoImage(int index, String url, String title, String credits, String description) {
+		setId(ID_NONE);
+		setPhotoId(ID_NONE);
+		setIndex(index);
+		setUrl(url);
+		setTitle(title);
+		setCredits(credits);
+		setDescription(description);
+	}
+	
 	public PhotoImage(MobilePhotoImage mobilePhotoImage) {
 		setIndex(mobilePhotoImage.getIndex());
 		setUrl(mobilePhotoImage.getUrl());
