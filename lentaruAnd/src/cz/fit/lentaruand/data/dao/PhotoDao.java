@@ -114,6 +114,20 @@ public class PhotoDao extends DefaultDao<Photo> {
 	}
 
 	@Override
+	public Photo read(SQLiteDatabase db, long id) {
+		Photo photo = super.read(db, id);
+		
+		if (photo == null)
+			return photo;
+			
+		List<PhotoImage> images = new ArrayList<PhotoImage>(photoImageDao.readForPhoto(db, photo.getId()));
+		Collections.sort(images);
+		
+		photo.setPhotos(images);
+		return photo;
+	}
+
+	@Override
 	public long create(SQLiteDatabase db, Photo photo) {
 		long photoId = super.create(db, photo);
 		Collection<PhotoImage> images = photo.getPhotos();

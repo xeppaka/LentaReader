@@ -26,7 +26,7 @@ public class PhotoImageDao extends DefaultDao<PhotoImage> {
 	protected ContentValues prepareContentValues(PhotoImage photoImage) {
 		ContentValues values = new ContentValues();
 
-		values.put(PhotoImageEntry.COLUMN_NAME_PHOTO_ID, photoImage.getId());
+		values.put(PhotoImageEntry.COLUMN_NAME_PHOTO_ID, photoImage.getPhotoId());
 		values.put(PhotoImageEntry.COLUMN_NAME_INDEX, photoImage.getIndex());
 		
 		if (photoImage.getTitle() == null)
