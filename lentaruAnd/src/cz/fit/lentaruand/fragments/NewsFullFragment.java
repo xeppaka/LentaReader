@@ -1,9 +1,5 @@
 package cz.fit.lentaruand.fragments;
 
-import java.util.List;
-
-import cz.fit.lentaruand.NewsAdapter;
-import cz.fit.lentaruand.data.News;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -12,22 +8,35 @@ import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+import cz.fit.lentaruand.R;
+import cz.fit.lentaruand.asyncloaders.AsyncFullNewsLoader;
+import cz.fit.lentaruand.data.News;
 
 public class NewsFullFragment extends Fragment implements LoaderManager.LoaderCallbacks<News>{
 
-	private NewsAdapter newsAdapter;
 	private Context context;
 	private News news;
 
+	
+	public static Fragment newInstance(Context context, News news){
+		NewsFullFragment fragment = new NewsFullFragment();
+		Bundle bndl = new Bundle(1);
+		bndl.putSerializable("News", news);
+		fragment.context = context;
+		fragment.news = news;
+		return fragment;
+	}
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		return inflater.inflate(R.layout.full_news_fragment_layout, null);
 	}
 
-	public NewsFullFragment(Context context, News news) {
-		this.context = context;
-		this.news = news;
+	
+	public NewsFullFragment() {
+		super();
 	}
 
 	@Override
@@ -41,9 +50,9 @@ public class NewsFullFragment extends Fragment implements LoaderManager.LoaderCa
 		super.onCreate(savedInstanceState);
 	}
 
-	public void showNews(List<News> news) {
-		newsAdapter.setNews(news);
-		newsAdapter.notifyDataSetChanged();
+	public void showNews(News news) {
+		TextView tv = (TextView) getActivity().findViewById(R.id.textView1);
+		tv.setText(news.getFullText());
 	}
 
 	@Override
@@ -57,8 +66,7 @@ public class NewsFullFragment extends Fragment implements LoaderManager.LoaderCa
 
 	@Override
 	public void onLoadFinished(Loader<News> arg0, News arg1) {
-		// TODO Auto-generated method stub
-		
+		showNews(arg1);
 	}
 
 	

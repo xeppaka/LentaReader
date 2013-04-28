@@ -18,7 +18,7 @@ public class FullNewsActivity extends SherlockFragmentActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_full_news);
-		fullNewsFragment = new NewsFullFragment(getApplicationContext(), news);
+		fullNewsFragment =  (NewsFullFragment) NewsFullFragment.newInstance(getApplicationContext(), news);
 		getSupportFragmentManager().beginTransaction().add(R.id.full_news_fragment_container, fullNewsFragment).commit();
 
 	}
