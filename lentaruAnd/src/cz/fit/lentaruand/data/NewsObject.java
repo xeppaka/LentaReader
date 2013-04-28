@@ -165,7 +165,7 @@ public abstract class NewsObject implements Comparable<NewsObject>, DaoObject, S
 
 	private void readObject(java.io.ObjectInputStream in) throws IOException,
 			ClassNotFoundException {
-		id = in.readInt();
+		id = in.readLong();
 		guid = in.readUTF();
 		title = in.readUTF();
 		link = in.readUTF();

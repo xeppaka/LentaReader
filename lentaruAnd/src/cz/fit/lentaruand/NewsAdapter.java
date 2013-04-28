@@ -75,7 +75,6 @@ public class NewsAdapter extends BaseAdapter {
 
 		News news = getItem(position);
 		
-//		newsTitle.setText(news.getBriefText());
 		newsListItemView.setText(news.getTitle());
 		return view;
 	}
