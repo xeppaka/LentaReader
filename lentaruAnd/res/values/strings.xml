@@ -12,7 +12,8 @@
     <string name="categories">Рубрики</string>
     <string name="download">Загрузить список новостей</string>
     <string name="fullnews">Текст полной новости должен быть здесь.</string>
-
+    <string name="saveToDB">Сохранить для будущего Я</string>
+	<string name="openFullNews">Открыть полную новость</string>
     <string-array name="my_array">
         <item>ONE</item>
         <item>TWO</item>

@@ -13,17 +13,27 @@ import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import com.actionbarsherlock.app.SherlockListFragment;
+import com.actionbarsherlock.internal.widget.IcsAdapterView;
+import com.actionbarsherlock.internal.widget.IcsAdapterView.OnItemLongClickListener;
+import com.actionbarsherlock.view.ActionMode;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
+
 import cz.fit.lentaruand.FullNewsActivity;
 import cz.fit.lentaruand.NewsAdapter;
 import cz.fit.lentaruand.R;
 import cz.fit.lentaruand.asyncloaders.AsyncBriefNewsLoader;
 import cz.fit.lentaruand.data.News;
 
-public class SwipeNewsListFragment extends ListFragment implements LoaderManager.LoaderCallbacks<List<News>> {
+public class SwipeNewsListFragment extends SherlockListFragment implements
+		LoaderManager.LoaderCallbacks<List<News>>, OnItemLongClickListener{
 
+	ActionMode actionMode;
 	int mCurrentPage;
 	static final String ARGUMENT_PAGE_NUMBER = "arg_page_number";
 	private String mContent = "???";
@@ -31,21 +41,20 @@ public class SwipeNewsListFragment extends ListFragment implements LoaderManager
 	private NewsAdapter newsAdapter;
 	private Context context;
 	TextView tv;
-	
-	
-		
+
 	public SwipeNewsListFragment() {
 		super();
 	}
 
-	public static Fragment newInstance(int page, Context context, List<News> news) {
+	public static Fragment newInstance(int page, Context context,
+			List<News> news) {
 		SwipeNewsListFragment fragment = new SwipeNewsListFragment();
 		Bundle arguments = new Bundle();
 		arguments.putInt(ARGUMENT_PAGE_NUMBER, page);
 		fragment.mCurrentPage = page;
 		fragment.newsAdapter = new NewsAdapter(context, news);
 		fragment.context = context;
-		switch(page){
+		switch (page) {
 		case 0:
 			fragment.mContent = "News";
 			break;
@@ -55,7 +64,7 @@ public class SwipeNewsListFragment extends ListFragment implements LoaderManager
 		case 2:
 			fragment.mContent = "Columns";
 			break;
-		case 3: 
+		case 3:
 			fragment.mContent = "Video";
 			break;
 		default:
@@ -65,46 +74,65 @@ public class SwipeNewsListFragment extends ListFragment implements LoaderManager
 		return fragment;
 	}
 
-//	public SwipeNewsListFragment(List<News> news, int currentPage, Context context) {
-//		newsAdapter = new NewsAdapter(context, news);
-//		this.mCurrentPage = currentPage;
-//		this.context = context;
-//	}
-	
+	// public SwipeNewsListFragment(List<News> news, int currentPage, Context
+	// context) {
+	// newsAdapter = new NewsAdapter(context, news);
+	// this.mCurrentPage = currentPage;
+	// this.context = context;
+	// }
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
 		setListAdapter(newsAdapter);
 	}
 
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
-		Intent intent = new Intent(this.getActivity(), FullNewsActivity.class);
+		Intent intent = new Intent(this.getSherlockActivity(),
+				FullNewsActivity.class);
 		intent.putExtra("NewsObject", newsAdapter.getItem(position));
-//		newsAdapter.getItem(position);
-//		Toast.makeText(getActivity(), mContent,
-//				Toast.LENGTH_SHORT).show();
 		startActivity(intent);
-		
+
 	}
+
+	@Override
+	public boolean onItemLongClick(IcsAdapterView<?> parent, View view,
+			int position, long id) {	
+		
+		if (actionMode == null)
+		      actionMode = getSherlockActivity().startActionMode(callback);
+		    else
+		      actionMode.finish();		
+		return false;
+	}
+
+
+
+//	@Override
+//	public boolean onItemLongClick(IcsAdapterView<?> parent, View view,
+//			int position, long id) {
+//		// TODO Auto-generated method stub
+//		return false;
+//	}
 	
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 	}
-	
+
 	@Override
 	public void onStart() {
 		super.onStart();
 	}
-	
+
 	public void showNews(List<News> news) {
 		newsAdapter.setNews(news);
 		newsAdapter.notifyDataSetChanged();
 	}
-	
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -116,18 +144,27 @@ public class SwipeNewsListFragment extends ListFragment implements LoaderManager
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		if(mContent == "News")getLoaderManager().initLoader(0, null, this).forceLoad();
-		if(mContent == "Error") {
+		if (mContent == "News")
+			getLoaderManager().initLoader(0, null, this).forceLoad();
+		if (mContent == "Error") {
 			tv.setText(mContent);
-			}
-		
+		}
+
+//		getListView().setOnItemLongClickListener(new OnItemLongClickListener() {
+//			@Override
+//			public boolean onItemLongClick(IcsAdapterView<?> parent, View view,
+//					int position, long id) {
+//				// TODO Auto-generated method stub
+//				return false;
+//			}
+//		});
 	}
-	
-//	@Override
-//	public void onSaveInstanceState(Bundle outState) {
-//		super.onSaveInstanceState(outState);
-//		outState.putString(KEY_CONTENT, mContent);
-//	}
+
+	// @Override
+	// public void onSaveInstanceState(Bundle outState) {
+	// super.onSaveInstanceState(outState);
+	// outState.putString(KEY_CONTENT, mContent);
+	// }
 
 	@Override
 	public Loader<List<News>> onCreateLoader(int id, Bundle args) {
@@ -143,5 +180,26 @@ public class SwipeNewsListFragment extends ListFragment implements LoaderManager
 	public void onLoaderReset(Loader<List<News>> loader) {
 	}
 
-	
+	private ActionMode.Callback callback = new ActionMode.Callback() {
+
+		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+			mode.getMenuInflater().inflate(R.menu.context_news_list, menu);
+			return true;
+		}
+
+		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+			return false;
+		}
+
+		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+			// Log.d(LOG_TAG, "item " + item.getTitle());
+			return false;
+		}
+
+		public void onDestroyActionMode(ActionMode mode) {
+			// Log.d(LOG_TAG, "destroy");
+			actionMode = null;
+		}
+
+	};
 }
