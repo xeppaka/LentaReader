@@ -84,7 +84,7 @@ public class PhotoImage implements DaoObject, Comparable<PhotoImage> {
 	}
 	
 	public void setUrl(String url) {
-		if (url == null || url.isEmpty())
+		if (url == null || url.length() <= 0)
 			throw new IllegalArgumentException("Argument url must not be null or empty.");
 		
 		this.url = url;
