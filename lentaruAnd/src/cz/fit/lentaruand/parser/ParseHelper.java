@@ -31,7 +31,7 @@ public class ParseHelper implements Iterable<List<String>> {
 
 	@Override
 	public Iterator<List<String>> iterator() {
-		if (text.isEmpty()) {
+		if (text.length() <= 0) {
 			List<List<String>> emptyList = Collections.emptyList();
 			return emptyList.iterator();
 		}
