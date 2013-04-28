@@ -18,14 +18,9 @@ public class NewsFullFragment extends Fragment implements LoaderManager.LoaderCa
 	private Context context;
 	private News news;
 
-	
-	public static Fragment newInstance(Context context, News news){
-		NewsFullFragment fragment = new NewsFullFragment();
-		Bundle bndl = new Bundle(1);
-		bndl.putSerializable("News", news);
-		fragment.context = context;
-		fragment.news = news;
-		return fragment;
+	public NewsFullFragment(Context context, News news){
+		this.context = context;
+		this.news = news;
 	}
 	
 	@Override
@@ -68,7 +63,4 @@ public class NewsFullFragment extends Fragment implements LoaderManager.LoaderCa
 	public void onLoadFinished(Loader<News> arg0, News arg1) {
 		showNews(arg1);
 	}
-
-	
-
 }
