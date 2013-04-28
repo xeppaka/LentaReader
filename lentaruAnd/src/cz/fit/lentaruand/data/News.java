@@ -1,5 +1,6 @@
 package cz.fit.lentaruand.data;
 
+import java.io.IOException;
 import java.util.Date;
 
 import cz.fit.lentaruand.parser.rss.LentaRssItem;
@@ -53,7 +54,7 @@ public class News extends NewsObject {
 	}
 
 	public void setBriefText(String briefText) {
-		if (briefText == null || briefText.isEmpty())
+		if (briefText == null || briefText.length()==0)
 			throw new IllegalArgumentException("Argument briefText must not be null or empty.");
 		
 		this.briefText = briefText;
@@ -92,11 +93,22 @@ public class News extends NewsObject {
 	}
 
 	public boolean isContentFull() {
-		return fullText != null && !fullText.isEmpty();
+		return fullText != null && !(fullText.length() == 0);
 	}
 
 	@Override
 	public NewsType getType() {
 		return NewsType.NEWS;
+	}
+	
+	private void writeObject(java.io.ObjectOutputStream out) throws IOException {
+		out.writeUTF(briefText);
+		out.writeUTF(imageLink);
+	}
+
+	private void readObject(java.io.ObjectInputStream in) throws IOException,
+			ClassNotFoundException {
+		briefText = in.readUTF();
+		imageLink = in.readUTF();
 	}
 }

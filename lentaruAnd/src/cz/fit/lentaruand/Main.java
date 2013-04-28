@@ -1,39 +1,73 @@
 package cz.fit.lentaruand;
 
-import android.app.Activity;
-import android.content.Intent;
+import java.util.Date;
+
+import android.graphics.Color;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.View;
+import android.support.v4.view.ViewPager;
 import android.widget.Button;
+
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
+import com.viewpagerindicator.PageIndicator;
+import com.viewpagerindicator.TitlePageIndicator;
+import com.viewpagerindicator.TitlePageIndicator.IndicatorStyle;
 
 /**
  * 
  * @author kacpa01
  *
  */
-public class Main extends Activity {
+public class Main extends SherlockFragmentActivity {
 
 	private Button showNews;
+	PageIndicator mIndicator;
+	SwipeNewsListFragmentPagerAdapter pagerAdapter;
+	ViewPager pager;
+	String date;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
+		final ActionBar bar = getSupportActionBar();
+		bar.setTitle(R.string.action_bar_title);
+//		date = new Date().toString();
+//		date.offsetByCodePoints(0, 10);
+//		bar.setSubtitle(date);
 		
-		showNews = (Button) findViewById(R.id.button1);
-		showNews.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View arg0) {
-				startActivity(new Intent(getApplicationContext(), TestActivity.class));
-			}
-		});
+		
+		pager = (ViewPager) findViewById(R.id.pager);
+		pagerAdapter = new SwipeNewsListFragmentPagerAdapter(
+				getSupportFragmentManager(), getApplicationContext());
+		pager.setAdapter(pagerAdapter);
+
+		TitlePageIndicator indicator = (TitlePageIndicator) findViewById(R.id.indicator);
+		mIndicator = indicator;
+		final float density = getResources().getDisplayMetrics().density;
+		indicator.setTextColor(Color.parseColor("#151515"));
+		indicator.setBackgroundColor(Color.parseColor("#ffffff"));
+		indicator.setFooterColor(0xFFAA2222);
+		indicator.setFooterLineHeight(1 * density); // 1dp
+		indicator.setFooterIndicatorHeight(3 * density); // 3dp
+		indicator.setFooterIndicatorStyle(IndicatorStyle.Triangle);
+		indicator.setSelectedColor(Color.parseColor("#d54c39"));
+		indicator.setSelectedBold(true);
+		mIndicator.setViewPager(pager);
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
+		getSupportMenuInflater().inflate(R.menu.main, menu);
 		return true;
+	}
+
+	// обработка нажатий
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		
+		return super.onOptionsItemSelected(item);
 	}
 }

@@ -54,16 +54,16 @@ public class LentaRssItem {
 	 */
 	public LentaRssItem(String guid, NewsType type, String title, String link, String author,
 			String description, Date pubDate, String imageLink, Rubrics rubric) {
-		if (guid == null || guid.isEmpty())
+		if (guid == null || (guid.length()==0))
 			throw new IllegalArgumentException("Argument guid must not be null or empty");
 		
-		if (title == null || title.isEmpty())
+		if (title == null || (title.length()==0))
 			throw new IllegalArgumentException("Argument title must not be null or empty");
 		
-		if (link == null || link.isEmpty())
+		if (link == null || (link.length()==0))
 			throw new IllegalArgumentException("Argument link must not be null or empty");
 		
-		if (description == null || description.isEmpty())
+		if (description == null || (description.length()==0))
 			throw new IllegalArgumentException("Argument description must not be null or empty");
 		
 		if (pubDate == null)

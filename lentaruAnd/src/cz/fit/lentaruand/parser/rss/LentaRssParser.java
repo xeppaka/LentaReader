@@ -30,6 +30,7 @@ import cz.fit.lentaruand.downloader.Page;
  * 
  * @author kacpa01
  * 
+ * 
  */
 public class LentaRssParser {
 	private final Logger logger = Logger.getLogger(LentaRssParser.class.getName());

@@ -1,11 +1,13 @@
 package cz.fit.lentaruand.data;
 
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.Date;
 
 import cz.fit.lentaruand.data.dao.DaoObject;
 import cz.fit.lentaruand.parser.rss.LentaRssItem;
 
-public abstract class NewsObject implements Comparable<NewsObject>, DaoObject {
+public abstract class NewsObject implements Comparable<NewsObject>, DaoObject, Serializable {
 	private long id;
 	private String guid;
 	private String title;
@@ -54,7 +56,7 @@ public abstract class NewsObject implements Comparable<NewsObject>, DaoObject {
 	}
 
 	public void setGuid(String guid) {
-		if (guid == null || guid.isEmpty())
+		if (guid == null || (guid.length()==0))
 			throw new IllegalArgumentException("Argument guid must not be null or empty.");
 		
 		this.guid = guid;
@@ -65,7 +67,7 @@ public abstract class NewsObject implements Comparable<NewsObject>, DaoObject {
 	}
 
 	public void setTitle(String title) {
-		if (title == null || title.isEmpty())
+		if (title == null || (title.length()==0))
 			throw new IllegalArgumentException("Argument title must not be null or empty.");
 		
 		this.title = title;
@@ -76,7 +78,7 @@ public abstract class NewsObject implements Comparable<NewsObject>, DaoObject {
 	}
 
 	public void setLink(String link) {
-		if (link == null || link.isEmpty())
+		if (link == null || (link.length()==0))
 			throw new IllegalArgumentException("Argument link must not be null or empty.");
 		
 		this.link = link;
@@ -141,4 +143,35 @@ public abstract class NewsObject implements Comparable<NewsObject>, DaoObject {
 	public String getKeyValue() {
 		return getGuid();
 	}
+	
+//	private long id;
+//	private String guid;
+//	private String title;
+//	private String link;
+//	private Date pubDate;
+//	private Rubrics rubric;
+//	private boolean rubricUpdateNeed;
+
+	
+	private void writeObject(java.io.ObjectOutputStream out) throws IOException {
+		out.writeLong(id);
+		out.writeUTF(guid);
+		out.writeUTF(title);
+		out.writeUTF(link);
+		out.writeLong(pubDate.getTime());
+		out.writeUTF(rubric.name());
+		out.writeBoolean(rubricUpdateNeed);
+	}
+
+	private void readObject(java.io.ObjectInputStream in) throws IOException,
+			ClassNotFoundException {
+		id = in.readInt();
+		guid = in.readUTF();
+		title = in.readUTF();
+		link = in.readUTF();
+		pubDate = new Date(in.readLong());
+		rubric = Rubrics.valueOf(in.readUTF());
+		rubricUpdateNeed = in.readBoolean();
+	}
+		 
 }
