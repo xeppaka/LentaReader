@@ -84,7 +84,7 @@ public class ArticleDao extends DefaultDao<Article> {
 		String briefText = cur.getString(cur.getColumnIndexOrThrow(ArticleEntry.COLUMN_NAME_BRIEFTEXT));
 		String fullText = cur.getString(cur.getColumnIndexOrThrow(ArticleEntry.COLUMN_NAME_FULLTEXT));
 		
-		return new Article(id, guidDb, title, secondTitle, author, link, briefText, fullText, pubDate, imageLink, imageCaption, imageCredits, rubric, rubricUpdateNeed);
+		return new Article(id, guidDb, title, secondTitle, author, link, briefText, fullText, pubDate, imageLink, imageCaption, imageCredits, null, rubric, rubricUpdateNeed);
 	}
 
 	@Override

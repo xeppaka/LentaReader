@@ -2,118 +2,110 @@ package cz.fit.lentaruand.data.dao;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import cz.fit.lentaruand.data.NewsLink;
-import cz.fit.lentaruand.data.PhotoImage;
-import cz.fit.lentaruand.data.db.PhotoImageEntry;
+import cz.fit.lentaruand.data.Link;
+import cz.fit.lentaruand.data.db.NewsLinksEntry;
 import cz.fit.lentaruand.data.db.SQLiteType;
 
-public class NewsLinksDao /*extends DefaultDao<NewsLink>*/ {
-//	private static final String[] projectionAll = {
-//		PhotoImageEntry._ID,
-//		PhotoImageEntry.COLUMN_NAME_INDEX,
-//		PhotoImageEntry.COLUMN_NAME_PHOTO_ID,
-//		PhotoImageEntry.COLUMN_NAME_TITLE,
-//		PhotoImageEntry.COLUMN_NAME_URL,
-//		PhotoImageEntry.COLUMN_NAME_CREDITS,
-//		PhotoImageEntry.COLUMN_NAME_DESCRIPTION
-//	};
-//
-//	@Override
-//	protected ContentValues prepareContentValues(PhotoImage photoImage) {
-//		ContentValues values = new ContentValues();
-//
-//		values.put(PhotoImageEntry.COLUMN_NAME_PHOTO_ID, photoImage.getPhotoId());
-//		values.put(PhotoImageEntry.COLUMN_NAME_INDEX, photoImage.getIndex());
-//		
-//		if (photoImage.getTitle() == null)
-//			values.putNull(PhotoImageEntry.COLUMN_NAME_TITLE);
-//		else
-//			values.put(PhotoImageEntry.COLUMN_NAME_TITLE, photoImage.getTitle());
-//		
-//		values.put(PhotoImageEntry.COLUMN_NAME_URL, photoImage.getUrl());
-//		
-//		if (photoImage.getCredits() == null)
-//			values.putNull(PhotoImageEntry.COLUMN_NAME_CREDITS);
-//		else
-//			values.put(PhotoImageEntry.COLUMN_NAME_CREDITS, photoImage.getCredits());
-//		
-//		if (photoImage.getDescription() == null)
-//			values.putNull(PhotoImageEntry.COLUMN_NAME_DESCRIPTION);
-//		else
-//			values.put(PhotoImageEntry.COLUMN_NAME_DESCRIPTION, photoImage.getDescription());
-//		
-//		return values;
-//	}
-//
-//	@Override
-//	protected PhotoImage createDaoObject(Cursor cur) {
-//		int id = cur.getInt(cur.getColumnIndexOrThrow(PhotoImageEntry._ID));
-//		int photoid = cur.getInt(cur.getColumnIndexOrThrow(PhotoImageEntry.COLUMN_NAME_PHOTO_ID));
-//		int index = cur.getInt(cur.getColumnIndexOrThrow(PhotoImageEntry.COLUMN_NAME_INDEX));
-//		String title = cur.getString(cur.getColumnIndexOrThrow(PhotoImageEntry.COLUMN_NAME_TITLE));
-//		String url = cur.getString(cur.getColumnIndexOrThrow(PhotoImageEntry.COLUMN_NAME_URL));
-//		String credits = cur.getString(cur.getColumnIndexOrThrow(PhotoImageEntry.COLUMN_NAME_CREDITS));
-//		String description = cur.getString(cur.getColumnIndexOrThrow(PhotoImageEntry.COLUMN_NAME_DESCRIPTION));
-//		
-//		return new PhotoImage(id, photoid, index, url, title, credits, description);
-//	}
-//
-//	@Override
-//	protected String getTableName() {
-//		return PhotoImageEntry.TABLE_NAME;
-//	}
-//
-//	@Override
-//	protected String getIdColumnName() {
-//		return PhotoImageEntry._ID;
-//	}
-//
-//	@Override
-//	protected String getKeyColumnName() {
-//		return PhotoImageEntry._ID;
-//	}
-//
-//	@Override
-//	protected SQLiteType getKeyColumnType() {
-//		return SQLiteType.INTEGER;
-//	}
-//
-//	@Override
-//	protected String[] getProjectionAll() {
-//		return projectionAll;
-//	}
-//
-//	public Collection<PhotoImage> readForPhoto(SQLiteDatabase db, long photoKey) {
-//		List<PhotoImage> result = new ArrayList<PhotoImage>();
-//		
-//		String[] keyWhereArgs = { String.valueOf(photoKey) };
-//		String keyWhere = PhotoImageEntry.COLUMN_NAME_PHOTO_ID + " = ?";
-//		
-//		Cursor cur = db.query(
-//				getTableName(), 
-//				getProjectionAll(), 
-//				keyWhere,
-//				keyWhereArgs, 
-//				null, 
-//				null, 
-//				null
-//				);
-//		
-//		try {
-//			if (cur.moveToFirst()) {
-//				do {
-//					result.add(createDaoObject(cur));
-//				} while (cur.moveToNext());
-//			}
-//			
-//			return result;
-//		} finally {
-//			cur.close();
-//		}
-//	}
+public class NewsLinksDao extends DefaultDao<Link> {
+	private static final String[] projectionAll = {
+		NewsLinksEntry._ID,
+		NewsLinksEntry.COLUMN_NAME_NEWS_ID,
+		NewsLinksEntry.COLUMN_NAME_TITLE,
+		NewsLinksEntry.COLUMN_NAME_URL,
+		NewsLinksEntry.COLUMN_NAME_DATE
+	};
+
+	@Override
+	protected ContentValues prepareContentValues(Link link) {
+		ContentValues values = new ContentValues();
+
+		values.put(NewsLinksEntry.COLUMN_NAME_NEWS_ID, link.getNewsId());
+		if (link.getTitle() == null)
+			values.putNull(NewsLinksEntry.COLUMN_NAME_TITLE);
+		else
+			values.put(NewsLinksEntry.COLUMN_NAME_TITLE, link.getTitle());
+		
+		values.put(NewsLinksEntry.COLUMN_NAME_URL, link.getUrl());
+		
+		if (link.getDate() == null)
+			values.putNull(NewsLinksEntry.COLUMN_NAME_DATE);
+		else
+			values.put(NewsLinksEntry.COLUMN_NAME_DATE, link.getDate().getTime());
+		
+		return values;
+	}
+
+	@Override
+	protected Link createDaoObject(Cursor cur) {
+		long id = cur.getInt(cur.getColumnIndexOrThrow(NewsLinksEntry._ID));
+		long newsId = cur.getInt(cur.getColumnIndexOrThrow(NewsLinksEntry.COLUMN_NAME_NEWS_ID));
+		String title = cur.getString(cur.getColumnIndexOrThrow(NewsLinksEntry.COLUMN_NAME_TITLE));
+		String url = cur.getString(cur.getColumnIndexOrThrow(NewsLinksEntry.COLUMN_NAME_URL));
+		Date date = new Date(cur.getLong(cur.getColumnIndexOrThrow(NewsLinksEntry.COLUMN_NAME_DATE)));
+		
+		return new Link(id, newsId, url, title, date);
+	}
+
+	@Override
+	protected String getTableName() {
+		return NewsLinksEntry.TABLE_NAME;
+	}
+
+	@Override
+	protected String getIdColumnName() {
+		return NewsLinksEntry._ID;
+	}
+
+	@Override
+	protected String getKeyColumnName() {
+		return NewsLinksEntry._ID;
+	}
+
+	@Override
+	protected SQLiteType getKeyColumnType() {
+		return SQLiteType.INTEGER;
+	}
+
+	@Override
+	protected String[] getProjectionAll() {
+		return projectionAll;
+	}
+
+	public Collection<Link> readForNews(SQLiteDatabase db, long newsId) {
+		List<Link> result = new ArrayList<Link>();
+		
+		String[] keyWhereArgs = { String.valueOf(newsId) };
+		String keyWhere = NewsLinksEntry.COLUMN_NAME_NEWS_ID + " = ?";
+		
+		Cursor cur = db.query(
+				getTableName(), 
+				getProjectionAll(), 
+				keyWhere,
+				keyWhereArgs, 
+				null, 
+				null, 
+				null
+				);
+		
+		try {
+			if (cur.moveToFirst()) {
+				do {
+					result.add(createDaoObject(cur));
+				} while (cur.moveToNext());
+			}
+			
+			Collections.sort(result);
+			
+			return result;
+		} finally {
+			cur.close();
+		}
+	}
 }

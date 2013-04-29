@@ -30,7 +30,7 @@ public class NewsDaoTest extends AndroidTestCase {
 		context.deleteDatabase(LentaDbHelper.DATABASE_NAME);
 		date = new Date();
 		testNews = new News("guid1", "News 1", "http://www.1.ru", "Brief news info", "Full news text", 
-				date, "http://www.image.com/image.png", "Image caption", "Photo: PK", Rubrics.CULTURE, true);
+				date, "http://www.image.com/image.png", "Image caption", "Photo: PK", null, Rubrics.CULTURE, true);
 		dbHelper = new LentaDbHelper(context);
 	}
 

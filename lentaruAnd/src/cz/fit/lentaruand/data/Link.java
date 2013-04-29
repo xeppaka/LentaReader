@@ -4,7 +4,7 @@ import java.util.Date;
 
 import cz.fit.lentaruand.data.dao.DaoObject;
 
-public class NewsLink implements DaoObject, Comparable<NewsLink> {
+public class Link implements DaoObject, Comparable<Link> {
 	private long id;
 	private String idStr;
 	private long newsId;
@@ -12,7 +12,7 @@ public class NewsLink implements DaoObject, Comparable<NewsLink> {
 	private String title;
 	private Date date;
 	
-	public NewsLink(long id, long newsId, String url, String title, Date date) {
+	public Link(long id, long newsId, String url, String title, Date date) {
 		super();
 		setId(id);
 		setNewsId(newsId);
@@ -21,7 +21,7 @@ public class NewsLink implements DaoObject, Comparable<NewsLink> {
 		setDate(date);
 	}
 
-	public NewsLink(long newsId, String url, String title, Date date) {
+	public Link(long newsId, String url, String title, Date date) {
 		super();
 		setId(ID_NONE);
 		setNewsId(newsId);
@@ -30,7 +30,7 @@ public class NewsLink implements DaoObject, Comparable<NewsLink> {
 		setDate(date);
 	}
 	
-	public NewsLink(String url, String title, Date date) {
+	public Link(String url, String title, Date date) {
 		super();
 		setId(ID_NONE);
 		setNewsId(ID_NONE);
@@ -61,6 +61,9 @@ public class NewsLink implements DaoObject, Comparable<NewsLink> {
 	}
 	
 	public void setUrl(String url) {
+		if (url == null || url.length() <= 0)
+			throw new IllegalArgumentException("Argument url must not be null or empty.");
+		
 		this.url = url;
 	}
 	
@@ -81,7 +84,7 @@ public class NewsLink implements DaoObject, Comparable<NewsLink> {
 	}
 
 	@Override
-	public int compareTo(NewsLink other) {
+	public int compareTo(Link other) {
 		return getDate().compareTo(other.getDate());
 	}
 

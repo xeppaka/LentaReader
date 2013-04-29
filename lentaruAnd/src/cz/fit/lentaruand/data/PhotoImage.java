@@ -12,7 +12,7 @@ public class PhotoImage implements DaoObject, Comparable<PhotoImage> {
 	private String credits;
 	private String description;
 	
-	public PhotoImage(int id, int photoId, int index, String url, String title, String credits, String description) {
+	public PhotoImage(long id, long photoId, int index, String url, String title, String credits, String description) {
 		setId(id);
 		setPhotoId(photoId);
 		setIndex(index);
@@ -22,7 +22,7 @@ public class PhotoImage implements DaoObject, Comparable<PhotoImage> {
 		setDescription(description);
 	}
 	
-	public PhotoImage(int photoId, int index, String url, String title, String credits, String description) {
+	public PhotoImage(long photoId, int index, String url, String title, String credits, String description) {
 		setId(ID_NONE);
 		setPhotoId(photoId);
 		setIndex(index);

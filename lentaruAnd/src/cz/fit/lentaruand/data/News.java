@@ -1,6 +1,8 @@
 package cz.fit.lentaruand.data;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 
 import cz.fit.lentaruand.parser.rss.LentaRssItem;
@@ -11,10 +13,11 @@ public class News extends NewsObject {
 	private String imageLink;
 	private String imageCaption;
 	private String imageCredits;
+	private Collection<Link> links;
 
 	public News(long id, String guid, String title, String link, String briefText,
 			String fullText, Date pubDate, String imageLink,
-			String imageCaption, String imageCredits, Rubrics rubric, 
+			String imageCaption, String imageCredits, Collection<Link> links, Rubrics rubric, 
 			boolean rubricUpdateNeed) {
 		super(id, guid, title, link, pubDate, rubric, rubricUpdateNeed);
 		
@@ -23,11 +26,13 @@ public class News extends NewsObject {
 		setImageLink(imageLink);
 		setImageCaption(imageCaption);
 		setImageCredits(imageCredits);
+		setLinks(links);
+		
 	}
 	
 	public News(String guid, String title, String link, String briefText,
 			String fullText, Date pubDate, String imageLink,
-			String imageCaption, String imageCredits, Rubrics rubric, 
+			String imageCaption, String imageCredits, Collection<Link> links, Rubrics rubric, 
 			boolean rubricUpdateNeed) {
 		super(guid, title, link, pubDate, rubric, rubricUpdateNeed);
 		
@@ -36,6 +41,7 @@ public class News extends NewsObject {
 		setImageLink(imageLink);
 		setImageCaption(imageCaption);
 		setImageCredits(imageCredits);
+		setLinks(links);
 	}
 
 	public News(LentaRssItem rssItem) {
@@ -46,6 +52,7 @@ public class News extends NewsObject {
 		setImageLink(rssItem.getImageLink());
 		setImageCaption(null);
 		setImageCredits(null);
+		setLinks(null);
 	}
 	
 
@@ -90,6 +97,17 @@ public class News extends NewsObject {
 
 	public void setImageCredits(String imageCredits) {
 		this.imageCredits = imageCredits;
+	}
+
+	public Collection<Link> getLinks() {
+		return links;
+	}
+
+	public void setLinks(Collection<Link> links) {
+		if (links == null)
+			this.links = Collections.emptyList();
+		else
+			this.links = links;
 	}
 
 	public boolean isContentFull() {

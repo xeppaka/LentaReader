@@ -2,6 +2,7 @@ package cz.fit.lentaruand.data.dao;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import android.content.ContentValues;
@@ -51,8 +52,8 @@ public class PhotoImageDao extends DefaultDao<PhotoImage> {
 
 	@Override
 	protected PhotoImage createDaoObject(Cursor cur) {
-		int id = cur.getInt(cur.getColumnIndexOrThrow(PhotoImageEntry._ID));
-		int photoid = cur.getInt(cur.getColumnIndexOrThrow(PhotoImageEntry.COLUMN_NAME_PHOTO_ID));
+		long id = cur.getInt(cur.getColumnIndexOrThrow(PhotoImageEntry._ID));
+		long photoid = cur.getInt(cur.getColumnIndexOrThrow(PhotoImageEntry.COLUMN_NAME_PHOTO_ID));
 		int index = cur.getInt(cur.getColumnIndexOrThrow(PhotoImageEntry.COLUMN_NAME_INDEX));
 		String title = cur.getString(cur.getColumnIndexOrThrow(PhotoImageEntry.COLUMN_NAME_TITLE));
 		String url = cur.getString(cur.getColumnIndexOrThrow(PhotoImageEntry.COLUMN_NAME_URL));
@@ -87,10 +88,10 @@ public class PhotoImageDao extends DefaultDao<PhotoImage> {
 		return projectionAll;
 	}
 
-	public Collection<PhotoImage> readForPhoto(SQLiteDatabase db, long photoKey) {
+	public Collection<PhotoImage> readForPhoto(SQLiteDatabase db, long photoId) {
 		List<PhotoImage> result = new ArrayList<PhotoImage>();
 		
-		String[] keyWhereArgs = { String.valueOf(photoKey) };
+		String[] keyWhereArgs = { String.valueOf(photoId) };
 		String keyWhere = PhotoImageEntry.COLUMN_NAME_PHOTO_ID + " = ?";
 		
 		Cursor cur = db.query(
@@ -109,6 +110,8 @@ public class PhotoImageDao extends DefaultDao<PhotoImage> {
 					result.add(createDaoObject(cur));
 				} while (cur.moveToNext());
 			}
+			
+			Collections.sort(result);
 			
 			return result;
 		} finally {

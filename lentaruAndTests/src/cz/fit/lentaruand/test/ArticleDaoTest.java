@@ -29,7 +29,7 @@ public class ArticleDaoTest extends AndroidTestCase {
 		context.deleteDatabase(LentaDbHelper.DATABASE_NAME);
 		date = new Date();
 		testArticle = new Article("guid1", "Vse o medvedjah.", "Mishki na severe.", "Pavel Kachalouski", "http://www.mishki.ru", 
-				"Holodno im.", "-40 tam ved'.", date, "http://www.mishki.ru/medved.jpg", "Mishka", "Photo: ISS", Rubrics.LIFE_ANIMALS, false);
+				"Holodno im.", "-40 tam ved'.", date, "http://www.mishki.ru/medved.jpg", "Mishka", "Photo: ISS", null, Rubrics.LIFE_ANIMALS, false);
 		dbHelper = new LentaDbHelper(context);
 	}
 

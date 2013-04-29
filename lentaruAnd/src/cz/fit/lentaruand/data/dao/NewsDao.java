@@ -1,10 +1,16 @@
 package cz.fit.lentaruand.data.dao;
 
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import cz.fit.lentaruand.data.News;
+import cz.fit.lentaruand.data.Link;
 import cz.fit.lentaruand.data.Rubrics;
 import cz.fit.lentaruand.data.db.NewsEntry;
 import cz.fit.lentaruand.data.db.SQLiteType;
@@ -24,6 +30,12 @@ public class NewsDao extends DefaultDao<News> {
 		NewsEntry.COLUMN_NAME_BRIEFTEXT,
 		NewsEntry.COLUMN_NAME_FULLTEXT
 	};
+	
+	private NewsLinksDao newsLinksDao;
+	
+	public NewsDao() {
+		newsLinksDao = new NewsLinksDao();
+	}
 	
 	@Override
 	protected ContentValues prepareContentValues(News news) {
@@ -77,7 +89,7 @@ public class NewsDao extends DefaultDao<News> {
 		String briefText = cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_BRIEFTEXT));
 		String fullText = cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_FULLTEXT));
 		
-		return new News(id, guidDb, title, link, briefText, fullText, pubDate, imageLink, imageCaption, imageCredits, rubric, rubricUpdateNeed);
+		return new News(id, guidDb, title, link, briefText, fullText, pubDate, imageLink, imageCaption, imageCredits, null, rubric, rubricUpdateNeed);
 	}
 
 	@Override
@@ -103,5 +115,72 @@ public class NewsDao extends DefaultDao<News> {
 	@Override
 	protected String[] getProjectionAll() {
 		return projectionAll;
+	}
+
+	@Override
+	public News read(SQLiteDatabase db, long id) {
+		News news = super.read(db, id);
+		
+		if (news == null)
+			return news;
+		
+		List<Link> links = new ArrayList<Link>(newsLinksDao.readForNews(db, news.getId()));
+		Collections.sort(links);
+		
+		news.setLinks(links);
+		return news;
+	}
+
+	@Override
+	public News read(SQLiteDatabase db, String key) {
+		News news = super.read(db, key);
+		
+		if (news == null)
+			return news;
+		
+		List<Link> links = new ArrayList<Link>(newsLinksDao.readForNews(db, news.getId()));
+		Collections.sort(links);
+		
+		news.setLinks(links);
+		return news;
+	}
+
+	@Override
+	public News read(SQLiteDatabase db, SQLiteType keyType,
+			String keyColumnName, String keyValue) {
+		News news = super.read(db, keyType, keyColumnName, keyValue);
+		
+		if (news == null)
+			return news;
+		
+		List<Link> links = new ArrayList<Link>(newsLinksDao.readForNews(db, news.getId()));
+		Collections.sort(links);
+		
+		news.setLinks(links);
+		return news;
+	}
+
+	@Override
+	public long create(SQLiteDatabase db, News news) {
+		long newsId = super.create(db, news);
+		Collection<Link> links = news.getLinks();
+		
+		for (Link link : links) {
+			link.setNewsId(newsId);
+			newsLinksDao.create(db, link);
+		}
+		
+		return newsId;
+	}
+
+	@Override
+	public void update(SQLiteDatabase db, News news) {
+		Collection<Link> links = news.getLinks();
+		
+		for (Link link : links) {
+			newsLinksDao.update(db, link);
+		}
+		
+		super.update(db, news);
 	}
 }
