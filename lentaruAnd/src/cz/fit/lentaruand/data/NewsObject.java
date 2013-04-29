@@ -144,15 +144,6 @@ public abstract class NewsObject implements Comparable<NewsObject>, DaoObject, S
 		return getGuid();
 	}
 	
-//	private long id;
-//	private String guid;
-//	private String title;
-//	private String link;
-//	private Date pubDate;
-//	private Rubrics rubric;
-//	private boolean rubricUpdateNeed;
-
-	
 	private void writeObject(java.io.ObjectOutputStream out) throws IOException {
 		out.writeLong(id);
 		out.writeUTF(guid);
