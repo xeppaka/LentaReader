@@ -30,7 +30,7 @@
             android:label="@string/title_activity_test" >
         </activity>
         <activity
-            android:name="cz.fit.lentaruand.FullNewsActivity"
+            android:name="cz.fit.lentaruand.ui.FullNewsActivity"
             android:label="@string/title_activity_full_news" >
         </activity>
     </application>

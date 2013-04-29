@@ -1,21 +1,21 @@
-package cz.fit.lentaruand.fragments;
+package cz.fit.lentaruand.ui;
 
 import java.util.List;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockListFragment;
 import com.actionbarsherlock.internal.widget.IcsAdapterView;
@@ -24,22 +24,24 @@ import com.actionbarsherlock.view.ActionMode;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 
-import cz.fit.lentaruand.FullNewsActivity;
+import cz.fit.lentaruand.Main;
 import cz.fit.lentaruand.NewsAdapter;
 import cz.fit.lentaruand.R;
 import cz.fit.lentaruand.asyncloaders.AsyncBriefNewsLoader;
 import cz.fit.lentaruand.data.News;
+import cz.fit.lentaruand.data.dao.NewsDao;
+import cz.fit.lentaruand.data.db.LentaDbHelper;
 
 public class SwipeNewsListFragment extends SherlockListFragment implements
-		LoaderManager.LoaderCallbacks<List<News>>, OnItemLongClickListener{
+		LoaderManager.LoaderCallbacks<List<News>> {
 
-	ActionMode actionMode;
 	int mCurrentPage;
+	private LentaDbHelper dbHelper;
 	static final String ARGUMENT_PAGE_NUMBER = "arg_page_number";
 	private String mContent = "???";
-	private static final String KEY_CONTENT = "TestFragment:Content";
 	private NewsAdapter newsAdapter;
 	private Context context;
+	ListView newsList;
 	TextView tv;
 
 	public SwipeNewsListFragment() {
@@ -74,13 +76,6 @@ public class SwipeNewsListFragment extends SherlockListFragment implements
 		return fragment;
 	}
 
-	// public SwipeNewsListFragment(List<News> news, int currentPage, Context
-	// context) {
-	// newsAdapter = new NewsAdapter(context, news);
-	// this.mCurrentPage = currentPage;
-	// this.context = context;
-	// }
-
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -95,29 +90,8 @@ public class SwipeNewsListFragment extends SherlockListFragment implements
 				FullNewsActivity.class);
 		intent.putExtra("NewsObject", newsAdapter.getItem(position));
 		startActivity(intent);
-
 	}
 
-	@Override
-	public boolean onItemLongClick(IcsAdapterView<?> parent, View view,
-			int position, long id) {	
-		
-		if (actionMode == null)
-		      actionMode = getSherlockActivity().startActionMode(callback);
-		    else
-		      actionMode.finish();		
-		return false;
-	}
-
-
-
-//	@Override
-//	public boolean onItemLongClick(IcsAdapterView<?> parent, View view,
-//			int position, long id) {
-//		// TODO Auto-generated method stub
-//		return false;
-//	}
-	
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
@@ -149,15 +123,11 @@ public class SwipeNewsListFragment extends SherlockListFragment implements
 		if (mContent == "Error") {
 			tv.setText(mContent);
 		}
-
-//		getListView().setOnItemLongClickListener(new OnItemLongClickListener() {
-//			@Override
-//			public boolean onItemLongClick(IcsAdapterView<?> parent, View view,
-//					int position, long id) {
-//				// TODO Auto-generated method stub
-//				return false;
-//			}
-//		});
+		newsList = getListView();
+		newsList.setLongClickable(true);
+		newsList.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+		newsList.setOnItemLongClickListener(
+				new ActionModeHelper(this, newsList));
 	}
 
 	// @Override
@@ -198,8 +168,36 @@ public class SwipeNewsListFragment extends SherlockListFragment implements
 
 		public void onDestroyActionMode(ActionMode mode) {
 			// Log.d(LOG_TAG, "destroy");
-			actionMode = null;
 		}
 
 	};
+	
+	@SuppressWarnings("unchecked")
+	public boolean performAction(int itemId, int checkedItemPosition) {
+		switch (itemId) {
+		case R.id.save:
+			dbHelper = new LentaDbHelper(context);
+			SQLiteDatabase db = dbHelper.getWritableDatabase();
+			NewsDao newsDao = new NewsDao();
+			try {
+			  newsDao.create(db, newsAdapter.getItem(checkedItemPosition));
+			} finally {
+			 db.close();
+			}
+			Toast.makeText(this.getSherlockActivity(), "TODO saving of the news", Toast.LENGTH_LONG)
+					.show();
+			return (true);
+
+		case R.id.openNews:
+			Intent intent = new Intent(this.getSherlockActivity(),
+					FullNewsActivity.class);
+			intent.putExtra("NewsObject", newsAdapter.getItem(checkedItemPosition));
+			startActivity(intent);
+			Toast.makeText(this.getSherlockActivity(), "TODO opening the news" + "position is:" + checkedItemPosition, Toast.LENGTH_LONG)
+					.show();
+			return (true);
+		}
+
+		return false;
+	}
 }

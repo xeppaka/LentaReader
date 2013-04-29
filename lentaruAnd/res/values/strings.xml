@@ -3,7 +3,7 @@
 
     <string name="app_name">lentaruAnd</string>
     <string name="action_bar_title">L3NTA.RU</string>
-    <string name="action_bar_subtitle">дата</string>
+    <string name="action_bar_subtitle">date</string>
     <string name="create_news">Load news</string>
     <string name="menu_settings">Settings</string>
     <string name="title_activity_test">Test News Activity</string>
@@ -12,8 +12,9 @@
     <string name="categories">Рубрики</string>
     <string name="download">Загрузить список новостей</string>
     <string name="fullnews">Текст полной новости должен быть здесь.</string>
-    <string name="saveToDB">Сохранить для будущего Я</string>
-	<string name="openFullNews">Открыть полную новость</string>
+    <string name="save_to_db">Сохранить для будущего Я</string>
+	<string name="open_full_news">Открыть полную новость</string>
+	<string name="action_mode_title">Действия</string>
     <string-array name="my_array">
         <item>ONE</item>
         <item>TWO</item>

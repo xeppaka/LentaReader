@@ -1,12 +1,14 @@
-package cz.fit.lentaruand;
+package cz.fit.lentaruand.ui;
 
 import android.os.Bundle;
 import android.view.Menu;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 
+import cz.fit.lentaruand.R;
+import cz.fit.lentaruand.R.id;
+import cz.fit.lentaruand.R.layout;
 import cz.fit.lentaruand.data.News;
-import cz.fit.lentaruand.fragments.NewsFullFragment;
 
 public class FullNewsActivity extends SherlockFragmentActivity {
 
@@ -23,4 +25,5 @@ public class FullNewsActivity extends SherlockFragmentActivity {
 		getSupportFragmentManager().beginTransaction().add(R.id.full_news_fragment_container, fullNewsFragment).commit();
 
 	}
+
 }

@@ -1,4 +1,4 @@
-package cz.fit.lentaruand.fragments;
+package cz.fit.lentaruand.ui;
 
 import android.content.Context;
 import android.os.Bundle;

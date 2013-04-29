@@ -1,11 +1,11 @@
 package cz.fit.lentaruand;
 
-import java.util.Date;
-
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
@@ -15,10 +15,13 @@ import com.viewpagerindicator.PageIndicator;
 import com.viewpagerindicator.TitlePageIndicator;
 import com.viewpagerindicator.TitlePageIndicator.IndicatorStyle;
 
+import cz.fit.lentaruand.ui.FullNewsActivity;
+import cz.fit.lentaruand.ui.SwipeNewsListFragmentPagerAdapter;
+
 /**
  * 
  * @author kacpa01
- *
+ * 
  */
 public class Main extends SherlockFragmentActivity {
 
@@ -27,18 +30,17 @@ public class Main extends SherlockFragmentActivity {
 	SwipeNewsListFragmentPagerAdapter pagerAdapter;
 	ViewPager pager;
 	String date;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		final ActionBar bar = getSupportActionBar();
 		bar.setTitle(R.string.action_bar_title);
-//		date = new Date().toString();
-//		date.offsetByCodePoints(0, 10);
-//		bar.setSubtitle(date);
-		
-		
+		// date = new Date().toString();
+		// date.offsetByCodePoints(0, 10);
+		// bar.setSubtitle(date);
+
 		pager = (ViewPager) findViewById(R.id.pager);
 		pagerAdapter = new SwipeNewsListFragmentPagerAdapter(
 				getSupportFragmentManager(), getApplicationContext());
@@ -67,7 +69,9 @@ public class Main extends SherlockFragmentActivity {
 	// обработка нажатий
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		
+
 		return super.onOptionsItemSelected(item);
 	}
+
+	
 }

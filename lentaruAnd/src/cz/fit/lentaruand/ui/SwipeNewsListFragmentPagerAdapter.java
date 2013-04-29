@@ -1,9 +1,8 @@
-package cz.fit.lentaruand;
+package cz.fit.lentaruand.ui;
 
 import java.util.Collections;
 
 import cz.fit.lentaruand.data.News;
-import cz.fit.lentaruand.fragments.SwipeNewsListFragment;
 import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
