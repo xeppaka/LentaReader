@@ -1,6 +1,5 @@
 package cz.fit.lentaruand.data;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -29,7 +28,6 @@ public class News extends NewsObject {
 		setImageCaption(imageCaption);
 		setImageCredits(imageCredits);
 		setLinks(links);
-		
 	}
 	
 	public News(String guid, String title, String link, String briefText,
@@ -119,16 +117,5 @@ public class News extends NewsObject {
 	@Override
 	public NewsType getType() {
 		return NewsType.NEWS;
-	}
-	
-	private void writeObject(java.io.ObjectOutputStream out) throws IOException {
-		out.writeUTF(briefText);
-		out.writeUTF(imageLink);
-	}
-
-	private void readObject(java.io.ObjectInputStream in) throws IOException,
-			ClassNotFoundException {
-		briefText = in.readUTF();
-		imageLink = in.readUTF();
 	}
 }

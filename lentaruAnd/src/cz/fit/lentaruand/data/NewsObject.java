@@ -1,13 +1,11 @@
 package cz.fit.lentaruand.data;
 
-import java.io.IOException;
-import java.io.Serializable;
 import java.util.Date;
 
 import cz.fit.lentaruand.data.dao.DaoObject;
 import cz.fit.lentaruand.parser.rss.LentaRssItem;
 
-public abstract class NewsObject implements Comparable<NewsObject>, DaoObject, Serializable {
+public abstract class NewsObject implements Comparable<NewsObject>, DaoObject {
 	private static final long serialVersionUID = 1L;
 	
 	private long id;
@@ -145,26 +143,4 @@ public abstract class NewsObject implements Comparable<NewsObject>, DaoObject, S
 	public String getKeyValue() {
 		return getGuid();
 	}
-	
-	private void writeObject(java.io.ObjectOutputStream out) throws IOException {
-		out.writeLong(id);
-		out.writeUTF(guid);
-		out.writeUTF(title);
-		out.writeUTF(link);
-		out.writeLong(pubDate.getTime());
-		out.writeUTF(rubric.name());
-		out.writeBoolean(rubricUpdateNeed);
-	}
-
-	private void readObject(java.io.ObjectInputStream in) throws IOException,
-			ClassNotFoundException {
-		id = in.readLong();
-		guid = in.readUTF();
-		title = in.readUTF();
-		link = in.readUTF();
-		pubDate = new Date(in.readLong());
-		rubric = Rubrics.valueOf(in.readUTF());
-		rubricUpdateNeed = in.readBoolean();
-	}
-		 
 }

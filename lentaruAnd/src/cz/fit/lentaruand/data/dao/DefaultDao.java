@@ -120,9 +120,9 @@ public abstract class DefaultDao<T extends DaoObject> implements Dao<T> {
 				getTableName(), 
 				projectionKeyOnly, 
 				null,
-				null, 
-				null, 
-				null, 
+				null,
+				null,
+				null,
 				null
 				);
 		
