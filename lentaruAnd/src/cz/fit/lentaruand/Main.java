@@ -1,22 +1,18 @@
 package cz.fit.lentaruand;
 
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
-import android.widget.Button;
-import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
-import com.viewpagerindicator.PageIndicator;
-import com.viewpagerindicator.TitlePageIndicator;
-import com.viewpagerindicator.TitlePageIndicator.IndicatorStyle;
 
-import cz.fit.lentaruand.ui.FullNewsActivity;
 import cz.fit.lentaruand.ui.SwipeNewsListFragmentPagerAdapter;
+import cz.fit.lentaruand.viewpagerindicator.PageIndicator;
+import cz.fit.lentaruand.viewpagerindicator.TitlePageIndicator;
+import cz.fit.lentaruand.viewpagerindicator.TitlePageIndicator.IndicatorStyle;
 
 /**
  * 
@@ -25,7 +21,7 @@ import cz.fit.lentaruand.ui.SwipeNewsListFragmentPagerAdapter;
  */
 public class Main extends SherlockFragmentActivity {
 
-	private Button showNews;
+	//private Button showNews;
 	PageIndicator mIndicator;
 	SwipeNewsListFragmentPagerAdapter pagerAdapter;
 	ViewPager pager;
@@ -66,7 +62,6 @@ public class Main extends SherlockFragmentActivity {
 		return true;
 	}
 
-	// обработка нажатий
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.viewpagerindicator;
+package cz.fit.lentaruand.viewpagerindicator;
 
 import android.support.v4.view.ViewPager;
 

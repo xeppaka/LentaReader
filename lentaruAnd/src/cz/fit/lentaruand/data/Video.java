@@ -5,6 +5,7 @@ import java.util.Date;
 import cz.fit.lentaruand.parser.rss.LentaRssItem;
 
 public class Video extends NewsObject {
+	private static final long serialVersionUID = 1L;
 	
 	public Video(String guid, String title, String link, Date pubDate,
 			Rubrics rubric, boolean rubricUpdateNeed) {

@@ -18,13 +18,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockListFragment;
-import com.actionbarsherlock.internal.widget.IcsAdapterView;
-import com.actionbarsherlock.internal.widget.IcsAdapterView.OnItemLongClickListener;
 import com.actionbarsherlock.view.ActionMode;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 
-import cz.fit.lentaruand.Main;
 import cz.fit.lentaruand.NewsAdapter;
 import cz.fit.lentaruand.R;
 import cz.fit.lentaruand.asyncloaders.AsyncBriefNewsLoader;
@@ -118,6 +115,7 @@ public class SwipeNewsListFragment extends SherlockListFragment implements
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
+		
 		if (mContent == "News")
 			getLoaderManager().initLoader(0, null, this).forceLoad();
 		if (mContent == "Error") {
@@ -172,7 +170,6 @@ public class SwipeNewsListFragment extends SherlockListFragment implements
 
 	};
 	
-	@SuppressWarnings("unchecked")
 	public boolean performAction(int itemId, int checkedItemPosition) {
 		switch (itemId) {
 		case R.id.save:

@@ -7,7 +7,8 @@ import java.util.Date;
 import cz.fit.lentaruand.parser.rss.LentaRssItem;
 
 public class Photo extends NewsObject {
-
+	private static final long serialVersionUID = 1L;
+	
 	private String secondTitle;
 	private String description;
 	private Collection<PhotoImage> photos;

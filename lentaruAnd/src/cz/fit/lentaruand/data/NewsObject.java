@@ -8,6 +8,8 @@ import cz.fit.lentaruand.data.dao.DaoObject;
 import cz.fit.lentaruand.parser.rss.LentaRssItem;
 
 public abstract class NewsObject implements Comparable<NewsObject>, DaoObject, Serializable {
+	private static final long serialVersionUID = 1L;
+	
 	private long id;
 	private String guid;
 	private String title;

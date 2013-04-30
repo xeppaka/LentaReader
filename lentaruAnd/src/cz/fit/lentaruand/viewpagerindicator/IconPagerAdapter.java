@@ -1,4 +1,4 @@
-package com.viewpagerindicator;
+package cz.fit.lentaruand.viewpagerindicator;
 
 public interface IconPagerAdapter {
     /**

@@ -2,11 +2,11 @@ package cz.fit.lentaruand.ui;
 
 import java.util.Collections;
 
-import cz.fit.lentaruand.data.News;
 import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import cz.fit.lentaruand.data.News;
 
 public class SwipeNewsListFragmentPagerAdapter extends FragmentPagerAdapter {
 

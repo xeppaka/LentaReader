@@ -8,6 +8,8 @@ import java.util.Date;
 import cz.fit.lentaruand.parser.rss.LentaRssItem;
 
 public class News extends NewsObject {
+	private static final long serialVersionUID = 1L;
+	
 	private String briefText;
 	private String fullText;
 	private String imageLink;

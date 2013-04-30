@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.viewpagerindicator;
+package cz.fit.lentaruand.viewpagerindicator;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -30,6 +30,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
+import cz.fit.lentaruand.R;
 
 /**
  * Draws a line for each page. The current page line is colored differently

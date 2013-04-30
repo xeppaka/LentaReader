@@ -1,4 +1,4 @@
-package com.viewpagerindicator;
+package cz.fit.lentaruand.viewpagerindicator;
 
 import android.content.Context;
 import android.content.res.TypedArray;
