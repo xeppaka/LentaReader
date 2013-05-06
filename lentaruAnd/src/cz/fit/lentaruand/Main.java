@@ -8,11 +8,11 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
+import com.viewpagerindicator.PageIndicator;
+import com.viewpagerindicator.TitlePageIndicator;
+import com.viewpagerindicator.TitlePageIndicator.IndicatorStyle;
 
 import cz.fit.lentaruand.ui.SwipeNewsListFragmentPagerAdapter;
-import cz.fit.lentaruand.viewpagerindicator.PageIndicator;
-import cz.fit.lentaruand.viewpagerindicator.TitlePageIndicator;
-import cz.fit.lentaruand.viewpagerindicator.TitlePageIndicator.IndicatorStyle;
 
 /**
  * 
