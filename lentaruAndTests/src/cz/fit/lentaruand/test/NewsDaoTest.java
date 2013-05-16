@@ -1,19 +1,23 @@
 package cz.fit.lentaruand.test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.SmallTest;
+import cz.fit.lentaruand.data.Link;
 import cz.fit.lentaruand.data.News;
 import cz.fit.lentaruand.data.NewsType;
 import cz.fit.lentaruand.data.Rubrics;
 import cz.fit.lentaruand.data.dao.NewsDao;
+import cz.fit.lentaruand.data.dao.NewsLinksDao;
 import cz.fit.lentaruand.data.db.LentaDbHelper;
 
 public class NewsDaoTest extends AndroidTestCase {
@@ -29,8 +33,11 @@ public class NewsDaoTest extends AndroidTestCase {
 		context = getContext();
 		context.deleteDatabase(LentaDbHelper.DATABASE_NAME);
 		date = new Date();
+		Link l1 = new Link("http://www.sky.com", "Link to the heaven", date);
+		Link l2 = new Link("http://www.sky1.com", "Link to the heaven 1", date);
+		Link l3 = new Link("http://www.sky2.com", "Link to the heaven 2", date);
 		testNews = new News("guid1", "News 1", "http://www.1.ru", "Brief news info", "Full news text", 
-				date, "http://www.image.com/image.png", "Image caption", "Photo: PK", null, Rubrics.CULTURE, true);
+				date, "http://www.image.com/image.png", "Image caption", "Photo: PK", Arrays.asList(l1, l2, l3), Rubrics.CULTURE, true);
 		dbHelper = new LentaDbHelper(context);
 	}
 
@@ -66,6 +73,25 @@ public class NewsDaoTest extends AndroidTestCase {
 			assertEquals(Rubrics.CULTURE, n.getRubric());
 			assertEquals(true, n.isRubricUpdateNeed());
 			
+			assertEquals(3, n.getLinks().size());
+			
+			Iterator<Link> li = n.getLinks().iterator();
+			Link l = li.next();
+			
+			assertEquals("http://www.sky.com", l.getUrl());
+			assertEquals("Link to the heaven", l.getTitle());
+			assertEquals(date, l.getDate());
+			
+			l = li.next();
+			assertEquals("http://www.sky2.com", l.getUrl());
+			assertEquals("Link to the heaven 2", l.getTitle());
+			assertEquals(date, l.getDate());
+			
+			l = li.next();
+			assertEquals("http://www.sky2.com", l.getUrl());
+			assertEquals("Link to the heaven 2", l.getTitle());
+			assertEquals(date, l.getDate());
+			
 			newsDao.delete(db, id);
 		} finally {
 			db.close();
@@ -93,6 +119,25 @@ public class NewsDaoTest extends AndroidTestCase {
 			assertEquals(Rubrics.CULTURE, n.getRubric());
 			assertEquals(true, n.isRubricUpdateNeed());
 			
+			assertEquals(3, n.getLinks().size());
+			
+			Iterator<Link> li = n.getLinks().iterator();
+			Link l = li.next();
+			
+			assertEquals("http://www.sky.com", l.getUrl());
+			assertEquals("Link to the heaven", l.getTitle());
+			assertEquals(date, l.getDate());
+			
+			l = li.next();
+			assertEquals("http://www.sky2.com", l.getUrl());
+			assertEquals("Link to the heaven 2", l.getTitle());
+			assertEquals(date, l.getDate());
+			
+			l = li.next();
+			assertEquals("http://www.sky2.com", l.getUrl());
+			assertEquals("Link to the heaven 2", l.getTitle());
+			assertEquals(date, l.getDate());
+			
 			newsDao.delete(db, "guid1");
 		} finally {
 			db.close();
@@ -102,12 +147,23 @@ public class NewsDaoTest extends AndroidTestCase {
 	@SmallTest
 	public void testDeleteNewsUseGuid() {
 		createNews("guid1");
+		Iterator<Link> it = testNews.getLinks().iterator();
+		long linkId1 = it.next().getId();
+		long linkId2 = it.next().getId();
+		long linkId3 = it.next().getId();
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
 		try {
+			NewsLinksDao nlinksDao = new NewsLinksDao();
 			NewsDao newsDao = new NewsDao();
 			newsDao.delete(db, "guid1");
 			News n = newsDao.read(db, "guid1");
 			assertNull(n);
+			Link l = nlinksDao.read(db, linkId1);
+			assertNull(l);
+			l = nlinksDao.read(db, linkId2);
+			assertNull(l);
+			l = nlinksDao.read(db, linkId3);
+			assertNull(l);
 		} finally {
 			db.close();
 		}
@@ -116,12 +172,23 @@ public class NewsDaoTest extends AndroidTestCase {
 	@SmallTest
 	public void testDeleteNewsUseId() {
 		long id = createNews("guid1");
+		Iterator<Link> it = testNews.getLinks().iterator();
+		long linkId1 = it.next().getId();
+		long linkId2 = it.next().getId();
+		long linkId3 = it.next().getId();
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
 		try {
+			NewsLinksDao nlinksDao = new NewsLinksDao();
 			NewsDao newsDao = new NewsDao();
 			newsDao.delete(db, id);
 			News n = newsDao.read(db, id);
 			assertNull(n);
+			Link l = nlinksDao.read(db, linkId1);
+			assertNull(l);
+			l = nlinksDao.read(db, linkId2);
+			assertNull(l);
+			l = nlinksDao.read(db, linkId3);
+			assertNull(l);
 		} finally {
 			db.close();
 		}
@@ -148,6 +215,23 @@ public class NewsDaoTest extends AndroidTestCase {
 			n.setRubricUpdateNeed(false);
 			n.setTitle("newtitle1");
 			
+			Iterator<Link> it = n.getLinks().iterator();
+			Date dd = new Date();
+			Link l = it.next();
+			l.setDate(dd);
+			l.setTitle("new title");
+			l.setUrl("http://www.mail.ru");
+			
+			l = it.next();
+			l.setDate(dd);
+			l.setTitle("new title 1");
+			l.setUrl("http://www.gmail.com");
+			
+			l = it.next();
+			l.setDate(dd);
+			l.setTitle("new title 2");
+			l.setUrl("http://www.htc.com");
+			
 			newsDao.update(db, n);
 			
 			n = newsDao.read(db, id);
@@ -165,6 +249,25 @@ public class NewsDaoTest extends AndroidTestCase {
 			assertEquals("newcredits1", n.getImageCredits());
 			assertEquals(Rubrics.ECONOMICS_FINANCE, n.getRubric());
 			assertEquals(false, n.isRubricUpdateNeed());
+			
+			it = n.getLinks().iterator();
+			l = it.next();
+			
+			assertEquals(dd, l.getDate());
+			assertEquals("new title", l.getTitle());
+			assertEquals("http://www.mail.ru", l.getUrl());
+			
+			l = it.next();
+			
+			assertEquals(dd, l.getDate());
+			assertEquals("new title 1", l.getTitle());
+			assertEquals("http://www.gmail.com", l.getUrl());
+			
+			l = it.next();
+			
+			assertEquals(dd, l.getDate());
+			assertEquals("new title 2", l.getTitle());
+			assertEquals("http://www.htc.com", l.getUrl());
 			
 			newsDao.delete(db, "newguid1");
 			n = newsDao.read(db, "newguid1");
