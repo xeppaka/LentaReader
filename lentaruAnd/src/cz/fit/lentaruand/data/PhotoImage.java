@@ -4,6 +4,8 @@ import cz.fit.lentaruand.data.dao.DaoObject;
 import cz.fit.lentaruand.parser.MobilePhotoImage;
 
 public class PhotoImage implements DaoObject, Comparable<PhotoImage> {
+	private static final long serialVersionUID = 1L;
+	
 	private long id;
 	private long photoId;
 	private int index;
@@ -123,5 +125,53 @@ public class PhotoImage implements DaoObject, Comparable<PhotoImage> {
 			return 1;
 		
 		return 0;
+	}
+	
+	@Override
+	public boolean equals(Object other) {
+		if (this == other)
+			return true;
+		
+		if (!(other instanceof PhotoImage))
+			return false;
+		
+		PhotoImage otherPhotoImage = (PhotoImage)other;
+		
+		if (getId() != otherPhotoImage.getId())
+			return false;
+
+		if (getPhotoId() != otherPhotoImage.getPhotoId())
+			return false;
+		
+		if (getIndex() != otherPhotoImage.getIndex())
+			return false;
+		
+		if (getUrl() != otherPhotoImage.getUrl() && (getUrl() != null && !getUrl().equals(otherPhotoImage.getUrl())))
+			return false;
+		
+		if (getTitle() != otherPhotoImage.getTitle() && (getTitle() != null && !getTitle().equals(otherPhotoImage.getTitle())))
+			return false;
+
+		if (getCredits() != otherPhotoImage.getCredits() && (getCredits() != null && !getCredits().equals(otherPhotoImage.getCredits())))
+			return false;
+		
+		if (getDescription() != otherPhotoImage.getDescription() && (getDescription() != null && !getDescription().equals(otherPhotoImage.getDescription())))
+			return false;
+
+		return true;
+	}
+	
+	@Override
+	public int hashCode() {
+		int hash = 17;
+		hash = 37 * hash + (int)(getId() ^ (getId() >> 32));
+		hash = 37 * hash + (int)(getPhotoId() ^ (getPhotoId() >> 32));
+		hash = 37 * hash + (int)(getIndex() ^ (getIndex() >> 32));
+		hash = 37 * hash + (getUrl() == null ? 0 : getUrl().hashCode());
+		hash = 37 * hash + (getTitle() == null ? 0 : getTitle().hashCode());
+		hash = 37 * hash + (getCredits() == null ? 0 : getCredits().hashCode());
+		hash = 37 * hash + (getDescription() == null ? 0 : getDescription().hashCode());
+		
+		return hash;
 	}
 }

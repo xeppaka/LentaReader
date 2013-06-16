@@ -118,4 +118,48 @@ public class News extends NewsObject {
 	public NewsType getType() {
 		return NewsType.NEWS;
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		if (!super.equals(other))
+			return false;
+		
+		if (!(other instanceof News))
+			return false;
+		
+		News otherNews = (News)other;
+		
+		if (getBriefText() != otherNews.getBriefText() && (getBriefText() != null && !getBriefText().equals(otherNews.getBriefText())))
+			return false;
+
+		if (getFullText() != otherNews.getFullText() && (getFullText() != null && !getFullText().equals(otherNews.getFullText())))
+			return false;
+		
+		if (getImageLink() != otherNews.getImageLink() && (getImageLink() != null && !getImageLink().equals(otherNews.getImageLink())))
+			return false;
+		
+		if (getImageCaption() != otherNews.getImageCaption() && (getImageCaption() != null && !getImageCaption().equals(otherNews.getImageCaption())))
+			return false;
+		
+		if (getImageCredits() != otherNews.getImageCredits() && (getImageCredits() != null && !getImageCredits().equals(otherNews.getImageCredits())))
+			return false;
+
+		if (getLinks() != otherNews.getLinks() && (getLinks() != null && !getLinks().equals(otherNews.getLinks())))
+			return false;
+		
+		return true;
+	}
+	
+	@Override
+	public int hashCode() {
+		int hash = super.hashCode();
+		hash = 37 * hash + (getBriefText() == null ? 0 : getBriefText().hashCode());
+		hash = 37 * hash + (getFullText() == null ? 0 : getFullText().hashCode());
+		hash = 37 * hash + (getImageLink() == null ? 0 : getImageLink().hashCode());
+		hash = 37 * hash + (getImageCredits() == null ? 0 : getImageCredits().hashCode());
+		hash = 37 * hash + (getImageCaption() == null ? 0 : getImageCaption().hashCode());
+		hash = 37 * hash + (getLinks() == null ? 0 : getLinks().hashCode());
+		
+		return hash;
+	}
 }

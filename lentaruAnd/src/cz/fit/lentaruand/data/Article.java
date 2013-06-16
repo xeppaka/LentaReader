@@ -63,4 +63,23 @@ public class Article extends News {
 	public NewsType getType() {
 		return NewsType.ARTICLE;
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		if (!super.equals(other))
+			return false;
+		
+		if (!(other instanceof Article))
+			return false;
+		
+		Article otherArticle = (Article)other;
+		
+		if (getSecondTitle() != otherArticle.getSecondTitle() && (getSecondTitle() != null && !getSecondTitle().equals(otherArticle.getSecondTitle())))
+			return false;
+		
+		if (getAuthor() != otherArticle.getAuthor() && (getAuthor() != null && !getAuthor().equals(otherArticle.getAuthor())))
+			return false;
+
+		return true;		
+	}
 }

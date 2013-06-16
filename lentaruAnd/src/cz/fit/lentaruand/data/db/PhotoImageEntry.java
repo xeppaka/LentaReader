@@ -21,7 +21,7 @@ public abstract class PhotoImageEntry implements BaseColumns {
 			COLUMN_NAME_URL + " TEXT, " +
 			COLUMN_NAME_CREDITS + " TEXT, " +
 			COLUMN_NAME_DESCRIPTION + " TEXT, FOREIGN KEY(" + COLUMN_NAME_PHOTO_ID + 
-				") REFERENCES " + PhotoEntry.TABLE_NAME + "(" + PhotoEntry._ID + ")";
+				") REFERENCES " + PhotoEntry.TABLE_NAME + "(" + PhotoEntry._ID + ") ON DELETE CASCADE";
 	
 	public static final String SQL_CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + " (" + SQL_CREATE_TABLE_COLUMNS + ")";
 	public static final String SQL_DELETE_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;

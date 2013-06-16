@@ -14,7 +14,6 @@ import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.SmallTest;
 import cz.fit.lentaruand.data.Link;
 import cz.fit.lentaruand.data.News;
-import cz.fit.lentaruand.data.NewsType;
 import cz.fit.lentaruand.data.Rubrics;
 import cz.fit.lentaruand.data.dao.NewsDao;
 import cz.fit.lentaruand.data.dao.NewsLinksDao;
@@ -59,38 +58,8 @@ public class NewsDaoTest extends AndroidTestCase {
 		try {
 			NewsDao newsDao = new NewsDao();
 			News n = newsDao.read(db, id);
-			assertEquals(id, n.getId());
-			assertEquals(NewsType.NEWS, n.getType());
-			assertEquals("guid1", n.getGuid());
-			assertEquals("News 1", n.getTitle());
-			assertEquals("http://www.1.ru", n.getLink());
-			assertEquals("Brief news info", n.getBriefText());
-			assertEquals("Full news text", n.getFullText());
-			assertEquals(date, n.getPubDate());
-			assertEquals("http://www.image.com/image.png", n.getImageLink());
-			assertEquals("Image caption", n.getImageCaption());
-			assertEquals("Photo: PK", n.getImageCredits());
-			assertEquals(Rubrics.CULTURE, n.getRubric());
-			assertEquals(true, n.isRubricUpdateNeed());
 			
-			assertEquals(3, n.getLinks().size());
-			
-			Iterator<Link> li = n.getLinks().iterator();
-			Link l = li.next();
-			
-			assertEquals("http://www.sky.com", l.getUrl());
-			assertEquals("Link to the heaven", l.getTitle());
-			assertEquals(date, l.getDate());
-			
-			l = li.next();
-			assertEquals("http://www.sky2.com", l.getUrl());
-			assertEquals("Link to the heaven 2", l.getTitle());
-			assertEquals(date, l.getDate());
-			
-			l = li.next();
-			assertEquals("http://www.sky2.com", l.getUrl());
-			assertEquals("Link to the heaven 2", l.getTitle());
-			assertEquals(date, l.getDate());
+			assertEquals(testNews, n);
 			
 			newsDao.delete(db, id);
 		} finally {
@@ -100,45 +69,14 @@ public class NewsDaoTest extends AndroidTestCase {
 	
 	@SmallTest
 	public void testReadNewsUseGuid() {
-		long id = createNews("guid1");
+		createNews("guid1");
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
 		try {
 			NewsDao newsDao = new NewsDao();
 			News n = newsDao.read(db, "guid1");
-			assertEquals(id, n.getId());
-			assertEquals(NewsType.NEWS, n.getType());
-			assertEquals("guid1", n.getGuid());
-			assertEquals("News 1", n.getTitle());
-			assertEquals("http://www.1.ru", n.getLink());
-			assertEquals("Brief news info", n.getBriefText());
-			assertEquals("Full news text", n.getFullText());
-			assertEquals(date, n.getPubDate());
-			assertEquals("http://www.image.com/image.png", n.getImageLink());
-			assertEquals("Image caption", n.getImageCaption());
-			assertEquals("Photo: PK", n.getImageCredits());
-			assertEquals(Rubrics.CULTURE, n.getRubric());
-			assertEquals(true, n.isRubricUpdateNeed());
+
+			assertEquals(testNews, n);
 			
-			assertEquals(3, n.getLinks().size());
-			
-			Iterator<Link> li = n.getLinks().iterator();
-			Link l = li.next();
-			
-			assertEquals("http://www.sky.com", l.getUrl());
-			assertEquals("Link to the heaven", l.getTitle());
-			assertEquals(date, l.getDate());
-			
-			l = li.next();
-			assertEquals("http://www.sky2.com", l.getUrl());
-			assertEquals("Link to the heaven 2", l.getTitle());
-			assertEquals(date, l.getDate());
-			
-			l = li.next();
-			assertEquals("http://www.sky2.com", l.getUrl());
-			assertEquals("Link to the heaven 2", l.getTitle());
-			assertEquals(date, l.getDate());
-			
-			newsDao.delete(db, "guid1");
 		} finally {
 			db.close();
 		}
@@ -234,40 +172,9 @@ public class NewsDaoTest extends AndroidTestCase {
 			
 			newsDao.update(db, n);
 			
-			n = newsDao.read(db, id);
-			
-			assertEquals(id, n.getId());
-			assertEquals(NewsType.NEWS, n.getType());
-			assertEquals("newguid1", n.getGuid());
-			assertEquals("newtitle1", n.getTitle());
-			assertEquals("newlink1", n.getLink());
-			assertEquals("newbrief1", n.getBriefText());
-			assertEquals("newfull1", n.getFullText());
-			assertEquals(date, n.getPubDate());
-			assertEquals("newimagelink1", n.getImageLink());
-			assertEquals("newcaption1", n.getImageCaption());
-			assertEquals("newcredits1", n.getImageCredits());
-			assertEquals(Rubrics.ECONOMICS_FINANCE, n.getRubric());
-			assertEquals(false, n.isRubricUpdateNeed());
-			
-			it = n.getLinks().iterator();
-			l = it.next();
-			
-			assertEquals(dd, l.getDate());
-			assertEquals("new title", l.getTitle());
-			assertEquals("http://www.mail.ru", l.getUrl());
-			
-			l = it.next();
-			
-			assertEquals(dd, l.getDate());
-			assertEquals("new title 1", l.getTitle());
-			assertEquals("http://www.gmail.com", l.getUrl());
-			
-			l = it.next();
-			
-			assertEquals(dd, l.getDate());
-			assertEquals("new title 2", l.getTitle());
-			assertEquals("http://www.htc.com", l.getUrl());
+			News n1 = newsDao.read(db, id);
+
+			assertEquals(n, n1);
 			
 			newsDao.delete(db, "newguid1");
 			n = newsDao.read(db, "newguid1");

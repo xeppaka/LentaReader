@@ -3,6 +3,7 @@ package cz.fit.lentaruand.data;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 
 import cz.fit.lentaruand.parser.rss.LentaRssItem;
 
@@ -67,5 +68,37 @@ public class Photo extends NewsObject {
 	@Override
 	public NewsType getType() {
 		return NewsType.PHOTO;
+	}
+	
+	@Override
+	public boolean equals(Object other) {
+		if (!super.equals(other))
+			return false;
+		
+		if (!(other instanceof Photo))
+			return false;
+		
+		Photo otherPhoto = (Photo)other;
+		
+		if (getSecondTitle() != otherPhoto.getSecondTitle() && (getSecondTitle() != null && !getSecondTitle().equals(otherPhoto.getSecondTitle())))
+			return false;
+
+		if (getDescription() != otherPhoto.getDescription() && (getDescription() != null && !getDescription().equals(otherPhoto.getDescription())))
+			return false;
+
+		if (getPhotos() != otherPhoto.getPhotos() && (getPhotos() != null && !getPhotos().equals(otherPhoto.getPhotos())))
+			return false;
+		
+		return true;
+	}
+	
+	@Override
+	public int hashCode() {
+		int hash = super.hashCode();
+		hash = 37 * hash + (getSecondTitle() == null ? 0 : getSecondTitle().hashCode());
+		hash = 37 * hash + (getDescription() == null ? 0 : getDescription().hashCode());
+		hash = 37 * hash + (getPhotos() == null ? 0 : getPhotos().hashCode());
+		
+		return hash;
 	}
 }

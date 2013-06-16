@@ -17,7 +17,7 @@ public abstract class NewsLinksEntry implements BaseColumns {
 			COLUMN_NAME_TITLE + " TEXT, " +
 			COLUMN_NAME_URL + " TEXT, " +
 			COLUMN_NAME_DATE + " TEXT, FOREIGN KEY(" + COLUMN_NAME_NEWS_ID + 
-				") REFERENCES " + TABLE_NAME + "(" + _ID + ") ON DELETE CASCADE";
+				") REFERENCES " + NewsEntry.TABLE_NAME + "(" + NewsEntry._ID + ") ON DELETE CASCADE";
 	
 	public static final String SQL_CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + " (" + SQL_CREATE_TABLE_COLUMNS + ")";
 	public static final String SQL_DELETE_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;

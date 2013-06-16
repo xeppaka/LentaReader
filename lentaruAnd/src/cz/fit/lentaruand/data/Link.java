@@ -5,6 +5,8 @@ import java.util.Date;
 import cz.fit.lentaruand.data.dao.DaoObject;
 
 public class Link implements DaoObject, Comparable<Link> {
+	private static final long serialVersionUID = 1L;
+	
 	private long id;
 	private String idStr;
 	private long newsId;
@@ -91,5 +93,45 @@ public class Link implements DaoObject, Comparable<Link> {
 	@Override
 	public String getKeyValue() {
 		return idStr;
+	}
+	
+	@Override
+	public boolean equals(Object other) {
+		if (this == other)
+			return true;
+		
+		if (!(other instanceof Link))
+			return false;
+		
+		Link otherLink = (Link)other;
+		
+		if (getId() != otherLink.getId())
+			return false;
+
+		if (getNewsId() != otherLink.getNewsId())
+			return false;
+		
+		if (getUrl() != otherLink.getUrl() && (getUrl() != null && !getUrl().equals(otherLink.getUrl())))
+			return false;
+		
+		if (getTitle() != otherLink.getTitle() && (getTitle() != null && !getTitle().equals(otherLink.getTitle())))
+			return false;
+
+		if (getDate() != otherLink.getDate() && (getDate() != null && !getDate().equals(otherLink.getDate())))
+			return false;
+
+		return true;
+	}
+	
+	@Override
+	public int hashCode() {
+		int hash = 17;
+		hash = 37 * hash + (int)(getId() ^ (getId() >> 32));
+		hash = 37 * hash + (int)(getNewsId() ^ (getNewsId() >> 32));
+		hash = 37 * hash + (getUrl() == null ? 0 : getUrl().hashCode());
+		hash = 37 * hash + (getTitle() == null ? 0 : getTitle().hashCode());
+		hash = 37 * hash + (getDate() == null ? 0 : getDate().hashCode());
+		
+		return hash;
 	}
 }

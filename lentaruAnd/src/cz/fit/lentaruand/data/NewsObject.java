@@ -131,12 +131,44 @@ public abstract class NewsObject implements Comparable<NewsObject>, DaoObject {
 		if (!(other instanceof NewsObject))
 			return false;
 		
-		return getGuid().equals(((NewsObject)other).getGuid());
+		NewsObject otherNewsObject = (NewsObject)other;
+		
+		if (getId() != otherNewsObject.getId())
+			return false;
+		
+		if (getGuid() != otherNewsObject.getGuid() && (getGuid() != null && !getGuid().equals(otherNewsObject.getGuid())))
+			return false;
+		
+		if (getTitle() != otherNewsObject.getTitle() && (getTitle() != null && !getTitle().equals(otherNewsObject.getTitle())))
+			return false;
+		
+		if (getLink() != otherNewsObject.getLink() && (getLink() != null && !getLink().equals(otherNewsObject.getLink())))
+			return false;
+		
+		if (getPubDate() != otherNewsObject.getPubDate() && (getPubDate() != null && !getPubDate().equals(otherNewsObject.getPubDate())))
+			return false;
+		
+		if (getRubric() != otherNewsObject.getRubric() && (getRubric() != null && !getRubric().equals(otherNewsObject.getRubric())))
+			return false;
+		
+		if (isRubricUpdateNeed() != otherNewsObject.isRubricUpdateNeed())
+			return false;
+		
+		return true;
 	}
 
 	@Override
 	public int hashCode() {
-		return getGuid().hashCode();
+		int hash = 17;
+		hash = 37 * hash + (int)(getId() ^ (getId() >> 32));
+		hash = 37 * hash + (getGuid() == null ? 0 : getGuid().hashCode());
+		hash = 37 * hash + (getTitle() == null ? 0 : getTitle().hashCode());
+		hash = 37 * hash + (getLink() == null ? 0 : getLink().hashCode());
+		hash = 37 * hash + (getPubDate() == null ? 0 : getPubDate().hashCode());
+		hash = 37 * hash + (getRubric() == null ? 0 : getRubric().hashCode());
+		hash = 37 * hash + (isRubricUpdateNeed() ? 1 : 0);
+		
+		return hash;
 	}
 
 	@Override
