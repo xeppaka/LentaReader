@@ -10,7 +10,6 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.view.View;
 import android.widget.ListView;
-import cz.fit.lentaruand.NewsAdapter;
 import cz.fit.lentaruand.asyncloaders.AsyncBriefNewsLoader;
 import cz.fit.lentaruand.data.News;
 

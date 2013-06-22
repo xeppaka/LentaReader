@@ -4,13 +4,11 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.ActionMode;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 
-import cz.fit.lentaruand.Main;
 import cz.fit.lentaruand.R;
 
 public class ActionModeHelper implements ActionMode.Callback, AdapterView.OnItemLongClickListener {

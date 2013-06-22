@@ -8,13 +8,17 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import cz.fit.lentaruand.data.News;
 
+/**
+ * This class represents pager adapter -> it contains all page definitions
+ * that should be shown by a swipe list.
+ * 
+ * @author 
+ *
+ */
 public class SwipeNewsListFragmentPagerAdapter extends FragmentPagerAdapter {
-
-	Context context;
-	protected static final String[] CONTENT = new String[] { "Статьи",
-			"Галлереи", "Колонки", "Видео", };
-	
-	private int PAGE_COUNT = 4;
+	private Context context;
+	private static final String[] CONTENT = new String[] { "Статьи",
+			"Галлереи", "Колонки", "Видео" };
 
 	public SwipeNewsListFragmentPagerAdapter(FragmentManager fm, Context context) {
 		super(fm);
@@ -29,18 +33,11 @@ public class SwipeNewsListFragmentPagerAdapter extends FragmentPagerAdapter {
 
 	@Override
 	public int getCount() {
-		return PAGE_COUNT;
+		return CONTENT.length;
 	}
 
 	@Override
 	public CharSequence getPageTitle(int position) {
 		return SwipeNewsListFragmentPagerAdapter.CONTENT[position % CONTENT.length];
 	}
-	
-	public void setCount(int count) {
-        if (count > 0 && count <= 10) {
-            PAGE_COUNT = count;
-            notifyDataSetChanged();
-        }
-    }
 }

@@ -18,16 +18,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockListFragment;
-import com.actionbarsherlock.view.ActionMode;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
 
-import cz.fit.lentaruand.NewsAdapter;
 import cz.fit.lentaruand.R;
 import cz.fit.lentaruand.asyncloaders.AsyncBriefNewsLoader;
 import cz.fit.lentaruand.data.News;
 import cz.fit.lentaruand.data.dao.NewsDao;
 import cz.fit.lentaruand.data.db.LentaDbHelper;
+import cz.fit.lentaruand.ui.activities.NewsFullActivity;
+import cz.fit.lentaruand.ui.fragments.NewsAdapter;
 
 public class SwipeNewsListFragment extends SherlockListFragment implements
 		LoaderManager.LoaderCallbacks<List<News>> {
@@ -84,7 +82,7 @@ public class SwipeNewsListFragment extends SherlockListFragment implements
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
 		Intent intent = new Intent(this.getSherlockActivity(),
-				FullNewsActivity.class);
+				NewsFullActivity.class);
 		intent.putExtra("NewsObject", newsAdapter.getItem(position));
 		startActivity(intent);
 	}
@@ -148,27 +146,27 @@ public class SwipeNewsListFragment extends SherlockListFragment implements
 	public void onLoaderReset(Loader<List<News>> loader) {
 	}
 
-	private ActionMode.Callback callback = new ActionMode.Callback() {
-
-		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-			mode.getMenuInflater().inflate(R.menu.context_news_list, menu);
-			return true;
-		}
-
-		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-			return false;
-		}
-
-		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-			// Log.d(LOG_TAG, "item " + item.getTitle());
-			return false;
-		}
-
-		public void onDestroyActionMode(ActionMode mode) {
-			// Log.d(LOG_TAG, "destroy");
-		}
-
-	};
+//	private ActionMode.Callback callback = new ActionMode.Callback() {
+//
+//		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+//			mode.getMenuInflater().inflate(R.menu.context_news_list, menu);
+//			return true;
+//		}
+//
+//		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+//			return false;
+//		}
+//
+//		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+//			// Log.d(LOG_TAG, "item " + item.getTitle());
+//			return false;
+//		}
+//
+//		public void onDestroyActionMode(ActionMode mode) {
+//			// Log.d(LOG_TAG, "destroy");
+//		}
+//
+//	};
 	
 	public boolean performAction(int itemId, int checkedItemPosition) {
 		switch (itemId) {
@@ -187,7 +185,7 @@ public class SwipeNewsListFragment extends SherlockListFragment implements
 
 		case R.id.openNews:
 			Intent intent = new Intent(this.getSherlockActivity(),
-					FullNewsActivity.class);
+					NewsFullActivity.class);
 			intent.putExtra("NewsObject", newsAdapter.getItem(checkedItemPosition));
 			startActivity(intent);
 			Toast.makeText(this.getSherlockActivity(), "TODO opening the news" + "position is:" + checkedItemPosition, Toast.LENGTH_LONG)

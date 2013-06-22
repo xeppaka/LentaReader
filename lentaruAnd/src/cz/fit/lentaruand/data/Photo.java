@@ -3,7 +3,6 @@ package cz.fit.lentaruand.data;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Iterator;
 
 import cz.fit.lentaruand.parser.rss.LentaRssItem;
 

@@ -44,7 +44,6 @@ public class LentaMobileNewsParser implements NewsParser<MobileNews> {
 		if (it.hasNext()) {
 			List<String> val = it.next();
 			text = val.get(1);
-			text = text.replaceAll("</?+p>", "");
 		} else {
 			logger.log(Level.WARNING, "Unable to find news body at URL address: " + page.getUrl().toExternalForm());
 		}
