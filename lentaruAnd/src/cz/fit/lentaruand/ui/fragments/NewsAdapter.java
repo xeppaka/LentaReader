@@ -1,20 +1,15 @@
 package cz.fit.lentaruand.ui.fragments;
 
-import java.util.List;
+import java.util.Collection;
 
 import android.content.Context;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.TextView;
 import cz.fit.lentaruand.R;
 import cz.fit.lentaruand.data.News;
 
-public class NewsAdapter extends BaseAdapter {
-	
-	private List<News> news;
-	private LayoutInflater inflater;
+public class NewsAdapter extends NewsObjectAdapter<News> {
 	
 	private static class ViewHolder {
 		private final TextView newsTitle;
@@ -27,34 +22,13 @@ public class NewsAdapter extends BaseAdapter {
 			return newsTitle;
 		}
 	}
-	
-	public void setNews(List<News> news) {
-		this.news = news;
-	}
-	
-	public NewsAdapter(Context context, List<News> news) {
-		this.news = news;
-		inflater = LayoutInflater.from(context);
-	}
-	
-	@Override
-	public int getCount() {
-		return news.size();
+
+	public NewsAdapter(Context context, Collection<News> newsObjects) {
+		super(context, newsObjects);
 	}
 
-	@Override
-	public News getItem(int position) {
-		return news.get(position);
-	}
-
-	@Override
-	public long getItemId(int position) {
-		return getItem(position).hashCode();
-	}
-
-	@Override
-	public int getItemViewType(int position) {
-		return 0;
+	public NewsAdapter(Context context) {
+		super(context);
 	}
 
 	@Override
@@ -79,29 +53,14 @@ public class NewsAdapter extends BaseAdapter {
 		newsTitleTextView.setText(news.getTitle());
 		return view;
 	}
-
-	@Override
-	public int getViewTypeCount() {
-		return 1;
-	}
-
-	@Override
-	public boolean hasStableIds() {
-		return false;
-	}
-
-	@Override
-	public boolean isEmpty() {
-		return news.isEmpty();
-	}
-
-	@Override
-	public boolean areAllItemsEnabled() {
-		return true;
-	}
-
-	@Override
-	public boolean isEnabled(int position) {
-		return true;
-	}
+//
+//	@Override
+//	public int getItemViewType(int position) {
+//		return 0;
+//	}
+//	
+//	@Override
+//	public int getViewTypeCount() {
+//		return 1;
+//	}
 }

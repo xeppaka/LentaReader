@@ -15,5 +15,11 @@
 	<string name="open_full_news">Открыть полную новость</string>
 	<string name="action_mode_title">Действия</string>
     <string name="title_activity_full_news">FullNewsActivity</string>
-
+    
+    <string name="pager_title_news">Новости</string>
+    <string name="pager_title_videos">Видео</string>
+    <string name="pager_title_photos">Фото</string>
+    <string name="pager_title_articles">Статьи</string>
+    <string name="pager_title_columns">Колонки</string>
+        
 </resources>

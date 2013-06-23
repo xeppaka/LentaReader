@@ -28,7 +28,7 @@ public class NewsFullFragment extends Fragment implements LoaderManager.LoaderCa
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		return inflater.inflate(R.layout.full_news_fragment_layout, null);
+		return inflater.inflate(R.layout.full_news_fragment, null);
 	}
 
 	public NewsFullFragment() {

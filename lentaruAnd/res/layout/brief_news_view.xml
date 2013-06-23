@@ -3,11 +3,11 @@
     android:layout_height="100dip"
     android:orientation="horizontal">
 
-    <ImageView
+    <!-- <ImageView
         android:id="@+id/brief_news_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" 
-        android:contentDescription="@string/brief_news_image_description" />
+        android:contentDescription="@string/brief_news_image_description" />  -->
 
     <LinearLayout
         android:layout_width="wrap_content"

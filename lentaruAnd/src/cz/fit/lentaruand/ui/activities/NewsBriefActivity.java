@@ -11,7 +11,7 @@ import com.viewpagerindicator.TitlePageIndicator;
 import com.viewpagerindicator.TitlePageIndicator.IndicatorStyle;
 
 import cz.fit.lentaruand.R;
-import cz.fit.lentaruand.ui.SwipeNewsListFragmentPagerAdapter;
+import cz.fit.lentaruand.ui.SwipeNewsObjectsListAdapter;
 
 /**
  * This is the main activity where everything starts right after application is 
@@ -21,7 +21,7 @@ import cz.fit.lentaruand.ui.SwipeNewsListFragmentPagerAdapter;
  * 
  */
 public class NewsBriefActivity extends SherlockFragmentActivity {
-	private SwipeNewsListFragmentPagerAdapter pagerAdapter;
+	private SwipeNewsObjectsListAdapter pagerAdapter;
 	private ViewPager pager;
 
 	@Override
@@ -41,14 +41,14 @@ public class NewsBriefActivity extends SherlockFragmentActivity {
 	}
 	
 	private void initializeViewPager() {
-		pager = (ViewPager) findViewById(R.id.pager);
-		pagerAdapter = new SwipeNewsListFragmentPagerAdapter(
+		pager = (ViewPager) findViewById(R.id.brief_news_pager);
+		pagerAdapter = new SwipeNewsObjectsListAdapter(
 				getSupportFragmentManager(), getApplicationContext());
 		pager.setAdapter(pagerAdapter);
 	}
 	
 	private void initializeViewIndicator() {
-		TitlePageIndicator indicator = (TitlePageIndicator) findViewById(R.id.indicator);
+		TitlePageIndicator indicator = (TitlePageIndicator) findViewById(R.id.brief_news_title_indicator);
 		final float density = getResources().getDisplayMetrics().density;
 		indicator.setTextColor(Color.parseColor("#151515"));
 		indicator.setBackgroundColor(Color.parseColor("#ffffff"));
