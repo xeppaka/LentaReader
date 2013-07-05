@@ -19,7 +19,7 @@ public class LentaNewsDownloader extends LentaNewsObjectDownloader<News> {
 	@Override
 	public void downloadFull(News brief) throws PageParseException, IOException {
 		URL url = URLHelper.createMobileUrl(brief.getLink());
-		Page mobilePage = PageDownloader.downloadPage(url);
+		Page mobilePage = HttpPageDownloader.downloadPage(url);
 		
 		MobileNews mobileNews = newsParser.parse(mobilePage);
 		brief.setFullText(mobileNews.getText());

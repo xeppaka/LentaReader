@@ -37,7 +37,7 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
 		TextView newsTitleTextView;
 		
 		if (convertView == null) {
-			view = inflater.inflate(R.layout.brief_news_view, null);
+			view = inflater.inflate(R.layout.brief_news_list_item, null);
 			newsTitleTextView = (TextView)view.findViewById(R.id.brief_news_title);
 			
 			view.setTag(new ViewHolder(newsTitleTextView));
@@ -53,14 +53,4 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
 		newsTitleTextView.setText(news.getTitle());
 		return view;
 	}
-//
-//	@Override
-//	public int getItemViewType(int position) {
-//		return 0;
-//	}
-//	
-//	@Override
-//	public int getViewTypeCount() {
-//		return 1;
-//	}
 }

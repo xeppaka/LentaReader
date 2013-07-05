@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 
+import android.graphics.Bitmap;
 import cz.fit.lentaruand.parser.rss.LentaRssItem;
 
 public class News extends NewsObject {
@@ -15,6 +16,8 @@ public class News extends NewsObject {
 	private String imageCaption;
 	private String imageCredits;
 	private Collection<Link> links;
+	
+	private transient Bitmap image;
 
 	public News(long id, String guid, String title, String link, String briefText,
 			String fullText, Date pubDate, String imageLink,
@@ -61,7 +64,7 @@ public class News extends NewsObject {
 	}
 
 	public void setBriefText(String briefText) {
-		if (briefText == null || briefText.length()==0)
+		if (briefText == null || briefText.length() == 0)
 			throw new IllegalArgumentException("Argument briefText must not be null or empty.");
 		
 		this.briefText = briefText;
@@ -110,10 +113,22 @@ public class News extends NewsObject {
 			this.links = links;
 	}
 
+	public Bitmap getImage() {
+		return image;
+	}
+
+	public void setImage(Bitmap image) {
+		this.image = image;
+	}
+
 	public boolean isContentFull() {
 		return fullText != null && !(fullText.length() == 0);
 	}
 
+	public boolean isImageLoaded() {
+		return image != null;
+	}
+	
 	@Override
 	public NewsType getType() {
 		return NewsType.NEWS;

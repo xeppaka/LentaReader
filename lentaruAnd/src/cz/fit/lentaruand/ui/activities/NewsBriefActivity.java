@@ -11,7 +11,7 @@ import com.viewpagerindicator.TitlePageIndicator;
 import com.viewpagerindicator.TitlePageIndicator.IndicatorStyle;
 
 import cz.fit.lentaruand.R;
-import cz.fit.lentaruand.ui.SwipeNewsObjectsListAdapter;
+import cz.fit.lentaruand.ui.fragments.SwipeNewsObjectsListAdapter;
 
 /**
  * This is the main activity where everything starts right after application is 

@@ -15,7 +15,7 @@ import cz.fit.lentaruand.R;
 import cz.fit.lentaruand.asyncloaders.AsyncFullNewsLoader;
 import cz.fit.lentaruand.data.News;
 
-public class NewsFullFragment extends Fragment implements LoaderManager.LoaderCallbacks<News>{
+public class NewsFullFragment extends Fragment implements LoaderManager.LoaderCallbacks<News> {
 
 	private Context context;
 	private News news;
@@ -24,7 +24,7 @@ public class NewsFullFragment extends Fragment implements LoaderManager.LoaderCa
 		this.context = context;
 		this.news = news;
 	}
-	
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
