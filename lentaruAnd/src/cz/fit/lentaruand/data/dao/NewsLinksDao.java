@@ -6,12 +6,14 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import cz.fit.lentaruand.data.Link;
 import cz.fit.lentaruand.data.db.NewsLinksEntry;
 import cz.fit.lentaruand.data.db.SQLiteType;
+import cz.fit.lentaruand.data.provider.LentaProvider;
 
 public class NewsLinksDao extends DefaultDao<Link> {
 	private static final String[] projectionAll = {
@@ -21,6 +23,10 @@ public class NewsLinksDao extends DefaultDao<Link> {
 		NewsLinksEntry.COLUMN_NAME_URL,
 		NewsLinksEntry.COLUMN_NAME_DATE
 	};
+
+	public NewsLinksDao(ContentResolver cr) {
+		super(cr);
+	}
 
 	@Override
 	protected ContentValues prepareContentValues(Link link) {
@@ -54,8 +60,8 @@ public class NewsLinksDao extends DefaultDao<Link> {
 	}
 
 	@Override
-	protected String getTableName() {
-		return NewsLinksEntry.TABLE_NAME;
+	protected Uri getContentProviderUri() {
+		return LentaProvider.CONTENT_URI_LINKS;
 	}
 
 	@Override
@@ -78,19 +84,17 @@ public class NewsLinksDao extends DefaultDao<Link> {
 		return projectionAll;
 	}
 
-	public Collection<Link> readForNews(SQLiteDatabase db, long newsId) {
+	public Collection<Link> readForNews(long newsId) {
 		List<Link> result = new ArrayList<Link>();
 		
 		String[] keyWhereArgs = { String.valueOf(newsId) };
 		String keyWhere = NewsLinksEntry.COLUMN_NAME_NEWS_ID + " = ?";
 		
-		Cursor cur = db.query(
-				getTableName(), 
-				getProjectionAll(), 
+		Cursor cur = getContentResolver().query(
+				getContentProviderUri(), 
+				getProjectionAll(),
 				keyWhere,
 				keyWhereArgs, 
-				null, 
-				null, 
 				null
 				);
 		

@@ -28,6 +28,7 @@
             android:name="cz.fit.lentaruand.ui.activities.NewsFullActivity"
             android:label="@string/title_activity_full_news" >
         </activity>
+        <provider android:exported="false" android:name="cz.fit.lentaruand.data.provider.LentaProvider" android:authorities="@string/provider_authority"></provider>
     </application>
 
 </manifest>

@@ -43,7 +43,7 @@ public class NewsBriefActivity extends SherlockFragmentActivity {
 	private void initializeViewPager() {
 		pager = (ViewPager) findViewById(R.id.brief_news_pager);
 		pagerAdapter = new SwipeNewsObjectsListAdapter(
-				getSupportFragmentManager(), getApplicationContext());
+				getSupportFragmentManager(), this);
 		pager.setAdapter(pagerAdapter);
 	}
 	

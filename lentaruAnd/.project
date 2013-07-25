@@ -4,6 +4,7 @@
 	<comment></comment>
 	<projects>
 		<project>actionbarsherlock</project>
+		<project>view_pager_indicator</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

@@ -2,9 +2,8 @@ package cz.fit.lentaruand.data;
 
 import java.util.Date;
 
-import cz.fit.lentaruand.data.dao.DaoObject;
 
-public class Link implements DaoObject, Comparable<Link> {
+public class Link implements DatabaseObject, Comparable<Link> {
 	private static final long serialVersionUID = 1L;
 	
 	private long id;

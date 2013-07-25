@@ -2,10 +2,9 @@ package cz.fit.lentaruand.data;
 
 import java.util.Date;
 
-import cz.fit.lentaruand.data.dao.DaoObject;
 import cz.fit.lentaruand.parser.rss.LentaRssItem;
 
-public abstract class NewsObject implements Comparable<NewsObject>, DaoObject {
+public abstract class NewsObject implements Comparable<NewsObject>, DatabaseObject {
 	private static final long serialVersionUID = 1L;
 	
 	private long id;

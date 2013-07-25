@@ -1,16 +1,12 @@
 package cz.fit.lentaruand.data.dao;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import cz.fit.lentaruand.data.Photo;
-import cz.fit.lentaruand.data.PhotoImage;
 import cz.fit.lentaruand.data.Rubrics;
 import cz.fit.lentaruand.data.db.PhotoEntry;
 import cz.fit.lentaruand.data.db.SQLiteType;
@@ -30,8 +26,9 @@ public class PhotoDao extends DefaultDao<Photo> {
 	
 	private PhotoImageDao photoImageDao;
 	
-	public PhotoDao() {
-		photoImageDao = new PhotoImageDao();
+	public PhotoDao(ContentResolver cr) {
+		super(cr);
+		photoImageDao = new PhotoImageDao(cr);
 	}
 	
 	@Override
@@ -75,8 +72,9 @@ public class PhotoDao extends DefaultDao<Photo> {
 	}
 
 	@Override
-	protected String getTableName() {
-		return PhotoEntry.TABLE_NAME;
+	protected Uri getContentProviderUri() {
+		// TODO return proper Uri
+		return null;
 	}
 
 	@Override
@@ -99,82 +97,82 @@ public class PhotoDao extends DefaultDao<Photo> {
 		return projectionAll;
 	}
 
-	@Override
-	public Photo read(SQLiteDatabase db, String key) {
-		Photo photo = super.read(db, key);
-		
-		if (photo == null)
-			return photo;
-			
-		List<PhotoImage> images = new ArrayList<PhotoImage>(photoImageDao.readForPhoto(db, photo.getId()));
-		Collections.sort(images);
-		
-		photo.setPhotos(images);
-		return photo;
-	}
-
-	@Override
-	public Photo read(SQLiteDatabase db, long id) {
-		Photo photo = super.read(db, id);
-		
-		if (photo == null)
-			return photo;
-			
-		List<PhotoImage> images = new ArrayList<PhotoImage>(photoImageDao.readForPhoto(db, photo.getId()));
-		Collections.sort(images);
-		
-		photo.setPhotos(images);
-		return photo;
-	}
-
-	@Override
-	public Photo read(SQLiteDatabase db, SQLiteType keyType,
-			String keyColumnName, String keyValue) {
-		Photo photo = super.read(db, keyType, keyColumnName, keyValue);
-		
-		if (photo == null)
-			return photo;
-			
-		List<PhotoImage> images = new ArrayList<PhotoImage>(photoImageDao.readForPhoto(db, photo.getId()));
-		Collections.sort(images);
-		
-		photo.setPhotos(images);
-		return photo;
-	}
-
-	@Override
-	public long create(SQLiteDatabase db, Photo photo) {
-		long photoId = super.create(db, photo);
-		Collection<PhotoImage> images = photo.getPhotos();
-		
-		for (PhotoImage image : images) {
-			image.setPhotoId(photoId);
-			photoImageDao.create(db, image);
-		}
-		
-		return photoId;
-	}
-
-	@Override
-	public void delete(SQLiteDatabase db, String key) {
-		Photo photo = read(db, key);
-		Collection<PhotoImage> images = photo.getPhotos();
-		
-		for (PhotoImage image : images) {
-			photoImageDao.delete(db, image.getKeyValue());
-		}
-		
-		super.delete(db, photo.getKeyValue());
-	}
-
-	@Override
-	public void update(SQLiteDatabase db, Photo photo) {
-		Collection<PhotoImage> images = photo.getPhotos();
-		
-		for (PhotoImage image : images) {
-			photoImageDao.update(db, image);
-		}
-		
-		super.update(db, photo);
-	}
+//	@Override
+//	public Photo read(SQLiteDatabase db, String key) {
+//		Photo photo = super.read(db, key);
+//		
+//		if (photo == null)
+//			return photo;
+//			
+//		List<PhotoImage> images = new ArrayList<PhotoImage>(photoImageDao.readForPhoto(db, photo.getId()));
+//		Collections.sort(images);
+//		
+//		photo.setPhotos(images);
+//		return photo;
+//	}
+//
+//	@Override
+//	public Photo read(SQLiteDatabase db, long id) {
+//		Photo photo = super.read(db, id);
+//		
+//		if (photo == null)
+//			return photo;
+//			
+//		List<PhotoImage> images = new ArrayList<PhotoImage>(photoImageDao.readForPhoto(db, photo.getId()));
+//		Collections.sort(images);
+//		
+//		photo.setPhotos(images);
+//		return photo;
+//	}
+//
+//	@Override
+//	public Photo read(SQLiteDatabase db, SQLiteType keyType,
+//			String keyColumnName, String keyValue) {
+//		Photo photo = super.read(db, keyType, keyColumnName, keyValue);
+//		
+//		if (photo == null)
+//			return photo;
+//			
+//		List<PhotoImage> images = new ArrayList<PhotoImage>(photoImageDao.readForPhoto(db, photo.getId()));
+//		Collections.sort(images);
+//		
+//		photo.setPhotos(images);
+//		return photo;
+//	}
+//
+//	@Override
+//	public long create(SQLiteDatabase db, Photo photo) {
+//		long photoId = super.create(db, photo);
+//		Collection<PhotoImage> images = photo.getPhotos();
+//		
+//		for (PhotoImage image : images) {
+//			image.setPhotoId(photoId);
+//			photoImageDao.create(db, image);
+//		}
+//		
+//		return photoId;
+//	}
+//
+//	@Override
+//	public void delete(SQLiteDatabase db, String key) {
+//		Photo photo = read(db, key);
+//		Collection<PhotoImage> images = photo.getPhotos();
+//		
+//		for (PhotoImage image : images) {
+//			photoImageDao.delete(db, image.getKeyValue());
+//		}
+//		
+//		super.delete(db, photo.getKeyValue());
+//	}
+//
+//	@Override
+//	public void update(SQLiteDatabase db, Photo photo) {
+//		Collection<PhotoImage> images = photo.getPhotos();
+//		
+//		for (PhotoImage image : images) {
+//			photoImageDao.update(db, image);
+//		}
+//		
+//		super.update(db, photo);
+//	}
 }

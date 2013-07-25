@@ -2,8 +2,10 @@ package cz.fit.lentaruand.data.dao;
 
 import java.sql.Date;
 
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.net.Uri;
 import cz.fit.lentaruand.data.Article;
 import cz.fit.lentaruand.data.Rubrics;
 import cz.fit.lentaruand.data.db.ArticleEntry;
@@ -28,6 +30,10 @@ public class ArticleDao extends DefaultDao<Article> {
 		ArticleEntry.COLUMN_NAME_FULLTEXT
 	};
 	
+	public ArticleDao(ContentResolver cr) {
+		super(cr);
+	}
+
 	@Override
 	protected ContentValues prepareContentValues(Article article) {
 		ContentValues values = new ContentValues();
@@ -88,8 +94,9 @@ public class ArticleDao extends DefaultDao<Article> {
 	}
 
 	@Override
-	protected String getTableName() {
-		return ArticleEntry.TABLE_NAME;
+	protected Uri getContentProviderUri() {
+		// TODO: return proper Uri
+		return null;
 	}
 
 	@Override

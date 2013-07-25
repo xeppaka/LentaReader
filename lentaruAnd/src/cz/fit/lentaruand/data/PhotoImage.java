@@ -1,9 +1,8 @@
 package cz.fit.lentaruand.data;
 
-import cz.fit.lentaruand.data.dao.DaoObject;
 import cz.fit.lentaruand.parser.MobilePhotoImage;
 
-public class PhotoImage implements DaoObject, Comparable<PhotoImage> {
+public class PhotoImage implements DatabaseObject, Comparable<PhotoImage> {
 	private static final long serialVersionUID = 1L;
 	
 	private long id;

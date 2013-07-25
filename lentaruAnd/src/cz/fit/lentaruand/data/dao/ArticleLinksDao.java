@@ -1,14 +1,11 @@
 package cz.fit.lentaruand.data.dao;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import cz.fit.lentaruand.data.Link;
 import cz.fit.lentaruand.data.db.ArticleLinksEntry;
 import cz.fit.lentaruand.data.db.SQLiteType;
@@ -21,6 +18,10 @@ public class ArticleLinksDao extends DefaultDao<Link> {
 		ArticleLinksEntry.COLUMN_NAME_URL,
 		ArticleLinksEntry.COLUMN_NAME_DATE
 	};
+
+	public ArticleLinksDao(ContentResolver cr) {
+		super(cr);
+	}
 
 	@Override
 	protected ContentValues prepareContentValues(Link link) {
@@ -54,8 +55,9 @@ public class ArticleLinksDao extends DefaultDao<Link> {
 	}
 
 	@Override
-	protected String getTableName() {
-		return ArticleLinksEntry.TABLE_NAME;
+	protected Uri getContentProviderUri() {
+		// TODO return proper Uri
+		return null;
 	}
 
 	@Override
@@ -78,34 +80,34 @@ public class ArticleLinksDao extends DefaultDao<Link> {
 		return projectionAll;
 	}
 
-	public Collection<Link> readForArticle(SQLiteDatabase db, long articleId) {
-		List<Link> result = new ArrayList<Link>();
-		
-		String[] keyWhereArgs = { String.valueOf(articleId) };
-		String keyWhere = ArticleLinksEntry.COLUMN_NAME_ARTICLE_ID + " = ?";
-		
-		Cursor cur = db.query(
-				getTableName(), 
-				getProjectionAll(), 
-				keyWhere,
-				keyWhereArgs, 
-				null, 
-				null, 
-				null
-				);
-		
-		try {
-			if (cur.moveToFirst()) {
-				do {
-					result.add(createDaoObject(cur));
-				} while (cur.moveToNext());
-			}
-			
-			Collections.sort(result);
-			
-			return result;
-		} finally {
-			cur.close();
-		}
-	}
+//	public Collection<Link> readForArticle(SQLiteDatabase db, long articleId) {
+//		List<Link> result = new ArrayList<Link>();
+//		
+//		String[] keyWhereArgs = { String.valueOf(articleId) };
+//		String keyWhere = ArticleLinksEntry.COLUMN_NAME_ARTICLE_ID + " = ?";
+//		
+//		Cursor cur = db.query(
+//				getTableName(), 
+//				getProjectionAll(), 
+//				keyWhere,
+//				keyWhereArgs, 
+//				null, 
+//				null, 
+//				null
+//				);
+//		
+//		try {
+//			if (cur.moveToFirst()) {
+//				do {
+//					result.add(createDaoObject(cur));
+//				} while (cur.moveToNext());
+//			}
+//			
+//			Collections.sort(result);
+//			
+//			return result;
+//		} finally {
+//			cur.close();
+//		}
+//	}
 }

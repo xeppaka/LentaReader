@@ -51,4 +51,34 @@ public class URLHelper {
 		
 		return new URL(fullUrl);
 	}
+	
+	/**
+	 * Returns id for the news image parsed from image URL.
+	 * E.g. url looks like http://icdn.lenta.ru/images/2013/07/20/13/20130720130546191/pic_529a4d2f9d668a24711cd4f11d31e32a.jpg,
+	 * than returned id will be pic_529a4d2f9d668a24711cd4f11d31e32a.
+	 * 
+	 * @param newsImageUrl is the url of the image. 
+	 * @return Parsed id of the image.
+	 */
+	public static String getImageId(String newsImageUrl) throws MalformedURLException {
+		if (newsImageUrl == null || newsImageUrl.isEmpty()) {
+			throw new IllegalArgumentException("newsImageUrl is null or empty");
+		}
+		
+		int lastSlash = newsImageUrl.lastIndexOf('/');
+		
+		if (lastSlash == -1) {		
+			throw new MalformedURLException("Image url has wrong format: " + newsImageUrl);
+		}
+		
+		int lastDot = newsImageUrl.lastIndexOf('.');
+		if (lastDot == -1)
+			lastDot = newsImageUrl.length();
+		
+		if (lastDot >= lastSlash) {
+			throw new MalformedURLException("Image url has wrong format: " + newsImageUrl);
+		}
+		
+		return newsImageUrl.substring(lastSlash, lastDot);
+	}
 }

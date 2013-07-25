@@ -1,13 +1,9 @@
 package cz.fit.lentaruand.data.dao;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import cz.fit.lentaruand.data.PhotoImage;
 import cz.fit.lentaruand.data.db.PhotoImageEntry;
 import cz.fit.lentaruand.data.db.SQLiteType;
@@ -22,6 +18,10 @@ public class PhotoImageDao extends DefaultDao<PhotoImage> {
 		PhotoImageEntry.COLUMN_NAME_CREDITS,
 		PhotoImageEntry.COLUMN_NAME_DESCRIPTION
 	};
+
+	public PhotoImageDao(ContentResolver cr) {
+		super(cr);
+	}
 
 	@Override
 	protected ContentValues prepareContentValues(PhotoImage photoImage) {
@@ -64,8 +64,9 @@ public class PhotoImageDao extends DefaultDao<PhotoImage> {
 	}
 
 	@Override
-	protected String getTableName() {
-		return PhotoImageEntry.TABLE_NAME;
+	protected Uri getContentProviderUri() {
+		// TODO return proper value
+		return null;
 	}
 
 	@Override
@@ -88,34 +89,34 @@ public class PhotoImageDao extends DefaultDao<PhotoImage> {
 		return projectionAll;
 	}
 
-	public Collection<PhotoImage> readForPhoto(SQLiteDatabase db, long photoId) {
-		List<PhotoImage> result = new ArrayList<PhotoImage>();
-		
-		String[] keyWhereArgs = { String.valueOf(photoId) };
-		String keyWhere = PhotoImageEntry.COLUMN_NAME_PHOTO_ID + " = ?";
-		
-		Cursor cur = db.query(
-				getTableName(), 
-				getProjectionAll(), 
-				keyWhere,
-				keyWhereArgs, 
-				null, 
-				null, 
-				null
-				);
-		
-		try {
-			if (cur.moveToFirst()) {
-				do {
-					result.add(createDaoObject(cur));
-				} while (cur.moveToNext());
-			}
-			
-			Collections.sort(result);
-			
-			return result;
-		} finally {
-			cur.close();
-		}
-	}
+//	public Collection<PhotoImage> readForPhoto(SQLiteDatabase db, long photoId) {
+//		List<PhotoImage> result = new ArrayList<PhotoImage>();
+//		
+//		String[] keyWhereArgs = { String.valueOf(photoId) };
+//		String keyWhere = PhotoImageEntry.COLUMN_NAME_PHOTO_ID + " = ?";
+//		
+//		Cursor cur = db.query(
+//				getTableName(), 
+//				getProjectionAll(), 
+//				keyWhere,
+//				keyWhereArgs, 
+//				null, 
+//				null, 
+//				null
+//				);
+//		
+//		try {
+//			if (cur.moveToFirst()) {
+//				do {
+//					result.add(createDaoObject(cur));
+//				} while (cur.moveToNext());
+//			}
+//			
+//			Collections.sort(result);
+//			
+//			return result;
+//		} finally {
+//			cur.close();
+//		}
+//	}
 }

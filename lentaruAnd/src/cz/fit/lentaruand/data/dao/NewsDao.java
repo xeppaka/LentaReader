@@ -1,21 +1,32 @@
 package cz.fit.lentaruand.data.dao;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import cz.fit.lentaruand.data.News;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import cz.fit.lentaruand.data.Link;
+import cz.fit.lentaruand.data.News;
 import cz.fit.lentaruand.data.Rubrics;
+import cz.fit.lentaruand.data.cache.DiskLruCache.Snapshot;
 import cz.fit.lentaruand.data.db.NewsEntry;
 import cz.fit.lentaruand.data.db.SQLiteType;
+import cz.fit.lentaruand.data.provider.LentaProvider;
+import cz.fit.lentaruand.site.URLHelper;
 
 public class NewsDao extends DefaultDao<News> {
+	Logger log = Logger.getLogger(NewsDao.class.toString());
+	
 	private static final String[] projectionAll = {
 		NewsEntry._ID,
 		NewsEntry.COLUMN_NAME_GUID,
@@ -30,11 +41,12 @@ public class NewsDao extends DefaultDao<News> {
 		NewsEntry.COLUMN_NAME_BRIEFTEXT,
 		NewsEntry.COLUMN_NAME_FULLTEXT
 	};
-	
+
 	private NewsLinksDao newsLinksDao;
 	
-	public NewsDao() {
-		newsLinksDao = new NewsLinksDao();
+	public NewsDao(ContentResolver cr) {
+		super(cr);
+		newsLinksDao = new NewsLinksDao(cr);
 	}
 	
 	@Override
@@ -93,8 +105,8 @@ public class NewsDao extends DefaultDao<News> {
 	}
 
 	@Override
-	protected String getTableName() {
-		return NewsEntry.TABLE_NAME;
+	protected Uri getContentProviderUri() {
+		return LentaProvider.CONTENT_URI_NEWS;
 	}
 
 	@Override
@@ -118,69 +130,85 @@ public class NewsDao extends DefaultDao<News> {
 	}
 
 	@Override
-	public News read(SQLiteDatabase db, long id) {
-		News news = super.read(db, id);
+	public News read(long id) {
+		News news = super.read(id);
 		
 		if (news == null)
 			return news;
+
+		readOtherNewsParts(news);
 		
-		List<Link> links = new ArrayList<Link>(newsLinksDao.readForNews(db, news.getId()));
-		Collections.sort(links);
-		
-		news.setLinks(links);
 		return news;
 	}
 
 	@Override
-	public News read(SQLiteDatabase db, String key) {
-		News news = super.read(db, key);
+	public News read(String key) {
+		News news = super.read(key);
 		
 		if (news == null)
 			return news;
 		
-		List<Link> links = new ArrayList<Link>(newsLinksDao.readForNews(db, news.getId()));
-		Collections.sort(links);
+		readOtherNewsParts(news);
 		
-		news.setLinks(links);
 		return news;
 	}
 
 	@Override
-	public News read(SQLiteDatabase db, SQLiteType keyType,
+	public News read(SQLiteType keyType,
 			String keyColumnName, String keyValue) {
-		News news = super.read(db, keyType, keyColumnName, keyValue);
+		News news = super.read(keyType, keyColumnName, keyValue);
 		
 		if (news == null)
 			return news;
+
+		readOtherNewsParts(news);
 		
-		List<Link> links = new ArrayList<Link>(newsLinksDao.readForNews(db, news.getId()));
-		Collections.sort(links);
-		
-		news.setLinks(links);
 		return news;
 	}
 
 	@Override
-	public long create(SQLiteDatabase db, News news) {
-		long newsId = super.create(db, news);
+	public long create(News news) {
+		long newsId = super.create(news);
 		Collection<Link> links = news.getLinks();
 		
 		for (Link link : links) {
 			link.setNewsId(newsId);
-			newsLinksDao.create(db, link);
+			newsLinksDao.create(link);
 		}
 		
 		return newsId;
 	}
 
+	private void readOtherNewsParts(News news) {
+		// read news links		
+		List<Link> links = new ArrayList<Link>(newsLinksDao.readForNews(news.getId()));
+		Collections.sort(links);
+		
+		news.setLinks(links);
+		
+//		String imageId = null;
+//		// read news image from cache if available
+//		try {
+//			imageId = URLHelper.getImageId(news.getImageLink());
+//			Snapshot snapshot = imagesCache.get(imageId);
+//			news.setImage(BitmapFactory.decodeStream(snapshot.getInputStream(0)));
+//		} catch (MalformedURLException e) {
+//			log.log(Level.INFO, "Unable to parse image id from url: " + news.getImageLink());
+//			// do nothing -> image is not going to be available for this news
+//		} catch (IOException e) {
+//			log.log(Level.INFO, String.format("Unable to read image id %s from cache", imageId));
+//			// do nothing -> image is not going to be available for this news
+//		}
+	}
+	
 	@Override
-	public void update(SQLiteDatabase db, News news) {
+	public void update(News news) {
 		Collection<Link> links = news.getLinks();
 		
 		for (Link link : links) {
-			newsLinksDao.update(db, link);
+			newsLinksDao.update(link);
 		}
 		
-		super.update(db, news);
+		super.update(news);
 	}
 }
