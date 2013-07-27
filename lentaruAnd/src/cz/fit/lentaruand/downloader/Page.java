@@ -1,7 +1,5 @@
 package cz.fit.lentaruand.downloader;
 
-import java.net.URL;
-
 import cz.fit.lentaruand.data.NewsType;
 import cz.fit.lentaruand.data.Rubrics;
 
@@ -12,19 +10,19 @@ import cz.fit.lentaruand.data.Rubrics;
  *
  */
 public class Page {
-	private URL url;
+	private String url;
 	private Rubrics rubric;
 	private NewsType type;
 	private String text;
 	
-	public Page(URL url, Rubrics rubric, NewsType type, String text) {
+	public Page(String url, Rubrics rubric, NewsType type, String text) {
 		this.url = url;
 		this.rubric = rubric;
 		this.type = type;
 		this.text = text;
 	}
 
-	public Page(URL url, String text) {
+	public Page(String url, String text) {
 		this(url, null, null, text);
 	}
 	
@@ -36,11 +34,11 @@ public class Page {
 		this.text = text;
 	}
 
-	public URL getUrl() {
+	public String getUrl() {
 		return url;
 	}
 
-	public void setUrl(URL url) {
+	public void setUrl(String url) {
 		this.url = url;
 	}
 

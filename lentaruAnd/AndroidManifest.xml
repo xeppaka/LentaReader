@@ -29,6 +29,7 @@
             android:label="@string/title_activity_full_news" >
         </activity>
         <provider android:exported="false" android:name="cz.fit.lentaruand.data.provider.LentaProvider" android:authorities="@string/provider_authority"></provider>
+        <service android:name=".service.UpdateService" android:label="UpdateService"></service>
     </application>
 
 </manifest>

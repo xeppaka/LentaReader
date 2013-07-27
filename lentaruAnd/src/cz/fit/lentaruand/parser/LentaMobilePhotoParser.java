@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import android.util.Log;
 import cz.fit.lentaruand.downloader.Page;
-import cz.fit.lentaruand.parser.exceptions.MobilePhotoParseException;
+import cz.fit.lentaruand.parser.exceptions.ParseWithRegexException;
+import cz.fit.lentaruand.utils.LentaConstants;
 
 /**
  * LentaMobilePhotoParser is NewsParser implementation that can parse mobile
@@ -19,8 +19,6 @@ import cz.fit.lentaruand.parser.exceptions.MobilePhotoParseException;
  * 
  */
 public class LentaMobilePhotoParser implements NewsParser<MobilePhoto> {
-	private static final Logger logger = Logger.getLogger(LentaMobilePhotoParser.class.getName());
-	
 	private static final Pattern PHOTO_SECOND_TITLE = Pattern.compile("<div class=\"b-topic__rightcol\">(.+?)</div>");
 	private static final int PHOTO_SECOND_TITLE_GROUPS = 1;
 	private static final Pattern PHOTO_OBJECT = Pattern.compile("<li class=\"b-gallery__item\">(.+?)</li>");
@@ -35,7 +33,7 @@ public class LentaMobilePhotoParser implements NewsParser<MobilePhoto> {
 	private static final int PHOTO_DESCRIPTION_GROUPS = 1;
 	
 	@Override
-	public MobilePhoto parse(Page page) throws MobilePhotoParseException {
+	public MobilePhoto parse(Page page) throws ParseWithRegexException {
 		String secondTitle = null;
 		Collection<MobilePhotoImage> photos = new ArrayList<MobilePhotoImage>();
 		
@@ -65,7 +63,7 @@ public class LentaMobilePhotoParser implements NewsParser<MobilePhoto> {
 				url = photoObjVal.get(1);
 				index = Integer.valueOf(photoObjVal.get(2));
 			} else {
-				logger.log(Level.WARNING, "Error parsing mobile photo url: " + page.getUrl().toExternalForm() + ". Image URL and index not found.");
+				Log.w(LentaConstants.LoggerMainAppTag, "Error parsing mobile photo for page: " + page.getUrl() + ", image url and index will be ommited for this news.");
 				continue;
 			}
 			

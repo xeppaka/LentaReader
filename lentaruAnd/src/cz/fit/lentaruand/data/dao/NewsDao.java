@@ -1,32 +1,23 @@
 package cz.fit.lentaruand.data.dao;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import cz.fit.lentaruand.data.Link;
 import cz.fit.lentaruand.data.News;
 import cz.fit.lentaruand.data.Rubrics;
-import cz.fit.lentaruand.data.cache.DiskLruCache.Snapshot;
 import cz.fit.lentaruand.data.db.NewsEntry;
 import cz.fit.lentaruand.data.db.SQLiteType;
 import cz.fit.lentaruand.data.provider.LentaProvider;
-import cz.fit.lentaruand.site.URLHelper;
 
 public class NewsDao extends DefaultDao<News> {
-	Logger log = Logger.getLogger(NewsDao.class.toString());
-	
 	private static final String[] projectionAll = {
 		NewsEntry._ID,
 		NewsEntry.COLUMN_NAME_GUID,

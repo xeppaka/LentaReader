@@ -2,16 +2,14 @@ package cz.fit.lentaruand.parser;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import android.util.Log;
 import cz.fit.lentaruand.downloader.Page;
-import cz.fit.lentaruand.parser.exceptions.MobileArticleParseException;
+import cz.fit.lentaruand.parser.exceptions.ParseWithRegexException;
+import cz.fit.lentaruand.utils.LentaConstants;
 
 public class LentaMobileArticleParser implements NewsParser<MobileArticle> {
-	private static final Logger logger = Logger.getLogger(LentaMobileArticleParser.class.getName());
-	
 	private static final Pattern ARTICLE_SECOND_TITLE = Pattern.compile("<div class=\"b-topic__rightcol\">(.+?)</div>");
 	private static final int ARTICLE_SECOND_TITLE_GROUPS = 1;
 	private static final Pattern ARTICLE_IMAGE_CAPTION = Pattern.compile("<div class=\"b-label__caption\">(.+?)</div>");
@@ -22,7 +20,7 @@ public class LentaMobileArticleParser implements NewsParser<MobileArticle> {
 	private static final int ARTICLE_BODY_GROUPS = 1;
 	
 	@Override
-	public MobileArticle parse(Page page) throws MobileArticleParseException {
+	public MobileArticle parse(Page page) throws ParseWithRegexException {
 		String secondTitle = null;
 		String imageCaption = null;
 		String imageCredits = null;
@@ -55,7 +53,7 @@ public class LentaMobileArticleParser implements NewsParser<MobileArticle> {
 			List<String> val = it.next();
 			text = val.get(1);
 		} else {
-			logger.log(Level.WARNING, "Unable to find article body at URL address: " + page.getUrl().toExternalForm());
+			Log.w(LentaConstants.LoggerMainAppTag, "Error parsing body for page: " + page.getUrl() + ", body will be ommited for this news.");
 		}
 		
 		return new MobileArticle(secondTitle, imageCaption, imageCredits, text);

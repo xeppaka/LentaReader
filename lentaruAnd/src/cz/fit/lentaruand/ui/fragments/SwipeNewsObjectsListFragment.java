@@ -10,6 +10,7 @@ import android.support.v4.content.Loader;
 import android.view.View;
 import android.widget.ListView;
 import cz.fit.lentaruand.data.NewsObject;
+import cz.fit.lentaruand.service.UpdateService;
 import cz.fit.lentaruand.ui.activities.NewsFullActivity;
 
 /**
@@ -75,7 +76,8 @@ public class SwipeNewsObjectsListFragment<T extends NewsObject> extends ListFrag
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		getLoaderManager().initLoader(0, null, this).forceLoad();
+		//getLoaderManager().initLoader(0, null, this).forceLoad();
+		getActivity().startService(new Intent(this.getActivity(), UpdateService.class));
 	}
 
 	@Override

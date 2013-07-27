@@ -3,19 +3,20 @@ package cz.fit.lentaruand.data.dao;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
+import android.util.Log;
 import cz.fit.lentaruand.data.DatabaseObject;
 import cz.fit.lentaruand.data.db.SQLiteType;
+import cz.fit.lentaruand.data.provider.LentaProvider;
+import cz.fit.lentaruand.utils.LentaConstants;
 
 public abstract class DefaultDao<T extends DatabaseObject> implements Dao<T> {
-	private final Logger logger = Logger.getLogger(DefaultDao.class.getName());
 	private final static String textKeyWhere;
 	private final static String intKeyWhere;
 	
@@ -74,8 +75,9 @@ public abstract class DefaultDao<T extends DatabaseObject> implements Dao<T> {
 				);
 		
 		try {
-			if (cur.getCount() > 1)
-				logger.log(Level.WARNING, "There are more than one data object by using uri '" + uri + "' with key = '" + id + "'.");
+			if (cur.getCount() > 1) {
+				Log.w(LentaConstants.LoggerMainAppTag, "There are more than one data object by using uri '" + uri + "'. Will use the first one from the list.");
+			}
 			
 			if (cur.moveToFirst())
 				return createDaoObject(cur);
@@ -105,8 +107,15 @@ public abstract class DefaultDao<T extends DatabaseObject> implements Dao<T> {
 				);
 		
 		try {
-			if (cur.getCount() > 1)
-				logger.log(Level.WARNING, "There are more than one data object by using uri '" + getContentProviderUri() + "' with key = '" + keyValue + "'.");
+			if (cur.getCount() > 1) {
+				Log.w(LentaConstants.LoggerMainAppTag,
+						"There are more than one data object by using uri '"
+								+ getContentProviderUri()
+								+ "' with keyType = '" + keyType.name()
+								+ "', keyColumnName = '" + keyColumnName
+								+ "', keyValue = '" + keyValue
+								+ "'. Will use the first one from the list.");
+			}
 			
 			if (cur.moveToFirst())
 				return createDaoObject(cur);
@@ -188,6 +197,14 @@ public abstract class DefaultDao<T extends DatabaseObject> implements Dao<T> {
 	
 	protected ContentResolver getContentResolver() {
 		return cr;
+	}
+	
+	public void registerContentObserver(boolean notifyForDescendents, ContentObserver observer) {
+		cr.registerContentObserver(LentaProvider.CONTENT_URI_NEWS, notifyForDescendents, observer);
+	}
+	
+	public void unregisterContentObserver(ContentObserver observer) {
+		cr.unregisterContentObserver(observer);
 	}
 	
 	protected abstract ContentValues prepareContentValues(T newsObject);

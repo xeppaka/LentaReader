@@ -6,19 +6,19 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import javax.xml.xpath.XPathExpressionException;
-
 import cz.fit.lentaruand.data.NewsObject;
 import cz.fit.lentaruand.data.NewsType;
 import cz.fit.lentaruand.data.Rubrics;
+import cz.fit.lentaruand.downloader.exceptions.HttpStatusCodeException;
+import cz.fit.lentaruand.parser.exceptions.ParseWithXPathException;
 import cz.fit.lentaruand.parser.rss.LentaRssItem;
 import cz.fit.lentaruand.parser.rss.LentaRssParser;
 
 public abstract class LentaNewsObjectDownloader<T extends NewsObject> implements NewsObjectDownloader<T> {
 	private final LentaRssParser rssParser = new LentaRssParser();
 	
-	public List<T> downloadRubricBrief(Rubrics rubric) throws XPathExpressionException, IOException {
-		Page xmlPage = HttpPageDownloader.downloadPage(rubric, getNewsType());
+	public List<T> downloadRubricBrief(Rubrics rubric) throws ParseWithXPathException, HttpStatusCodeException, IOException {
+		Page xmlPage = LentaHttpPageDownloader.downloadPage(rubric, getNewsType());
 		
 		Collection<LentaRssItem> items = rssParser.parseItems(xmlPage);
 		List<T> result = new ArrayList<T>();

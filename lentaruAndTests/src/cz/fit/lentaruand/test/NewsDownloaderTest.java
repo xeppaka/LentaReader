@@ -13,7 +13,7 @@ import android.test.suitebuilder.annotation.LargeTest;
 import cz.fit.lentaruand.data.News;
 import cz.fit.lentaruand.data.Rubrics;
 import cz.fit.lentaruand.downloader.LentaNewsDownloader;
-import cz.fit.lentaruand.parser.exceptions.PageParseException;
+import cz.fit.lentaruand.parser.exceptions.ParseWithRegexException;
 
 public class NewsDownloaderTest extends AndroidTestCase {
 	private final Logger logger = Logger.getLogger(NewsDownloaderTest.class.getName());
@@ -26,7 +26,7 @@ public class NewsDownloaderTest extends AndroidTestCase {
 	}
 
 	@LargeTest
-	public void testFullParsing() throws MalformedURLException, IOException, XPathExpressionException, PageParseException {
+	public void testFullParsing() throws MalformedURLException, IOException, XPathExpressionException, ParseWithRegexException {
 		int total = 0;
 		
 		for (Rubrics rubric : Rubrics.values()) {

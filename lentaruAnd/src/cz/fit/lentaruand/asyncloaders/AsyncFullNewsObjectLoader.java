@@ -4,9 +4,12 @@ import java.io.IOException;
 
 import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
+import android.util.Log;
 import cz.fit.lentaruand.data.NewsObject;
 import cz.fit.lentaruand.downloader.LentaNewsObjectDownloader;
-import cz.fit.lentaruand.parser.exceptions.PageParseException;
+import cz.fit.lentaruand.downloader.exceptions.HttpStatusCodeException;
+import cz.fit.lentaruand.parser.exceptions.ParseWithRegexException;
+import cz.fit.lentaruand.utils.LentaConstants;
 
 /**
  * 
@@ -28,10 +31,12 @@ public abstract class AsyncFullNewsObjectLoader<T extends NewsObject> extends As
 	public T loadInBackground() {
 		try {
 			downloader.downloadFull(newsObject);
-		} catch (PageParseException e) {
-			e.printStackTrace();
+		} catch (ParseWithRegexException e) {
+			Log.e(LentaConstants.LoggerMainAppTag, "Error occured during downloading full news:" + newsObject.getLink(), e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			Log.e(LentaConstants.LoggerMainAppTag, "Error occured during downloading RSS for rubric:" + newsObject.getLink(), e);
+		} catch (HttpStatusCodeException e) {
+			Log.e(LentaConstants.LoggerMainAppTag, "Error occured during downloading RSS for rubric:" + newsObject.getLink(), e);
 		}
 		
 		return newsObject;

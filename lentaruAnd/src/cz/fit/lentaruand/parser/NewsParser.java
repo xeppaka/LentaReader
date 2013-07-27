@@ -1,7 +1,7 @@
 package cz.fit.lentaruand.parser;
 
 import cz.fit.lentaruand.downloader.Page;
-import cz.fit.lentaruand.parser.exceptions.PageParseException;
+import cz.fit.lentaruand.parser.exceptions.ParseWithRegexException;
 
 /**
  * NewsParser is the interface for all parsers that are able to parse mobile
@@ -21,10 +21,10 @@ public interface NewsParser<T> {
 	 *            is downloaded page (basically String object inside Page object
 	 *            instance).
 	 * @return Data object filled with parsed information.
-	 * @throws PageParseException
+	 * @throws ParseWithRegexException
 	 *             if parser is unable to get some mandatory information from
 	 *             the page. For example from the news page it unable to get main
 	 *             news text which is mandatory for news.
 	 */
-	public T parse(Page page) throws PageParseException;
+	public T parse(Page page) throws ParseWithRegexException;
 }

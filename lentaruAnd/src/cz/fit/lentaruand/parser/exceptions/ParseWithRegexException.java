@@ -2,17 +2,17 @@ package cz.fit.lentaruand.parser.exceptions;
 
 import java.net.URL;
 
-public class PageParseException extends ParseException {
+public class ParseWithRegexException extends ParseException {
 	private static final long serialVersionUID = 45892750770122306L;
 	
 	private URL url;
 	private String regex;
 	
-	public PageParseException(URL url, String regex) {
+	public ParseWithRegexException(URL url, String regex) {
 		this(url, regex, null);
 	}
 	
-	public PageParseException(URL url, String regex, String message) {
+	public ParseWithRegexException(URL url, String regex, String message) {
 		super(message);
 		this.url = url;
 		this.regex = regex;

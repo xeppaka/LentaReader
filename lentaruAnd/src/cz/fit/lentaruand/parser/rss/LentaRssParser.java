@@ -8,8 +8,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -22,7 +20,10 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
+import android.util.Log;
 import cz.fit.lentaruand.downloader.Page;
+import cz.fit.lentaruand.parser.exceptions.ParseWithXPathException;
+import cz.fit.lentaruand.utils.LentaConstants;
 
 /**
  * LentaRssParser is used for parsing RSS page from Lenta.ru site. It could be
@@ -33,8 +34,6 @@ import cz.fit.lentaruand.downloader.Page;
  * 
  */
 public class LentaRssParser {
-	private final Logger logger = Logger.getLogger(LentaRssParser.class.getName());
-	
 	private final static String ITEM_PATH = "/rss/channel/item";
 //	private final static String GUID = "(//guid)[1]";
 //	private final static String TITLE = "(//title)[1]";
@@ -129,7 +128,7 @@ public class LentaRssParser {
 	 *         null.
 	 * @throws XPathExpressionException if some error occurred during parsing with XPath.
 	 */
-	public Collection<LentaRssItem> parseItems(Page page) throws XPathExpressionException {
+	public Collection<LentaRssItem> parseItems(Page page) throws ParseWithXPathException {
 		if (page.getRubric() == null)
 			throw new IllegalArgumentException("page.getRubric() must not be null.");
 		
@@ -140,7 +139,13 @@ public class LentaRssParser {
 		List<LentaRssItem> resultItems = new ArrayList<LentaRssItem>();
 		
 		try {
-			NodeList itemNodes = (NodeList) items.evaluate(new InputSource(sr), XPathConstants.NODESET);
+			NodeList itemNodes;
+			try {
+				itemNodes = (NodeList) items.evaluate(new InputSource(sr), XPathConstants.NODESET);
+			} catch(XPathExpressionException e) {
+				Log.e(LentaConstants.LoggerMainAppTag, "Error occured during parsing RSS, on the page: " + page.getUrl(), e);
+				throw new ParseWithXPathException(page.getUrl(), ITEM_PATH);
+			}
 			final int itemsLength = itemNodes.getLength();
 			
 			for (int i = 0; i < itemsLength; ++i) {
@@ -224,7 +229,7 @@ public class LentaRssParser {
 				try {
 					date = lentaDateSDF.parse(pubDateStr);
 				} catch (ParseException e) {
-					logger.log(Level.SEVERE, "Error occured suring parsing date: " + pubDateStr + ", on the page: " + page.getUrl().toString());
+					Log.e(LentaConstants.LoggerMainAppTag, "Error occured during parsing date: " + pubDateStr + ", on the page: " + page.getUrl(), e);
 					continue;
 				}
 				

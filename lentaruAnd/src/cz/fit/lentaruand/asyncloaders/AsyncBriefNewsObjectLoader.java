@@ -4,13 +4,15 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-import javax.xml.xpath.XPathExpressionException;
-
 import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
+import android.util.Log;
 import cz.fit.lentaruand.data.NewsObject;
 import cz.fit.lentaruand.data.Rubrics;
 import cz.fit.lentaruand.downloader.LentaNewsObjectDownloader;
+import cz.fit.lentaruand.downloader.exceptions.HttpStatusCodeException;
+import cz.fit.lentaruand.parser.exceptions.ParseWithXPathException;
+import cz.fit.lentaruand.utils.LentaConstants;
 
 /**
  * 
@@ -36,10 +38,12 @@ public abstract class AsyncBriefNewsObjectLoader<T extends NewsObject> extends A
 	public List<T> loadInBackground() {
 		try {
 			return downloader.downloadRubricBrief(rubric);
-		} catch (XPathExpressionException e) {
-			e.printStackTrace();
+		} catch (ParseWithXPathException e) {
+			Log.e(LentaConstants.LoggerMainAppTag, "Error occured during downloading RSS for rubric:" + rubric.getName(), e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			Log.e(LentaConstants.LoggerMainAppTag, "Error occured during downloading RSS for rubric:" + rubric.getName(), e);
+		} catch (HttpStatusCodeException e) {
+			Log.e(LentaConstants.LoggerMainAppTag, "Error occured during downloading RSS for rubric:" + rubric.getName(), e);
 		}
 		
 		return Collections.emptyList();

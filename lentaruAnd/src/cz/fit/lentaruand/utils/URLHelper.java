@@ -1,7 +1,6 @@
-package cz.fit.lentaruand.site;
+package cz.fit.lentaruand.utils;
 
 import java.net.MalformedURLException;
-import java.net.URL;
 
 import cz.fit.lentaruand.data.NewsType;
 import cz.fit.lentaruand.data.Rubrics;
@@ -23,16 +22,13 @@ public class URLHelper {
 	 *            is the value from Rubrics enum that specifies news rubric.
 	 * @param type
 	 *            is the value from NewsType enum.
-	 * @return New URL instance that can be used to download RSS page.
-	 * @throws MalformedURLException
-	 *             if URL cannot be created. It can happen only if some
-	 *             constants in Rubrics or NewsType enums are set incorrectly.
+	 * @return URL that can be used to download RSS page.
 	 */
-	public static URL getRssForRubric(Rubrics rubric, NewsType type) throws MalformedURLException {
+	public static String getRssForRubric(Rubrics rubric, NewsType type) {
 		if (rubric == null)
 			throw new IllegalArgumentException("Argument rubric must not be null");
 		
-		return new URL(LentaSite.URL_ROOT + "/" + rubric.getRssPath(type));
+		return LentaConstants.URL_ROOT + rubric.getRssPath(type);
 	}
 
 	/**
@@ -42,14 +38,12 @@ public class URLHelper {
 	 * @param link
 	 *            is the link to the full version of the site (e.g.
 	 *            http://lenta.ru/news... )
-	 * @return New URL instance that can be used to download mobile page.
-	 * @throws MalformedURLException
-	 *             if provided link argument is malformed URL.
+	 * @return URL that can be used to download mobile page.
 	 */
-	public static URL createMobileUrl(String link) throws MalformedURLException {
+	public static String createMobileUrl(String link) {
 		String fullUrl = link.replaceFirst("http://", "http://m.");
 		
-		return new URL(fullUrl);
+		return fullUrl;
 	}
 	
 	/**

@@ -1,25 +1,24 @@
 package cz.fit.lentaruand.downloader;
 
 import java.io.IOException;
-import java.net.URL;
 
 import cz.fit.lentaruand.data.News;
 import cz.fit.lentaruand.data.NewsType;
+import cz.fit.lentaruand.downloader.exceptions.HttpStatusCodeException;
 import cz.fit.lentaruand.parser.LentaMobileNewsParser;
 import cz.fit.lentaruand.parser.MobileNews;
 import cz.fit.lentaruand.parser.NewsParser;
-import cz.fit.lentaruand.parser.exceptions.PageParseException;
+import cz.fit.lentaruand.parser.exceptions.ParseWithRegexException;
 import cz.fit.lentaruand.parser.rss.LentaRssItem;
-import cz.fit.lentaruand.site.URLHelper;
+import cz.fit.lentaruand.utils.URLHelper;
 
 public class LentaNewsDownloader extends LentaNewsObjectDownloader<News> {
 
 	private final NewsParser<MobileNews> newsParser = new LentaMobileNewsParser();
 	
 	@Override
-	public void downloadFull(News brief) throws PageParseException, IOException {
-		URL url = URLHelper.createMobileUrl(brief.getLink());
-		Page mobilePage = HttpPageDownloader.downloadPage(url);
+	public void downloadFull(News brief) throws ParseWithRegexException, IOException, HttpStatusCodeException {
+		Page mobilePage = LentaHttpPageDownloader.downloadPage(URLHelper.createMobileUrl(brief.getLink()));
 		
 		MobileNews mobileNews = newsParser.parse(mobilePage);
 		brief.setFullText(mobileNews.getText());
