@@ -8,7 +8,7 @@ import cz.fit.lentaruand.data.PhotoImage;
 import cz.fit.lentaruand.data.db.PhotoImageEntry;
 import cz.fit.lentaruand.data.db.SQLiteType;
 
-public class PhotoImageDao extends DefaultDao<PhotoImage> {
+public class PhotoImageDao extends ContentResolverDao<PhotoImage> {
 	private static final String[] projectionAll = {
 		PhotoImageEntry._ID,
 		PhotoImageEntry.COLUMN_NAME_INDEX,
@@ -51,7 +51,7 @@ public class PhotoImageDao extends DefaultDao<PhotoImage> {
 	}
 
 	@Override
-	protected PhotoImage createDaoObject(Cursor cur) {
+	protected PhotoImage createDataObject(Cursor cur) {
 		long id = cur.getInt(cur.getColumnIndexOrThrow(PhotoImageEntry._ID));
 		long photoid = cur.getInt(cur.getColumnIndexOrThrow(PhotoImageEntry.COLUMN_NAME_PHOTO_ID));
 		int index = cur.getInt(cur.getColumnIndexOrThrow(PhotoImageEntry.COLUMN_NAME_INDEX));

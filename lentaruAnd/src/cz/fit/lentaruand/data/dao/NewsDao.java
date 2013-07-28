@@ -17,7 +17,7 @@ import cz.fit.lentaruand.data.db.NewsEntry;
 import cz.fit.lentaruand.data.db.SQLiteType;
 import cz.fit.lentaruand.data.provider.LentaProvider;
 
-public class NewsDao extends DefaultDao<News> {
+public class NewsDao extends ContentResolverDao<News> {
 	private static final String[] projectionAll = {
 		NewsEntry._ID,
 		NewsEntry.COLUMN_NAME_GUID,
@@ -77,7 +77,7 @@ public class NewsDao extends DefaultDao<News> {
 	}
 
 	@Override
-	protected News createDaoObject(Cursor cur) {
+	protected News createDataObject(Cursor cur) {
 		long id = cur.getLong(cur.getColumnIndexOrThrow(NewsEntry._ID));
 		String guidDb = cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_GUID));
 		String title = cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_TITLE));
@@ -160,16 +160,33 @@ public class NewsDao extends DefaultDao<News> {
 	@Override
 	public long create(News news) {
 		long newsId = super.create(news);
-		Collection<Link> links = news.getLinks();
-		
-		for (Link link : links) {
-			link.setNewsId(newsId);
-			newsLinksDao.create(link);
-		}
+
+		createNewsLinks(news);
 		
 		return newsId;
 	}
 
+	@Override
+	public Collection<Long> create(Collection<News> dataObjects) {
+		Collection<Long> ids = super.create(dataObjects);
+		
+		for (News n : dataObjects) {
+			createNewsLinks(n);
+		}
+		
+		return ids;
+	}
+
+	private void createNewsLinks(News news) {
+		Collection<Link> links = news.getLinks();
+		
+		for (Link link : links) {
+			link.setNewsId(news.getId());
+		}
+		
+		newsLinksDao.create(links);
+	}
+	
 	private void readOtherNewsParts(News news) {
 		// read news links		
 		List<Link> links = new ArrayList<Link>(newsLinksDao.readForNews(news.getId()));

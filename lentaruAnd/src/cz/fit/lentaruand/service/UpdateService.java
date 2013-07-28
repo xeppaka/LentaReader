@@ -57,10 +57,7 @@ public class UpdateService extends Service {
 				
 				ContentResolver cr = UpdateService.this.getApplicationContext().getContentResolver();
 				NewsDao newsDao = new NewsDao(cr);
-				
-				for (News n : news) {
-					newsDao.create(n);
-				}
+				newsDao.create(news);
 				
 				UpdateService.this.stopSelf();
 			}

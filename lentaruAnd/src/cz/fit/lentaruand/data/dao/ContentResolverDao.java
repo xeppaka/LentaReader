@@ -2,6 +2,7 @@ package cz.fit.lentaruand.data.dao;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import android.content.ContentResolver;
@@ -10,15 +11,74 @@ import android.content.ContentValues;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Handler;
 import android.util.Log;
 import cz.fit.lentaruand.data.DatabaseObject;
 import cz.fit.lentaruand.data.db.SQLiteType;
-import cz.fit.lentaruand.data.provider.LentaProvider;
 import cz.fit.lentaruand.utils.LentaConstants;
 
-public abstract class DefaultDao<T extends DatabaseObject> implements Dao<T> {
+public abstract class ContentResolverDao<T extends DatabaseObject> implements Dao<T> {
 	private final static String textKeyWhere;
 	private final static String intKeyWhere;
+	
+	public static abstract class DaoObserver<T> implements Dao.Observer<T> {
+		private ContentObserver contentObserver;
+		private Dao<T> dao;
+		
+		public DaoObserver(Handler handler) {
+			initialize(handler);
+		}
+
+		private void initialize(Handler handler) {
+			contentObserver = new ContentObserver(handler) {
+				@Override
+				public void onChange(boolean selfChange, Uri uri) {
+					long id;
+					
+					try {
+						id = ContentUris.parseId(uri);
+					} catch (NumberFormatException e) {
+						id = -1;
+					}
+					
+					if (id >= 0) {
+						T dataObject = dao.read(id);
+						
+						if (dataObject == null) {
+							// something went wrong...
+							Log.w(LentaConstants.LoggerAnyTag, "DaoObserver triggered. Read object is null for uri: " + uri + ".");
+							return;
+						}
+						
+						onDataChanged(selfChange, dataObject);
+					} else {
+						this.onChange(selfChange);
+					}
+				}
+
+				@Override
+				public void onChange(boolean selfChange) {
+					Collection<T> dataObjects = dao.read();
+					
+					if (dataObjects == null || dataObjects.isEmpty()) {
+						// something went wrong...
+						Log.w(LentaConstants.LoggerAnyTag, "DaoObserver triggered. Read collection of objects is null or empty.");
+						return;
+					}
+					
+					onDataChanged(selfChange, dataObjects);
+				}
+			};
+		}
+		
+		private void setDao(Dao<T> dao) {
+			this.dao = dao;
+		}
+		
+		private ContentObserver getContentObserver() {
+			return contentObserver;
+		}
+	}
 	
 	private static String getWhereFromSQLiteType(SQLiteType type) {
 		switch (type) {
@@ -38,7 +98,7 @@ public abstract class DefaultDao<T extends DatabaseObject> implements Dao<T> {
 	
 	private ContentResolver cr;
 	
-	public DefaultDao(ContentResolver cr) {
+	public ContentResolverDao(ContentResolver cr) {
 		this.cr = cr;
 	}
 
@@ -52,7 +112,7 @@ public abstract class DefaultDao<T extends DatabaseObject> implements Dao<T> {
 
 			if (cur.moveToFirst()) {
 				do {
-					result.add(createDaoObject(cur));
+					result.add(createDataObject(cur));
 				} while (cur.moveToNext());
 			}
 			
@@ -80,7 +140,7 @@ public abstract class DefaultDao<T extends DatabaseObject> implements Dao<T> {
 			}
 			
 			if (cur.moveToFirst())
-				return createDaoObject(cur);
+				return createDataObject(cur);
 		} finally {
 			cur.close();
 		}
@@ -118,7 +178,7 @@ public abstract class DefaultDao<T extends DatabaseObject> implements Dao<T> {
 			}
 			
 			if (cur.moveToFirst())
-				return createDaoObject(cur);
+				return createDataObject(cur);
 		} finally {
 			cur.close();
 		}
@@ -132,11 +192,38 @@ public abstract class DefaultDao<T extends DatabaseObject> implements Dao<T> {
 		long id = ContentUris.parseId(uri);
 		daoObject.setId(id);
 
-		cr.notifyChange(getContentProviderUri(), null);
+		cr.notifyChange(ContentUris.withAppendedId(getContentProviderUri(), id), null);
 		
 		return id;
 	}
 	
+	@Override
+	public Collection<Long> create(Collection<T> dataObjects) {
+		Collection<Long> result = null;
+		
+		for (T dataObject : dataObjects) {
+			Uri uri = cr.insert(getContentProviderUri(), prepareContentValues(dataObject));
+			Long id = ContentUris.parseId(uri);
+			
+			dataObject.setId(id);
+			
+			if (result == null) {
+				result = new ArrayList<Long>();
+			}
+			
+			result.add(id);
+		}
+		
+
+		cr.notifyChange(getContentProviderUri(), null);
+		
+		if (result == null) {
+			return Collections.emptyList();
+		}
+		
+		return result;
+	}
+
 	@Override
 	public int delete(long id) {
 		Uri uri = ContentUris.withAppendedId(getContentProviderUri(), id);
@@ -201,16 +288,47 @@ public abstract class DefaultDao<T extends DatabaseObject> implements Dao<T> {
 		return cr;
 	}
 	
-	public void registerContentObserver(boolean notifyForDescendents, ContentObserver observer) {
-		cr.registerContentObserver(LentaProvider.CONTENT_URI_NEWS, notifyForDescendents, observer);
+	@Override
+	public void registerContentObserver(final Dao.Observer<T> observer) {
+		DaoObserver<T> daoObserver;
+		
+		if (observer instanceof DaoObserver) {
+			daoObserver = (DaoObserver<T>)observer;
+		} else {
+//			daoObserver = new DaoObserver<T>() {
+//				@Override
+//				public void onDataChanged(boolean selfChange, Collection<T> dataObjects) {
+//					observer.onDataChanged(selfChange, dataObjects);
+//				}
+//				
+//				@Override
+//				public void onDataChanged(boolean selfChange, T dataObject) {
+//					observer.onDataChanged(selfChange, dataObject);
+//				}
+//			};
+			
+			throw new IllegalArgumentException("observer is not derived from DaoObserver which is not supported now. You should create observer by extending DaoObserver abstract class.");
+		}
+		
+		daoObserver.setDao(this);
+		cr.registerContentObserver(getContentProviderUri(), true, daoObserver.getContentObserver());
 	}
 	
-	public void unregisterContentObserver(ContentObserver observer) {
-		cr.unregisterContentObserver(observer);
+	@Override
+	public void unregisterContentObserver(Dao.Observer<T> observer) {
+		DaoObserver<T> daoObserver;
+		
+		if (observer instanceof DaoObserver) {
+			daoObserver = (DaoObserver<T>)observer;
+		} else {
+			throw new IllegalArgumentException("observer is not derived from DaoObserver which is not supported now. You should create observer by extending DaoObserver abstract class.");
+		}
+		
+		cr.unregisterContentObserver(daoObserver.getContentObserver());
 	}
 	
 	protected abstract ContentValues prepareContentValues(T newsObject);
-	protected abstract T createDaoObject(Cursor cur);
+	protected abstract T createDataObject(Cursor cur);
 	protected abstract Uri getContentProviderUri();
 	protected abstract String getKeyColumnName();
 	protected abstract SQLiteType getKeyColumnType();

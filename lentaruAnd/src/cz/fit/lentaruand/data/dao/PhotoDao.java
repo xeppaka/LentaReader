@@ -11,7 +11,7 @@ import cz.fit.lentaruand.data.Rubrics;
 import cz.fit.lentaruand.data.db.PhotoEntry;
 import cz.fit.lentaruand.data.db.SQLiteType;
 
-public class PhotoDao extends DefaultDao<Photo> {
+public class PhotoDao extends ContentResolverDao<Photo> {
 	private static final String[] projectionAll = {
 		PhotoEntry._ID,
 		PhotoEntry.COLUMN_NAME_GUID,
@@ -57,7 +57,7 @@ public class PhotoDao extends DefaultDao<Photo> {
 	}
 
 	@Override
-	protected Photo createDaoObject(Cursor cur) {
+	protected Photo createDataObject(Cursor cur) {
 		long id = cur.getLong(cur.getColumnIndexOrThrow(PhotoEntry._ID));
 		String guidDb = cur.getString(cur.getColumnIndexOrThrow(PhotoEntry.COLUMN_NAME_GUID));
 		String title = cur.getString(cur.getColumnIndexOrThrow(PhotoEntry.COLUMN_NAME_TITLE));

@@ -14,6 +14,15 @@ import cz.fit.lentaruand.data.db.SQLiteType;
  *            is any class which can be saved into the database.
  */
 public interface Dao<T> {
+	
+	interface Observer<T> {	
+		void onDataChanged(boolean selfChange, T dataObject);
+		void onDataChanged(boolean selfChange, Collection<T> dataObjects);
+	}
+	
+	void registerContentObserver(Observer<T> observer);
+	void unregisterContentObserver(Observer<T> observer);
+	
 	/**
 	 * Create new object in the database (row in the table).
 	 * 
@@ -23,6 +32,16 @@ public interface Dao<T> {
 	 */
 	long create(T dataObject);
 
+	/**
+	 * Create new objects in the database (rows in the table).
+	 * 
+	 * @param dataObjects
+	 *            is the news objects to create.
+	 * @return database ids for the newly created object in the same order as
+	 *         objects were.
+	 */
+	Collection<Long> create(Collection<T> dataObjects);
+	
 	/**
 	 * Read all news objects from database.
 	 * 

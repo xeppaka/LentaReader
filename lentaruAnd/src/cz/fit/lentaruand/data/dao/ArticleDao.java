@@ -12,7 +12,7 @@ import cz.fit.lentaruand.data.db.ArticleEntry;
 import cz.fit.lentaruand.data.db.NewsEntry;
 import cz.fit.lentaruand.data.db.SQLiteType;
 
-public class ArticleDao extends DefaultDao<Article> {
+public class ArticleDao extends ContentResolverDao<Article> {
 	private static final String[] projectionAll = {
 		ArticleEntry._ID,
 		ArticleEntry.COLUMN_NAME_GUID,
@@ -73,7 +73,7 @@ public class ArticleDao extends DefaultDao<Article> {
 	}
 
 	@Override
-	protected Article createDaoObject(Cursor cur) {
+	protected Article createDataObject(Cursor cur) {
 		long id = cur.getLong(cur.getColumnIndexOrThrow(ArticleEntry._ID));
 		String guidDb = cur.getString(cur.getColumnIndexOrThrow(ArticleEntry.COLUMN_NAME_GUID));
 		String title = cur.getString(cur.getColumnIndexOrThrow(ArticleEntry.COLUMN_NAME_TITLE));

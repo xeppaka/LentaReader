@@ -15,7 +15,7 @@ import cz.fit.lentaruand.data.db.NewsLinksEntry;
 import cz.fit.lentaruand.data.db.SQLiteType;
 import cz.fit.lentaruand.data.provider.LentaProvider;
 
-public class NewsLinksDao extends DefaultDao<Link> {
+public class NewsLinksDao extends ContentResolverDao<Link> {
 	private static final String[] projectionAll = {
 		NewsLinksEntry._ID,
 		NewsLinksEntry.COLUMN_NAME_NEWS_ID,
@@ -49,7 +49,7 @@ public class NewsLinksDao extends DefaultDao<Link> {
 	}
 
 	@Override
-	protected Link createDaoObject(Cursor cur) {
+	protected Link createDataObject(Cursor cur) {
 		long id = cur.getInt(cur.getColumnIndexOrThrow(NewsLinksEntry._ID));
 		long newsId = cur.getInt(cur.getColumnIndexOrThrow(NewsLinksEntry.COLUMN_NAME_NEWS_ID));
 		String title = cur.getString(cur.getColumnIndexOrThrow(NewsLinksEntry.COLUMN_NAME_TITLE));
@@ -101,7 +101,7 @@ public class NewsLinksDao extends DefaultDao<Link> {
 		try {
 			if (cur.moveToFirst()) {
 				do {
-					result.add(createDaoObject(cur));
+					result.add(createDataObject(cur));
 				} while (cur.moveToNext());
 			}
 			
