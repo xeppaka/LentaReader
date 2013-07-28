@@ -1,19 +1,18 @@
 package cz.fit.lentaruand.test;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.xml.xpath.XPathExpressionException;
 
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.LargeTest;
 import cz.fit.lentaruand.data.News;
 import cz.fit.lentaruand.data.Rubrics;
 import cz.fit.lentaruand.downloader.LentaNewsDownloader;
+import cz.fit.lentaruand.downloader.exceptions.HttpStatusCodeException;
 import cz.fit.lentaruand.parser.exceptions.ParseWithRegexException;
+import cz.fit.lentaruand.parser.exceptions.ParseWithXPathException;
 
 public class NewsDownloaderTest extends AndroidTestCase {
 	private final Logger logger = Logger.getLogger(NewsDownloaderTest.class.getName());
@@ -26,7 +25,7 @@ public class NewsDownloaderTest extends AndroidTestCase {
 	}
 
 	@LargeTest
-	public void testFullParsing() throws MalformedURLException, IOException, XPathExpressionException, ParseWithRegexException {
+	public void testFullParsing() throws IOException, ParseWithRegexException, ParseWithXPathException, HttpStatusCodeException {
 		int total = 0;
 		
 		for (Rubrics rubric : Rubrics.values()) {

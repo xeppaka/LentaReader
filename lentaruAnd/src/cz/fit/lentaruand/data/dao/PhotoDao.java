@@ -24,11 +24,11 @@ public class PhotoDao extends DefaultDao<Photo> {
 		PhotoEntry.COLUMN_NAME_RUBRIC_UPDATE
 	};
 	
-	private PhotoImageDao photoImageDao;
+	//private PhotoImageDao photoImageDao;
 	
 	public PhotoDao(ContentResolver cr) {
 		super(cr);
-		photoImageDao = new PhotoImageDao(cr);
+		//photoImageDao = new PhotoImageDao(cr);
 	}
 	
 	@Override

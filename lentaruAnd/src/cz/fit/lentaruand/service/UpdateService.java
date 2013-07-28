@@ -41,7 +41,7 @@ public class UpdateService extends Service {
 				
 				LentaNewsDownloader lnd = new LentaNewsDownloader();
 				
-				List<News> news;				
+				List<News> news;
 				try {
 					news = lnd.downloadRubricBrief(Rubrics.ECONOMICS);
 				} catch (ParseWithXPathException e) {

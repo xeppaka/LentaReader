@@ -1,15 +1,22 @@
 package cz.fit.lentaruand.ui.fragments;
 
+import java.util.Collection;
 import java.util.List;
 
+import android.content.ContentResolver;
 import android.content.Intent;
+import android.database.ContentObserver;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.view.View;
 import android.widget.ListView;
 import cz.fit.lentaruand.data.NewsObject;
+import cz.fit.lentaruand.data.dao.DefaultDao;
+import cz.fit.lentaruand.data.dao.NewsDao;
 import cz.fit.lentaruand.service.UpdateService;
 import cz.fit.lentaruand.ui.activities.NewsFullActivity;
 
@@ -27,6 +34,7 @@ public class SwipeNewsObjectsListFragment<T extends NewsObject> extends ListFrag
 
 	private NewsObjectAdapter<T> newsObjectsAdapter;
 	private Loader<List<T>> newsObjectsLoader;
+	private DefaultDao<T> dataDao;
 
 	public SwipeNewsObjectsListFragment(Loader<List<T>> newsObjectsLoader, NewsObjectAdapter<T> newsObjectsAdapter) {
 		if (newsObjectsLoader == null) {
@@ -57,7 +65,7 @@ public class SwipeNewsObjectsListFragment<T extends NewsObject> extends ListFrag
 		startActivity(intent);
 	}
 
-	public void showNewsObjects(List<T> newsObjects) {
+	public void showNewsObjects(Collection<T> newsObjects) {
 		newsObjectsAdapter.setNewsObjects(newsObjects);
 		newsObjectsAdapter.notifyDataSetChanged();
 	}
@@ -65,6 +73,10 @@ public class SwipeNewsObjectsListFragment<T extends NewsObject> extends ListFrag
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
+		
+		ContentResolver cr = getActivity().getContentResolver();
+		dataDao = (DefaultDao<T>)new NewsDao(cr);
+		dataDao.registerContentObserver(true, new MyContentObserver(new Handler()));
 		
 //		newsList = getListView();
 //		newsList.setLongClickable(true);
@@ -92,5 +104,27 @@ public class SwipeNewsObjectsListFragment<T extends NewsObject> extends ListFrag
 
 	@Override
 	public void onLoaderReset(Loader<List<T>> loader) {
+	}
+	
+	private class MyContentObserver extends ContentObserver {
+		public MyContentObserver(Handler handler) {
+			super(handler);
+		}
+
+		@Override
+		public boolean deliverSelfNotifications() {
+			return super.deliverSelfNotifications();
+		}
+
+		@Override
+		public void onChange(boolean selfChange, Uri uri) {
+			Collection<T> news = dataDao.read();
+			showNewsObjects(news);
+		}
+
+		@Override
+		public void onChange(boolean selfChange) {
+			super.onChange(selfChange);
+		}
 	}
 }

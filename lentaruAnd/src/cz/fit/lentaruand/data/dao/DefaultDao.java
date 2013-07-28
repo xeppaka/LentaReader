@@ -55,7 +55,7 @@ public abstract class DefaultDao<T extends DatabaseObject> implements Dao<T> {
 					result.add(createDaoObject(cur));
 				} while (cur.moveToNext());
 			}
-
+			
 			return result;
 		} finally {
 			cur.close();
@@ -131,6 +131,8 @@ public abstract class DefaultDao<T extends DatabaseObject> implements Dao<T> {
 		Uri uri = cr.insert(getContentProviderUri(), prepareContentValues(daoObject));
 		long id = ContentUris.parseId(uri);
 		daoObject.setId(id);
+
+		cr.notifyChange(getContentProviderUri(), null);
 		
 		return id;
 	}
