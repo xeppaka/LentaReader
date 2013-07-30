@@ -21,6 +21,7 @@
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -28,8 +29,21 @@
             android:name="cz.fit.lentaruand.ui.activities.NewsFullActivity"
             android:label="@string/title_activity_full_news" >
         </activity>
-        <provider android:exported="false" android:name="cz.fit.lentaruand.data.provider.LentaProvider" android:authorities="@string/provider_authority"></provider>
-        <service android:name=".service.UpdateService" android:label="UpdateService"></service>
+
+        <provider
+            android:name="cz.fit.lentaruand.data.provider.LentaProvider"
+            android:authorities="@string/provider_authority"
+            android:exported="false" >
+        </provider>
+
+        <service
+            android:name=".service.UpdateService"
+            android:label="UpdateService" >
+        </service>
+        <service
+            android:name=".service.Service"
+            android:label="Service" >
+        </service>
     </application>
 
 </manifest>

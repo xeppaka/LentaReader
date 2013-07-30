@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,11 +13,14 @@ import android.support.v4.app.ListFragment;
 import android.support.v4.content.Loader;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.Toast;
 import cz.fit.lentaruand.data.NewsObject;
+import cz.fit.lentaruand.data.Rubrics;
 import cz.fit.lentaruand.data.dao.ContentResolverDao;
 import cz.fit.lentaruand.data.dao.ContentResolverDao.DaoObserver;
 import cz.fit.lentaruand.data.dao.NewsDao;
-import cz.fit.lentaruand.service.UpdateService;
+import cz.fit.lentaruand.service.ServiceCallbackListener;
+import cz.fit.lentaruand.service.ServiceHelper;
 import cz.fit.lentaruand.ui.activities.NewsFullActivity;
 
 /**
@@ -28,7 +32,8 @@ import cz.fit.lentaruand.ui.activities.NewsFullActivity;
  *
  * @param <T>
  */
-public class SwipeNewsObjectsListFragment<T extends NewsObject> extends ListFragment { 
+@SuppressLint("ValidFragment")
+public class SwipeNewsObjectsListFragment<T extends NewsObject> extends ListFragment implements ServiceCallbackListener { 
 			//implements LoaderManager.LoaderCallbacks<List<T>> {
 
 	private NewsObjectAdapter<T> newsObjectsAdapter;
@@ -88,7 +93,10 @@ public class SwipeNewsObjectsListFragment<T extends NewsObject> extends ListFrag
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		//getLoaderManager().initLoader(0, null, this).forceLoad();
-		getActivity().startService(new Intent(this.getActivity(), UpdateService.class));
+//		getActivity().startService(new Intent(this.getActivity(), UpdateService.class));
+		ServiceHelper serviceHelper = new ServiceHelper(this.getActivity());
+		serviceHelper.addListener(this);
+		serviceHelper.downloadListOfBriefNews(Rubrics.ECONOMICS);
 	}
 
 //	@Override
@@ -119,5 +127,12 @@ public class SwipeNewsObjectsListFragment<T extends NewsObject> extends ListFrag
 		public void onDataChanged(boolean selfChange, Collection<T> dataObjects) {
 			showNewsObjects(dataObjects);
 		}
+	}
+
+	@Override
+	public void onServiceCallback(int requestId, Intent requestIntent,
+			int resultCode, Bundle data) {
+		Toast.makeText(getActivity(), "Callback received! data in bundle = " + data.getString("EXTRA_STRING"), Toast.LENGTH_SHORT).show();
+		
 	}
 }
