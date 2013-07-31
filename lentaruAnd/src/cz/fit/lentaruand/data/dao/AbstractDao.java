@@ -15,7 +15,7 @@ import cz.fit.lentaruand.data.DatabaseObject;
 import cz.fit.lentaruand.data.db.SQLiteType;
 import cz.fit.lentaruand.utils.LentaConstants;
 
-abstract class ContentResolverDao<T extends DatabaseObject> implements Dao<T> {
+abstract class AbstractDao<T extends DatabaseObject> implements Dao<T> {
 	private final static String textKeyWhere;
 	private final static String intKeyWhere;
 	
@@ -37,7 +37,7 @@ abstract class ContentResolverDao<T extends DatabaseObject> implements Dao<T> {
 	
 	private final ContentResolver cr;
 	
-	protected ContentResolverDao(ContentResolver cr) {
+	protected AbstractDao(ContentResolver cr) {
 		if (cr == null) {
 			throw new IllegalArgumentException("contentResolver is null.");
 		}

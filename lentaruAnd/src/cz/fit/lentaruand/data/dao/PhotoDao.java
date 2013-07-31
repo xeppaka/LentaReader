@@ -12,7 +12,7 @@ import cz.fit.lentaruand.data.Rubrics;
 import cz.fit.lentaruand.data.db.PhotoEntry;
 import cz.fit.lentaruand.data.db.SQLiteType;
 
-public class PhotoDao extends ContentResolverDao<Photo> {
+public class PhotoDao extends AbstractDao<Photo> {
 	private static final String[] projectionAll = {
 		PhotoEntry._ID,
 		PhotoEntry.COLUMN_NAME_GUID,

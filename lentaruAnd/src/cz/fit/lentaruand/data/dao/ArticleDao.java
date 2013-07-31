@@ -13,7 +13,7 @@ import cz.fit.lentaruand.data.db.ArticleEntry;
 import cz.fit.lentaruand.data.db.NewsEntry;
 import cz.fit.lentaruand.data.db.SQLiteType;
 
-public class ArticleDao extends ContentResolverDao<Article> {
+public class ArticleDao extends AbstractDao<Article> {
 	private static final String[] projectionAll = {
 		ArticleEntry._ID,
 		ArticleEntry.COLUMN_NAME_GUID,

@@ -11,7 +11,7 @@ import cz.fit.lentaruand.data.Link;
 import cz.fit.lentaruand.data.db.ArticleLinksEntry;
 import cz.fit.lentaruand.data.db.SQLiteType;
 
-public class ArticleLinksDao extends ContentResolverDao<Link> {
+public class ArticleLinksDao extends AbstractDao<Link> {
 	private static final String[] projectionAll = {
 		ArticleLinksEntry._ID,
 		ArticleLinksEntry.COLUMN_NAME_ARTICLE_ID,

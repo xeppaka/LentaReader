@@ -34,7 +34,7 @@ public class NewsLinksDao {
 	private NewsLinksDao() {
 	}
 	
-	private static class ContentResolverNewsLinksDao extends ContentResolverDao<Link> {
+	private static class ContentResolverNewsLinksDao extends AbstractDao<Link> {
 		private static final String[] projectionAll = {
 			NewsLinksEntry._ID,
 			NewsLinksEntry.COLUMN_NAME_NEWS_ID,

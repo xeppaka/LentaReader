@@ -36,7 +36,7 @@ public final class NewsDao {
 	private NewsDao() {
 	}
 	
-	private static class ContentResolverNewsDao extends ContentResolverDao<News> {
+	private static class ContentResolverNewsDao extends AbstractDao<News> {
 		private static final String[] projectionAll = {
 			NewsEntry._ID,
 			NewsEntry.COLUMN_NAME_GUID,
