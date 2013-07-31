@@ -17,9 +17,10 @@ import cz.fit.lentaruand.data.Rubrics;
 import cz.fit.lentaruand.data.db.NewsEntry;
 import cz.fit.lentaruand.data.db.SQLiteType;
 import cz.fit.lentaruand.data.provider.LentaProvider;
+import cz.fit.lentaruand.utils.LentaConstants;
 
 public final class NewsDao {
-	private static final int CACHE_MAX_OBJECTS = 100;
+	private static final int CACHE_MAX_OBJECTS = LentaConstants.DAO_CACHE_MAX_OBJECTS;
 	
 	private static final LruCache<Long, News> cacheId = new LruCache<Long, News>(CACHE_MAX_OBJECTS);
 	private static final LruCache<String, News> cacheKey = new LruCache<String, News>(CACHE_MAX_OBJECTS);
@@ -51,11 +52,11 @@ public final class NewsDao {
 			NewsEntry.COLUMN_NAME_FULLTEXT
 		};
 		
-		private NewsLinksDao newsLinksDao;
+		private Dao<Link> newsLinksDao;
 		
 		public ContentResolverNewsDao(ContentResolver cr) {
 			super(cr);
-			newsLinksDao = new NewsLinksDao(cr);
+			newsLinksDao = NewsLinksDao.getInstance(cr);
 		}
 	
 		@Override
@@ -205,9 +206,25 @@ public final class NewsDao {
 			newsLinksDao.create(links);
 		}
 		
+		@Override
+		public void update(News news) {
+			Collection<Link> links = news.getLinks();
+			
+			for (Link link : links) {
+				newsLinksDao.update(link);
+			}
+			
+			super.update(news);
+		}
+		
+		@Override
+		public Collection<News> readForParentObject(long parentId) {
+			return null;
+		}
+
 		private void readOtherNewsParts(News news) {
-			// read news links		
-			List<Link> links = new ArrayList<Link>(newsLinksDao.readForNews(news.getId()));
+			// read news links
+			List<Link> links = new ArrayList<Link>(newsLinksDao.readForParentObject(news.getId()));
 			Collections.sort(links);
 			
 			news.setLinks(links);
@@ -225,17 +242,6 @@ public final class NewsDao {
 	//			log.log(Level.INFO, String.format("Unable to read image id %s from cache", imageId));
 	//			// do nothing -> image is not going to be available for this news
 	//		}
-		}
-		
-		@Override
-		public void update(News news) {
-			Collection<Link> links = news.getLinks();
-			
-			for (Link link : links) {
-				newsLinksDao.update(link);
-			}
-			
-			super.update(news);
 		}
 	}
 }

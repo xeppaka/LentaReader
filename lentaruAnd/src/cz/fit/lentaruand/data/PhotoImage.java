@@ -173,4 +173,9 @@ public class PhotoImage implements DatabaseObject, Comparable<PhotoImage> {
 		
 		return hash;
 	}
+
+	@Override
+	public long getParentId() {
+		return photoId;
+	}
 }

@@ -90,7 +90,7 @@ public class NewsDaoTest extends AndroidTestCase {
 		long linkId2 = it.next().getId();
 		long linkId3 = it.next().getId();
 		ContentResolver cr = getContext().getContentResolver();
-		NewsLinksDao nlinksDao = new NewsLinksDao(cr);
+		Dao<Link> nlinksDao = NewsLinksDao.getInstance(cr);
 		Dao<News> newsDao = NewsDao.getInstance(cr);
 		newsDao.delete("guid1");
 		News n = newsDao.read("guid1");
@@ -111,7 +111,7 @@ public class NewsDaoTest extends AndroidTestCase {
 		long linkId2 = it.next().getId();
 		long linkId3 = it.next().getId();
 		ContentResolver cr = getContext().getContentResolver();
-		NewsLinksDao nlinksDao = new NewsLinksDao(cr);
+		Dao<Link> nlinksDao = NewsLinksDao.getInstance(cr);
 		Dao<News> newsDao = NewsDao.getInstance(cr);
 		newsDao.delete(id);
 		News n = newsDao.read(id);

@@ -1,5 +1,6 @@
 package cz.fit.lentaruand.data.dao;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import android.support.v4.util.LruCache;
@@ -17,6 +18,12 @@ final class CachedDao<T extends DatabaseObject> implements Dao<T> {
 	private final Dao<T> underlinedDao;
 	private final LruCache<Long, T> cacheId;
 	private final LruCache<String, T> cacheKey;
+	
+	/**
+	 * used only in {@link CachedDao#read(Collection)} to not create temporary
+	 * object for every method invocation.
+	 */
+	private final Collection<Long> missed = new ArrayList<Long>();
 	
 	public CachedDao(Dao<T> underlinedDao, LruCache<Long, T> cacheId, LruCache<String, T> cacheKey) {
 		if (underlinedDao == null) {
@@ -83,6 +90,28 @@ final class CachedDao<T extends DatabaseObject> implements Dao<T> {
 	}
 
 	@Override
+	public synchronized Collection<T> read(Collection<Long> ids) {
+		missed.clear();
+		Collection<T> result = new ArrayList<T>();
+		
+		for (Long id : ids) {
+			T dataObject = cacheId.get(id);
+			
+			if (dataObject == null) {
+				missed.add(id);
+			} else {
+				result.add(dataObject);
+			}
+		}
+		
+		if (!missed.isEmpty()) {
+			result.addAll(underlinedDao.read(missed));
+		}
+		
+		return result;
+	}
+
+	@Override
 	public synchronized T read(String key) {
 		T dataObject = cacheKey.get(key);
 		
@@ -96,6 +125,12 @@ final class CachedDao<T extends DatabaseObject> implements Dao<T> {
 	@Override
 	public synchronized T read(SQLiteType keyType, String keyColumnName, String keyValue) {
 		return underlinedDao.read(keyType, keyColumnName, keyValue);
+	}
+
+	@Override
+	public Collection<T> readForParentObject(long parentId) {
+		// TODO: consider if cache can be used in that case.
+		return underlinedDao.readForParentObject(parentId);
 	}
 
 	@Override

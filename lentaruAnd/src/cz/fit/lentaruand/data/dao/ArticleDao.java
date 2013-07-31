@@ -1,6 +1,7 @@
 package cz.fit.lentaruand.data.dao;
 
 import java.sql.Date;
+import java.util.Collection;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -117,5 +118,10 @@ public class ArticleDao extends ContentResolverDao<Article> {
 	@Override
 	protected String[] getProjectionAll() {
 		return projectionAll;
+	}
+
+	@Override
+	public Collection<Article> readForParentObject(long parentId) {
+		return null;
 	}
 }

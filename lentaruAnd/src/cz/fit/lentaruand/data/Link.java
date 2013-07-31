@@ -133,4 +133,9 @@ public class Link implements DatabaseObject, Comparable<Link> {
 		
 		return hash;
 	}
+
+	@Override
+	public long getParentId() {
+		return newsId;
+	}
 }

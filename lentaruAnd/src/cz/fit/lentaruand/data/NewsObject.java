@@ -174,4 +174,9 @@ public abstract class NewsObject implements Comparable<NewsObject>, DatabaseObje
 	public String getKeyValue() {
 		return getGuid();
 	}
+
+	@Override
+	public long getParentId() {
+		return ID_NONE;
+	}
 }

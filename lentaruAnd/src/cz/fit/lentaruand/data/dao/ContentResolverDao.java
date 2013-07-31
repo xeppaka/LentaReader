@@ -92,6 +92,21 @@ abstract class ContentResolverDao<T extends DatabaseObject> implements Dao<T> {
 	}
 
 	@Override
+	public synchronized Collection<T> read(Collection<Long> ids) {
+		Collection<T> result = new ArrayList<T>(ids.size());
+		
+		for (long id : ids) {
+			T dataObject = read(id);
+			
+			if (dataObject != null) {
+				result.add(dataObject);
+			}
+		}
+		
+		return result;
+	}
+
+	@Override
 	public synchronized T read(String key) {
 		return read(getKeyColumnType(), getKeyColumnName(), key);
 	}

@@ -1,5 +1,7 @@
 package cz.fit.lentaruand.data.dao;
 
+import java.util.Collection;
+
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -87,6 +89,11 @@ public class PhotoImageDao extends ContentResolverDao<PhotoImage> {
 	@Override
 	protected String[] getProjectionAll() {
 		return projectionAll;
+	}
+
+	@Override
+	public Collection<PhotoImage> readForParentObject(long parentId) {
+		return null;
 	}
 
 //	public Collection<PhotoImage> readForPhoto(SQLiteDatabase db, long photoId) {

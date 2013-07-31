@@ -17,6 +17,7 @@ public interface DatabaseObject extends Serializable {
 	
 	void setId(long id);
 	long getId();
+	long getParentId();
 	
 	String getKeyValue();
 	

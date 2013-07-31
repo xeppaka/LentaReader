@@ -63,6 +63,19 @@ public interface Dao<T> {
 	T read(long id);
 	
 	/**
+	 * Read some news objects from the database specifying its collection of
+	 * ids.
+	 * 
+	 * @param ids
+	 *            collections of ids returned by
+	 *            {@link ContentResolver#create(android.database.sqlite.ContentResolver.CursorFactory)}
+	 *            method. Only one object can be identified by id.
+	 * @return Collection of News objects created from the database. Not null.
+	 *         Could be empty.
+	 */
+	Collection<T> read(Collection<Long> ids);
+	
+	/**
 	 * Read some news object from the database specifying its key.
 	 * 
 	 * @param key
@@ -143,4 +156,15 @@ public interface Dao<T> {
 	 * @return Collection of keys. Not null. Could be empty.
 	 */
 	Collection<String> readAllKeys();
+	
+	/**
+	 * Read all data objects that are connected to the id of the parent object
+	 * (foreign key).
+	 * 
+	 * @param parentId
+	 *            is the id of parent object.
+	 * @return Collection of objects or null if there is no foreign key for this
+	 *         table.
+	 */
+	Collection<T> readForParentObject(long parentId);
 }

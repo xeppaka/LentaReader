@@ -1,5 +1,6 @@
 package cz.fit.lentaruand.data.dao;
 
+import java.util.Collection;
 import java.util.Date;
 
 import android.content.ContentResolver;
@@ -97,6 +98,11 @@ public class PhotoDao extends ContentResolverDao<Photo> {
 		return projectionAll;
 	}
 
+	@Override
+	public Collection<Photo> readForParentObject(long parentId) {
+		return null;
+	}
+	
 //	@Override
 //	public Photo read(SQLiteDatabase db, String key) {
 //		Photo photo = super.read(db, key);
