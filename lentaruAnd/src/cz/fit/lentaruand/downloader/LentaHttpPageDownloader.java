@@ -20,7 +20,8 @@ import cz.fit.lentaruand.utils.LentaConstants;
 import cz.fit.lentaruand.utils.URLHelper;
 
 public class LentaHttpPageDownloader {
-	static class FlushedInputStream extends FilterInputStream {
+	
+	private static class FlushedInputStream extends FilterInputStream {
 	    public FlushedInputStream(InputStream inputStream) {
 	        super(inputStream);
 	    }
@@ -62,11 +63,10 @@ public class LentaHttpPageDownloader {
 			
 			final HttpEntity entity = response.getEntity();
 			if (entity != null) {
-				InputStream is = null;
+				BufferedReader br = null;
 				try {
-					is = entity.getContent();
 					String line = null;
-					final BufferedReader br = new BufferedReader(new InputStreamReader(new FlushedInputStream(is)));
+					br = new BufferedReader(new InputStreamReader(new FlushedInputStream(entity.getContent())));
 					final StringBuilder result = new StringBuilder();
 					
 					while ((line = br.readLine()) != null) {
@@ -75,8 +75,8 @@ public class LentaHttpPageDownloader {
 					
 					return new Page(url, result.toString());
 				} finally {
-					if (is != null) {
-						is.close();
+					if (br != null) {
+						br.close();
 					}
 					
 					entity.consumeContent();

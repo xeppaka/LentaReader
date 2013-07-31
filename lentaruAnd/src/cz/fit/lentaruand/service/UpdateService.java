@@ -10,6 +10,7 @@ import android.os.IBinder;
 import android.util.Log;
 import cz.fit.lentaruand.data.News;
 import cz.fit.lentaruand.data.Rubrics;
+import cz.fit.lentaruand.data.dao.Dao;
 import cz.fit.lentaruand.data.dao.NewsDao;
 import cz.fit.lentaruand.downloader.LentaNewsDownloader;
 import cz.fit.lentaruand.downloader.exceptions.HttpStatusCodeException;
@@ -56,7 +57,7 @@ public class UpdateService extends Service {
 				}
 				
 				ContentResolver cr = UpdateService.this.getApplicationContext().getContentResolver();
-				NewsDao newsDao = new NewsDao(cr);
+				Dao<News> newsDao = NewsDao.getInstance(cr);
 				newsDao.create(news);
 				
 				UpdateService.this.stopSelf();

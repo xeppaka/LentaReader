@@ -14,10 +14,11 @@ import android.support.v4.content.Loader;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
+import cz.fit.lentaruand.data.News;
 import cz.fit.lentaruand.data.NewsObject;
 import cz.fit.lentaruand.data.Rubrics;
-import cz.fit.lentaruand.data.dao.ContentResolverDao;
-import cz.fit.lentaruand.data.dao.ContentResolverDao.DaoObserver;
+import cz.fit.lentaruand.data.dao.Dao;
+import cz.fit.lentaruand.data.dao.DaoObserver;
 import cz.fit.lentaruand.data.dao.NewsDao;
 import cz.fit.lentaruand.service.ServiceCallbackListener;
 import cz.fit.lentaruand.service.ServiceHelper;
@@ -38,7 +39,7 @@ public class SwipeNewsObjectsListFragment<T extends NewsObject> extends ListFrag
 
 	private NewsObjectAdapter<T> newsObjectsAdapter;
 	private Loader<List<T>> newsObjectsLoader;
-	private ContentResolverDao<T> dataDao;
+	//private ContentResolverDao<T> dataDao;
 
 	public SwipeNewsObjectsListFragment(Loader<List<T>> newsObjectsLoader, NewsObjectAdapter<T> newsObjectsAdapter) {
 		if (newsObjectsLoader == null) {
@@ -79,8 +80,8 @@ public class SwipeNewsObjectsListFragment<T extends NewsObject> extends ListFrag
 		super.onActivityCreated(savedInstanceState);
 		
 		ContentResolver cr = getActivity().getContentResolver();
-		dataDao = (ContentResolverDao<T>)new NewsDao(cr);
-		dataDao.registerContentObserver(new MyContentObserver(new Handler()));
+		Dao<News> dataDao= NewsDao.getInstance(cr);
+		dataDao.registerContentObserver((Dao.Observer<News>)(new MyContentObserver(new Handler())));
 		
 //		newsList = getListView();
 //		newsList.setLongClickable(true);

@@ -136,4 +136,11 @@ public interface Dao<T> {
 	 * @return number of rows deleted.
 	 */
 	int delete(SQLiteType keyType, String keyColumnName, String keyValue);
+	
+	/**
+	 * Reads all object keys from database.
+	 * 
+	 * @return Collection of keys. Not null. Could be empty.
+	 */
+	Collection<String> readAllKeys();
 }

@@ -8,77 +8,16 @@ import java.util.List;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
-import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Handler;
 import android.util.Log;
 import cz.fit.lentaruand.data.DatabaseObject;
 import cz.fit.lentaruand.data.db.SQLiteType;
 import cz.fit.lentaruand.utils.LentaConstants;
 
-public abstract class ContentResolverDao<T extends DatabaseObject> implements Dao<T> {
+abstract class ContentResolverDao<T extends DatabaseObject> implements Dao<T> {
 	private final static String textKeyWhere;
 	private final static String intKeyWhere;
-	
-	public static abstract class DaoObserver<T> implements Dao.Observer<T> {
-		private ContentObserver contentObserver;
-		private Dao<T> dao;
-		
-		public DaoObserver(Handler handler) {
-			initialize(handler);
-		}
-
-		private void initialize(Handler handler) {
-			contentObserver = new ContentObserver(handler) {
-				@Override
-				public void onChange(boolean selfChange, Uri uri) {
-					long id;
-					
-					try {
-						id = ContentUris.parseId(uri);
-					} catch (NumberFormatException e) {
-						id = -1;
-					}
-					
-					if (id >= 0) {
-						T dataObject = dao.read(id);
-						
-						if (dataObject == null) {
-							// something went wrong...
-							Log.w(LentaConstants.LoggerAnyTag, "DaoObserver triggered. Read object is null for uri: " + uri + ".");
-							return;
-						}
-						
-						onDataChanged(selfChange, dataObject);
-					} else {
-						this.onChange(selfChange);
-					}
-				}
-
-				@Override
-				public void onChange(boolean selfChange) {
-					Collection<T> dataObjects = dao.read();
-					
-					if (dataObjects == null || dataObjects.isEmpty()) {
-						// something went wrong...
-						Log.w(LentaConstants.LoggerAnyTag, "DaoObserver triggered. Read collection of objects is null or empty.");
-						return;
-					}
-					
-					onDataChanged(selfChange, dataObjects);
-				}
-			};
-		}
-		
-		private void setDao(Dao<T> dao) {
-			this.dao = dao;
-		}
-		
-		private ContentObserver getContentObserver() {
-			return contentObserver;
-		}
-	}
 	
 	private static String getWhereFromSQLiteType(SQLiteType type) {
 		switch (type) {
@@ -96,14 +35,18 @@ public abstract class ContentResolverDao<T extends DatabaseObject> implements Da
 		intKeyWhere = "%1s = ?";
 	}
 	
-	private ContentResolver cr;
+	private final ContentResolver cr;
 	
-	public ContentResolverDao(ContentResolver cr) {
+	protected ContentResolverDao(ContentResolver cr) {
+		if (cr == null) {
+			throw new IllegalArgumentException("contentResolver is null.");
+		}
+		
 		this.cr = cr;
 	}
 
 	@Override
-	public Collection<T> read() {
+	public synchronized Collection<T> read() {
 		Cursor cur = cr.query(getContentProviderUri(),
 				getProjectionAll(), null, null, null);
 
@@ -123,7 +66,7 @@ public abstract class ContentResolverDao<T extends DatabaseObject> implements Da
 	}
 
 	@Override
-	public T read(long id) {
+	public synchronized T read(long id) {
 		Uri uri = ContentUris.withAppendedId(getContentProviderUri(), id);
 		
 		Cursor cur = cr.query(
@@ -149,12 +92,12 @@ public abstract class ContentResolverDao<T extends DatabaseObject> implements Da
 	}
 
 	@Override
-	public T read(String key) {
+	public synchronized T read(String key) {
 		return read(getKeyColumnType(), getKeyColumnName(), key);
 	}
 	
 	@Override
-	public T read(SQLiteType keyType, String keyColumnName, String keyValue) {
+	public synchronized T read(SQLiteType keyType, String keyColumnName, String keyValue) {
 		String[] whereArgs = { keyValue };
 		String where = String.format(getWhereFromSQLiteType(keyType), keyColumnName);
 
@@ -187,7 +130,7 @@ public abstract class ContentResolverDao<T extends DatabaseObject> implements Da
 	}
 	
 	@Override
-	public long create(T daoObject) {
+	public synchronized long create(T daoObject) {
 		Uri uri = cr.insert(getContentProviderUri(), prepareContentValues(daoObject));
 		long id = ContentUris.parseId(uri);
 		daoObject.setId(id);
@@ -198,7 +141,7 @@ public abstract class ContentResolverDao<T extends DatabaseObject> implements Da
 	}
 	
 	@Override
-	public Collection<Long> create(Collection<T> dataObjects) {
+	public synchronized Collection<Long> create(Collection<T> dataObjects) {
 		Collection<Long> result = null;
 		
 		for (T dataObject : dataObjects) {
@@ -225,18 +168,18 @@ public abstract class ContentResolverDao<T extends DatabaseObject> implements Da
 	}
 
 	@Override
-	public int delete(long id) {
+	public synchronized int delete(long id) {
 		Uri uri = ContentUris.withAppendedId(getContentProviderUri(), id);
 		return cr.delete(uri, null, null);
 	}
 
 	@Override
-	public int delete(String keyValue) {
+	public synchronized int delete(String keyValue) {
 		return delete(getKeyColumnType(), getKeyColumnName(), keyValue);
 	}
 	
 	@Override
-	public int delete(SQLiteType keyType,
+	public synchronized int delete(SQLiteType keyType,
 			String keyColumnName, String keyValue) {
 		String[] whereArgs = { keyValue };
 		String where = String.format(getWhereFromSQLiteType(keyType), keyColumnName);
@@ -244,7 +187,7 @@ public abstract class ContentResolverDao<T extends DatabaseObject> implements Da
 		return cr.delete(getContentProviderUri(), where, whereArgs);
 	}
 
-	public void update(T daoObject) {
+	public synchronized void update(T daoObject) {
 		long id = daoObject.getId();
 		
 		String[] whereArgs;
@@ -260,7 +203,7 @@ public abstract class ContentResolverDao<T extends DatabaseObject> implements Da
 		}
 	}
 	
-	public Collection<String> readAllKeys() {
+	public synchronized Collection<String> readAllKeys() {
 		String[] projectionKeyOnly = {	getKeyColumnName() };
 			
 		Cursor cur = cr.query(
@@ -329,9 +272,9 @@ public abstract class ContentResolverDao<T extends DatabaseObject> implements Da
 	
 	protected abstract ContentValues prepareContentValues(T newsObject);
 	protected abstract T createDataObject(Cursor cur);
-	protected abstract Uri getContentProviderUri();
 	protected abstract String getKeyColumnName();
 	protected abstract SQLiteType getKeyColumnType();
 	protected abstract String getIdColumnName();
 	protected abstract String[] getProjectionAll();
+	protected abstract Uri getContentProviderUri();
 }

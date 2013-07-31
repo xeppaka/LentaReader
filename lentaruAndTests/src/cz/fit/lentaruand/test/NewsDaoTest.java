@@ -15,6 +15,7 @@ import android.test.suitebuilder.annotation.SmallTest;
 import cz.fit.lentaruand.data.Link;
 import cz.fit.lentaruand.data.News;
 import cz.fit.lentaruand.data.Rubrics;
+import cz.fit.lentaruand.data.dao.Dao;
 import cz.fit.lentaruand.data.dao.NewsDao;
 import cz.fit.lentaruand.data.dao.NewsLinksDao;
 import cz.fit.lentaruand.data.db.LentaDbHelper;
@@ -53,7 +54,7 @@ public class NewsDaoTest extends AndroidTestCase {
 
 	private long createNews(String guid) {
 		ContentResolver cr = getContext().getContentResolver();
-		NewsDao newsDao = new NewsDao(cr);
+		Dao<News> newsDao = NewsDao.getInstance(cr);
 		testNews.setGuid(guid);
 		return newsDao.create(testNews);
 	}
@@ -62,7 +63,7 @@ public class NewsDaoTest extends AndroidTestCase {
 	public void testReadNewsUseId() {
 		long id = createNews("guid1");
 		ContentResolver cr = getContext().getContentResolver();
-		NewsDao newsDao = new NewsDao(cr);
+		Dao<News> newsDao = NewsDao.getInstance(cr);
 		News n = newsDao.read(id);
 		
 		assertEquals(testNews, n);
@@ -74,7 +75,7 @@ public class NewsDaoTest extends AndroidTestCase {
 	public void testReadNewsUseGuid() {
 		createNews("guid1");
 		ContentResolver cr = getContext().getContentResolver();	
-		NewsDao newsDao = new NewsDao(cr);
+		Dao<News> newsDao = NewsDao.getInstance(cr);
 		News n = newsDao.read("guid1");
 
 		assertEquals(testNews, n);
@@ -90,7 +91,7 @@ public class NewsDaoTest extends AndroidTestCase {
 		long linkId3 = it.next().getId();
 		ContentResolver cr = getContext().getContentResolver();
 		NewsLinksDao nlinksDao = new NewsLinksDao(cr);
-		NewsDao newsDao = new NewsDao(cr);
+		Dao<News> newsDao = NewsDao.getInstance(cr);
 		newsDao.delete("guid1");
 		News n = newsDao.read("guid1");
 		assertNull(n);
@@ -111,7 +112,7 @@ public class NewsDaoTest extends AndroidTestCase {
 		long linkId3 = it.next().getId();
 		ContentResolver cr = getContext().getContentResolver();
 		NewsLinksDao nlinksDao = new NewsLinksDao(cr);
-		NewsDao newsDao = new NewsDao(cr);
+		Dao<News> newsDao = NewsDao.getInstance(cr);
 		newsDao.delete(id);
 		News n = newsDao.read(id);
 		assertNull(n);
@@ -127,7 +128,7 @@ public class NewsDaoTest extends AndroidTestCase {
 	public void testUpdateNews() {
 		long id = createNews("guid1");
 		ContentResolver cr = getContext().getContentResolver();	
-		NewsDao newsDao = new NewsDao(cr);
+		Dao<News> newsDao = NewsDao.getInstance(cr);
 		News n = newsDao.read("guid1");
 		assertEquals("News 1", n.getTitle());
 
@@ -185,7 +186,7 @@ public class NewsDaoTest extends AndroidTestCase {
 		}
 		
 		ContentResolver cr = getContext().getContentResolver();	
-		NewsDao newsDao = new NewsDao(cr);
+		Dao<News> newsDao = NewsDao.getInstance(cr);
 		Collection<String> allIds = newsDao.readAllKeys();
 		List<String> sortedIds = new ArrayList<String>(allIds);
 		Collections.sort(sortedIds);
