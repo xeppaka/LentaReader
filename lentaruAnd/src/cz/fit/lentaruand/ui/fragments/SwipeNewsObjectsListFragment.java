@@ -94,7 +94,7 @@ public class SwipeNewsObjectsListFragment<T extends NewsObject> extends ListFrag
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		//getLoaderManager().initLoader(0, null, this).forceLoad();
-//		getActivity().startService(new Intent(this.getActivity(), UpdateService.class));
+		//getActivity().startService(new Intent(this.getActivity(), UpdateService.class));
 		ServiceHelper serviceHelper = new ServiceHelper(this.getActivity());
 		serviceHelper.addListener(this);
 		serviceHelper.downloadListOfBriefNews(Rubrics.ECONOMICS);

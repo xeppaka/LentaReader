@@ -26,7 +26,7 @@ import cz.fit.lentaruand.utils.LentaConstants;
  * @see Processor
  */
 
-public class Service extends IntentService {
+public class LentaService extends IntentService {
 	public static final String PACKAGE = "cz.fit.lentaruand.service";
 	public static final String ACTION_EXECUTE_COMMAND = PACKAGE.concat(".ACTION_EXECUTE_COMMAND");
 	public static final String ACTION_EXECUTE_DOWNLOAD_BRIEF = PACKAGE.concat(".ACTION_EXECUTE_DOWNLOAD_BRIEF");
@@ -40,7 +40,7 @@ public class Service extends IntentService {
 	
 	Processor processor = new Processor(this);
 	
-	public Service(){
+	public LentaService(){
 		super("Lenta Download Service");
 	}
 	

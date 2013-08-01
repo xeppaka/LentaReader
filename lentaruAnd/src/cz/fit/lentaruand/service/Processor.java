@@ -27,7 +27,7 @@ import cz.fit.lentaruand.utils.LentaConstants;
  * 
  * @author TheWalkingDelirium
  * @see presentation http://bit.ly/15amlM4 slide 11
- * @see Service
+ * @see LentaService
  * @see Downloader
  */
 
@@ -38,13 +38,13 @@ public class Processor {
 
 	private	LentaNewsDownloader lnd;
 	private ResultReceiver resultReceiver;
-	private Service service;
+	private LentaService service;
 
 	public Processor() {
 		lnd = new LentaNewsDownloader();
 	}
 	
-	public Processor(Service service) {
+	public Processor(LentaService service) {
 		lnd = new LentaNewsDownloader();
 		this.service = service;
 	}
