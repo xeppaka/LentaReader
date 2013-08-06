@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import android.content.ContentResolver;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.ResultReceiver;
 import android.util.Log;
@@ -84,6 +85,23 @@ public class Processor {
 		if (resultReceiver != null) {
 			resultReceiver.send(resultCode, data);
 		}
+	}
+
+	public void execute(Intent intent) {
+		if(intent.getAction().equals(LentaService.ACTION_EXECUTE_DOWNLOAD_BRIEF)){
+			downloadRubricBrief(getRubric(intent), getReceiver(intent));
+		}
+		
+	}
+	
+	private ResultReceiver getReceiver(Intent intent) {
+		return intent.getParcelableExtra(LentaService.EXTRA_STATUS_RECEIVER);
+	}
+
+	private Rubrics getRubric(Intent intent) {
+		Rubrics rubric = (Rubrics) intent.getSerializableExtra(LentaService.EXTRA_RUBRIC);
+		if(rubric == null) Log.d(LentaConstants.LoggerServiceTag, "rubric is null");
+		return rubric;
 	}
 
 }
