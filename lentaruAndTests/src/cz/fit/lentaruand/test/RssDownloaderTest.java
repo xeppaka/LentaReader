@@ -1,12 +1,9 @@
 package cz.fit.lentaruand.test;
 
-import java.util.logging.Logger;
-
 import android.test.AndroidTestCase;
 import cz.fit.lentaruand.parser.rss.LentaRssParser;
 
 public class RssDownloaderTest extends AndroidTestCase {
-	private final Logger logger = Logger.getLogger(RssDownloaderTest.class.getName());
 	private LentaRssParser rssParser;
 	
 //	@Override

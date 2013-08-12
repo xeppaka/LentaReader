@@ -29,7 +29,7 @@ import cz.fit.lentaruand.utils.LentaConstants;
  * 
  * @author TheWalkingDelirium
  * @see http://bit.ly/15amlM4
- * @see Service
+ * @see LentaService
  * 
  */
 
@@ -62,12 +62,12 @@ public class ServiceHelper {
 	}
 
 	private Intent createIntent(final Context context, Rubrics rubric, final int requestId){
-		Intent i = new Intent(context, Service.class);
-		i.setAction(Service.ACTION_EXECUTE_DOWNLOAD_BRIEF); // hardcoded command type, temporary way
+		Intent i = new Intent(context, LentaService.class);
+		i.setAction(LentaService.ACTION_EXECUTE_DOWNLOAD_BRIEF); // hardcoded command type, temporary way
 		if(rubric == null) Log.d(LentaConstants.LoggerMainAppTag, "rubric is null");
-		i.putExtra(Service.EXTRA_RUBRIC, rubric);
-		i.putExtra(Service.EXTRA_REQUEST_ID, requestId);
-		i.putExtra(Service.EXTRA_STATUS_RECEIVER, new ResultReceiver(
+		i.putExtra(LentaService.EXTRA_RUBRIC, rubric);
+		i.putExtra(LentaService.EXTRA_REQUEST_ID, requestId);
+		i.putExtra(LentaService.EXTRA_STATUS_RECEIVER, new ResultReceiver(
 				new Handler()) {
 			@Override
 			protected void onReceiveResult(int resultCode, Bundle resultData) {

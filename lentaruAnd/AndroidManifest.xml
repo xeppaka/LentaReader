@@ -41,7 +41,7 @@
             android:label="UpdateService" >
         </service>
         <service
-            android:name=".service.Service"
+            android:name=".service.LentaService"
             android:label="Service" >
         </service>
     </application>
