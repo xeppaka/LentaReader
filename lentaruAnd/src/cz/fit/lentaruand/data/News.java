@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 
-import android.graphics.Bitmap;
+import cz.fit.lentaruand.data.dao.BitmapReference;
 import cz.fit.lentaruand.parser.rss.LentaRssItem;
 
 public class News extends NewsObject {
@@ -17,7 +17,7 @@ public class News extends NewsObject {
 	private String imageCredits;
 	private Collection<Link> links;
 	
-	private transient Bitmap image;
+	private transient BitmapReference imageRef;
 
 	public News(long id, String guid, String title, String link, String briefText,
 			String fullText, Date pubDate, String imageLink,
@@ -58,7 +58,6 @@ public class News extends NewsObject {
 		setLinks(null);
 	}
 	
-
 	public String getBriefText() {
 		return briefText;
 	}
@@ -113,12 +112,12 @@ public class News extends NewsObject {
 			this.links = links;
 	}
 
-	public Bitmap getImage() {
-		return image;
+	public BitmapReference getImage() {
+		return imageRef;
 	}
 
-	public void setImage(Bitmap image) {
-		this.image = image;
+	public void setImage(BitmapReference imageRef) {
+		this.imageRef = imageRef;
 	}
 
 	public boolean isContentFull() {
@@ -126,7 +125,7 @@ public class News extends NewsObject {
 	}
 
 	public boolean isImageLoaded() {
-		return image != null;
+		return imageRef != null;
 	}
 	
 	@Override

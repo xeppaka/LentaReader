@@ -59,9 +59,9 @@ public class URLHelper {
 			throw new IllegalArgumentException("newsImageUrl is null or empty");
 		}
 		
-		int lastSlash = newsImageUrl.lastIndexOf('/');
+		int lastSlash = newsImageUrl.lastIndexOf('/') + 1;
 		
-		if (lastSlash == -1) {		
+		if (lastSlash == -1) {
 			throw new MalformedURLException("Image url has wrong format: " + newsImageUrl);
 		}
 		
@@ -69,7 +69,7 @@ public class URLHelper {
 		if (lastDot == -1)
 			lastDot = newsImageUrl.length();
 		
-		if (lastDot >= lastSlash) {
+		if (lastDot <= lastSlash) {
 			throw new MalformedURLException("Image url has wrong format: " + newsImageUrl);
 		}
 		

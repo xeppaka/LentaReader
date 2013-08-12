@@ -1,5 +1,6 @@
 package cz.fit.lentaruand.data.dao;
 
+import java.net.MalformedURLException;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -9,8 +10,11 @@ import java.util.List;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.v4.util.LruCache;
+import android.text.TextUtils;
+import android.util.Log;
 import cz.fit.lentaruand.data.Link;
 import cz.fit.lentaruand.data.News;
 import cz.fit.lentaruand.data.Rubrics;
@@ -18,6 +22,7 @@ import cz.fit.lentaruand.data.db.NewsEntry;
 import cz.fit.lentaruand.data.db.SQLiteType;
 import cz.fit.lentaruand.data.provider.LentaProvider;
 import cz.fit.lentaruand.utils.LentaConstants;
+import cz.fit.lentaruand.utils.URLHelper;
 
 public final class NewsDao {
 	private static final int CACHE_MAX_OBJECTS = LentaConstants.DAO_CACHE_MAX_OBJECTS;
@@ -52,11 +57,13 @@ public final class NewsDao {
 			NewsEntry.COLUMN_NAME_FULLTEXT
 		};
 		
-		private Dao<Link> newsLinksDao;
+		private final Dao<Link> newsLinksDao;
+		private final ImageDao imageDao;
 		
 		public ContentResolverNewsDao(ContentResolver cr) {
 			super(cr);
 			newsLinksDao = NewsLinksDao.getInstance(cr);
+			imageDao = ImageDao.getInstance(cr);
 		}
 	
 		@Override
@@ -138,7 +145,18 @@ public final class NewsDao {
 		protected String[] getProjectionAll() {
 			return projectionAll;
 		}
-	
+
+		@Override
+		public synchronized Collection<News> read() {
+			Collection<News> news = super.read();
+			
+			for (News n : news) {
+				readOtherNewsParts(n);
+			}
+			
+			return news;
+		}
+
 		@Override
 		public News read(long id) {
 			News news = super.read(id);
@@ -208,18 +226,36 @@ public final class NewsDao {
 		
 		@Override
 		public void update(News news) {
+			super.update(news);
+			
+			updateOtherNewsParts(news);
+		}
+		
+		@Override
+		public Collection<News> readForParentObject(long parentId) {
+			return null;
+		}
+
+		private void updateOtherNewsParts(News news) {
 			Collection<Link> links = news.getLinks();
 			
 			for (Link link : links) {
 				newsLinksDao.update(link);
 			}
 			
-			super.update(news);
-		}
-		
-		@Override
-		public Collection<News> readForParentObject(long parentId) {
-			return null;
+			BitmapReference imageRef = news.getImage();
+			String imageLink = news.getImageLink();
+			
+			Bitmap image = imageRef.getBitmap();
+			
+			if ( imageLink != null) {
+				try {
+					BitmapReference newImageRef = imageDao.create(URLHelper.getImageId(imageLink), image);
+					news.setImage(newImageRef);
+				} catch (MalformedURLException e) {
+					Log.e(LentaConstants.LoggerAnyTag, "Error saving image to cache, cannot create id from URL: " + imageLink, e);
+				}
+			}
 		}
 
 		private void readOtherNewsParts(News news) {
@@ -229,19 +265,16 @@ public final class NewsDao {
 			
 			news.setLinks(links);
 			
-	//		String imageId = null;
-	//		// read news image from cache if available
-	//		try {
-	//			imageId = URLHelper.getImageId(news.getImageLink());
-	//			Snapshot snapshot = imagesCache.get(imageId);
-	//			news.setImage(BitmapFactory.decodeStream(snapshot.getInputStream(0)));
-	//		} catch (MalformedURLException e) {
-	//			log.log(Level.INFO, "Unable to parse image id from url: " + news.getImageLink());
-	//			// do nothing -> image is not going to be available for this news
-	//		} catch (IOException e) {
-	//			log.log(Level.INFO, String.format("Unable to read image id %s from cache", imageId));
-	//			// do nothing -> image is not going to be available for this news
-	//		}
+			String imageLink = news.getImageLink();
+			if (imageLink != null && !TextUtils.isEmpty(imageLink)) {
+				try {
+					news.setImage(imageDao.read(URLHelper.getImageId(imageLink)));
+				} catch (MalformedURLException e) {
+					Log.e(LentaConstants.LoggerAnyTag, "Error reading image. Unable to get id from image URL: " + imageLink, e);
+				}
+			} else {
+				news.setImage(imageDao.readNotAvailableImage());
+			}
 		}
 	}
 }

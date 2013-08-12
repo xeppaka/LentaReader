@@ -1,12 +1,17 @@
 package cz.fit.lentaruand.data.provider;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+
 import android.content.ContentProvider;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.ParcelFileDescriptor;
 import cz.fit.lentaruand.data.db.LentaDbHelper;
 import cz.fit.lentaruand.data.db.NewsEntry;
 import cz.fit.lentaruand.data.db.NewsLinksEntry;
@@ -19,7 +24,7 @@ public class LentaProvider extends ContentProvider {
 	private static final String PATH_LINKS_ID = "links/#";
 	
 	private static final String PATH_CACHED_IMAGE = "cached_image";
-	private static final String PATH_CACHED_IMAGE_ID = "cached_image/#";
+	private static final String PATH_CACHED_IMAGE_ID = "cached_image/*";
 	
 	private static final int NEWS = 1;
 	private static final int NEWS_ID = 2;
@@ -37,12 +42,13 @@ public class LentaProvider extends ContentProvider {
 	private static final String MIME_CACHED_IMAGE_DIR = "vnd.android.cursor.dir/cz.fit.lentaruand.cached_image";
 	
 	private static final UriMatcher uriMatcher;
-	private LentaDbHelper dbHelper;
 	
 	public static final Uri CONTENT_URI = new Uri.Builder().scheme("content").authority(CONTENT_URI_STRING).build();
 	public static final Uri CONTENT_URI_NEWS = CONTENT_URI.buildUpon().appendPath(PATH_NEWS).build();
 	public static final Uri CONTENT_URI_LINKS = CONTENT_URI.buildUpon().appendPath(PATH_LINKS).build();
 	public static final Uri CONTENT_URI_CACHED_IMAGE = CONTENT_URI.buildUpon().appendPath(PATH_CACHED_IMAGE).build();
+	
+	private LentaDbHelper dbHelper;
 
 	static {
 		uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
@@ -84,6 +90,10 @@ public class LentaProvider extends ContentProvider {
 
 	@Override
 	public int delete(Uri uri, String selection, String[] selectionArgs) {
+		if (uri == null) {
+			throw new NullPointerException();
+		}
+		
 		switch (uriMatcher.match(uri)) {
 		case NEWS:
 			return deleteTable(NewsEntry.TABLE_NAME, selection, selectionArgs);
@@ -98,6 +108,12 @@ public class LentaProvider extends ContentProvider {
 			String idSelection = NewsLinksEntry._ID + " = ?";
 			String[] idSelectionArgs = {String.valueOf(ContentUris.parseId(uri))};
 			return deleteTable(NewsLinksEntry.TABLE_NAME, idSelection, idSelectionArgs);
+			}
+		case CACHED_IMAGE: {
+			return deleteAllImages();
+			}
+		case CACHED_IMAGE_ID: {
+			return deleteImage(uri.getLastPathSegment());
 			}
 		}
 		
@@ -118,10 +134,40 @@ public class LentaProvider extends ContentProvider {
 
 	@Override
 	public boolean onCreate() {
-		dbHelper = new LentaDbHelper(getContext());
+		Context context = getContext();
+		
+		dbHelper = new LentaDbHelper(context);
+		//initBitmapCache(context);
+		
 		return true;
 	}
 
+//	/**
+//	 * TODO: test if this is called when application is closed.
+//	 */
+//	@Override
+//	public void shutdown() {
+//		super.shutdown();
+//		
+//		if (bitmapCache != null) {
+//			try {
+//				bitmapCache.close();
+//			} catch (IOException e) {
+//				Log.e(LentaConstants.LoggerProviderTag, "Error occured while closing bitmap cache.", e);
+//			}
+//		}
+//	}
+//
+//	private void initBitmapCache(Context context) {
+//		try {
+//			bitmapCache = DiskLruCache.open(context.getExternalCacheDir(),
+//					LentaConstants.AppVersion, 1,
+//					LentaConstants.BITMAP_CACHE_MAX_SIZE_IN_BYTES);
+//		} catch (IOException e) {
+//			Log.e(LentaConstants.LoggerProviderTag, "Error ocurred while opening cache on external memory card.", e);
+//		}
+//	}
+	
 	@Override
 	public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
 		switch (uriMatcher.match(uri)) {
@@ -188,5 +234,101 @@ public class LentaProvider extends ContentProvider {
 	private int updateTable(String tableName, Uri uri, ContentValues values, String selection, String[] selectionArgs) {
 		SQLiteDatabase db = dbHelper.getWritableDatabase();
 		return db.update(tableName, values, selection, selectionArgs);
+	}
+
+	private int deleteImage(String name) {
+		File cache = getContext().getExternalCacheDir();
+		
+		if (cache == null || !cache.isDirectory()) {
+			return 0;
+		}
+
+		File fileToDelete = new File(cache, name);
+		
+		if (fileToDelete.delete()) {
+			return 1;
+		}
+		
+		return 0;
+	}
+	
+	private int deleteAllImages() {
+		File cache = getContext().getExternalCacheDir();
+		
+		if (cache == null || !cache.isDirectory()) {
+			return 0;
+		}
+		
+		File[] filesToDelete = cache.listFiles();
+		
+		if (filesToDelete == null) {
+			return 0;
+		}
+		
+		int filesDeleted = 0;
+		
+		for (File fileToDelete : filesToDelete) {
+			if (fileToDelete.delete()) {
+				++filesDeleted;
+			}
+		}
+		
+		return filesDeleted;
+	}
+	
+	private int getIntModeFromStringMode(String mode) {
+		if (mode == null || mode.isEmpty()) {
+			return 0;
+		}
+		
+		int intMode = 0;
+		
+		if (mode.indexOf('r') >= 0) {
+			intMode |= ParcelFileDescriptor.MODE_READ_ONLY;
+		}
+		
+		if (mode.indexOf('w') >= 0) {
+			intMode |= ParcelFileDescriptor.MODE_WRITE_ONLY;
+		}
+		
+		if (mode.indexOf('t') >= 0) {
+			intMode |= ParcelFileDescriptor.MODE_CREATE;
+		}
+		
+		return intMode;
+	}
+	
+	@Override
+	public ParcelFileDescriptor openFile(Uri uri, String mode)
+			throws FileNotFoundException {
+		if (mode == null || mode.isEmpty()) {
+			throw new IllegalArgumentException("mode is null or empty.");
+		}
+		
+		String fileName = uri.getLastPathSegment();
+		
+		if (fileName == null || fileName.isEmpty()) {
+			throw new FileNotFoundException();
+		}
+		
+//		String externalDriveState = Environment.getExternalStorageState();
+		
+//		if (!Environment.MEDIA_MOUNTED.equals(externalDriveState) || !(mode.indexOf('w') < 0 && Environment.MEDIA_MOUNTED_READ_ONLY.equals(externalDriveState))) {
+//			throw new FileNotFoundException();
+//		}
+
+		File cache = getContext().getExternalCacheDir();
+		
+		if (cache == null) {
+			throw new FileNotFoundException("Could not able to open cache directory.");
+		}
+		
+		File file = new File(cache, fileName);
+		
+//		if (file == null || !file.exists()) {
+//			throw new FileNotFoundException("File " + cache + "/" + fileName + " is not found.");
+//		}
+		
+		return ParcelFileDescriptor.open(file, getIntModeFromStringMode(mode));
 	}
 }
