@@ -15,12 +15,11 @@ import android.widget.ListView;
 import android.widget.Toast;
 import cz.fit.lentaruand.data.News;
 import cz.fit.lentaruand.data.NewsObject;
-import cz.fit.lentaruand.data.Rubrics;
 import cz.fit.lentaruand.data.dao.Dao;
 import cz.fit.lentaruand.data.dao.DaoObserver;
 import cz.fit.lentaruand.data.dao.NewsDao;
 import cz.fit.lentaruand.service.ServiceCallbackListener;
-import cz.fit.lentaruand.service.ServiceHelper;
+import cz.fit.lentaruand.service.UpdateService;
 import cz.fit.lentaruand.ui.activities.NewsFullActivity;
 
 /**
@@ -78,7 +77,7 @@ public class SwipeNewsObjectsListFragment<T extends NewsObject> extends ListFrag
 		super.onActivityCreated(savedInstanceState);
 		
 		ContentResolver cr = getActivity().getContentResolver();
-		Dao<News> dataDao= NewsDao.getInstance(cr);
+		Dao<News> dataDao = NewsDao.getInstance(cr);
 		dataDao.registerContentObserver((Dao.Observer<News>)(new MyContentObserver(new Handler())));
 		
 //		newsList = getListView();
@@ -92,12 +91,12 @@ public class SwipeNewsObjectsListFragment<T extends NewsObject> extends ListFrag
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		//getLoaderManager().initLoader(0, null, this).forceLoad();
-		//getActivity().startService(new Intent(this.getActivity(), UpdateService.class));
-		Collection<News> news = NewsDao.getInstance(getActivity().getContentResolver()).read();
-		showNewsObjects((Collection<T>)news);
-		ServiceHelper serviceHelper = new ServiceHelper(this.getActivity());
-		serviceHelper.addListener(this);
-		serviceHelper.downloadListOfBriefNews(Rubrics.ECONOMICS);
+		getActivity().startService(new Intent(this.getActivity(), UpdateService.class));
+//		Collection<News> news = NewsDao.getInstance(getActivity().getContentResolver()).read();
+//		showNewsObjects((Collection<T>)news);
+//		ServiceHelper serviceHelper = new ServiceHelper(this.getActivity());
+//		serviceHelper.addListener(this);
+//		serviceHelper.downloadListOfBriefNews(Rubrics.ECONOMICS);
 	}
 
 //	@Override

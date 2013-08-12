@@ -13,9 +13,11 @@ import android.text.TextUtils;
 import android.util.Log;
 import cz.fit.lentaruand.data.News;
 import cz.fit.lentaruand.data.Rubrics;
+import cz.fit.lentaruand.data.dao.BitmapReference;
 import cz.fit.lentaruand.data.dao.Dao;
 import cz.fit.lentaruand.data.dao.ImageDao;
 import cz.fit.lentaruand.data.dao.NewsDao;
+import cz.fit.lentaruand.data.dao.StrongBitmapReference;
 import cz.fit.lentaruand.downloader.LentaHttpImageDownloader;
 import cz.fit.lentaruand.downloader.LentaNewsDownloader;
 import cz.fit.lentaruand.downloader.exceptions.HttpStatusCodeException;
@@ -64,9 +66,12 @@ public class UpdateService extends Service {
 				
 				ContentResolver cr = UpdateService.this.getApplicationContext().getContentResolver();
 				Dao<News> newsDao = NewsDao.getInstance(cr);
-				newsDao.create(news);
+				for (News n : news) {
+					newsDao.delete(n.getGuid());
+				}
 				
 				loadImages(newsDao, news);
+				newsDao.create(news);
 				
 				UpdateService.this.stopSelf();
 			}
@@ -76,31 +81,30 @@ public class UpdateService extends Service {
 	}
 	
 	private void loadImages(Dao<News> dao, Collection<News> news) {
-//		ImageDao imageDao = ImageDao.getInstance(getContentResolver());
-//		
-//		for (News n : news) {
-//			try {
-//				String imageLink = n.getImageLink();
-//				if (imageLink != null && !TextUtils.isEmpty(imageLink)) {
-//					String imageKey = URLHelper.getImageId(imageLink);
-//					Bitmap b = imageDao.read(imageKey);
-//
-//					if (b != null) {
-//						n.setImage(b);
-//					} else {
-//						b = LentaHttpImageDownloader.downloadBitmap(imageLink);
-//						n.setImage(b);
-////						dao.update(n);
-//						imageDao.create(imageKey, b);
-//					}
-//				}
-//			} catch (HttpStatusCodeException e) {
-//				e.printStackTrace();
-//				continue;
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//				continue;
-//			}
-//		}
+		ImageDao imageDao = ImageDao.getInstance(getContentResolver());
+		
+		for (News n : news) {
+			try {
+				String imageLink = n.getImageLink();
+				if (imageLink != null && !TextUtils.isEmpty(imageLink)) {
+					String imageKey = URLHelper.getImageId(imageLink);
+
+					if (imageDao.isBitmapLoaded(imageKey)) {
+						continue;
+					}
+					
+					if (!imageDao.checkImageInDiskCache(imageKey)) {
+						Bitmap b = LentaHttpImageDownloader.downloadBitmap(imageLink);
+						n.setImage(imageDao.create(imageKey, b));
+					}
+				}
+			} catch (HttpStatusCodeException e) {
+				e.printStackTrace();
+				continue;
+			} catch (IOException e) {
+				e.printStackTrace();
+				continue;
+			}
+		}
 	}
 }
