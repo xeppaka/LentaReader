@@ -2,6 +2,7 @@ package cz.fit.lentaruand.data.dao;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.MalformedURLException;
 
 import android.content.ContentResolver;
 import android.graphics.Bitmap;
@@ -15,15 +16,11 @@ import android.support.v4.util.LruCache;
 import android.util.Log;
 import cz.fit.lentaruand.data.provider.LentaProvider;
 import cz.fit.lentaruand.utils.LentaConstants;
+import cz.fit.lentaruand.utils.URLHelper;
 
 public class ImageDao {
 	private static final int cacheSize = 7 * 1024 * 1024; // 7MB
 	private static final LruCache<String, CachedLazyLoadBitmapReference> bitmapCache = new LruCache<String, CachedLazyLoadBitmapReference>(cacheSize) {
-		@Override
-		protected int sizeOf(String key, CachedLazyLoadBitmapReference value) {
-			return value.bitmapSize();
-		}
-
 		@Override
 		protected void entryRemoved(boolean evicted, String key,
 				CachedLazyLoadBitmapReference oldValue, CachedLazyLoadBitmapReference newValue) {
@@ -34,31 +31,74 @@ public class ImageDao {
 	private final ContentResolver contentResolver;
 	private final StrongBitmapReference notAvailableImageRef;
 	
+	private static final BitmapFactory.Options bitmapThumbnailOptions = new BitmapFactory.Options();
+	
 	private ImageDao(ContentResolver contentResolver) {
 		this.contentResolver = contentResolver;
 		notAvailableImageRef = new StrongBitmapReference(createNotAvailableBitmap());
+		bitmapThumbnailOptions.inSampleSize = 4;
 	}
 	
 	public static ImageDao getInstance(ContentResolver contentResolver) {
 		return new ImageDao(contentResolver);
 	}
 	
-	public BitmapReference read(String key) {
-		return read(key, false);
+	public BitmapReference read(String imageUrl) {
+		return read(imageUrl, false);
 	}
 	
-	public BitmapReference read(String key, boolean cacheOnly) {
-		Log.i(LentaConstants.LoggerAnyTag, "Load bitmap for key: " + key);
+	public BitmapReference read(String imageUrl, boolean cacheOnly) {
+		Log.d(LentaConstants.LoggerAnyTag,
+				"Trying to load bitmap with from disk or memory cache with URL: "
+						+ imageUrl);
 
-		CachedLazyLoadBitmapReference imageRef = bitmapCache.get(key);
+		String imageKey;
+		try {
+			imageKey = URLHelper.getImageId(imageUrl);
+		} catch (MalformedURLException e) {
+			Log.e(LentaConstants.LoggerAnyTag, "Error getting key for image URL: " + imageUrl);
+			return readNotAvailableImage();
+		}
+		
+		CachedLazyLoadBitmapReference imageRef = bitmapCache.get(imageKey);
 
 		if (cacheOnly || imageRef != null) {
-			Log.i(LentaConstants.LoggerAnyTag, "Found in cache. Bitmap size: " + imageRef.bitmapSize());
+			Log.d(LentaConstants.LoggerAnyTag, "Found in cache. Bitmap size: " + imageRef.bitmapSize());
 			return imageRef;
 		}
 		
-		imageRef = new CachedLazyLoadBitmapReference(key);
-		bitmapCache.put(key, imageRef);
+		imageRef = new CachedLazyLoadBitmapReference(imageKey);
+		bitmapCache.put(imageKey, imageRef);
+		
+		return imageRef;
+	}
+	
+	public BitmapReference readThumbnail(String imageUrl) {
+		return readThumbnail(imageUrl, false);
+	}
+	
+	public BitmapReference readThumbnail(String imageUrl, boolean cacheOnly) {
+		Log.d(LentaConstants.LoggerAnyTag,
+				"Trying to load thumbnail bitmap with from disk or memory cache with URL: "
+						+ imageUrl);
+
+		String imageKey;
+		try {
+			imageKey = URLHelper.getThumbnailImageId(imageUrl);
+		} catch (MalformedURLException e) {
+			Log.e(LentaConstants.LoggerAnyTag, "Error getting key for image URL: " + imageUrl);
+			return readNotAvailableImage();
+		}
+		
+		CachedLazyLoadBitmapReference imageRef = bitmapCache.get(imageKey);
+
+		if (cacheOnly || imageRef != null) {
+			Log.d(LentaConstants.LoggerAnyTag, "Found in cache. Bitmap size: " + imageRef.bitmapSize());
+			return imageRef;
+		}
+		
+		imageRef = new CachedLazyLoadBitmapReference(imageKey, true);
+		bitmapCache.put(imageKey, imageRef);
 		
 		return imageRef;
 	}
@@ -67,25 +107,43 @@ public class ImageDao {
 		return notAvailableImageRef;
 	}
 	
-	public BitmapReference create(String key, Bitmap bitmap) {
-		Log.i(LentaConstants.LoggerAnyTag, "Create bitmap for key: " + key);
+	public BitmapReference create(String imageUrl, Bitmap bitmap) {
+		Log.d(LentaConstants.LoggerAnyTag, "Create bitmap in disk and/or memory cache for image URL: " + imageUrl);
 		
-		CachedLazyLoadBitmapReference imageRef = new CachedLazyLoadBitmapReference(key, bitmap);
-		bitmapCache.put(key, imageRef);
+		String imageKey;
+		try {
+			imageKey = URLHelper.getImageId(imageUrl);
+		} catch (MalformedURLException e) {
+			Log.e(LentaConstants.LoggerAnyTag, "Error getting key for image URL: " + imageUrl);
+			return readNotAvailableImage();
+		}
 		
-		Log.i(LentaConstants.LoggerAnyTag, "Put bitmap to cache. Cache size: " + bitmapCache.size());
+		CachedLazyLoadBitmapReference imageRef = new CachedLazyLoadBitmapReference(imageKey, bitmap);
+		bitmapCache.put(imageKey, imageRef);
+		Log.d(LentaConstants.LoggerAnyTag, "Put bitmap to cache. Cache size: " + bitmapCache.size());
 		
-		createBitmapOnDisk(key, bitmap);
+		createBitmapOnDisk(imageKey, bitmap);
 		
 		return imageRef;
 	}
 	
-	public boolean checkImageInDiskCache(String key) {
+	public boolean checkImageInDiskCache(String imageUrl) {
+		Log.d(LentaConstants.LoggerAnyTag, "Check bitmap in disk cache for image URL: " + imageUrl);
+		
+		String imageKey;
+		try {
+			imageKey = URLHelper.getImageId(imageUrl);
+		} catch (MalformedURLException e) {
+			Log.e(LentaConstants.LoggerAnyTag, "Error getting key for image URL: " + imageUrl);
+			return false;
+		}
+		
 		ParcelFileDescriptor.AutoCloseInputStream input = null;
+		
 		try {
 			ParcelFileDescriptor fileDescriptor = contentResolver
 					.openFileDescriptor(
-							LentaProvider.CONTENT_URI_CACHED_IMAGE.buildUpon().appendPath(key).build(), "r");
+							LentaProvider.CONTENT_URI_CACHED_IMAGE.buildUpon().appendPath(imageKey).build(), "r");
 			input = new ParcelFileDescriptor.AutoCloseInputStream(fileDescriptor);
 			
 			return true;
@@ -102,11 +160,21 @@ public class ImageDao {
 		}
 	}
 	
-	public boolean isBitmapLoaded(String key) {
-		CachedLazyLoadBitmapReference bitmap = bitmapCache.get(key);
+	public boolean isBitmapInMemory(String imageUrl) {
+		Log.d(LentaConstants.LoggerAnyTag, "Check bitmap in memory cache for image URL: " + imageUrl);
+		
+		String imageKey;
+		try {
+			imageKey = URLHelper.getImageId(imageUrl);
+		} catch (MalformedURLException e) {
+			Log.e(LentaConstants.LoggerAnyTag, "Error getting key for image URL: " + imageUrl);
+			return false;
+		}
+		
+		CachedLazyLoadBitmapReference bitmap = bitmapCache.get(imageKey);
 		
 		if (bitmap != null) {
-			return bitmap.isBitmapLoaded();
+			return bitmap.isBitmapInMemory();
 		}
 		
 		return false;
@@ -150,7 +218,7 @@ public class ImageDao {
 		}
 	}
 	
-	private Bitmap readBitmapFromDisk(String key) {
+	private Bitmap readBitmapFromDisk(String key, boolean thumbnail) {
 		ParcelFileDescriptor.AutoCloseInputStream input = null;
 		try {
 			ParcelFileDescriptor fileDescriptor = contentResolver
@@ -158,7 +226,11 @@ public class ImageDao {
 							LentaProvider.CONTENT_URI_CACHED_IMAGE.buildUpon().appendPath(key).build(), "r");
 			input = new ParcelFileDescriptor.AutoCloseInputStream(fileDescriptor);
 			
-			return BitmapFactory.decodeStream(input);
+			if (thumbnail) {
+				return BitmapFactory.decodeStream(input, null, bitmapThumbnailOptions);
+			} else {	
+				return BitmapFactory.decodeStream(input);
+			}
 		} catch (FileNotFoundException e) {
 			Log.e(LentaConstants.LoggerAnyTag, "Error occured during reading bitmap with id: " + key, e);
 			return null;
@@ -179,6 +251,7 @@ public class ImageDao {
 		private boolean recycled;
 		private boolean cached;
 		private final String cacheKey;
+		private final boolean thumbnail;
 		
 		private class BitmapLoadTask extends AsyncTask<BitmapLoadListener, Void, Bitmap> {
 			private BitmapLoadListener[] listeners;
@@ -203,21 +276,37 @@ public class ImageDao {
 		}
 		
 		public CachedLazyLoadBitmapReference(String key, Bitmap bitmap) {
+			this(key, bitmap, false);
+		}
+		
+		public CachedLazyLoadBitmapReference(String key, boolean isThumbnail) {
+			this(key, null, isThumbnail);
+		}
+		
+		public CachedLazyLoadBitmapReference(String key, Bitmap bitmap, boolean thumbnail) {
 			this.bitmap = bitmap;
 			this.cacheKey = key;
 			this.recycled = false;
 			this.cached = true;
+			this.thumbnail = thumbnail;
 		}
 		
 		@Override
 		public synchronized Bitmap getBitmap() {
 			if (bitmap == null) {
-				bitmap = readBitmapFromDisk(cacheKey);
+				bitmap = readBitmapFromDisk(cacheKey, thumbnail);
 				
 				if (bitmap == null) {
 					return notAvailableImageRef.getBitmap();
 				} else {
-					Log.i(LentaConstants.LoggerAnyTag, "Loaded from disk. Bitmap size: " + bitmap.getByteCount() + " bytes.");
+					Log.d(LentaConstants.LoggerAnyTag, "Loaded from disk. Bitmap size: " + bitmap.getByteCount() + " bytes.");
+					/*
+					 * bitmap == null -> when we put this reference in the
+					 * cache last time, it returned size 0. put it again with
+					 * bitmap != null -> it will report correct size and size of
+					 * cache will be recalculated.
+					 */
+					bitmapCache.put(cacheKey, this);
 				}
 			}
 			
@@ -254,7 +343,7 @@ public class ImageDao {
 			return cached;
 		}
 		
-		public synchronized boolean isBitmapLoaded() {
+		public synchronized boolean isBitmapInMemory() {
 			return bitmap != null && !recycled;
 		}
 		
