@@ -55,7 +55,7 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
 		BitmapReference imageRef;
 
 		News news = getItem(position);
-		imageRef = news.getImage();
+		imageRef = news.getThumbnailImage();
 		
 		if (convertView == null) {
 			view = inflater.inflate(R.layout.brief_news_list_item, null);

@@ -267,13 +267,11 @@ public final class NewsDao {
 			
 			String imageLink = news.getImageLink();
 			if (imageLink != null && !TextUtils.isEmpty(imageLink)) {
-				try {
-					news.setImage(imageDao.read(URLHelper.getImageId(imageLink)));
-				} catch (MalformedURLException e) {
-					Log.e(LentaConstants.LoggerAnyTag, "Error reading image. Unable to get id from image URL: " + imageLink, e);
-				}
+				news.setImage(imageDao.read(imageLink));
+				news.setThumbnailImage(imageDao.readThumbnail(imageLink));
 			} else {
 				news.setImage(imageDao.readNotAvailableImage());
+				news.setThumbnailImage(imageDao.readNotAvailableImage());
 			}
 		}
 	}

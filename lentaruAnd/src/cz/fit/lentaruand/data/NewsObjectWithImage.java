@@ -12,6 +12,6 @@ import cz.fit.lentaruand.data.dao.BitmapReference;
 public interface NewsObjectWithImage {
 	public BitmapReference getImage();
 	public void setImage(BitmapReference imageRef);
-	public BitmapReference getThumbnailImageRef();
-	public void setThumbnailImageRef(BitmapReference thumbnailImageRef);
+	public BitmapReference getThumbnailImage();
+	public void setThumbnailImage(BitmapReference thumbnailImageRef);
 }

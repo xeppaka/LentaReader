@@ -84,7 +84,7 @@ public class ImageDao {
 
 		String imageKey;
 		try {
-			imageKey = URLHelper.getThumbnailImageId(imageUrl);
+			imageKey = URLHelper.getImageId(imageUrl);
 		} catch (MalformedURLException e) {
 			Log.e(LentaConstants.LoggerAnyTag, "Error getting key for image URL: " + imageUrl);
 			return readNotAvailableImage();

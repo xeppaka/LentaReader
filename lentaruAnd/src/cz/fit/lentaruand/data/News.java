@@ -121,11 +121,11 @@ public class News extends NewsObject implements NewsObjectWithImage {
 		this.imageRef = imageRef;
 	}
 
-	public BitmapReference getThumbnailImageRef() {
+	public BitmapReference getThumbnailImage() {
 		return thumbnailImageRef;
 	}
 
-	public void setThumbnailImageRef(BitmapReference thumbnailImageRef) {
+	public void setThumbnailImage(BitmapReference thumbnailImageRef) {
 		this.thumbnailImageRef = thumbnailImageRef;
 	}
 
