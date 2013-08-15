@@ -19,24 +19,51 @@ import cz.fit.lentaruand.utils.LentaConstants;
 import cz.fit.lentaruand.utils.URLHelper;
 
 public class ImageDao {
-	private static final int cacheSize = 7 * 1024 * 1024; // 7MB
-	private static final LruCache<String, CachedLazyLoadBitmapReference> bitmapCache = new LruCache<String, CachedLazyLoadBitmapReference>(cacheSize) {
+	private static final int sampleSizeCoeff = 4;
+	private static final int fullBitmapCacheSize = 5 * 1024 * 1024; // 5 MB
+	private static final int thumbnailBitmapCacheSize = 3 * 1024 * 1024; // 3 MB
+	private static final LruCache<String, CachedLazyLoadBitmapReference> fullBitmapCache = new LruCache<String, CachedLazyLoadBitmapReference>(fullBitmapCacheSize) {
 		@Override
 		protected void entryRemoved(boolean evicted, String key,
 				CachedLazyLoadBitmapReference oldValue, CachedLazyLoadBitmapReference newValue) {
-			oldValue.onRemoveFromCache();
+			if (newValue != oldValue) {
+				oldValue.onRemoveFromCache();
+			}
+		}
+
+		@Override
+		protected int sizeOf(String key, CachedLazyLoadBitmapReference value) {
+			return value.bitmapSize();
+		}
+	};
+	
+	private static final LruCache<String, CachedLazyLoadBitmapReference> thumbnailBitmapCache = new LruCache<String, CachedLazyLoadBitmapReference>(thumbnailBitmapCacheSize) {
+		@Override
+		protected void entryRemoved(boolean evicted, String key,
+				CachedLazyLoadBitmapReference oldValue, CachedLazyLoadBitmapReference newValue) {
+			if (newValue != oldValue) {
+				oldValue.onRemoveFromCache();
+			}
+		}
+
+		@Override
+		protected int sizeOf(String key, CachedLazyLoadBitmapReference value) {
+			return value.bitmapSize();
 		}
 	};
 	
 	private final ContentResolver contentResolver;
-	private final StrongBitmapReference notAvailableImageRef;
+	private final static StrongBitmapReference notAvailableImageRef;
 	
 	private static final BitmapFactory.Options bitmapThumbnailOptions = new BitmapFactory.Options();
 	
+	static {
+		notAvailableImageRef = new StrongBitmapReference(createNotAvailableBitmap());
+	}
+	
 	private ImageDao(ContentResolver contentResolver) {
 		this.contentResolver = contentResolver;
-		notAvailableImageRef = new StrongBitmapReference(createNotAvailableBitmap());
-		bitmapThumbnailOptions.inSampleSize = 4;
+		bitmapThumbnailOptions.inSampleSize = sampleSizeCoeff;
 	}
 	
 	public static ImageDao getInstance(ContentResolver contentResolver) {
@@ -47,7 +74,7 @@ public class ImageDao {
 		return read(imageUrl, false);
 	}
 	
-	public BitmapReference read(String imageUrl, boolean cacheOnly) {
+	private BitmapReference read(String imageUrl, boolean cacheOnly) {
 		Log.d(LentaConstants.LoggerAnyTag,
 				"Trying to load bitmap with from disk or memory cache with URL: "
 						+ imageUrl);
@@ -57,10 +84,10 @@ public class ImageDao {
 			imageKey = URLHelper.getImageId(imageUrl);
 		} catch (MalformedURLException e) {
 			Log.e(LentaConstants.LoggerAnyTag, "Error getting key for image URL: " + imageUrl);
-			return readNotAvailableImage();
+			return getNotAvailableImage();
 		}
 		
-		CachedLazyLoadBitmapReference imageRef = bitmapCache.get(imageKey);
+		CachedLazyLoadBitmapReference imageRef = fullBitmapCache.get(imageKey);
 
 		if (cacheOnly || imageRef != null) {
 			Log.d(LentaConstants.LoggerAnyTag, "Found in cache. Bitmap size: " + imageRef.bitmapSize());
@@ -68,7 +95,7 @@ public class ImageDao {
 		}
 		
 		imageRef = new CachedLazyLoadBitmapReference(imageKey);
-		bitmapCache.put(imageKey, imageRef);
+		fullBitmapCache.put(imageKey, imageRef);
 		
 		return imageRef;
 	}
@@ -87,10 +114,10 @@ public class ImageDao {
 			imageKey = URLHelper.getImageId(imageUrl);
 		} catch (MalformedURLException e) {
 			Log.e(LentaConstants.LoggerAnyTag, "Error getting key for image URL: " + imageUrl);
-			return readNotAvailableImage();
+			return getNotAvailableImage();
 		}
 		
-		CachedLazyLoadBitmapReference imageRef = bitmapCache.get(imageKey);
+		CachedLazyLoadBitmapReference imageRef = thumbnailBitmapCache.get(imageKey);
 
 		if (cacheOnly || imageRef != null) {
 			Log.d(LentaConstants.LoggerAnyTag, "Found in cache. Bitmap size: " + imageRef.bitmapSize());
@@ -98,15 +125,22 @@ public class ImageDao {
 		}
 		
 		imageRef = new CachedLazyLoadBitmapReference(imageKey, true);
-		bitmapCache.put(imageKey, imageRef);
+		thumbnailBitmapCache.put(imageKey, imageRef);
 		
 		return imageRef;
 	}
 	
-	public BitmapReference readNotAvailableImage() {
+	public static BitmapReference getNotAvailableImage() {
 		return notAvailableImageRef;
 	}
 	
+	/**
+	 * 
+	 * 
+	 * @param imageUrl
+	 * @param bitmap
+	 * @return
+	 */
 	public BitmapReference create(String imageUrl, Bitmap bitmap) {
 		Log.d(LentaConstants.LoggerAnyTag, "Create bitmap in disk and/or memory cache for image URL: " + imageUrl);
 		
@@ -115,14 +149,23 @@ public class ImageDao {
 			imageKey = URLHelper.getImageId(imageUrl);
 		} catch (MalformedURLException e) {
 			Log.e(LentaConstants.LoggerAnyTag, "Error getting key for image URL: " + imageUrl);
-			return readNotAvailableImage();
+			return getNotAvailableImage();
 		}
 		
 		CachedLazyLoadBitmapReference imageRef = new CachedLazyLoadBitmapReference(imageKey, bitmap);
-		bitmapCache.put(imageKey, imageRef);
-		Log.d(LentaConstants.LoggerAnyTag, "Put bitmap to cache. Cache size: " + bitmapCache.size());
-		
-		createBitmapOnDisk(imageKey, bitmap);
+		try {
+			fullBitmapCache.put(imageKey, imageRef);
+			Log.d(LentaConstants.LoggerAnyTag, "Put bitmap to cache. Cache size: " + fullBitmapCache.size());
+			
+			createBitmapOnDisk(imageKey, bitmap);
+		} finally {
+			/**
+			 * When CachedLazyLoadBitmapReference is created it supposes that we are
+			 * the one user of the bitmap. So we need to release bitmap before
+			 * return lazy load reference to it.
+			 */
+			imageRef.releaseBitmap();
+		}
 		
 		return imageRef;
 	}
@@ -171,7 +214,7 @@ public class ImageDao {
 			return false;
 		}
 		
-		CachedLazyLoadBitmapReference bitmap = bitmapCache.get(imageKey);
+		CachedLazyLoadBitmapReference bitmap = fullBitmapCache.get(imageKey);
 		
 		if (bitmap != null) {
 			return bitmap.isBitmapInMemory();
@@ -180,7 +223,27 @@ public class ImageDao {
 		return false;
 	}
 	
-	private Bitmap createNotAvailableBitmap() {
+	public boolean isThumbnailBitmapInMemory(String imageUrl) {
+		Log.d(LentaConstants.LoggerAnyTag, "Check bitmap in memory cache for image URL: " + imageUrl);
+		
+		String imageKey;
+		try {
+			imageKey = URLHelper.getImageId(imageUrl);
+		} catch (MalformedURLException e) {
+			Log.e(LentaConstants.LoggerAnyTag, "Error getting key for image URL: " + imageUrl);
+			return false;
+		}
+		
+		CachedLazyLoadBitmapReference bitmap = thumbnailBitmapCache.get(imageKey);
+		
+		if (bitmap != null) {
+			return bitmap.isBitmapInMemory();
+		}
+		
+		return false;
+	}
+	
+	private static Bitmap createNotAvailableBitmap() {
 		Bitmap result = Bitmap.createBitmap(300, 300, Bitmap.Config.ARGB_8888);
 		Canvas canvas = new Canvas(result);
 		
@@ -246,10 +309,10 @@ public class ImageDao {
 	}
 	
 	public class CachedLazyLoadBitmapReference implements BitmapReference {
-		private int bitmapReferences;
+		private volatile int bitmapReferences;
 		private Bitmap bitmap;
-		private boolean recycled;
-		private boolean cached;
+		private volatile boolean recycled;
+		private volatile boolean cached;
 		private final String cacheKey;
 		private final boolean thumbnail;
 		
@@ -279,41 +342,87 @@ public class ImageDao {
 			this(key, bitmap, false);
 		}
 		
-		public CachedLazyLoadBitmapReference(String key, boolean isThumbnail) {
-			this(key, null, isThumbnail);
+		public CachedLazyLoadBitmapReference(String key, boolean thumbnail) {
+			this(key, null, thumbnail);
 		}
 		
 		public CachedLazyLoadBitmapReference(String key, Bitmap bitmap, boolean thumbnail) {
-			this.bitmap = bitmap;
+			if (bitmap != null) {
+				this.bitmap = bitmap;
+				
+				/**
+				 * This class suppose that the user of the bitmap already has
+				 * one reference to the bitmap. Also it allows to not recycle
+				 * bitmap immediately after creation if cache is full of
+				 * bitmaps.
+				 */
+				bitmapReferences = 1;
+			}
+			
 			this.cacheKey = key;
 			this.recycled = false;
 			this.cached = true;
 			this.thumbnail = thumbnail;
 		}
 		
-		@Override
-		public synchronized Bitmap getBitmap() {
-			if (bitmap == null) {
-				bitmap = readBitmapFromDisk(cacheKey, thumbnail);
+		private Bitmap tryCreateThumbnailFromFullBitmapInCache() {
+			CachedLazyLoadBitmapReference fullBitmapRef = fullBitmapCache.get(cacheKey);
+			
+			if (fullBitmapRef != null) {
+				Bitmap fullBitmap = fullBitmapRef.getBitmapIfCached();
 				
-				if (bitmap == null) {
-					return notAvailableImageRef.getBitmap();
-				} else {
-					Log.d(LentaConstants.LoggerAnyTag, "Loaded from disk. Bitmap size: " + bitmap.getByteCount() + " bytes.");
-					/*
-					 * bitmap == null -> when we put this reference in the
-					 * cache last time, it returned size 0. put it again with
-					 * bitmap != null -> it will report correct size and size of
-					 * cache will be recalculated.
-					 */
-					bitmapCache.put(cacheKey, this);
+				if (fullBitmap != null) {
+					return Bitmap.createScaledBitmap(
+							fullBitmap,
+							Math.round(fullBitmap.getWidth() / (float) sampleSizeCoeff),
+							Math.round(fullBitmap.getHeight() / (float) sampleSizeCoeff), false);
 				}
 			}
 			
-			++bitmapReferences;
-			return bitmap;
+			return null;
 		}
 		
+		@Override
+		public synchronized Bitmap getBitmap() {
+			if (bitmap == null) {
+				if (thumbnail) {
+					/**
+					 * we can try to create thumbnail from full bitmap if full
+					 * bitmap is in the cache
+					 */
+					bitmap = tryCreateThumbnailFromFullBitmapInCache();
+				}
+				
+				if (bitmap == null) {
+					bitmap = readBitmapFromDisk(cacheKey, thumbnail);
+					if (bitmap != null) {
+						Log.d(LentaConstants.LoggerAnyTag, "Loaded from disk. Bitmap size: " + bitmap.getByteCount() + " bytes.");
+					}
+				}
+				
+				/*
+				 * bitmap was == null -> when we've put this reference in the
+				 * cache last time, it returned size 0. put it again with
+				 * bitmap != null -> it will report correct size and size of
+				 * cache will be recalculated.
+				 */
+				if (bitmap != null) {
+					if (thumbnail) {
+						thumbnailBitmapCache.put(cacheKey, this);
+					} else {
+						fullBitmapCache.put(cacheKey, this);
+					}
+				}
+			}
+
+			return seizeBitmap();
+		}
+
+		@Override
+		public synchronized Bitmap getBitmapIfCached() {
+			return seizeBitmap();
+		}
+
 		/*
 		 * Note: <b>MUST be called from UI thread.</b> 
 		 * (non-Javadoc)
@@ -321,9 +430,8 @@ public class ImageDao {
 		 */
 		@Override
 		public synchronized void getBitmapAsync(BitmapLoadListener listener) {
-			if (bitmap != null && bitmap != notAvailableImageRef.getBitmap()) {
-				++bitmapReferences;
-				listener.onBitmapLoaded(bitmap);
+			if (bitmap != null) {
+				listener.onBitmapLoaded(seizeBitmap());
 			} else {
 				new BitmapLoadTask().execute(listener);
 			}
@@ -363,8 +471,16 @@ public class ImageDao {
 			
 			return 0;
 		}
+
+		private Bitmap seizeBitmap() {
+			if (bitmap != null) {
+				++bitmapReferences;
+			}
+			
+			return bitmap;
+		}
 		
-		private synchronized void recycleBitmap() {
+		private void recycleBitmap() {
 			if (bitmap != null) {
 				bitmap.recycle();
 				bitmap = null;

@@ -270,8 +270,8 @@ public final class NewsDao {
 				news.setImage(imageDao.read(imageLink));
 				news.setThumbnailImage(imageDao.readThumbnail(imageLink));
 			} else {
-				news.setImage(imageDao.readNotAvailableImage());
-				news.setThumbnailImage(imageDao.readNotAvailableImage());
+				news.setImage(ImageDao.getNotAvailableImage());
+				news.setThumbnailImage(ImageDao.getNotAvailableImage());
 			}
 		}
 	}
