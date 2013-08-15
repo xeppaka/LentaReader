@@ -21,6 +21,8 @@
     <string name="pager_title_photos">Фото</string>
     <string name="pager_title_articles">Статьи</string>
     <string name="pager_title_columns">Колонки</string>
+    
     <string name="provider_authority">cz.fit.lentaruand.provider</string>
+    <string name="thumbnail_not_available">Изображение не доступно</string>   
         
 </resources>

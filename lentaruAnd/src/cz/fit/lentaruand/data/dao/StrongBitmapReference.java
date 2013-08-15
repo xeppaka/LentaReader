@@ -15,6 +15,11 @@ public class StrongBitmapReference implements BitmapReference {
 	}
 
 	@Override
+	public void getBitmapAsync(BitmapLoadListener listener) {
+		listener.onBitmapLoaded(bitmap);
+	}
+
+	@Override
 	public void releaseBitmap() {
 		return;
 	}

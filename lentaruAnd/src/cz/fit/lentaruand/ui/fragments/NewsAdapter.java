@@ -11,6 +11,7 @@ import android.widget.TextView;
 import cz.fit.lentaruand.R;
 import cz.fit.lentaruand.data.News;
 import cz.fit.lentaruand.data.dao.BitmapReference;
+import cz.fit.lentaruand.data.dao.BitmapReference.BitmapLoadListener;;
 
 public class NewsAdapter extends NewsObjectAdapter<News> {
 	
@@ -54,7 +55,7 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
 		BitmapReference imageRef;
 
 		News news = getItem(position);
-		imageRef = news.getImage();
+		imageRef = news.getThumbnailImage();
 		
 		if (convertView == null) {
 			view = inflater.inflate(R.layout.brief_news_list_item, null);
@@ -71,13 +72,19 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
 			holder.getImage().releaseBitmap();
 		}
 
-		Bitmap currBitmap = imageRef.getBitmap();
-		
-		if (currBitmap != null) {
-			newsImageView.setImageBitmap(currBitmap);
-		}
-		
 		newsTitleTextView.setText(news.getTitle());
+
+		final ImageView newsImageViewForAsync = newsImageView;
+		
+		imageRef.getBitmapAsync(new BitmapLoadListener() {
+			@Override
+			public void onBitmapLoaded(final Bitmap bitmap) {
+				if (bitmap != null) {
+					newsImageViewForAsync.setImageBitmap(bitmap);
+				}
+			}
+		});
+		
 		return view;
 	}
 }

@@ -7,7 +7,7 @@ import java.util.Date;
 import cz.fit.lentaruand.data.dao.BitmapReference;
 import cz.fit.lentaruand.parser.rss.LentaRssItem;
 
-public class News extends NewsObject {
+public class News extends NewsObject implements NewsObjectWithImage {
 	private static final long serialVersionUID = 1L;
 	
 	private String briefText;
@@ -18,6 +18,7 @@ public class News extends NewsObject {
 	private Collection<Link> links;
 	
 	private transient BitmapReference imageRef;
+	private transient BitmapReference thumbnailImageRef;
 
 	public News(long id, String guid, String title, String link, String briefText,
 			String fullText, Date pubDate, String imageLink,
@@ -58,6 +59,7 @@ public class News extends NewsObject {
 		setLinks(null);
 	}
 	
+
 	public String getBriefText() {
 		return briefText;
 	}
@@ -120,12 +122,16 @@ public class News extends NewsObject {
 		this.imageRef = imageRef;
 	}
 
-	public boolean isContentFull() {
-		return fullText != null && !(fullText.length() == 0);
+	public BitmapReference getThumbnailImage() {
+		return thumbnailImageRef;
 	}
 
-	public boolean isImageLoaded() {
-		return imageRef != null;
+	public void setThumbnailImage(BitmapReference thumbnailImageRef) {
+		this.thumbnailImageRef = thumbnailImageRef;
+	}
+
+	public boolean isContentFull() {
+		return fullText != null && !(fullText.length() == 0);
 	}
 	
 	@Override

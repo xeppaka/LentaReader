@@ -47,7 +47,7 @@ public class URLHelper {
 	}
 	
 	/**
-	 * Returns id for the news image parsed from image URL.
+	 * Returns id for the news full image parsed from image URL.
 	 * E.g. url looks like http://icdn.lenta.ru/images/2013/07/20/13/20130720130546191/pic_529a4d2f9d668a24711cd4f11d31e32a.jpg,
 	 * than returned id will be pic_529a4d2f9d668a24711cd4f11d31e32a.
 	 * 
