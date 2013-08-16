@@ -85,11 +85,7 @@ public class UpdateService extends Service {
 			try {
 				String imageLink = n.getImageLink();
 				if (imageLink != null && !TextUtils.isEmpty(imageLink)) {
-					if (imageDao.isBitmapInMemory(imageLink)) {
-						continue;
-					}
-					
-					if (!imageDao.checkImageInDiskCache(imageLink)) {
+					if (!imageDao.imageExist(imageLink)) {
 						Bitmap newBitmap = LentaHttpImageDownloader.downloadBitmap(imageLink);
 						BitmapReference newBitmapRef = imageDao.create(imageLink, newBitmap);
 						BitmapReference newThumbnailBitmapRef = imageDao.readThumbnail(imageLink);
