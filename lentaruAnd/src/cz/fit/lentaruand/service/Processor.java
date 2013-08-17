@@ -13,7 +13,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import cz.fit.lentaruand.data.IntentContent;
 import cz.fit.lentaruand.data.News;
-import cz.fit.lentaruand.data.Progress;
 import cz.fit.lentaruand.data.Rubrics;
 import cz.fit.lentaruand.data.dao.BitmapReference;
 import cz.fit.lentaruand.data.dao.Dao;
@@ -95,7 +94,7 @@ public class Processor {
 		return;
 	}
 	
-	private void loadImages(Collection<News> news) {
+	public void loadImages(Collection<News> news) {
 		ImageDao imageDao = ImageDao.getInstance(service.getContentResolver());
 		
 		for (News n : news) {
@@ -119,6 +118,10 @@ public class Processor {
 				continue;
 			}
 		}
+	}
+	
+	public void loadImage(News news) {
+		ImageDao imageDao = ImageDao.getInstance(service.getContentResolver());
 	}
 	
 	public void downloadFull(News brief) { // TODO DB interaction

@@ -9,7 +9,6 @@ import android.os.ResultReceiver;
 import android.util.Log;
 import android.util.SparseArray;
 import cz.fit.lentaruand.data.IntentContent;
-import cz.fit.lentaruand.data.Progress;
 import cz.fit.lentaruand.data.Rubrics;
 import cz.fit.lentaruand.utils.LentaConstants;
 
