@@ -11,7 +11,7 @@ import android.os.ResultReceiver;
 import android.util.Log;
 import android.util.SparseArray;
 import android.widget.Toast;
-import cz.fit.lentaruand.data.Rubrics;
+import cz.fit.lentaruand.data.IntentContent;
 import cz.fit.lentaruand.utils.LentaConstants;
 
 /**
@@ -36,33 +36,18 @@ public class LentaService extends Service {
 
 	private static final int NUM_THREADS = 4;
 
-	public static final String PACKAGE = "cz.fit.lentaruand.service";
-	public static final String ACTION_EXECUTE_COMMAND = PACKAGE
-			.concat(".ACTION_EXECUTE_COMMAND");
-	public static final String ACTION_EXECUTE_DOWNLOAD_BRIEF = PACKAGE
-			.concat(".ACTION_EXECUTE_DOWNLOAD_BRIEF");
-	public static final String ACTION_EXECUTE_DOWNLOAD_FULL = PACKAGE
-			.concat(".ACTION_EXECUTE_DOWNLOAD_FULL");
-	public static final String ACTION_CANCEL_COMMAND = PACKAGE
-			.concat(".ACTION_CANCEL_COMMAND");
-	public static final String EXTRA_REQUEST_ID = PACKAGE
-			.concat(".EXTRA_REQUEST_ID");
-	public static final String EXTRA_STATUS_RECEIVER = PACKAGE
-			.concat(".EXTRA_STATUS_RECEIVER");
-	public static final String EXTRA_COMMAND = PACKAGE.concat(".EXTRA_COMMAND");
-	public static final String EXTRA_RUBRIC = PACKAGE.concat(".EXTRA_RUBRIC");
-	public static final String EXTRA_LIST = PACKAGE.concat(".EXTRA_LIST");
-
-	private ExecutorService executor = Executors
-			.newFixedThreadPool(NUM_THREADS); // поменять потом очередь
-												// приоритетов
+	private ExecutorService executor = Executors.newFixedThreadPool(NUM_THREADS); // поменять потом очередь приоритетов на стек
 	private SparseArray<RunningCommand> runningCommands = new SparseArray<RunningCommand>();
 	Processor processor = new Processor(this);
-
+	ResultReceiver resultReceiver;
+	
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-
-		if (ACTION_EXECUTE_DOWNLOAD_BRIEF.equals(intent.getAction())) {
+		
+		resultReceiver = getReceiver(intent);
+		processor.setResultReceiver(resultReceiver);
+		
+		if (IntentContent.ACTION_EXECUTE_DOWNLOAD_BRIEF.equals(intent.getAction())) {
 			RunningCommand runningCommand = new RunningCommand(intent);
 			
 			synchronized (runningCommands) {
@@ -112,9 +97,6 @@ public class LentaService extends Service {
 			this.intent = intent;
 		}
 
-		public void cancel() {
-		}
-
 		@Override
 		public void run() {
 			Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
@@ -122,7 +104,7 @@ public class LentaService extends Service {
 			// processor.downloadRubricBrief(getRubric(intent),
 			// getReceiver(intent));
 			processor.execute(intent);
-			Log.d(LentaConstants.LoggerServiceTag, "Done download.");
+			Log.d(LentaConstants.LoggerServiceTag, "Downloaded news. Stopping myself.");
 			shutdown();
 		}
 
@@ -138,26 +120,10 @@ public class LentaService extends Service {
 	}
 
 	private int getCommandId(Intent intent) {
-		return intent.getIntExtra(EXTRA_REQUEST_ID, -1);
+		return intent.getIntExtra(IntentContent.EXTRA_REQUEST_ID.getIntentContent(), -1);
 	}
-
-	/**
-	 * The IntentService calls this method from the default worker thread with
-	 * the intent that started the service. When this method returns,
-	 * IntentService stops the service, as appropriate.
-	 */
-	// @Override
-	// protected void onHandleIntent(Intent intent) {
-	//
-	// Log.d(LentaConstants.LoggerServiceTag, "Handled intent!");
-	// String action = intent.getAction();
-	// if (!TextUtils.isEmpty(action)) {
-	// if(action == ACTION_EXECUTE_DOWNLOAD_BRIEF){
-	// Log.d(LentaConstants.LoggerServiceTag, "starting download");
-	// processor.downloadRubricBrief(getRubric(intent), getReceiver(intent)); //
-	// Log.d(LentaConstants.LoggerServiceTag, "Done. Stopping myself");
-	// stopSelf();
-	// }
-	// }
-	// }
+	
+	private ResultReceiver getReceiver(Intent intent) {
+		return intent.getParcelableExtra(IntentContent.EXTRA_STATUS_RECEIVER.getIntentContent());
+	}
 }

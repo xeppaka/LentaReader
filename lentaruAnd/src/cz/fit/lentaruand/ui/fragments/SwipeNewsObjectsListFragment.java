@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,39 +16,47 @@ import android.widget.ListView;
 import android.widget.Toast;
 import cz.fit.lentaruand.data.News;
 import cz.fit.lentaruand.data.NewsObject;
+import cz.fit.lentaruand.data.Rubrics;
 import cz.fit.lentaruand.data.dao.Dao;
 import cz.fit.lentaruand.data.dao.DaoObserver;
 import cz.fit.lentaruand.data.dao.NewsDao;
 import cz.fit.lentaruand.service.ServiceCallbackListener;
+import cz.fit.lentaruand.service.ServiceHelper;
 import cz.fit.lentaruand.service.UpdateService;
 import cz.fit.lentaruand.ui.activities.NewsFullActivity;
 
 /**
- * This is general fragment that shows list of loaded news objects (News, Articles, etc.).
- * The way how item will be shown in the list depends on the used list adapter that is 
- * passed as an argument in constructor.
+ * This is general fragment that shows list of loaded news objects (News,
+ * Articles, etc.). The way how item will be shown in the list depends on the
+ * used list adapter that is passed as an argument in constructor.
  * 
  * @author nnm
- *
+ * 
  * @param <T>
  */
 @SuppressLint("ValidFragment")
-public class SwipeNewsObjectsListFragment<T extends NewsObject> extends ListFragment implements ServiceCallbackListener { 
-			//implements LoaderManager.LoaderCallbacks<List<T>> {
+public class SwipeNewsObjectsListFragment<T extends NewsObject> extends
+		ListFragment implements ServiceCallbackListener {
+	// implements LoaderManager.LoaderCallbacks<List<T>> {
 
 	private NewsObjectAdapter<T> newsObjectsAdapter;
 	private Loader<List<T>> newsObjectsLoader;
-	//private ContentResolverDao<T> dataDao;
+	private ServiceHelper serviceHelper;
 
-	public SwipeNewsObjectsListFragment(Loader<List<T>> newsObjectsLoader, NewsObjectAdapter<T> newsObjectsAdapter) {
+	// private ContentResolverDao<T> dataDao;
+
+	public SwipeNewsObjectsListFragment(Loader<List<T>> newsObjectsLoader,
+			NewsObjectAdapter<T> newsObjectsAdapter) {
 		if (newsObjectsLoader == null) {
-			throw new IllegalArgumentException("Argument newsObjectLoader must not be null.");
+			throw new IllegalArgumentException(
+					"Argument newsObjectLoader must not be null.");
 		}
-		
+
 		if (newsObjectsAdapter == null) {
-			throw new IllegalArgumentException("Argument newsObjectAdapter must not be null.");
+			throw new IllegalArgumentException(
+					"Argument newsObjectAdapter must not be null.");
 		}
-		
+
 		this.newsObjectsLoader = newsObjectsLoader;
 		this.newsObjectsAdapter = newsObjectsAdapter;
 	}
@@ -55,15 +64,14 @@ public class SwipeNewsObjectsListFragment<T extends NewsObject> extends ListFrag
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
 		setListAdapter(newsObjectsAdapter);
+		serviceHelper = new ServiceHelper(this.getActivity());
 	}
 
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
-		Intent intent = new Intent(this.getActivity(),
-				NewsFullActivity.class);
+		Intent intent = new Intent(this.getActivity(), NewsFullActivity.class);
 		intent.putExtra("NewsObject", newsObjectsAdapter.getItem(position));
 		startActivity(intent);
 	}
@@ -76,44 +84,40 @@ public class SwipeNewsObjectsListFragment<T extends NewsObject> extends ListFrag
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		
+
 		ContentResolver cr = getActivity().getContentResolver();
 		Dao<News> dataDao = NewsDao.getInstance(cr);
-		dataDao.registerContentObserver((Dao.Observer<News>)(new MyContentObserver(new Handler())));
-		
-//		newsList = getListView();
-//		newsList.setLongClickable(true);
-//		newsList.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-//		newsList.setOnItemLongClickListener(
-//				new ActionModeHelper(this, newsList));
+		dataDao.registerContentObserver((Dao.Observer<News>) (new MyContentObserver(new Handler())));
+
+		// newsList = getListView();
+		// newsList.setLongClickable(true);
+		// newsList.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+		// newsList.setOnItemLongClickListener(
+		// new ActionModeHelper(this, newsList));
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		serviceHelper.addListener(this);
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+		serviceHelper.removeListener(this);
 	}
 
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		//getLoaderManager().initLoader(0, null, this).forceLoad();
-		getActivity().startService(new Intent(this.getActivity(), UpdateService.class));
-//		Collection<News> news = NewsDao.getInstance(getActivity().getContentResolver()).read();
-//		showNewsObjects((Collection<T>)news);
-//		ServiceHelper serviceHelper = new ServiceHelper(this.getActivity());
-//		serviceHelper.addListener(this);
-//		serviceHelper.downloadListOfBriefNews(Rubrics.ECONOMICS);
+//		 getActivity().startService(new Intent(this.getActivity(), UpdateService.class));
+		// Collection<News> news =
+		// NewsDao.getInstance(getActivity().getContentResolver()).read();
+		// showNewsObjects((Collection<T>)news);
+		serviceHelper.downloadListOfBriefNews(Rubrics.ECONOMICS);
 	}
 
-//	@Override
-//	public Loader<List<T>> onCreateLoader(int id, Bundle args) {
-//		return newsObjectsLoader;
-//	}
-//
-//	@Override
-//	public void onLoadFinished(Loader<List<T>> loader, List<T> data) {
-//		showNewsObjects(data);
-//	}
-//
-//	@Override
-//	public void onLoaderReset(Loader<List<T>> loader) {
-//	}
-	
 	private class MyContentObserver extends DaoObserver<T> {
 		public MyContentObserver(Handler handler) {
 			super(handler);
@@ -121,7 +125,7 @@ public class SwipeNewsObjectsListFragment<T extends NewsObject> extends ListFrag
 
 		@Override
 		public void onDataChanged(boolean selfChange, T dataObject) {
-			showNewsObjects(Arrays.<T>asList(dataObject));
+			showNewsObjects(Arrays.<T> asList(dataObject));
 		}
 
 		@Override
@@ -133,7 +137,10 @@ public class SwipeNewsObjectsListFragment<T extends NewsObject> extends ListFrag
 	@Override
 	public void onServiceCallback(int requestId, Intent requestIntent,
 			int resultCode, Bundle data) {
-		Toast.makeText(getActivity(), "Callback received! data in bundle = " + data.getString("EXTRA_STRING"), Toast.LENGTH_SHORT).show();
-		
+		Toast.makeText(
+				getActivity(),
+				"Callback received! data in bundle = "
+						+ data.getString("EXTRA_STRING"), Toast.LENGTH_SHORT).show();
+
 	}
 }

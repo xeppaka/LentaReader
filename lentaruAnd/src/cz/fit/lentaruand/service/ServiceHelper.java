@@ -1,6 +1,5 @@
 package cz.fit.lentaruand.service;
 import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import android.content.Context;
 import android.content.Intent;
@@ -9,6 +8,8 @@ import android.os.Handler;
 import android.os.ResultReceiver;
 import android.util.Log;
 import android.util.SparseArray;
+import cz.fit.lentaruand.data.IntentContent;
+import cz.fit.lentaruand.data.Progress;
 import cz.fit.lentaruand.data.Rubrics;
 import cz.fit.lentaruand.utils.LentaConstants;
 
@@ -43,39 +44,56 @@ public class ServiceHelper {
 
 	private SparseArray<Intent> pendingActivities = new SparseArray<Intent>();
 
-	private AtomicInteger idCounter = new AtomicInteger();
+//	private AtomicInteger idCounter = new AtomicInteger();
 
+	private IntentContent intentAction;
 
     public ServiceHelper(Context context) {
 		 this.context = context;
 		 return;
 	 }
 
+    /**
+     * Creating requestId of the task, creating and packing the intent and launching the task;
+     * Setting the command type of the action;
+     * @param rubric is rubric to download
+     * @return int is the requestId of this task
+     */
+    
 	public int downloadListOfBriefNews(Rubrics rubric) {
-		final int requestId = 1;//createId(); // создание ID запроса
-		Intent i = createIntent(context, rubric, requestId); // создание и упаковка интента
-		return runRequest(requestId, i); // добавление id запроса в реестр действующих задач, старт сервиса
+		final int requestId = 1;
+		intentAction = IntentContent.ACTION_EXECUTE_DOWNLOAD_BRIEF;
+		Intent i = createIntent(context, rubric, requestId, intentAction); 
+		return runRequest(requestId, i);
 	}
 	
-	private int createId() {
-		return idCounter.getAndIncrement();
-	}
+//	private int createId() {
+//		return idCounter.getAndIncrement();
+//	}
 
-	private Intent createIntent(final Context context, Rubrics rubric, final int requestId){
-		Intent i = new Intent(context, LentaService.class);
-		i.setAction(LentaService.ACTION_EXECUTE_DOWNLOAD_BRIEF); // hardcoded command type, temporary way
+	private Intent createIntent(final Context context, Rubrics rubric, final int requestId, IntentContent intentActionExecute){
+		Intent i; 
+		
+		i	= new Intent(context, LentaService.class);
+		
+		i.setAction(intentActionExecute.getIntentContent()); 
+		
 		if(rubric == null) Log.d(LentaConstants.LoggerMainAppTag, "rubric is null");
-		i.putExtra(LentaService.EXTRA_RUBRIC, rubric);
-		i.putExtra(LentaService.EXTRA_REQUEST_ID, requestId);
-		i.putExtra(LentaService.EXTRA_STATUS_RECEIVER, new ResultReceiver(
+		
+		i.putExtra(IntentContent.EXTRA_RUBRIC.getIntentContent(), rubric);
+		i.putExtra(IntentContent.EXTRA_REQUEST_ID.getIntentContent(), requestId);
+		i.putExtra(IntentContent.EXTRA_STATUS_RECEIVER.getIntentContent(), new ResultReceiver(
 				new Handler()) {
 			@Override
 			protected void onReceiveResult(int resultCode, Bundle resultData) {
 				Intent originalIntent = pendingActivities.get(requestId);
+				
 				if (isPending(requestId)) {
-					if (resultCode != Processor.RESPONSE_PROGRESS) {
+					
+					if (resultCode != Progress.RESPONSE_PROGRESS.getValue()) {
 						pendingActivities.remove(requestId);
 					}
+					
 					for (ServiceCallbackListener currentListener : currentListeners) {
 						if (currentListener != null) {
 							currentListener.onServiceCallback(requestId,
@@ -83,6 +101,7 @@ public class ServiceHelper {
 						}
 					}
 				}
+				
 			}
 		});
 		return i;

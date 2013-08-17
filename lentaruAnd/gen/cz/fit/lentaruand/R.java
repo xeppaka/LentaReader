@@ -1420,6 +1420,7 @@ containing a value of this type.
         public static final int pager_title_videos=0x7f0a001c;
         public static final int provider_authority=0x7f0a0020;
         public static final int save_to_db=0x7f0a0017;
+        public static final int thumbnail_not_available=0x7f0a0021;
         public static final int title_activity_full_news=0x7f0a001a;
     }
     public static final class style {

@@ -1,17 +1,25 @@
 package cz.fit.lentaruand.service;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import android.content.ContentResolver;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.ResultReceiver;
+import android.text.TextUtils;
 import android.util.Log;
+import cz.fit.lentaruand.data.IntentContent;
 import cz.fit.lentaruand.data.News;
+import cz.fit.lentaruand.data.Progress;
 import cz.fit.lentaruand.data.Rubrics;
+import cz.fit.lentaruand.data.dao.BitmapReference;
 import cz.fit.lentaruand.data.dao.Dao;
+import cz.fit.lentaruand.data.dao.ImageDao;
 import cz.fit.lentaruand.data.dao.NewsDao;
+import cz.fit.lentaruand.downloader.LentaHttpImageDownloader;
 import cz.fit.lentaruand.downloader.LentaNewsDownloader;
 import cz.fit.lentaruand.downloader.exceptions.HttpStatusCodeException;
 import cz.fit.lentaruand.parser.exceptions.ParseWithXPathException;
@@ -33,9 +41,6 @@ import cz.fit.lentaruand.utils.LentaConstants;
  */
 
 public class Processor {
-	public static final int RESPONSE_SUCCESS = 0;
-	public static final int RESPONSE_FAILURE = 1;
-	public static final int RESPONSE_PROGRESS = 2;
 
 	private	LentaNewsDownloader lnd;
 	private ResultReceiver resultReceiver;
@@ -50,12 +55,20 @@ public class Processor {
 		this.service = service;
 	}
 
-	public void downloadRubricBrief(Rubrics rubric,
-			ResultReceiver receiver) { // TODO DB interaction		
+
+	public ResultReceiver getResultReceiver() {
+		return resultReceiver;
+	}
+
+	public void setResultReceiver(ResultReceiver resultReceiver) {
+		this.resultReceiver = resultReceiver;
+	}
+	
+	public void downloadRubricBrief(Rubrics rubric, ResultReceiver receiver) { // TODO DB interaction		
 		this.resultReceiver = receiver;		
 		List<News> news;		
 		try {
-			news = lnd.downloadRubricBrief(Rubrics.ECONOMICS);
+			news = lnd.downloadRubricBrief(rubric);
 		} catch (ParseWithXPathException e) {
 			Log.w(LentaConstants.LoggerServiceTag, "Error downloading page, parse error.");
 			return;
@@ -69,37 +82,69 @@ public class Processor {
 		
 		ContentResolver cr = service.getApplicationContext().getContentResolver();
 		Dao<News> newsDao = NewsDao.getInstance(cr);
+		for (News n : news) {
+			newsDao.delete(n.getGuid());
+		}
+		
+		loadImages(news);
 		newsDao.create(news);
 		
 		Bundle b = new Bundle();
 		b.putString("EXTRA_STRING", "downloaded");
-		sendUpdate(RESPONSE_SUCCESS, b); // sending message to subscribed activities or another components
+		sendUpdate(Progress.RESPONSE_SUCCESS, b); // sending message to subscribed activities or another components
 		return;
 	}
-
+	
+	private void loadImages(Collection<News> news) {
+		ImageDao imageDao = ImageDao.getInstance(service.getContentResolver());
+		
+		for (News n : news) {
+			try {
+				String imageLink = n.getImageLink();
+				if (imageLink != null && !TextUtils.isEmpty(imageLink)) {
+					if (!imageDao.imageExist(imageLink)) {
+						Bitmap newBitmap = LentaHttpImageDownloader.downloadBitmap(imageLink);
+						BitmapReference newBitmapRef = imageDao.create(imageLink, newBitmap);
+						BitmapReference newThumbnailBitmapRef = imageDao.readThumbnail(imageLink);
+						
+						n.setImage(newBitmapRef);
+						n.setThumbnailImage(newThumbnailBitmapRef);
+					}
+				}
+			} catch (HttpStatusCodeException e) {
+				e.printStackTrace();
+				continue;
+			} catch (IOException e) {
+				e.printStackTrace();
+				continue;
+			}
+		}
+	}
+	
 	public void downloadFull(News brief) { // TODO DB interaction
 		
 	}
 
-	private void sendUpdate(int resultCode, Bundle data) {
+	private void sendUpdate(Progress progressCode, Bundle data) {
 		if (resultReceiver != null) {
-			resultReceiver.send(resultCode, data);
+			resultReceiver.send(progressCode.getValue(), data);
 		}
 	}
 
 	public void execute(Intent intent) {
-		if(intent.getAction().equals(LentaService.ACTION_EXECUTE_DOWNLOAD_BRIEF)){
+		if(intent.getAction().equals(IntentContent.ACTION_EXECUTE_DOWNLOAD_BRIEF.getIntentContent())){
 			downloadRubricBrief(getRubric(intent), getReceiver(intent));
 		}
 		
 	}
 	
 	private ResultReceiver getReceiver(Intent intent) {
-		return intent.getParcelableExtra(LentaService.EXTRA_STATUS_RECEIVER);
+		return intent.getParcelableExtra(IntentContent.EXTRA_STATUS_RECEIVER
+				.getIntentContent());
 	}
 
 	private Rubrics getRubric(Intent intent) {
-		Rubrics rubric = (Rubrics) intent.getSerializableExtra(LentaService.EXTRA_RUBRIC);
+		Rubrics rubric = (Rubrics) intent.getSerializableExtra(IntentContent.EXTRA_RUBRIC.getIntentContent());
 		if(rubric == null) Log.d(LentaConstants.LoggerServiceTag, "rubric is null");
 		return rubric;
 	}
