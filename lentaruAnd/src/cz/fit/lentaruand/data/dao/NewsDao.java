@@ -30,12 +30,12 @@ public final class NewsDao {
 	private static final LruCache<Long, News> cacheId = new LruCache<Long, News>(CACHE_MAX_OBJECTS);
 	private static final LruCache<String, News> cacheKey = new LruCache<String, News>(CACHE_MAX_OBJECTS);
 	
-	public final static Dao<News> getInstance(ContentResolver contentResolver) {
+	public final static AsyncDao<News> getInstance(ContentResolver contentResolver) {
 		if (contentResolver == null) {
 			throw new IllegalArgumentException("contentResolver is null.");
 		}
 		
-		return new CachedDao<News>(new ContentResolverNewsDao(contentResolver), cacheId, cacheKey);
+		return new AsyncCachedDao<News>(new ContentResolverNewsDao(contentResolver), cacheId, cacheKey);
 	}
 
 	private NewsDao() {
@@ -147,12 +147,14 @@ public final class NewsDao {
 		}
 
 		@Override
-		public synchronized Collection<News> read() {
-			Collection<News> news = super.read();
+		public List<News> read() {
+			List<News> news = super.read();
 			
 			for (News n : news) {
 				readOtherNewsParts(n);
 			}
+			
+			Collections.sort(news);
 			
 			return news;
 		}
@@ -225,10 +227,12 @@ public final class NewsDao {
 		}
 		
 		@Override
-		public void update(News news) {
-			super.update(news);
+		public int update(News news) {
+			int result = super.update(news);
 			
 			updateOtherNewsParts(news);
+			
+			return result;
 		}
 		
 		@Override

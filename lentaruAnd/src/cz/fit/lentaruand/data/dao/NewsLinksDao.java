@@ -2,7 +2,6 @@ package cz.fit.lentaruand.data.dao;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -123,8 +122,6 @@ public class NewsLinksDao {
 						result.add(createDataObject(cur));
 					} while (cur.moveToNext());
 				}
-				
-				Collections.sort(result);
 				
 				return result;
 			} finally {

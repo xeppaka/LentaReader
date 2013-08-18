@@ -14,7 +14,7 @@ import cz.fit.lentaruand.data.db.SQLiteType;
  * 
  * @param <T> is the database object for Dao.
  */
-final class CachedDao<T extends DatabaseObject> implements Dao<T> {
+class CachedDao<T extends DatabaseObject> implements Dao<T> {
 	private final Dao<T> underlinedDao;
 	private final LruCache<Long, T> cacheId;
 	private final LruCache<String, T> cacheKey;
@@ -23,7 +23,19 @@ final class CachedDao<T extends DatabaseObject> implements Dao<T> {
 	 * used only in {@link CachedDao#read(Collection)} to not create temporary
 	 * object for every method invocation.
 	 */
-	private final Collection<Long> missed = new ArrayList<Long>();
+	protected final Collection<Long> missed = new ArrayList<Long>();
+
+	private Dao<T> getUnderlinedDao() {
+		return underlinedDao;
+	}
+	
+	private LruCache<Long, T> getLruCacheId() {
+		return cacheId;
+	}
+	
+	private LruCache<String, T> getLruCacheKey() {
+		return cacheKey;
+	}
 	
 	public CachedDao(Dao<T> underlinedDao, LruCache<Long, T> cacheId, LruCache<String, T> cacheKey) {
 		if (underlinedDao == null) {
@@ -45,24 +57,24 @@ final class CachedDao<T extends DatabaseObject> implements Dao<T> {
 
 	@Override
 	public void registerContentObserver(Dao.Observer<T> observer) {
-		underlinedDao.registerContentObserver(observer);
+		getUnderlinedDao().registerContentObserver(observer);
 	}
 
 	@Override
 	public void unregisterContentObserver(Dao.Observer<T> observer) {
-		underlinedDao.unregisterContentObserver(observer);
+		getUnderlinedDao().unregisterContentObserver(observer);
 	}
 
 	@Override
 	public synchronized long create(T dataObject) {
-		long newId = underlinedDao.create(dataObject);
+		long newId = getUnderlinedDao().create(dataObject);
 		
-		cacheId.put(newId, dataObject);
+		getLruCacheId().put(newId, dataObject);
 
 		String key = dataObject.getKeyValue();
 		
 		if (key != null) {
-			cacheKey.put(key, dataObject);
+			getLruCacheKey().put(key, dataObject);
 		}
 		
 		return newId;
@@ -70,23 +82,23 @@ final class CachedDao<T extends DatabaseObject> implements Dao<T> {
 
 	@Override
 	public synchronized Collection<Long> create(Collection<T> dataObjects) {
-		return underlinedDao.create(dataObjects);
+		return getUnderlinedDao().create(dataObjects);
 	}
 
 	@Override
 	public synchronized Collection<T> read() {
-		return underlinedDao.read();
+		return getUnderlinedDao().read();
 	}
 
 	@Override
 	public synchronized T read(long id) {
-		T dataObject = cacheId.get(id);
+		T dataObject = getLruCacheId().get(id);
 		
 		if (dataObject != null) {
 			return dataObject;
 		}
 		
-		return underlinedDao.read(id);
+		return getUnderlinedDao().read(id);
 	}
 
 	@Override
@@ -95,7 +107,7 @@ final class CachedDao<T extends DatabaseObject> implements Dao<T> {
 		Collection<T> result = new ArrayList<T>();
 		
 		for (Long id : ids) {
-			T dataObject = cacheId.get(id);
+			T dataObject = getLruCacheId().get(id);
 			
 			if (dataObject == null) {
 				missed.add(id);
@@ -105,7 +117,7 @@ final class CachedDao<T extends DatabaseObject> implements Dao<T> {
 		}
 		
 		if (!missed.isEmpty()) {
-			result.addAll(underlinedDao.read(missed));
+			result.addAll(getUnderlinedDao().read(missed));
 		}
 		
 		return result;
@@ -113,63 +125,61 @@ final class CachedDao<T extends DatabaseObject> implements Dao<T> {
 
 	@Override
 	public synchronized T read(String key) {
-		T dataObject = cacheKey.get(key);
+		T dataObject = getLruCacheKey().get(key);
 		
 		if (dataObject != null) {
 			return dataObject;
 		}
 		
-		return underlinedDao.read(key);
+		return getUnderlinedDao().read(key);
 	}
 
 	@Override
 	public synchronized T read(SQLiteType keyType, String keyColumnName, String keyValue) {
-		return underlinedDao.read(keyType, keyColumnName, keyValue);
+		return getUnderlinedDao().read(keyType, keyColumnName, keyValue);
 	}
 
 	@Override
 	public Collection<T> readForParentObject(long parentId) {
 		// TODO: consider if cache can be used in that case.
-		return underlinedDao.readForParentObject(parentId);
+		return getUnderlinedDao().readForParentObject(parentId);
 	}
 
 	@Override
-	public synchronized void update(T dataObject) {
-		underlinedDao.update(dataObject);
-		
-		cacheId.put(dataObject.getId(), dataObject);
+	public synchronized int update(T dataObject) {
+		getLruCacheId().put(dataObject.getId(), dataObject);
 		
 		String key = dataObject.getKeyValue();
 		if (key != null) {		
-			cacheKey.put(key, dataObject);
+			getLruCacheKey().put(key, dataObject);
 		}
+		
+		return getUnderlinedDao().update(dataObject);
 	}
 
 	@Override
 	public synchronized int delete(long id) {
-		int result = underlinedDao.delete(id);
-		
-		T dataObject = cacheId.remove(id);
+		T dataObject = getLruCacheId().remove(id);
 		
 		if (dataObject != null) {
 			String key = dataObject.getKeyValue();
 			
 			if (key != null) {
-				cacheKey.remove(key);
+				getLruCacheKey().remove(key);
 			}
 		}
 		
-		return result;
+		return getUnderlinedDao().delete(id);
 	}
 
 	@Override
 	public synchronized int delete(String key) {
-		int result = underlinedDao.delete(key);
+		int result = getUnderlinedDao().delete(key);
 		
-		T dataObject = cacheKey.remove(key);
+		T dataObject = getLruCacheKey().remove(key);
 		
 		if (dataObject != null) {
-			cacheId.remove(dataObject.getId());
+			getLruCacheId().remove(dataObject.getId());
 		}
 		
 		return result;
@@ -177,11 +187,11 @@ final class CachedDao<T extends DatabaseObject> implements Dao<T> {
 
 	@Override
 	public synchronized int delete(SQLiteType keyType, String keyColumnName, String keyValue) {
-		return underlinedDao.delete(keyType, keyColumnName, keyValue);
+		return getUnderlinedDao().delete(keyType, keyColumnName, keyValue);
 	}
 
 	@Override
 	public Collection<String> readAllKeys() {
-		return underlinedDao.readAllKeys();
+		return getUnderlinedDao().readAllKeys();
 	}
 }

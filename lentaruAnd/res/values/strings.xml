@@ -24,5 +24,6 @@
     
     <string name="provider_authority">cz.fit.lentaruand.provider</string>
     <string name="thumbnail_not_available">Изображение не доступно</string>   
-        
+    
+    <string name="full_news_image_desc">News image</string>
 </resources>

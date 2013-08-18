@@ -111,8 +111,9 @@ public interface Dao<T> {
 	 * 
 	 *            NOTE: all fields of the object are updates, thus newsObject
 	 *            argument must contain all fields filled with a proper data.
+	 * @return number of objects updated.
 	 */
-	void update(T dataObject);
+	int update(T dataObject);
 
 	/**
 	 * Deletes object from the database.

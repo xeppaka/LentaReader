@@ -46,7 +46,7 @@ abstract class AbstractDao<T extends DatabaseObject> implements Dao<T> {
 	}
 
 	@Override
-	public synchronized Collection<T> read() {
+	public synchronized List<T> read() {
 		Cursor cur = cr.query(getContentProviderUri(),
 				getProjectionAll(), null, null, null);
 
@@ -92,8 +92,8 @@ abstract class AbstractDao<T extends DatabaseObject> implements Dao<T> {
 	}
 
 	@Override
-	public synchronized Collection<T> read(Collection<Long> ids) {
-		Collection<T> result = new ArrayList<T>(ids.size());
+	public synchronized List<T> read(Collection<Long> ids) {
+		List<T> result = new ArrayList<T>(ids.size());
 		
 		for (long id : ids) {
 			T dataObject = read(id);
@@ -202,19 +202,19 @@ abstract class AbstractDao<T extends DatabaseObject> implements Dao<T> {
 		return cr.delete(getContentProviderUri(), where, whereArgs);
 	}
 
-	public synchronized void update(T daoObject) {
+	public synchronized int update(T daoObject) {
 		long id = daoObject.getId();
 		
 		String[] whereArgs;
 		String where;
 		
 		if (id != DatabaseObject.ID_NONE) {
-			cr.update(ContentUris.withAppendedId(getContentProviderUri(), id), prepareContentValues(daoObject), null, null);
+			return cr.update(ContentUris.withAppendedId(getContentProviderUri(), id), prepareContentValues(daoObject), null, null);
 		} else {
 			whereArgs = new String[]{ daoObject.getKeyValue() };
 			where = String.format(getWhereFromSQLiteType(getKeyColumnType()), getKeyColumnName());
 			
-			cr.update(getContentProviderUri(), prepareContentValues(daoObject), where, whereArgs);
+			return cr.update(getContentProviderUri(), prepareContentValues(daoObject), where, whereArgs);
 		}
 	}
 	

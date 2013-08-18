@@ -2,6 +2,5 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/full_news_fragment_container"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".NewsFullActivity">
+    android:layout_height="match_parent">
 </FrameLayout>

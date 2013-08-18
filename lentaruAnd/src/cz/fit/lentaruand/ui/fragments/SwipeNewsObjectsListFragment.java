@@ -1,14 +1,11 @@
 package cz.fit.lentaruand.ui.fragments;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
 import android.annotation.SuppressLint;
-import android.content.ContentResolver;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.ListFragment;
 import android.support.v4.content.Loader;
 import android.view.View;
@@ -17,12 +14,10 @@ import android.widget.Toast;
 import cz.fit.lentaruand.data.News;
 import cz.fit.lentaruand.data.NewsObject;
 import cz.fit.lentaruand.data.Rubrics;
-import cz.fit.lentaruand.data.dao.Dao;
-import cz.fit.lentaruand.data.dao.DaoObserver;
+import cz.fit.lentaruand.data.dao.AsyncDao.DaoReadMultiListener;
 import cz.fit.lentaruand.data.dao.NewsDao;
 import cz.fit.lentaruand.service.ServiceCallbackListener;
 import cz.fit.lentaruand.service.ServiceHelper;
-import cz.fit.lentaruand.service.UpdateService;
 import cz.fit.lentaruand.ui.activities.NewsFullActivity;
 
 /**
@@ -85,9 +80,9 @@ public class SwipeNewsObjectsListFragment<T extends NewsObject> extends
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 
-		ContentResolver cr = getActivity().getContentResolver();
-		Dao<News> dataDao = NewsDao.getInstance(cr);
-		dataDao.registerContentObserver((Dao.Observer<News>) (new MyContentObserver(new Handler())));
+		//ContentResolver cr = getActivity().getContentResolver();
+		//Dao<News> dataDao = NewsDao.getInstance(cr);
+		//dataDao.registerContentObserver((Dao.Observer<News>) (new MyContentObserver(new Handler())));
 
 		// newsList = getListView();
 		// newsList.setLongClickable(true);
@@ -115,24 +110,24 @@ public class SwipeNewsObjectsListFragment<T extends NewsObject> extends
 		// Collection<News> news =
 		// NewsDao.getInstance(getActivity().getContentResolver()).read();
 		// showNewsObjects((Collection<T>)news);
-		serviceHelper.downloadListOfBriefNews(Rubrics.ECONOMICS);
+		serviceHelper.downloadListOfBriefNews(Rubrics.ROOT);
 	}
 
-	private class MyContentObserver extends DaoObserver<T> {
-		public MyContentObserver(Handler handler) {
-			super(handler);
-		}
-
-		@Override
-		public void onDataChanged(boolean selfChange, T dataObject) {
-			showNewsObjects(Arrays.<T> asList(dataObject));
-		}
-
-		@Override
-		public void onDataChanged(boolean selfChange, Collection<T> dataObjects) {
-			showNewsObjects(dataObjects);
-		}
-	}
+//	private class MyContentObserver extends DaoObserver<T> {
+//		public MyContentObserver(Handler handler) {
+//			super(handler);
+//		}
+//
+//		@Override
+//		public void onDataChanged(boolean selfChange, T dataObject) {
+//			showNewsObjects(Arrays.<T> asList(dataObject));
+//		}
+//
+//		@Override
+//		public void onDataChanged(boolean selfChange, Collection<T> dataObjects) {
+//			showNewsObjects(dataObjects);
+//		}
+//	}
 
 	@Override
 	public void onServiceCallback(int requestId, Intent requestIntent,
@@ -141,6 +136,12 @@ public class SwipeNewsObjectsListFragment<T extends NewsObject> extends
 				getActivity(),
 				"Callback received! data in bundle = "
 						+ data.getString("EXTRA_STRING"), Toast.LENGTH_SHORT).show();
-
+		
+		NewsDao.getInstance(getActivity().getContentResolver()).readAsync(new DaoReadMultiListener<News>() {
+			@Override
+			public void finished(Collection<News> result) {
+				showNewsObjects((Collection<T>)result);
+			}
+		});
 	}
 }

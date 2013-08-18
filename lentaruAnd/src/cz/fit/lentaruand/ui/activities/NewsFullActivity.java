@@ -29,7 +29,7 @@ public class NewsFullActivity extends SherlockFragmentActivity {
 		
 		setContentView(R.layout.full_news_activity);
 		news = (News)getIntent().getSerializableExtra("NewsObject");
-		fullNewsFragment =  new NewsFullFragment(getApplicationContext(), news);
-		getSupportFragmentManager().beginTransaction().add(R.id.full_news_fragment_container, fullNewsFragment).commit();
+		fullNewsFragment = new NewsFullFragment(getApplicationContext(), news);
+		getSupportFragmentManager().beginTransaction().replace(R.id.full_news_fragment_container, fullNewsFragment).commit();
 	}
 }

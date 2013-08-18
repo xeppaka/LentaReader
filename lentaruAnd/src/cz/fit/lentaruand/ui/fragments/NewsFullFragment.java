@@ -1,6 +1,7 @@
 package cz.fit.lentaruand.ui.fragments;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -10,10 +11,16 @@ import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import cz.fit.lentaruand.R;
 import cz.fit.lentaruand.asyncloaders.AsyncFullNewsLoader;
 import cz.fit.lentaruand.data.News;
+import cz.fit.lentaruand.data.dao.AsyncDao;
+import cz.fit.lentaruand.data.dao.AsyncDao.DaoReadSingleListener;
+import cz.fit.lentaruand.data.dao.BitmapReference.BitmapLoadListener;
+import cz.fit.lentaruand.data.dao.ImageDao;
+import cz.fit.lentaruand.data.dao.NewsDao;
 
 public class NewsFullFragment extends Fragment implements LoaderManager.LoaderCallbacks<News> {
 
@@ -47,9 +54,32 @@ public class NewsFullFragment extends Fragment implements LoaderManager.LoaderCa
 	}
 
 	public void showNews(News news) {
-		TextView tv = (TextView) getActivity().findViewById(R.id.textView1);
-		tv.setText(Html.fromHtml(news.getFullText()));
-		tv.setMovementMethod(LinkMovementMethod.getInstance());
+		AsyncDao<News> nd = NewsDao.getInstance(getActivity().getContentResolver());		
+		
+		final TextView titleView = (TextView) getActivity().findViewById(R.id.full_news_title);
+		TextView contentView = (TextView) getActivity().findViewById(R.id.full_news_content);
+		final ImageView imageView = (ImageView) getActivity().findViewById(R.id.full_news_image);
+		
+		contentView.setText(Html.fromHtml(news.getFullText()));
+		contentView.setMovementMethod(LinkMovementMethod.getInstance());
+		
+		nd.readAsync(news.getId(), new DaoReadSingleListener<News>() {
+			@Override
+			public void finished(News news) {
+				titleView.setText(news.getTitle());
+				
+				news.getImage().getBitmapAsync(new BitmapLoadListener() {
+					@Override
+					public void onBitmapLoaded(Bitmap bitmap) {
+						if (bitmap == null) {
+							bitmap = ImageDao.getNotAvailableImage().getBitmap();
+						}
+						
+						imageView.setImageBitmap(bitmap);
+					}
+				});
+			}
+		});
 	}
 
 	@Override
