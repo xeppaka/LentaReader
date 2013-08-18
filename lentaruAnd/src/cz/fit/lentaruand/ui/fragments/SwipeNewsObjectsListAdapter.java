@@ -42,7 +42,7 @@ public class SwipeNewsObjectsListAdapter extends FragmentPagerAdapter {
 
 	@Override
 	public int getCount() {
-		return 2;//TITLES.length;
+		return 1;//TITLES.length;
 	}
 
 	@Override

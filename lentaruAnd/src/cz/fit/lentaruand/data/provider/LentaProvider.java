@@ -76,17 +76,20 @@ public class LentaProvider extends ContentProvider {
 		return null;
 	}
 
-	@Override
-	public String[] getStreamTypes(Uri uri, String mimeTypeFilter) {
-		switch (uriMatcher.match(uri)) {
-		case CACHED_IMAGE:
-			return new String[]{MIME_CACHED_IMAGE_DIR};
-		case CACHED_IMAGE_ID:
-			return new String[]{MIME_CACHED_IMAGE_ITEM};
-		}
-		
-		return null;
-	}
+	/**
+	 * this method added in API level 11
+	 */
+//	@Override
+//	public String[] getStreamTypes(Uri uri, String mimeTypeFilter) {
+//		switch (uriMatcher.match(uri)) {
+//		case CACHED_IMAGE:
+//			return new String[]{MIME_CACHED_IMAGE_DIR};
+//		case CACHED_IMAGE_ID:
+//			return new String[]{MIME_CACHED_IMAGE_ITEM};
+//		}
+//		
+//		return null;
+//	}
 
 	@Override
 	public int delete(Uri uri, String selection, String[] selectionArgs) {
@@ -142,32 +145,6 @@ public class LentaProvider extends ContentProvider {
 		return true;
 	}
 
-//	/**
-//	 * TODO: test if this is called when application is closed.
-//	 */
-//	@Override
-//	public void shutdown() {
-//		super.shutdown();
-//		
-//		if (bitmapCache != null) {
-//			try {
-//				bitmapCache.close();
-//			} catch (IOException e) {
-//				Log.e(LentaConstants.LoggerProviderTag, "Error occured while closing bitmap cache.", e);
-//			}
-//		}
-//	}
-//
-//	private void initBitmapCache(Context context) {
-//		try {
-//			bitmapCache = DiskLruCache.open(context.getExternalCacheDir(),
-//					LentaConstants.AppVersion, 1,
-//					LentaConstants.BITMAP_CACHE_MAX_SIZE_IN_BYTES);
-//		} catch (IOException e) {
-//			Log.e(LentaConstants.LoggerProviderTag, "Error ocurred while opening cache on external memory card.", e);
-//		}
-//	}
-	
 	@Override
 	public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
 		switch (uriMatcher.match(uri)) {

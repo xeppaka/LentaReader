@@ -54,7 +54,6 @@ public class Processor {
 		this.service = service;
 	}
 
-
 	public ResultReceiver getResultReceiver() {
 		return resultReceiver;
 	}

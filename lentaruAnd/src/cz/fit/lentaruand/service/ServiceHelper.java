@@ -62,7 +62,8 @@ public class ServiceHelper {
 	public int downloadListOfBriefNews(Rubrics rubric) {
 		final int requestId = 1;
 		intentAction = IntentContent.ACTION_EXECUTE_DOWNLOAD_BRIEF;
-		Intent i = createIntent(context, rubric, requestId, intentAction); 
+		Intent i = createIntent(context, rubric, requestId, intentAction);
+		
 		return runRequest(requestId, i);
 	}
 	
@@ -70,39 +71,42 @@ public class ServiceHelper {
 //		return idCounter.getAndIncrement();
 //	}
 
-	private Intent createIntent(final Context context, Rubrics rubric, final int requestId, IntentContent intentActionExecute){
-		Intent i; 
-		
-		i	= new Intent(context, LentaService.class);
-		
-		i.setAction(intentActionExecute.getIntentContent()); 
-		
-		if(rubric == null) Log.d(LentaConstants.LoggerMainAppTag, "rubric is null");
-		
+	private Intent createIntent(final Context context, Rubrics rubric, final int requestId, IntentContent intentActionExecute) {
+		Intent i = new Intent(context, LentaService.class);
+		i.setAction(intentActionExecute.getIntentContent());
+
+		if (rubric == null) {
+			Log.d(LentaConstants.LoggerMainAppTag, "rubric is null");
+		}
+
 		i.putExtra(IntentContent.EXTRA_RUBRIC.getIntentContent(), rubric);
 		i.putExtra(IntentContent.EXTRA_REQUEST_ID.getIntentContent(), requestId);
-		i.putExtra(IntentContent.EXTRA_STATUS_RECEIVER.getIntentContent(), new ResultReceiver(
-				new Handler()) {
-			@Override
-			protected void onReceiveResult(int resultCode, Bundle resultData) {
-				Intent originalIntent = pendingActivities.get(requestId);
-				
-				if (isPending(requestId)) {
-					
-					if (resultCode != Progress.RESPONSE_PROGRESS.getValue()) {
-						pendingActivities.remove(requestId);
-					}
-					
-					for (ServiceCallbackListener currentListener : currentListeners) {
-						if (currentListener != null) {
-							currentListener.onServiceCallback(requestId,
-									originalIntent, resultCode, resultData);
+		i.putExtra(IntentContent.EXTRA_STATUS_RECEIVER.getIntentContent(),
+				new ResultReceiver(new Handler()) {
+					@Override
+					protected void onReceiveResult(int resultCode,
+							Bundle resultData) {
+						Intent originalIntent = pendingActivities
+								.get(requestId);
+
+						if (isPending(requestId)) {
+							if (resultCode != Progress.RESPONSE_PROGRESS
+									.getValue()) {
+								pendingActivities.remove(requestId);
+							}
+
+							for (ServiceCallbackListener currentListener : currentListeners) {
+								if (currentListener != null) {
+									currentListener.onServiceCallback(
+											requestId, originalIntent,
+											resultCode, resultData);
+								}
+							}
 						}
+
 					}
-				}
-				
-			}
-		});
+				});
+
 		return i;
 	}
 
@@ -110,6 +114,7 @@ public class ServiceHelper {
 		pendingActivities.append(requestId, i);
 		Log.d(LentaConstants.LoggerMainAppTag, "Starting the service");
 		context.startService(i);
+		
 		return requestId;
 	}
 

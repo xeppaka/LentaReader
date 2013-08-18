@@ -33,11 +33,9 @@ import cz.fit.lentaruand.utils.URLHelper;
  */
 public class ImageDao {
 	// how many times thumbnail image is smaller than full image
-	private static final int sampleSizeCoeff = 6;
+	private static final float SAMPLE_SIZE_COEFF = 4;
 	
-	private static final int fullBitmapCacheSize = 4 * 1024 * 1024; // 4 MB
-	private static final int thumbnailBitmapCacheSize = 4 * 1024 * 1024; // 4 MB
-	private static final LruCache<String, CachedLazyLoadBitmapReference> fullBitmapCache = new LruCache<String, CachedLazyLoadBitmapReference>(fullBitmapCacheSize) {
+	private static final LruCache<String, CachedLazyLoadBitmapReference> fullBitmapCache = new LruCache<String, CachedLazyLoadBitmapReference>(LentaConstants.BITMAP_CACHE_MAX_SIZE_IN_BYTES) {
 		@Override
 		protected void entryRemoved(boolean evicted, String key,
 				CachedLazyLoadBitmapReference oldValue, CachedLazyLoadBitmapReference newValue) {
@@ -52,7 +50,7 @@ public class ImageDao {
 		}
 	};
 	
-	private static final LruCache<String, CachedLazyLoadBitmapReference> thumbnailBitmapCache = new LruCache<String, CachedLazyLoadBitmapReference>(thumbnailBitmapCacheSize) {
+	private static final LruCache<String, CachedLazyLoadBitmapReference> thumbnailBitmapCache = new LruCache<String, CachedLazyLoadBitmapReference>(LentaConstants.BITMAP_THUMBNAIL_CACHE_MAX_SIZE_IN_BYTES) {
 		@Override
 		protected void entryRemoved(boolean evicted, String key,
 				CachedLazyLoadBitmapReference oldValue, CachedLazyLoadBitmapReference newValue) {
@@ -78,7 +76,7 @@ public class ImageDao {
 	
 	private ImageDao(ContentResolver contentResolver) {
 		this.contentResolver = contentResolver;
-		bitmapThumbnailOptions.inSampleSize = sampleSizeCoeff;
+		bitmapThumbnailOptions.inSampleSize = (int) SAMPLE_SIZE_COEFF;
 	}
 	
 	public static ImageDao getInstance(ContentResolver contentResolver) {
@@ -304,8 +302,8 @@ public class ImageDao {
 	private static Bitmap createThumbnailBitmap(Bitmap fullBitmap) {
 		return Bitmap.createScaledBitmap(
 				fullBitmap,
-				Math.round(fullBitmap.getWidth() / (float) sampleSizeCoeff),
-				Math.round(fullBitmap.getHeight() / (float) sampleSizeCoeff), false);
+				Math.round(fullBitmap.getWidth() / SAMPLE_SIZE_COEFF),
+				Math.round(fullBitmap.getHeight() / SAMPLE_SIZE_COEFF), false);
 	}
 	
 	private boolean createBitmapOnDisk(String key, Bitmap bitmap) {
@@ -320,7 +318,7 @@ public class ImageDao {
 			
 			return true;
 		} catch (FileNotFoundException e) {
-			Log.e(LentaConstants.LoggerAnyTag, "Error occured during saving bitmap with id: " + key, e);
+			Log.d(LentaConstants.LoggerAnyTag, "Cannot find on the external drive bitmap with id: " + key, e);
 			return false;
 		} finally {
 			if (output != null) {
@@ -347,7 +345,7 @@ public class ImageDao {
 				return BitmapFactory.decodeStream(input);
 			}
 		} catch (FileNotFoundException e) {
-			Log.e(LentaConstants.LoggerAnyTag, "Error occured during reading bitmap with id: " + key, e);
+			Log.d(LentaConstants.LoggerAnyTag, "Cannot find on the external drive bitmap with id: " + key, e);
 			return null;
 		} finally {
 			if (input != null) {
@@ -446,7 +444,7 @@ public class ImageDao {
 					bitmap = readBitmapFromDisk(cacheKey, thumbnail);
 					
 					if (bitmap != null) {
-						Log.d(LentaConstants.LoggerAnyTag, "Loaded from disk. Bitmap size: " + bitmap.getByteCount() + " bytes.");
+						Log.d(LentaConstants.LoggerAnyTag, "Loaded from disk. Bitmap size: " + bitmapSize() + " bytes.");
 					}
 				}
 				
@@ -514,9 +512,27 @@ public class ImageDao {
 			cached = false;
 		}
 		
+		private int getBytesPerPixel(Bitmap.Config config) {
+			switch (config) {
+				case ALPHA_8:
+					return 1;
+				case ARGB_4444:
+				case RGB_565:
+					return 2;
+				case ARGB_8888:
+					return 4;
+			}
+			
+			return 1;
+		}
+		
 		private synchronized int bitmapSize() {
 			if (bitmap != null) {
-				return bitmap.getByteCount();
+				if (LentaConstants.SDK_VER > 11) {
+					return bitmap.getByteCount();
+				} else {
+					return bitmap.getWidth() * bitmap.getHeight() * getBytesPerPixel(bitmap.getConfig());
+				}
 			}
 			
 			return 0;

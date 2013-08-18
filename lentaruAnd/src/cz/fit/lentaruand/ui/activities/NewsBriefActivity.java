@@ -2,6 +2,7 @@ package cz.fit.lentaruand.ui.activities;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.v4.view.ViewPager;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -12,6 +13,7 @@ import com.viewpagerindicator.TitlePageIndicator.IndicatorStyle;
 
 import cz.fit.lentaruand.R;
 import cz.fit.lentaruand.ui.fragments.SwipeNewsObjectsListAdapter;
+import cz.fit.lentaruand.utils.LentaConstants;
 
 /**
  * This is the main activity where everything starts right after application is 
@@ -27,6 +29,15 @@ public class NewsBriefActivity extends SherlockFragmentActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		if (LentaConstants.SDK_VER > 10 && LentaConstants.DEVELOPER_MODE) {
+			StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+					.detectDiskReads().detectDiskWrites().detectNetwork() 
+					.penaltyLog().build());
+			StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+					.detectLeakedSqlLiteObjects().detectLeakedClosableObjects()
+					.penaltyLog().penaltyDeath().build());
+		}
 
 		setContentView(R.layout.brief_news_activity);
 
