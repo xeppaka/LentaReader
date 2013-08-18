@@ -47,16 +47,20 @@ public class LentaService extends Service {
 		resultReceiver = getReceiver(intent);
 		processor.setResultReceiver(resultReceiver);
 		
-		if (IntentContent.ACTION_EXECUTE_DOWNLOAD_BRIEF.equals(intent.getAction())) {
+		Log.d(LentaConstants.LoggerServiceTag, "Got the intent, checking the command");
+		
+		if (IntentContent.ACTION_EXECUTE_DOWNLOAD_BRIEF.getIntentContent().equals(intent.getAction())) {
 			RunningCommand runningCommand = new RunningCommand(intent);
-			
+			Log.d(LentaConstants.LoggerServiceTag, "Service got command");
 			synchronized (runningCommands) {
-				if (runningCommands.get(getCommandId(intent)) != null) {
+				if (runningCommands.get(getCommandId(intent)) == null) {
+					Log.d(LentaConstants.LoggerServiceTag, "adding the task to running command array");
 					runningCommands.append(getCommandId(intent), runningCommand);
-					return START_NOT_STICKY;
 				}
+				else 
+					return START_NOT_STICKY;
 			}
-			
+			Log.d(LentaConstants.LoggerServiceTag, "submitting the task");
 			executor.submit(runningCommand);
 		}
 		
@@ -78,7 +82,6 @@ public class LentaService extends Service {
 
 	@Override
 	public void onCreate() {
-		Toast.makeText(this, "service created", Toast.LENGTH_SHORT).show();
 		Log.d(LentaConstants.LoggerServiceTag, "Service created!");
 
 		super.onCreate();
