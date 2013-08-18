@@ -49,17 +49,19 @@ public class LentaService extends Service {
 		
 		Log.d(LentaConstants.LoggerServiceTag, "Got the intent, checking the command");
 		
-		if (IntentContent.ACTION_EXECUTE_DOWNLOAD_BRIEF.getIntentContent().equals(intent.getAction())) {
+		if ( IntentContent.ACTION_EXECUTE_DOWNLOAD_BRIEF.getIntentContent().equals(intent.getAction()) ) {
 			RunningCommand runningCommand = new RunningCommand(intent);
 			Log.d(LentaConstants.LoggerServiceTag, "Service got command");
+			
 			synchronized (runningCommands) {
 				if (runningCommands.get(getCommandId(intent)) == null) {
 					Log.d(LentaConstants.LoggerServiceTag, "adding the task to running command array");
 					runningCommands.append(getCommandId(intent), runningCommand);
-				}
-				else 
+				} else { 
 					return START_NOT_STICKY;
+				}
 			}
+			
 			Log.d(LentaConstants.LoggerServiceTag, "submitting the task");
 			executor.submit(runningCommand);
 		}
