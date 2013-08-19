@@ -63,33 +63,8 @@ public class Processor {
 	}
 	
 	public void downloadRubricBrief(Rubrics rubric, ResultReceiver receiver) { // TODO DB interaction		
-		this.resultReceiver = receiver;		
-		List<News> news;		
-		try {
-			news = lnd.downloadRubricBrief(rubric);
-		} catch (ParseWithXPathException e) {
-			Log.w(LentaConstants.LoggerServiceTag, "Error downloading page, parse error.");
-			return;
-		} catch (IOException e) {
-			Log.w(LentaConstants.LoggerServiceTag, "Error downloading page, I/O error.");
-			return;
-		} catch (HttpStatusCodeException e) {
-			Log.w(LentaConstants.LoggerServiceTag, "Error downloading page, status code returned: " + e.getHttpStatusCode() + ".");
-			return;
-		}
+		this.resultReceiver = receiver;
 		
-		ContentResolver cr = service.getApplicationContext().getContentResolver();
-		Dao<News> newsDao = NewsDao.getInstance(cr);
-		for (News n : news) {
-			newsDao.delete(n.getGuid());
-		}
-		
-		loadImages(news);
-		newsDao.create(news);
-		
-		Bundle b = new Bundle();
-		b.putString("EXTRA_STRING", "downloaded");
-		sendUpdate(Progress.RESPONSE_SUCCESS, b); // sending message to subscribed activities or another components
 		return;
 	}
 	

@@ -1,16 +1,19 @@
 package cz.fit.lentaruand.service;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.Comparator;
+import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
-import android.os.Process;
 import android.os.ResultReceiver;
 import android.util.Log;
-import android.util.SparseArray;
 import cz.fit.lentaruand.data.IntentContent;
+import cz.fit.lentaruand.data.Rubrics;
 import cz.fit.lentaruand.utils.LentaConstants;
 
 /**
@@ -33,49 +36,68 @@ import cz.fit.lentaruand.utils.LentaConstants;
 
 public class LentaService extends Service {
 
-	private static final int NUM_THREADS = 2;
+	private static final int POOL_SIZE = 2;
+	private static final int KEEP_ALIVE_TIME = 60;
+	private static final TimeUnit KEEP_ALIVE_TIME_UNITS = TimeUnit.SECONDS;
 
-	private ExecutorService executor = Executors.newFixedThreadPool(NUM_THREADS);
-	private SparseArray<RunningCommand> runningCommands = new SparseArray<RunningCommand>();
+	private ThreadPoolExecutor executor;
+	private AtomicInteger threads = new AtomicInteger();
+	
+	class CountableThread extends Thread {
+		public CountableThread(Runnable runnable) {
+			super(runnable);
+		}
+
+		@Override
+		public void run() {
+			threads.incrementAndGet();
+			
+			super.run();
+			
+			if (threads.decrementAndGet() == 0) {
+				Log.d(LentaConstants.LoggerServiceTag, "Stopping service: no working threads are active.");
+				stopSelf();
+			}
+		}
+	}
+	
+	class CountableThreadFactory implements ThreadFactory {
+		@Override
+		public Thread newThread(Runnable runnable) {
+			return new CountableThread(runnable);
+		}
+	}
+	
 	Processor processor = new Processor(this);
-	ResultReceiver resultReceiver;
 	
 	public LentaService() {
-		//executor = new ThreadPoolExecutor(, maximumPoolSize, keepAliveTime, unit, workQueue)
+		Comparator<Runnable> comparator = new Comparator<Runnable>() {
+			@Override
+			public int compare(Runnable command1, Runnable command2) {
+				return ((ServiceCommand)command1).compareTo((ServiceCommand)command2);
+			}
+		};
+		
+		executor = new ThreadPoolExecutor(POOL_SIZE, POOL_SIZE,
+				KEEP_ALIVE_TIME, KEEP_ALIVE_TIME_UNITS,	new PriorityBlockingQueue<Runnable>(11, comparator));
+		executor.allowCoreThreadTimeOut(true);
+		executor.setThreadFactory(new CountableThreadFactory());
+	}
+
+	@Override
+	public void onCreate() {
+		super.onCreate();
+		Log.d(LentaConstants.LoggerServiceTag, "Starting service.");
 	}
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		
-		resultReceiver = getReceiver(intent);
-		processor.setResultReceiver(resultReceiver);
-		
 		Log.d(LentaConstants.LoggerServiceTag, "Got the intent, checking the command");
 		
-		if ( IntentContent.ACTION_EXECUTE_DOWNLOAD_BRIEF.getIntentContent().equals(intent.getAction()) ) {
-			RunningCommand runningCommand = new RunningCommand(intent);
-			Log.d(LentaConstants.LoggerServiceTag, "Service got command");
-			
-			synchronized (runningCommands) {
-				if (runningCommands.get(getCommandId(intent)) == null) {
-					Log.d(LentaConstants.LoggerServiceTag, "adding the task to running command array");
-					runningCommands.append(getCommandId(intent), runningCommand);
-				} else { 
-					return START_NOT_STICKY;
-				}
-			}
-			
-			Log.d(LentaConstants.LoggerServiceTag, "submitting the task");
-			executor.submit(runningCommand);
+		if (IntentContent.ACTION_EXECUTE_DOWNLOAD_BRIEF.getIntentContent().equals(intent.getAction())) {
+			RubricUpdateServiceCommand command = new RubricUpdateServiceCommand(Rubrics.ROOT, getContentResolver(), executor, getReceiver(intent));
+			executor.execute(command);
 		}
-		
-		// if (ACTION_CANCEL_COMMAND.equals(intent.getAction())) {
-		// RunningCommand runningCommand = runningCommands
-		// .get(getCommandId(intent));
-		// if (runningCommand != null) {
-		// runningCommand.cancel();
-		// }
-		// }
 		
 		return START_NOT_STICKY;
 	}
@@ -85,52 +107,6 @@ public class LentaService extends Service {
 		return null;
 	}
 
-	@Override
-	public void onCreate() {
-		Log.d(LentaConstants.LoggerServiceTag, "Service created!");
-
-		super.onCreate();
-	}
-
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-	}
-
-	private class RunningCommand implements Runnable {
-
-		private Intent intent;
-
-		public RunningCommand(Intent intent) {
-			this.intent = intent;
-		}
-
-		@Override
-		public void run() {
-			Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
-			Log.d(LentaConstants.LoggerServiceTag, "starting download");
-			// processor.downloadRubricBrief(getRubric(intent),
-			// getReceiver(intent));
-			processor.execute(intent);
-			Log.d(LentaConstants.LoggerServiceTag, "Downloaded news. Stopping myself.");
-			shutdown();
-		}
-
-		private void shutdown() {
-			synchronized (runningCommands) {
-				runningCommands.remove(getCommandId(intent));
-				if (runningCommands.size() == 0) {
-					stopSelf();
-				}
-			}
-		}
-
-	}
-
-	private int getCommandId(Intent intent) {
-		return intent.getIntExtra(IntentContent.EXTRA_REQUEST_ID.getIntentContent(), -1);
-	}
-	
 	private ResultReceiver getReceiver(Intent intent) {
 		return intent.getParcelableExtra(IntentContent.EXTRA_STATUS_RECEIVER.getIntentContent());
 	}

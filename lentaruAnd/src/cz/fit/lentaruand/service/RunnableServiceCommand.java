@@ -5,8 +5,10 @@ import android.os.ResultReceiver;
 
 public abstract class RunnableServiceCommand implements ServiceCommand {
 	private ResultReceiver resultReceiver;
+	private long creationTime;
 	
 	public RunnableServiceCommand(ResultReceiver resultReceiver) {
+		creationTime = System.currentTimeMillis();
 		this.resultReceiver = resultReceiver;
 	}
 
@@ -15,10 +17,14 @@ public abstract class RunnableServiceCommand implements ServiceCommand {
 		try {
 			execute();
 		} catch (Exception e) {
-			resultReceiver.send(ServiceResult.ERROR.ordinal(), prepareExceptionResult(e));
+			if (resultReceiver != null) {
+				resultReceiver.send(ServiceResult.ERROR.ordinal(), prepareExceptionResult(e));
+			}
 		}
 		
-		resultReceiver.send(ServiceResult.SUCCESS.ordinal(), prepareResult());
+		if (resultReceiver != null) {
+			resultReceiver.send(ServiceResult.SUCCESS.ordinal(), prepareResult());
+		}
 	}
 	
 	protected abstract Bundle prepareResult();
@@ -28,5 +34,30 @@ public abstract class RunnableServiceCommand implements ServiceCommand {
 		bundle.putSerializable(BundleConstants.KEY_EXCEPTION, e);
 		
 		return bundle;
+	}
+
+	@Override
+	public int compareTo(ServiceCommand otherCommand) {
+		long time1 = getCreationTime();
+		long time2 = otherCommand.getCreationTime();
+		
+		if (time1 < time2) {
+			return 1;
+		}
+		
+		if (time1 > time2) {
+			return -1;
+		}
+		
+		return 0;
+	}
+
+	@Override
+	public long getCreationTime() {
+		return creationTime;
+	}
+	
+	protected ResultReceiver getResultReceiver() {
+		return resultReceiver;
 	}
 }

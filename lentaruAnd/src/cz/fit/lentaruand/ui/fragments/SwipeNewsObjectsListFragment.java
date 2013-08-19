@@ -132,10 +132,10 @@ public class SwipeNewsObjectsListFragment<T extends NewsObject> extends
 	@Override
 	public void onServiceCallback(int requestId, Intent requestIntent,
 			int resultCode, Bundle data) {
-		Toast.makeText(
-				getActivity(),
-				"Callback received! data in bundle = "
-						+ data.getString("EXTRA_STRING"), Toast.LENGTH_SHORT).show();
+//		Toast.makeText(
+//				getActivity(),
+//				"Callback received! data in bundle = "
+//						+ data.getString("EXTRA_STRING"), Toast.LENGTH_SHORT).show();
 		
 		NewsDao.getInstance(getActivity().getContentResolver()).readAsync(new DaoReadMultiListener<News>() {
 			@Override

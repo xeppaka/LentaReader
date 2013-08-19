@@ -60,8 +60,10 @@ public class NewsFullFragment extends Fragment implements LoaderManager.LoaderCa
 		TextView contentView = (TextView) getActivity().findViewById(R.id.full_news_content);
 		final ImageView imageView = (ImageView) getActivity().findViewById(R.id.full_news_image);
 		
-		contentView.setText(Html.fromHtml(news.getFullText()));
-		contentView.setMovementMethod(LinkMovementMethod.getInstance());
+		if (news.getFullText() != null) {
+			contentView.setText(Html.fromHtml(news.getFullText()));
+			contentView.setMovementMethod(LinkMovementMethod.getInstance());
+		}
 		
 		nd.readAsync(news.getId(), new DaoReadSingleListener<News>() {
 			@Override
