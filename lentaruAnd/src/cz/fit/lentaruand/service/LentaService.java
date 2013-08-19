@@ -33,13 +33,17 @@ import cz.fit.lentaruand.utils.LentaConstants;
 
 public class LentaService extends Service {
 
-	private static final int NUM_THREADS = 4;
+	private static final int NUM_THREADS = 2;
 
-	private ExecutorService executor = Executors.newFixedThreadPool(NUM_THREADS); // поменять потом очередь приоритетов на стек
+	private ExecutorService executor = Executors.newFixedThreadPool(NUM_THREADS);
 	private SparseArray<RunningCommand> runningCommands = new SparseArray<RunningCommand>();
 	Processor processor = new Processor(this);
 	ResultReceiver resultReceiver;
 	
+	public LentaService() {
+		//executor = new ThreadPoolExecutor(, maximumPoolSize, keepAliveTime, unit, workQueue)
+	}
+
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		
