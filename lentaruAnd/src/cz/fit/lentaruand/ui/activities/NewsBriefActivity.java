@@ -14,6 +14,7 @@ import com.viewpagerindicator.TitlePageIndicator.IndicatorStyle;
 import cz.fit.lentaruand.R;
 import cz.fit.lentaruand.ui.fragments.SwipeNewsObjectsListAdapter;
 import cz.fit.lentaruand.utils.LentaConstants;
+import cz.fit.lentaruand.utils.LentaUtils;
 
 /**
  * This is the main activity where everything starts right after application is 
@@ -30,14 +31,7 @@ public class NewsBriefActivity extends SherlockFragmentActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		if (LentaConstants.SDK_VER > 10 && LentaConstants.DEVELOPER_MODE) {
-			StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-					.detectDiskReads().detectDiskWrites().detectNetwork() 
-					.penaltyLog().build());
-			StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-					.detectLeakedSqlLiteObjects().detectLeakedClosableObjects()
-					.penaltyLog().penaltyDeath().build());
-		}
+		LentaUtils.strictMode();
 
 		setContentView(R.layout.brief_news_activity);
 
