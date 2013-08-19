@@ -1,14 +1,9 @@
 package cz.fit.lentaruand.service;
 
-import java.io.IOException;
 import java.util.Collection;
 
-import android.graphics.Bitmap;
 import cz.fit.lentaruand.data.NewsObjectWithImage;
 import cz.fit.lentaruand.data.dao.ImageDao;
-import cz.fit.lentaruand.downloader.LentaHttpImageDownloader;
-import cz.fit.lentaruand.downloader.exceptions.HttpStatusCodeException;
-import cz.fit.lentaruand.utils.URLHelper;
 
 public class ImageUpdater {
 	public static void updateImage(ImageDao imageDao, String imageUrl, NewsObjectWithImage newsObject) {

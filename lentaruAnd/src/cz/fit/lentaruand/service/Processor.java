@@ -120,7 +120,7 @@ public class Processor {
 	}
 	
 	public void loadImage(News news) {
-		ImageDao imageDao = ImageDao.getInstance(service.getContentResolver());
+		//ImageDao imageDao = ImageDao.getInstance(service.getContentResolver());
 	}
 	
 	public void downloadFull(News brief) { // TODO DB interaction

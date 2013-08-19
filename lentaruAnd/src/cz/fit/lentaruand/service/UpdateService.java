@@ -23,6 +23,7 @@ import cz.fit.lentaruand.downloader.exceptions.HttpStatusCodeException;
 import cz.fit.lentaruand.parser.exceptions.ParseWithXPathException;
 import cz.fit.lentaruand.utils.LentaConstants;
 
+@Deprecated
 public class UpdateService extends Service {
 	@Override
 	public IBinder onBind(Intent arg0) {

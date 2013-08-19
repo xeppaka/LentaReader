@@ -10,7 +10,6 @@ import android.os.Process;
 import android.os.ResultReceiver;
 import android.util.Log;
 import android.util.SparseArray;
-import android.widget.Toast;
 import cz.fit.lentaruand.data.IntentContent;
 import cz.fit.lentaruand.utils.LentaConstants;
 
