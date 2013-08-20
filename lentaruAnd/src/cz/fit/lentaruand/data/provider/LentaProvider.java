@@ -38,8 +38,8 @@ public class LentaProvider extends ContentProvider {
 	private static final String MIME_LINKS_ITEM = "vnd.android.cursor.item/cz.fit.lentaruand.links";
 	private static final String MIME_LINKS_DIR = "vnd.android.cursor.dir/cz.fit.lentaruand.links";
 	
-	private static final String MIME_CACHED_IMAGE_ITEM = "vnd.android.cursor.item/cz.fit.lentaruand.cached_image";
-	private static final String MIME_CACHED_IMAGE_DIR = "vnd.android.cursor.dir/cz.fit.lentaruand.cached_image";
+//	private static final String MIME_CACHED_IMAGE_ITEM = "vnd.android.cursor.item/cz.fit.lentaruand.cached_image";
+//	private static final String MIME_CACHED_IMAGE_DIR = "vnd.android.cursor.dir/cz.fit.lentaruand.cached_image";
 	
 	private static final UriMatcher uriMatcher;
 	

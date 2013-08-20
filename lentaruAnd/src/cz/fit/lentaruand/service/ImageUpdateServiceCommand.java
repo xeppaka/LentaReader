@@ -10,6 +10,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import cz.fit.lentaruand.data.News;
 import cz.fit.lentaruand.data.dao.AsyncDao;
+import cz.fit.lentaruand.data.dao.BitmapReference;
 import cz.fit.lentaruand.data.dao.ImageDao;
 import cz.fit.lentaruand.data.dao.NewsDao;
 import cz.fit.lentaruand.downloader.LentaHttpImageDownloader;
@@ -45,7 +46,11 @@ public class ImageUpdateServiceCommand extends RunnableServiceCommand {
 				if (!imageDao.imageExist(imageLink)) {
 					try {
 						Bitmap newBitmap = LentaHttpImageDownloader.downloadBitmap(imageLink);
-						imageDao.create(imageLink, newBitmap);
+						BitmapReference fullBitmapRef = imageDao.create(imageLink, newBitmap);
+						BitmapReference thumbnailBitmapRef = imageDao.readThumbnail(imageLink);
+						
+						news.setImage(fullBitmapRef);
+						news.setThumbnailImage(thumbnailBitmapRef);
 					} catch (HttpStatusCodeException e) {
 						Log.e(LentaConstants.LoggerServiceTag,
 								"Error loading image from URL: " + imageLink, e);
