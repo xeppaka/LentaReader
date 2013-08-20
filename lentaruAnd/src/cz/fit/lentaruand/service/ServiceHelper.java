@@ -9,6 +9,7 @@ import android.os.ResultReceiver;
 import android.util.Log;
 import android.util.SparseArray;
 import cz.fit.lentaruand.data.IntentContent;
+import cz.fit.lentaruand.data.NewsType;
 import cz.fit.lentaruand.data.Rubrics;
 import cz.fit.lentaruand.utils.LentaConstants;
 
@@ -84,8 +85,7 @@ public class ServiceHelper {
 		i.putExtra(IntentContent.EXTRA_STATUS_RECEIVER.getIntentContent(),
 				new ResultReceiver(new Handler()) {
 					@Override
-					protected void onReceiveResult(int resultCode,
-							Bundle resultData) {
+					protected void onReceiveResult(int resultCode, Bundle resultData) {
 						Intent originalIntent = pendingActivities
 								.get(requestId);
 
@@ -97,9 +97,7 @@ public class ServiceHelper {
 
 							for (ServiceCallbackListener currentListener : currentListeners) {
 								if (currentListener != null) {
-									currentListener.onServiceCallback(
-											requestId, originalIntent,
-											resultCode, resultData);
+									currentListener.onDatabaseObjectsCreated(NewsType.NEWS, null);
 								}
 							}
 						}

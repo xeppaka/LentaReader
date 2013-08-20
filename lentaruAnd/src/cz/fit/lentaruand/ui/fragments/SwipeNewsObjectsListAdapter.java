@@ -31,8 +31,8 @@ public class SwipeNewsObjectsListAdapter extends FragmentPagerAdapter {
 		this.context = context;
 		
 		fragments = new ArrayList<SwipeNewsObjectsListFragment<?>>();
-		fragments.add(new SwipeNewsObjectsListFragment<News>(new AsyncBriefNewsLoader(context), new NewsAdapter(context)));
-		fragments.add(new SwipeNewsObjectsListFragment<News>(new AsyncBriefNewsLoader(context), new NewsAdapter(context)));
+		fragments.add(new SwipeNewsObjectsListFragment<News>(new NewsAdapter(context)));
+		fragments.add(new SwipeNewsObjectsListFragment<News>(new NewsAdapter(context)));
 	}
 
 	@Override

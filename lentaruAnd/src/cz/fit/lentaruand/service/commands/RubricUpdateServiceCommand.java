@@ -11,22 +11,27 @@ import android.os.Bundle;
 import android.os.ResultReceiver;
 import android.util.Log;
 import cz.fit.lentaruand.data.News;
+import cz.fit.lentaruand.data.NewsType;
 import cz.fit.lentaruand.data.Rubrics;
 import cz.fit.lentaruand.data.dao.Dao;
 import cz.fit.lentaruand.data.dao.NewsDao;
 import cz.fit.lentaruand.downloader.LentaNewsDownloader;
 import cz.fit.lentaruand.downloader.exceptions.HttpStatusCodeException;
 import cz.fit.lentaruand.parser.exceptions.ParseWithXPathException;
-import cz.fit.lentaruand.service.LentaService;
 import cz.fit.lentaruand.utils.LentaConstants;
 
 public class RubricUpdateServiceCommand extends RunnableServiceCommand {
 	private Rubrics rubric;
 	private ExecutorService executor;
 	private ContentResolver contentResolver;
-
-	public RubricUpdateServiceCommand(Rubrics rubric, ContentResolver contentResolver, ExecutorService executor, ResultReceiver resultReceiver) {
+	private NewsType newsType;
+	
+	public RubricUpdateServiceCommand(NewsType newsType, Rubrics rubric, ExecutorService executor, ContentResolver contentResolver, ResultReceiver resultReceiver) {
 		super(resultReceiver);
+		
+		if (newsType == null) {
+			throw new NullPointerException("newsType is null.");
+		}
 		
 		if (rubric == null) {
 			throw new NullPointerException("rubric is null.");
@@ -43,10 +48,21 @@ public class RubricUpdateServiceCommand extends RunnableServiceCommand {
 		this.rubric = rubric;
 		this.executor = executor;
 		this.contentResolver = contentResolver;
+		this.newsType = newsType;
 	}
 
 	@Override
 	public void execute() throws Exception {
+		switch (newsType) {
+		case NEWS:
+			executeNews();
+			break;
+		default:
+			throw new UnsupportedOperationException("rubric update for news type: " + newsType.name() + " is not supported.");
+		}
+	}
+
+	private void executeNews() throws Exception {
 		List<News> news;
 		
 		try {
@@ -83,7 +99,7 @@ public class RubricUpdateServiceCommand extends RunnableServiceCommand {
 			executor.execute(new FullNewsUpdateServiceCommand(n, contentResolver, getResultReceiver()));
 		}
 	}
-
+	
 	@Override
 	protected Bundle prepareResult() {
 		Bundle b = new Bundle();

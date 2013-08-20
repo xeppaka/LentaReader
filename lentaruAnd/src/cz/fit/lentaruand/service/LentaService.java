@@ -13,6 +13,7 @@ import android.os.IBinder;
 import android.os.ResultReceiver;
 import android.util.Log;
 import cz.fit.lentaruand.data.IntentContent;
+import cz.fit.lentaruand.data.NewsType;
 import cz.fit.lentaruand.data.Rubrics;
 import cz.fit.lentaruand.service.commands.RubricUpdateServiceCommand;
 import cz.fit.lentaruand.service.commands.ServiceCommand;
@@ -97,7 +98,7 @@ public class LentaService extends Service {
 		Log.d(LentaConstants.LoggerServiceTag, "Got the intent, checking the command");
 		
 		if (IntentContent.ACTION_EXECUTE_DOWNLOAD_BRIEF.getIntentContent().equals(intent.getAction())) {
-			RubricUpdateServiceCommand command = new RubricUpdateServiceCommand(Rubrics.ROOT, getContentResolver(), executor, getReceiver(intent));
+			RubricUpdateServiceCommand command = new RubricUpdateServiceCommand(NewsType.NEWS, Rubrics.ROOT, executor, getContentResolver(), getReceiver(intent));
 			executor.execute(command);
 		}
 		
