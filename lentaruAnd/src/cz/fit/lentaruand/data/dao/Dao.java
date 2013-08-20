@@ -104,6 +104,24 @@ public interface Dao<T> {
 	T read(SQLiteType keyType, String keyColumnName, String keyValue);
 	
 	/**
+	 * Check whether object exists in database.
+	 * 
+	 * @param id is the primary key of the row.
+	 * 
+	 * @return true if exist, false otherwise.
+	 */
+	boolean exist(long id);
+	
+	/**
+	 * Check whether object exists in database.
+	 * 
+	 * @param id is the unique key of the object.
+	 * 
+	 * @return true if exist, false otherwise.
+	 */
+	boolean exist(String key);
+	
+	/**
 	 * Update object's information in database.
 	 * 
 	 * @param dataObject

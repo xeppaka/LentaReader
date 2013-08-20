@@ -33,18 +33,46 @@ public interface AsyncDao<T> extends Dao<T> {
 		void finished(Collection<Long> result);
 	}
 	
+	/**
+	 * Listener of reading single object from database.
+	 * 
+	 * @author nnm
+	 *
+	 * @param <T>
+	 */
 	public interface DaoReadSingleListener<T> {	
 		void finished(T result);
 	}
 	
+	/**
+	 * Listener of reading multiple objects from database.
+	 * 
+	 * @author nnm
+	 *
+	 * @param <T>
+	 */
 	public interface DaoReadMultiListener<T> {	
 		void finished(Collection<T> result);
 	}
 	
+	/**
+	 * Listener of deleting from database.
+	 * 
+	 * @author nnm
+	 *
+	 * @param <T>
+	 */
 	public interface DaoDeleteListener {	
 		void finished(int rowsDeleted);
 	}
 	
+	/**
+	 * Listener of updating objects in database.
+	 * 
+	 * @author nnm
+	 *
+	 * @param <T>
+	 */
 	public interface DaoUpdateListener {	
 		void finished(int rowsUpdated);
 	}

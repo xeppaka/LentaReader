@@ -140,6 +140,24 @@ class CachedDao<T extends DatabaseObject> implements Dao<T> {
 	}
 
 	@Override
+	public synchronized boolean exist(long id) {
+		if (getLruCacheId().get(id) != null) {
+			return true;
+		}
+		
+		return getUnderlinedDao().exist(id);
+	}
+
+	@Override
+	public boolean exist(String key) {
+		if (getLruCacheKey().get(key) != null) {
+			return true;
+		}
+		
+		return getUnderlinedDao().exist(key);
+	}
+
+	@Override
 	public Collection<T> readForParentObject(long parentId) {
 		// TODO: consider if cache can be used in that case.
 		return getUnderlinedDao().readForParentObject(parentId);

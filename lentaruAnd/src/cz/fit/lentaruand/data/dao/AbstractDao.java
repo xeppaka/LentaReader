@@ -10,6 +10,7 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
+import android.provider.BaseColumns;
 import android.util.Log;
 import cz.fit.lentaruand.data.DatabaseObject;
 import cz.fit.lentaruand.data.db.SQLiteType;
@@ -18,6 +19,7 @@ import cz.fit.lentaruand.utils.LentaConstants;
 abstract class AbstractDao<T extends DatabaseObject> implements Dao<T> {
 	private final static String textKeyWhere;
 	private final static String intKeyWhere;
+	private final static String[] projectionId = {BaseColumns._ID};
 	
 	private static String getWhereFromSQLiteType(SQLiteType type) {
 		switch (type) {
@@ -215,6 +217,48 @@ abstract class AbstractDao<T extends DatabaseObject> implements Dao<T> {
 			where = String.format(getWhereFromSQLiteType(getKeyColumnType()), getKeyColumnName());
 			
 			return cr.update(getContentProviderUri(), prepareContentValues(daoObject), where, whereArgs);
+		}
+	}
+	
+	@Override
+	public synchronized boolean exist(long id) {
+		Uri uri = ContentUris.withAppendedId(getContentProviderUri(), id);
+		Cursor cur = null;
+		
+		try {
+			cur = cr.query(uri, projectionId, null, null, null);
+			
+			if (cur == null) {
+				return false;
+			}
+			
+			return cur.moveToFirst();
+		} finally {
+			if (cur != null) {
+				cur.close();
+			}
+		}
+	}
+
+	@Override
+	public synchronized boolean exist(String key) {
+		String[] whereArgs = { key };
+		String where = String.format(getWhereFromSQLiteType(getKeyColumnType()), getKeyColumnName());
+		
+		Cursor cur = null;
+		
+		try {
+			cur = cr.query(getContentProviderUri(), projectionId, where, whereArgs, null);
+			
+			if (cur == null) {
+				return false;
+			}
+			
+			return cur.moveToFirst();
+		} finally {
+			if (cur != null) {
+				cur.close();
+			}
 		}
 	}
 	

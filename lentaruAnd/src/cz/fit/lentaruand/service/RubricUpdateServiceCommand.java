@@ -1,6 +1,7 @@
 package cz.fit.lentaruand.service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -61,7 +62,16 @@ public class RubricUpdateServiceCommand extends RunnableServiceCommand {
 		}
 		
 		Dao<News> newsDao = NewsDao.getInstance(contentResolver);
-		Collection<Long> newsIds = newsDao.create(news);
+		
+		List<News> nonExistingNews = new ArrayList<News>();
+		
+		for (News n : news) {
+			if (!newsDao.exist(n.getGuid())) {
+				nonExistingNews.add(n);
+			}
+		}
+		
+		Collection<Long> newsIds = newsDao.create(nonExistingNews);
 		
 		for (Long id : newsIds) {
 			executor.execute(new ImageUpdateServiceCommand(id, contentResolver, getResultReceiver()));

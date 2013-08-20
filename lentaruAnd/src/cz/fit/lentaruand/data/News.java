@@ -130,10 +130,6 @@ public class News extends NewsObject implements NewsObjectWithImage {
 		this.thumbnailImageRef = thumbnailImageRef;
 	}
 
-	public boolean isContentFull() {
-		return fullText != null && !(fullText.length() == 0);
-	}
-	
 	@Override
 	public NewsType getType() {
 		return NewsType.NEWS;
