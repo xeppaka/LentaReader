@@ -14,6 +14,8 @@ import android.os.ResultReceiver;
 import android.util.Log;
 import cz.fit.lentaruand.data.IntentContent;
 import cz.fit.lentaruand.data.Rubrics;
+import cz.fit.lentaruand.service.commands.RubricUpdateServiceCommand;
+import cz.fit.lentaruand.service.commands.ServiceCommand;
 import cz.fit.lentaruand.utils.LentaConstants;
 
 /**

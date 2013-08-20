@@ -1,4 +1,4 @@
-package cz.fit.lentaruand.service;
+package cz.fit.lentaruand.service.commands;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -17,6 +17,7 @@ import cz.fit.lentaruand.data.dao.NewsDao;
 import cz.fit.lentaruand.downloader.LentaNewsDownloader;
 import cz.fit.lentaruand.downloader.exceptions.HttpStatusCodeException;
 import cz.fit.lentaruand.parser.exceptions.ParseWithXPathException;
+import cz.fit.lentaruand.service.LentaService;
 import cz.fit.lentaruand.utils.LentaConstants;
 
 public class RubricUpdateServiceCommand extends RunnableServiceCommand {
@@ -72,9 +73,14 @@ public class RubricUpdateServiceCommand extends RunnableServiceCommand {
 		}
 		
 		Collection<Long> newsIds = newsDao.create(nonExistingNews);
+		Log.d(LentaConstants.LoggerServiceTag, "Newly created news ids: " + newsIds + ".");
 		
-		for (Long id : newsIds) {
-			executor.execute(new ImageUpdateServiceCommand(id, contentResolver, getResultReceiver()));
+		for (News n : nonExistingNews) {
+			executor.execute(new ImageUpdateServiceCommand(n, contentResolver, getResultReceiver()));
+		}
+		
+		for (News n : nonExistingNews) {
+			executor.execute(new FullNewsUpdateServiceCommand(n, contentResolver, getResultReceiver()));
 		}
 	}
 

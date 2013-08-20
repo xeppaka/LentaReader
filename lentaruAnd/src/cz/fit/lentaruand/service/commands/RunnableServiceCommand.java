@@ -1,5 +1,7 @@
-package cz.fit.lentaruand.service;
+package cz.fit.lentaruand.service.commands;
 
+import cz.fit.lentaruand.service.BundleConstants;
+import cz.fit.lentaruand.service.ServiceResult;
 import android.os.Bundle;
 import android.os.ResultReceiver;
 

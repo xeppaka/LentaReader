@@ -67,7 +67,7 @@ public class SwipeNewsObjectsListFragment<T extends NewsObject> extends
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
 		Intent intent = new Intent(this.getActivity(), NewsFullActivity.class);
-		intent.putExtra("NewsObject", newsObjectsAdapter.getItem(position));
+		intent.putExtra("newsId", newsObjectsAdapter.getItem(position).getId());
 		startActivity(intent);
 	}
 

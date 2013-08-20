@@ -1,4 +1,4 @@
-package cz.fit.lentaruand.service;
+package cz.fit.lentaruand.service.commands;
 
 import java.io.IOException;
 
@@ -19,6 +19,7 @@ import cz.fit.lentaruand.utils.LentaConstants;
 
 public class ImageUpdateServiceCommand extends RunnableServiceCommand {
 	private long newsId;
+	private News news;
 	private ContentResolver contentResolver;
 	
 	public ImageUpdateServiceCommand(long newsId, ContentResolver contentResolver, ResultReceiver resultReceiver) {
@@ -32,11 +33,28 @@ public class ImageUpdateServiceCommand extends RunnableServiceCommand {
 		this.contentResolver = contentResolver;
 	}
 
+	public ImageUpdateServiceCommand(News news, ContentResolver contentResolver, ResultReceiver resultReceiver) {
+		super(resultReceiver);
+		
+		if (news == null) {
+			throw new NullPointerException("news is null.");
+		}
+		
+		if (contentResolver == null) {
+			throw new NullPointerException("contentResolver is null.");
+		}
+
+		this.news = news;
+		this.contentResolver = contentResolver;
+	}
+	
 	@Override
 	public void execute() {
 		AsyncDao<News> newsDao = NewsDao.getInstance(contentResolver);
 
-		News news = newsDao.read(newsId);
+		if (news == null) {
+			news = newsDao.read(newsId);
+		}
 
 		if (news != null) {
 			String imageLink = news.getImageLink();

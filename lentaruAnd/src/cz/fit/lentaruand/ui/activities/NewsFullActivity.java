@@ -5,13 +5,11 @@ import android.os.Bundle;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 
 import cz.fit.lentaruand.R;
-import cz.fit.lentaruand.data.News;
 import cz.fit.lentaruand.ui.fragments.NewsFullFragment;
 import cz.fit.lentaruand.utils.LentaUtils;
 
 public class NewsFullActivity extends SherlockFragmentActivity {
 	private NewsFullFragment fullNewsFragment;
-	private News news;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -20,8 +18,11 @@ public class NewsFullActivity extends SherlockFragmentActivity {
 		LentaUtils.strictMode();
 		
 		setContentView(R.layout.full_news_activity);
-		news = (News)getIntent().getSerializableExtra("NewsObject");
-		fullNewsFragment = new NewsFullFragment(getApplicationContext(), news);
-		getSupportFragmentManager().beginTransaction().replace(R.id.full_news_fragment_container, fullNewsFragment).commit();
+		long newsId = getIntent().getLongExtra("newsId", -1);
+		
+		if (newsId >= 0) {
+			fullNewsFragment = new NewsFullFragment(getApplicationContext(), newsId);
+			getSupportFragmentManager().beginTransaction().replace(R.id.full_news_fragment_container, fullNewsFragment).commit();
+		}
 	}
 }
