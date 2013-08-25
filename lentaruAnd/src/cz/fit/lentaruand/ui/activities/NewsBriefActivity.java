@@ -2,7 +2,6 @@ package cz.fit.lentaruand.ui.activities;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.support.v4.view.ViewPager;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -13,7 +12,6 @@ import com.viewpagerindicator.TitlePageIndicator.IndicatorStyle;
 
 import cz.fit.lentaruand.R;
 import cz.fit.lentaruand.ui.fragments.SwipeNewsObjectsListAdapter;
-import cz.fit.lentaruand.utils.LentaConstants;
 import cz.fit.lentaruand.utils.LentaUtils;
 
 /**

@@ -18,39 +18,42 @@ import cz.fit.lentaruand.data.dao.NewsDao;
 import cz.fit.lentaruand.downloader.LentaNewsDownloader;
 import cz.fit.lentaruand.downloader.exceptions.HttpStatusCodeException;
 import cz.fit.lentaruand.parser.exceptions.ParseWithXPathException;
+import cz.fit.lentaruand.service.BundleConstants;
+import cz.fit.lentaruand.service.ServiceResultAction;
 import cz.fit.lentaruand.utils.LentaConstants;
 
-public class RubricUpdateServiceCommand extends RunnableServiceCommand {
+public final class RubricUpdateServiceCommand extends RunnableServiceCommand {
 	private Rubrics rubric;
 	private ExecutorService executor;
 	private ContentResolver contentResolver;
 	private NewsType newsType;
-	
-	public RubricUpdateServiceCommand(NewsType newsType, Rubrics rubric, ExecutorService executor, ContentResolver contentResolver, ResultReceiver resultReceiver) {
-		super(resultReceiver);
-		
-		if (newsType == null) {
-			throw new NullPointerException("newsType is null.");
-		}
+	private Bundle result;
+
+	public RubricUpdateServiceCommand(int requestId, Rubrics rubric, NewsType newsType, ExecutorService executor, ContentResolver contentResolver, ResultReceiver resultReceiver, boolean reportError) {
+		super(requestId, resultReceiver, reportError);
 		
 		if (rubric == null) {
 			throw new NullPointerException("rubric is null.");
 		}
 		
-		if (contentResolver == null) {
-			throw new NullPointerException("contentResolver is null.");
+		if (newsType == null) {
+			throw new NullPointerException("newsType is null.");
 		}
 		
 		if (executor == null) {
 			throw new NullPointerException("executor is null.");
 		}
 		
-		this.rubric = rubric;
+		if (contentResolver == null) {
+			throw new NullPointerException("contentResolver is null.");
+		}
+		
 		this.executor = executor;
 		this.contentResolver = contentResolver;
 		this.newsType = newsType;
+		this.rubric = rubric;
 	}
-
+	
 	@Override
 	public void execute() throws Exception {
 		switch (newsType) {
@@ -91,20 +94,34 @@ public class RubricUpdateServiceCommand extends RunnableServiceCommand {
 		Collection<Long> newsIds = newsDao.create(nonExistingNews);
 		Log.d(LentaConstants.LoggerServiceTag, "Newly created news ids: " + newsIds + ".");
 		
+		prepareResultCreated(newsIds);
+		
 		for (News n : nonExistingNews) {
-			executor.execute(new ImageUpdateServiceCommand(n, contentResolver, getResultReceiver()));
+			executor.execute(new NewsImageUpdateServiceCommand(getRequestId(), n, contentResolver, getResultReceiver(), false));
 		}
 		
 		for (News n : nonExistingNews) {
-			executor.execute(new FullNewsUpdateServiceCommand(n, contentResolver, getResultReceiver()));
+			executor.execute(new NewsFullTextUpdateServiceCommand(getRequestId(), n, contentResolver, getResultReceiver(), false));
 		}
 	}
 	
-	@Override
-	protected Bundle prepareResult() {
-		Bundle b = new Bundle();
-		b.putString("EXTRA_STRING", "downloaded");
+	private void prepareResultCreated(Collection<Long> ids) {
+		result = new Bundle();
+		result.putInt(BundleConstants.KEY_REQUEST_ID.name(), getRequestId());
+		result.putString(BundleConstants.KEY_ACTION.name(), ServiceResultAction.DATABASE_OBJECT_CREATED.name());
+		result.putString(BundleConstants.KEY_NEWS_TYPE.name(), newsType.name());
 		
-		return b;
+		long[] createdIds = new long[ids.size()];
+		int index = 0;
+		for (Long id : ids) {
+			createdIds[index++] = id;
+		}
+		
+		result.putLongArray(BundleConstants.KEY_IDS.name(), createdIds);
+	}
+	
+	@Override
+	protected Bundle getResult() {
+		return result;
 	}
 }

@@ -1,6 +1,5 @@
 package cz.fit.lentaruand.ui.fragments;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -19,13 +18,10 @@ import cz.fit.lentaruand.data.dao.BitmapReference.BitmapLoadListener;
 import cz.fit.lentaruand.data.dao.ImageDao;
 import cz.fit.lentaruand.data.dao.NewsDao;
 
-public class NewsFullFragment extends Fragment /*implements LoaderManager.LoaderCallbacks<News>*/ {
-
-	private Context context;
+public class NewsFullFragment extends Fragment {
 	private long newsId;
 
-	public NewsFullFragment(Context context, long newsId){
-		this.context = context;
+	public NewsFullFragment(long newsId){
 		this.newsId = newsId;
 	}
 
@@ -42,7 +38,6 @@ public class NewsFullFragment extends Fragment /*implements LoaderManager.Loader
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		//getLoaderManager().initLoader(0, null, this).forceLoad();
 		
 		AsyncDao<News> nd = NewsDao.getInstance(getActivity().getContentResolver());
 		nd.readAsync(newsId, new DaoReadSingleListener<News>() {
@@ -81,18 +76,4 @@ public class NewsFullFragment extends Fragment /*implements LoaderManager.Loader
 			}
 		});
 	}
-//
-//	@Override
-//	public Loader<News> onCreateLoader(int id, Bundle args) {
-//		return new AsyncFullNewsLoader(context, news);
-//	}
-//
-//	@Override
-//	public void onLoaderReset(Loader<News> loader) {
-//	}
-//
-//	@Override
-//	public void onLoadFinished(Loader<News> arg0, News arg1) {
-//		showNews(arg1);
-//	}
 }

@@ -21,7 +21,7 @@ public class NewsFullActivity extends SherlockFragmentActivity {
 		long newsId = getIntent().getLongExtra("newsId", -1);
 		
 		if (newsId >= 0) {
-			fullNewsFragment = new NewsFullFragment(getApplicationContext(), newsId);
+			fullNewsFragment = new NewsFullFragment(newsId);
 			getSupportFragmentManager().beginTransaction().replace(R.id.full_news_fragment_container, fullNewsFragment).commit();
 		}
 	}

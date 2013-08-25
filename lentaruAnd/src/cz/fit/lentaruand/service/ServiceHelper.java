@@ -1,131 +1,133 @@
 package cz.fit.lentaruand.service;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.ResultReceiver;
-import android.util.Log;
-import android.util.SparseArray;
-import cz.fit.lentaruand.data.IntentContent;
 import cz.fit.lentaruand.data.NewsType;
 import cz.fit.lentaruand.data.Rubrics;
-import cz.fit.lentaruand.utils.LentaConstants;
 
 /**
- * Singleton which exposes a simple asynchronous API to be used by the user
- * interface. 
- * Prepare and send the Service request: + 
- * Check if the method is already pending; + 
- * Create the request Intent; + 
- * Add the operation type and a unique request id; + 
- * Add the method specific parameters; 
- * Add the binder callback; + 
- * Call startService(Intent); + 
- * Return the request id. + 
- * Handle the callback from the service: + 
- * Dispatch callbacks to the user interface listeners; + 
- * methods should be called from fragment or activity. +
  * 
- * @author TheWalkingDelirium
- * @see http://bit.ly/15amlM4
- * @see LentaService
- * 
+ * @author nnm
+ *
  */
-
 public class ServiceHelper {
+	private static ArrayList<ServiceCallbackListener> listeners = new ArrayList<ServiceCallbackListener>();
+	private static AtomicInteger requestCounter = new AtomicInteger();
 
-	Context context;
-
-//	private Application application;
-	
-	private ArrayList<ServiceCallbackListener> currentListeners = new ArrayList<ServiceCallbackListener>();
-
-	private SparseArray<Intent> pendingActivities = new SparseArray<Intent>();
-
-//	private AtomicInteger idCounter = new AtomicInteger();
-
-	private IntentContent intentAction;
-
-    public ServiceHelper(Context context) {
-		 this.context = context;
-		 return;
-	 }
-
-    /**
-     * Creating requestId of the task, creating and packing the intent and launching the task;
-     * Setting the command type of the action;
-     * @param rubric is rubric to download
-     * @return int is the requestId of this task
-     */
-    
-	public int downloadListOfBriefNews(Rubrics rubric) {
-		final int requestId = 1;
-		intentAction = IntentContent.ACTION_EXECUTE_DOWNLOAD_BRIEF;
-		Intent i = createIntent(context, rubric, requestId, intentAction);
-		
-		return runRequest(requestId, i);
-	}
-	
-//	private int createId() {
-//		return idCounter.getAndIncrement();
-//	}
-
-	private Intent createIntent(final Context context, Rubrics rubric, final int requestId, IntentContent intentActionExecute) {
-		Intent i = new Intent(context, LentaService.class);
-		i.setAction(intentActionExecute.getIntentContent());
-
-		if (rubric == null) {
-			Log.d(LentaConstants.LoggerMainAppTag, "rubric is null");
+	private class ServiceResultReceiver extends ResultReceiver {
+		public ServiceResultReceiver(Handler handler) {
+			super(handler);
 		}
 
-		i.putExtra(IntentContent.EXTRA_RUBRIC.getIntentContent(), rubric);
-		i.putExtra(IntentContent.EXTRA_REQUEST_ID.getIntentContent(), requestId);
-		i.putExtra(IntentContent.EXTRA_STATUS_RECEIVER.getIntentContent(),
-				new ResultReceiver(new Handler()) {
-					@Override
-					protected void onReceiveResult(int resultCode, Bundle resultData) {
-						Intent originalIntent = pendingActivities
-								.get(requestId);
-
-						if (isPending(requestId)) {
-							if (resultCode != Progress.RESPONSE_PROGRESS
-									.getValue()) {
-								pendingActivities.remove(requestId);
-							}
-
-							for (ServiceCallbackListener currentListener : currentListeners) {
-								if (currentListener != null) {
-									currentListener.onDatabaseObjectsCreated(NewsType.NEWS, null);
-								}
-							}
-						}
-
-					}
-				});
-
-		return i;
+		@Override
+		protected void onReceiveResult(int resultCode, Bundle resultData) {
+			if (resultCode == ServiceResult.SUCCESS.ordinal()) {
+				notifySucessResult(resultData);
+			} else {
+				notifyFailResult(resultData);
+			}
+		}
 	}
 
-	private int runRequest(final int requestId, Intent i) {
-		pendingActivities.append(requestId, i);
-		Log.d(LentaConstants.LoggerMainAppTag, "Starting the service");
-		context.startService(i);
+	private ServiceResultReceiver resultReceiver;
+	private Context context;
+	
+    public ServiceHelper(Context context, Handler handler) {
+    	this.context = context;
+		resultReceiver = new ServiceResultReceiver(handler);
+	}
+
+	public int updateRubric(NewsType newsType, Rubrics rubric) {
+		final int requestId = requestCounter.incrementAndGet();
+
+		startService(new ServiceIntentBuilder(context, requestId)
+				.forAction(ServiceAction.UPDATE_RUBRIC).forNewsType(newsType)
+				.forResultReceiver(resultReceiver).forRubric(rubric).build());
 		
 		return requestId;
 	}
-
-	public boolean isPending(int requestId) {
-		return pendingActivities.get(requestId) != null;
+	
+	private void startService(Intent intent) {
+		context.startService(intent);
 	}
-
+	
+	private void notifySucessResult(Bundle bundle) {
+		ServiceResultAction resultAction = ServiceResultAction.valueOf(bundle.getString(BundleConstants.KEY_ACTION.name()));
+		
+		switch (resultAction) {
+		case DATABASE_OBJECT_CREATED:
+			notifyDatabaseObjectsCreated(bundle);
+			break;
+		case DATABASE_OBJECT_UPDATED:
+			break;
+		case IMAGE_UPDATED:
+			notifyImageUpdated(bundle);
+			break;
+		}
+	}
+	
+	private void notifyFailResult(Bundle bundle) {
+	}
+	
+	private void notifyDatabaseObjectsCreated(Bundle bundle) {
+		int requestId = bundle.getInt(BundleConstants.KEY_REQUEST_ID.name());
+		long[] ids = bundle.getLongArray(BundleConstants.KEY_IDS.name());
+		NewsType newsType = NewsType.valueOf(bundle.getString(BundleConstants.KEY_NEWS_TYPE.name()));
+		
+		List<Long> newIds = new ArrayList<Long>(ids.length);
+		
+		for (long id : ids) {
+			newIds.add(id);
+		}
+		
+		List<ServiceCallbackListener> currentListeners;
+		
+		synchronized (listeners) {
+			currentListeners = new ArrayList<ServiceCallbackListener>(listeners);
+		}
+		
+		for (ServiceCallbackListener listener : currentListeners) {
+			listener.onDatabaseObjectsCreate(requestId, newsType, newIds);
+		}
+	}
+	
+	private void notifyImageUpdated(Bundle bundle) {
+		int requestId = bundle.getInt(BundleConstants.KEY_REQUEST_ID.name());
+		long[] ids = bundle.getLongArray(BundleConstants.KEY_IDS.name());
+		NewsType newsType = NewsType.valueOf(bundle.getString(BundleConstants.KEY_NEWS_TYPE.name()));
+		
+		List<Long> newIds = new ArrayList<Long>(ids.length);
+		
+		for (long id : ids) {
+			newIds.add(id);
+		}
+		
+		List<ServiceCallbackListener> currentListeners;
+		
+		synchronized (listeners) {
+			currentListeners = new ArrayList<ServiceCallbackListener>(listeners);
+		}
+		
+		for (ServiceCallbackListener listener : currentListeners) {
+			listener.onImagesUpdate(requestId, newsType, newIds);
+		}
+	}
+	
 	public void addListener(ServiceCallbackListener currentListener) {
-		currentListeners.add(currentListener);
+		synchronized (listeners) {
+			listeners.add(currentListener);
+		}
 	}
 
 	public void removeListener(ServiceCallbackListener currentListener) {
-		currentListeners.remove(currentListener);
+		synchronized (listeners) {
+			listeners.remove(currentListener);
+		}
 	}
-
 }

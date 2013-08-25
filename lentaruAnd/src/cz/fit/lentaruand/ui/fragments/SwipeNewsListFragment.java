@@ -4,13 +4,14 @@ import java.util.Collection;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.ListFragment;
 import android.view.View;
 import android.widget.ListView;
 import cz.fit.lentaruand.data.News;
-import cz.fit.lentaruand.data.NewsObject;
 import cz.fit.lentaruand.data.NewsType;
 import cz.fit.lentaruand.data.Rubrics;
+import cz.fit.lentaruand.data.dao.AsyncDao;
 import cz.fit.lentaruand.data.dao.AsyncDao.DaoReadMultiListener;
 import cz.fit.lentaruand.data.dao.NewsDao;
 import cz.fit.lentaruand.service.ServiceCallbackListener;
@@ -26,43 +27,48 @@ import cz.fit.lentaruand.ui.activities.NewsFullActivity;
  * 
  * @param <T>
  */
-public class SwipeNewsObjectsListFragment<T extends NewsObject> extends ListFragment {
-	private NewsObjectAdapter<T> newsObjectsAdapter;
+public class SwipeNewsListFragment extends ListFragment {
+	private NewsObjectAdapter<News> newsObjectsAdapter;
 	private ServiceHelper serviceHelper;
+	private AsyncDao<News> dao;
 
 	private class ListFragmentServiceListener implements ServiceCallbackListener {
+
 		@Override
-		public void onDatabaseObjectsCreated(NewsType newsType,
+		public void onDatabaseObjectsCreate(int requestId, NewsType newsType,
 				Collection<Long> newIds) {
-			NewsDao.getInstance(getActivity().getContentResolver()).readAsync(new DaoReadMultiListener<News>() {
+			if (newIds.size() <= 0) {
+				return;
+			}
+			
+			AsyncDao<News> newsDao = NewsDao.getInstance(getActivity().getContentResolver());
+			
+			newsDao.readAsync(new DaoReadMultiListener<News>() {
 				@Override
 				public void finished(Collection<News> result) {
-					showNewsObjects((Collection<T>)result);
+					showNewsObjects(result);
 				}
 			});
 		}
 
 		@Override
-		public void onDatabaseObjectCreated(NewsType newsType, long newId) {
-		}
-
-		@Override
-		public void onDatabaseObjectsUpdated(NewsType newsType,
+		public void onDatabaseObjectsUpdate(int requestId, NewsType newsType,
 				Collection<Long> ids) {
 		}
 
 		@Override
-		public void onDatabaseObjectUpdated(NewsType newsType, long id) {
+		public void onImagesUpdate(int requestId, NewsType newsType,
+				Collection<Long> ids) {
 		}
 
 		@Override
-		public void onImageUpdated(NewsType newsType, long id) {
+		public void onFailed(int requestId, Exception e, boolean rootAction) {
 		}
 	}
 	
 	private ListFragmentServiceListener serviceListener = new ListFragmentServiceListener();
 	
-	public SwipeNewsObjectsListFragment(NewsObjectAdapter<T> newsObjectsAdapter) {
+	public SwipeNewsListFragment(NewsObjectAdapter<News> newsObjectsAdapter) {
 		if (newsObjectsAdapter == null) {
 			throw new IllegalArgumentException(
 					"Argument newsObjectAdapter must not be null.");
@@ -76,18 +82,29 @@ public class SwipeNewsObjectsListFragment<T extends NewsObject> extends ListFrag
 		super.onCreate(savedInstanceState);
 		setListAdapter(newsObjectsAdapter);
 		
-		serviceHelper = new ServiceHelper(this.getActivity());
+		serviceHelper = new ServiceHelper(this.getActivity(), new Handler());
+		dao = NewsDao.getInstance(this.getActivity().getContentResolver());
+		
+		dao.readAsync(new DaoReadMultiListener<News>() {
+			@Override
+			public void finished(Collection<News> result) {
+				showNewsObjects(result);
+				serviceHelper.updateRubric(NewsType.NEWS, Rubrics.ROOT);
+			}
+		});
 	}
 
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
+		
 		Intent intent = new Intent(this.getActivity(), NewsFullActivity.class);
 		intent.putExtra("newsId", newsObjectsAdapter.getItem(position).getId());
+		
 		startActivity(intent);
 	}
 
-	private void showNewsObjects(Collection<T> newsObjects) {
+	private void showNewsObjects(Collection<News> newsObjects) {
 		newsObjectsAdapter.setNewsObjects(newsObjects);
 		newsObjectsAdapter.notifyDataSetChanged();
 	}
@@ -95,7 +112,7 @@ public class SwipeNewsObjectsListFragment<T extends NewsObject> extends ListFrag
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		serviceHelper.downloadListOfBriefNews(Rubrics.ROOT);
+		serviceHelper.updateRubric(NewsType.NEWS, Rubrics.ROOT);
 	}
 
 	@Override

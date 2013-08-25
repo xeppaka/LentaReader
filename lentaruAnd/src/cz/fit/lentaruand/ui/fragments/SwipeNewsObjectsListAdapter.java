@@ -7,9 +7,8 @@ import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.ListFragment;
 import cz.fit.lentaruand.R;
-import cz.fit.lentaruand.asyncloaders.AsyncBriefNewsLoader;
-import cz.fit.lentaruand.data.News;
 
 /**
  * This class represents pager adapter -> it contains all page definitions
@@ -24,15 +23,15 @@ public class SwipeNewsObjectsListAdapter extends FragmentPagerAdapter {
 			R.string.pager_title_articles, R.string.pager_title_columns,
 			R.string.pager_title_photos, R.string.pager_title_videos };
 	
-	private final List<SwipeNewsObjectsListFragment<?>> fragments;
+	private final List<ListFragment> fragments;
 	
 	public SwipeNewsObjectsListAdapter(FragmentManager fragmentManager, Context context) {
 		super(fragmentManager);
 		this.context = context;
 		
-		fragments = new ArrayList<SwipeNewsObjectsListFragment<?>>();
-		fragments.add(new SwipeNewsObjectsListFragment<News>(new NewsAdapter(context)));
-		fragments.add(new SwipeNewsObjectsListFragment<News>(new NewsAdapter(context)));
+		fragments = new ArrayList<ListFragment>();
+		fragments.add(new SwipeNewsListFragment(new NewsAdapter(context)));
+		fragments.add(new SwipeNewsListFragment(new NewsAdapter(context)));
 	}
 
 	@Override
