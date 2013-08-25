@@ -31,7 +31,7 @@ public class SwipeNewsObjectsListAdapter extends FragmentPagerAdapter {
 		
 		fragments = new ArrayList<ListFragment>();
 		fragments.add(new SwipeNewsListFragment(new NewsAdapter(context)));
-		fragments.add(new SwipeNewsListFragment(new NewsAdapter(context)));
+		//fragments.add(new SwipeNewsListFragment(new NewsAdapter(context)));
 	}
 
 	@Override
