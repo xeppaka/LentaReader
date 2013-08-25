@@ -59,6 +59,7 @@ public class SwipeNewsListFragment extends ListFragment {
 		@Override
 		public void onImagesUpdate(int requestId, NewsType newsType,
 				Collection<Long> ids) {
+			newsObjectsAdapter.notifyDataSetChanged();
 		}
 
 		@Override

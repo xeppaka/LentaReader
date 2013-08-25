@@ -8,8 +8,8 @@ import cz.fit.lentaruand.data.DatabaseObject;
 
 
 public class AsyncCachedDao<T extends DatabaseObject> extends CachedDao<T> implements AsyncDao<T> {
-	public AsyncCachedDao(Dao<T> underlinedDao, LruCache<Long, T> cacheId, LruCache<String, T> cacheKey) {
-		super(underlinedDao, cacheId, cacheKey);
+	public AsyncCachedDao(Dao<T> underlinedDao, LruCache<Long, T> cacheId) {
+		super(underlinedDao, cacheId);
 	}
 
 	private class AsyncCreateSingleTask extends AsyncTask<T, Void, Long> {

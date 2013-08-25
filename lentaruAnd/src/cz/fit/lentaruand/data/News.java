@@ -4,7 +4,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 
+import android.util.Log;
 import cz.fit.lentaruand.data.dao.BitmapReference;
+import cz.fit.lentaruand.data.dao.ImageDao;
 import cz.fit.lentaruand.parser.rss.LentaRssItem;
 
 public class News extends NewsObject implements NewsObjectWithImage {
@@ -17,8 +19,8 @@ public class News extends NewsObject implements NewsObjectWithImage {
 	private String imageCredits;
 	private Collection<Link> links;
 	
-	private transient BitmapReference imageRef;
-	private transient BitmapReference thumbnailImageRef;
+	private BitmapReference imageRef;
+	private BitmapReference thumbnailImageRef;
 
 	public News(long id, String guid, String title, String link, String briefText,
 			String fullText, Date pubDate, String imageLink,
@@ -32,6 +34,9 @@ public class News extends NewsObject implements NewsObjectWithImage {
 		setImageCaption(imageCaption);
 		setImageCredits(imageCredits);
 		setLinks(links);
+		
+		setImage(ImageDao.getNotAvailableImage());
+		setThumbnailImage(ImageDao.getNotAvailableImage());
 	}
 	
 	public News(String guid, String title, String link, String briefText,
@@ -46,6 +51,9 @@ public class News extends NewsObject implements NewsObjectWithImage {
 		setImageCaption(imageCaption);
 		setImageCredits(imageCredits);
 		setLinks(links);
+		
+		setImage(ImageDao.getNotAvailableImage());
+		setThumbnailImage(ImageDao.getNotAvailableImage());
 	}
 
 	public News(LentaRssItem rssItem) {
@@ -57,6 +65,9 @@ public class News extends NewsObject implements NewsObjectWithImage {
 		setImageCaption(null);
 		setImageCredits(null);
 		setLinks(null);
+		
+		setImage(ImageDao.getNotAvailableImage());
+		setThumbnailImage(ImageDao.getNotAvailableImage());
 	}
 	
 
@@ -119,6 +130,8 @@ public class News extends NewsObject implements NewsObjectWithImage {
 	}
 
 	public void setImage(BitmapReference imageRef) {
+		Log.d("SET IMAGE REF", "set reference to: " + imageRef.getClass().getSimpleName());
+		
 		this.imageRef = imageRef;
 	}
 

@@ -20,14 +20,15 @@ public class NewsLinksDao {
 	private static final int CACHE_MAX_OBJECTS = LentaConstants.DAO_CACHE_MAX_OBJECTS;
 	
 	private static final LruCache<Long, Link> cacheId = new LruCache<Long, Link>(CACHE_MAX_OBJECTS);
-	private static final LruCache<String, Link> cacheKey = new LruCache<String, Link>(CACHE_MAX_OBJECTS);
+	
+	private static final Object sync = new Object();
 	
 	public final static Dao<Link> getInstance(ContentResolver contentResolver) {
 		if (contentResolver == null) {
 			throw new IllegalArgumentException("contentResolver is null.");
 		}
 		
-		return new CachedDao<Link>(new ContentResolverNewsLinksDao(contentResolver), cacheId, cacheKey);
+		return new SynchronizedDao<Link>(new AsyncCachedDao<Link>(new ContentResolverNewsLinksDao(contentResolver), cacheId), sync);
 	}
 
 	private NewsLinksDao() {

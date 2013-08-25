@@ -56,17 +56,21 @@ public final class NewsFullTextUpdateServiceCommand extends RunnableServiceComma
 	
 	@Override
 	public void execute() throws Exception {
+		Log.d(LentaConstants.LoggerServiceTag, "Command started: " + getClass().getSimpleName());
+		
 		AsyncDao<News> newsDao = NewsDao.getInstance(contentResolver);
 
 		if (news == null) {
 			news = newsDao.read(newsId);
 		}
 
-		if (news.getFullText() != null && TextUtils.isEmpty(news.getFullText())) {
-			return;
-		}
-		
 		if (news != null) {
+			Log.d(LentaConstants.LoggerServiceTag, "Update full text for news guid: " + news.getGuid());
+			
+			if (news.getFullText() != null && TextUtils.isEmpty(news.getFullText())) {
+				return;
+			}
+			
 			try {
 				new LentaNewsDownloader().downloadFull(news);
 				newsDao.update(news);
@@ -83,6 +87,8 @@ public final class NewsFullTextUpdateServiceCommand extends RunnableServiceComma
 				throw e;
 			}
 		}
+		
+		Log.d(LentaConstants.LoggerServiceTag, "Command finished successfuly: " + getClass().getSimpleName());
 	}
 
 	private void prepareResultUpdated(long id) {

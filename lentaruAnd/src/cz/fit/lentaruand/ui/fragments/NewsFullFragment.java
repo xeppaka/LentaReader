@@ -20,6 +20,7 @@ import cz.fit.lentaruand.data.dao.NewsDao;
 
 public class NewsFullFragment extends Fragment {
 	private long newsId;
+	private News loadedNews;
 
 	public NewsFullFragment(long newsId){
 		this.newsId = newsId;
@@ -43,7 +44,8 @@ public class NewsFullFragment extends Fragment {
 		nd.readAsync(newsId, new DaoReadSingleListener<News>() {
 			@Override
 			public void finished(News result) {
-				showNews(result);
+				loadedNews = result;
+				showNews(loadedNews);
 			}
 		});
 	}
@@ -51,6 +53,13 @@ public class NewsFullFragment extends Fragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		
+		loadedNews.getImage().releaseBitmap();
 	}
 
 	private void showNews(News news) {

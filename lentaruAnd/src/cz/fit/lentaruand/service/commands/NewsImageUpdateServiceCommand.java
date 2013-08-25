@@ -11,9 +11,9 @@ import android.util.Log;
 import cz.fit.lentaruand.data.News;
 import cz.fit.lentaruand.data.NewsType;
 import cz.fit.lentaruand.data.dao.AsyncDao;
-import cz.fit.lentaruand.data.dao.BitmapReference;
 import cz.fit.lentaruand.data.dao.ImageDao;
 import cz.fit.lentaruand.data.dao.NewsDao;
+import cz.fit.lentaruand.data.dao.StrongBitmapReference;
 import cz.fit.lentaruand.downloader.LentaHttpImageDownloader;
 import cz.fit.lentaruand.downloader.exceptions.HttpStatusCodeException;
 import cz.fit.lentaruand.service.BundleConstants;
@@ -32,14 +32,19 @@ public class NewsImageUpdateServiceCommand extends ImageUpdateServiceCommand<New
 	
 	@Override
 	public void execute() throws Exception {
+		Log.d(LentaConstants.LoggerServiceTag, "Command started: " + getClass().getSimpleName());
+		
 		AsyncDao<News> newsDao = NewsDao.getInstance(getContentResolver());
 
 		News news = getNewsObject();
+		
 		if (news == null) {
 			news = newsDao.read(getNewsId());
 		}
 
 		if (news != null) {
+			Log.d(LentaConstants.LoggerServiceTag, "Update image for news guid: " + news.getGuid());
+			
 			String imageLink = news.getImageLink();
 			
 			if (imageLink != null && !TextUtils.isEmpty(imageLink)) {
@@ -47,12 +52,14 @@ public class NewsImageUpdateServiceCommand extends ImageUpdateServiceCommand<New
 
 				if (!imageDao.imageExist(imageLink)) {
 					try {
-						Bitmap newBitmap = LentaHttpImageDownloader.downloadBitmap(imageLink);
-						BitmapReference fullBitmapRef = imageDao.create(imageLink, newBitmap);
-						BitmapReference thumbnailBitmapRef = imageDao.readThumbnail(imageLink);
+						Log.d(LentaConstants.LoggerServiceTag, "Image doesn't exist in the cache: " + imageLink);
 						
-						news.setImage(fullBitmapRef);
-						news.setThumbnailImage(thumbnailBitmapRef);
+						Bitmap newBitmap = LentaHttpImageDownloader.downloadBitmap(imageLink);
+						news.setImage(new StrongBitmapReference(newBitmap));
+						
+						newsDao.update(news);
+
+						Log.d(LentaConstants.LoggerServiceTag, "Successfuly downloaded and saved image: " + imageLink);
 						
 						prepareResultUpdated(news.getId());
 					} catch (HttpStatusCodeException e) {
@@ -71,6 +78,8 @@ public class NewsImageUpdateServiceCommand extends ImageUpdateServiceCommand<New
 		} else {
 			throw new ImageUpdateException("Read news from database for guid " + getNewsId() + " failed.");
 		}
+		
+		Log.d(LentaConstants.LoggerServiceTag, "Command finished successfuly: " + getClass().getSimpleName());
 	}
 	
 	private void prepareResultUpdated(long id) {

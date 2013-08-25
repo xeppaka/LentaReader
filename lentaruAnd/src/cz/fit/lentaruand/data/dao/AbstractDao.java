@@ -48,7 +48,7 @@ abstract class AbstractDao<T extends DatabaseObject> implements Dao<T> {
 	}
 
 	@Override
-	public synchronized List<T> read() {
+	public List<T> read() {
 		Cursor cur = cr.query(getContentProviderUri(),
 				getProjectionAll(), null, null, null);
 
@@ -68,7 +68,7 @@ abstract class AbstractDao<T extends DatabaseObject> implements Dao<T> {
 	}
 
 	@Override
-	public synchronized T read(long id) {
+	public T read(long id) {
 		Uri uri = ContentUris.withAppendedId(getContentProviderUri(), id);
 		
 		Cursor cur = cr.query(
@@ -94,7 +94,7 @@ abstract class AbstractDao<T extends DatabaseObject> implements Dao<T> {
 	}
 
 	@Override
-	public synchronized List<T> read(Collection<Long> ids) {
+	public List<T> read(Collection<Long> ids) {
 		List<T> result = new ArrayList<T>(ids.size());
 		
 		for (long id : ids) {
@@ -109,12 +109,12 @@ abstract class AbstractDao<T extends DatabaseObject> implements Dao<T> {
 	}
 
 	@Override
-	public synchronized T read(String key) {
+	public T read(String key) {
 		return read(getKeyColumnType(), getKeyColumnName(), key);
 	}
 	
 	@Override
-	public synchronized T read(SQLiteType keyType, String keyColumnName, String keyValue) {
+	public T read(SQLiteType keyType, String keyColumnName, String keyValue) {
 		String[] whereArgs = { keyValue };
 		String where = String.format(getWhereFromSQLiteType(keyType), keyColumnName);
 
@@ -147,7 +147,7 @@ abstract class AbstractDao<T extends DatabaseObject> implements Dao<T> {
 	}
 	
 	@Override
-	public synchronized long create(T daoObject) {
+	public long create(T daoObject) {
 		Uri uri = cr.insert(getContentProviderUri(), prepareContentValues(daoObject));
 		long id = ContentUris.parseId(uri);
 		daoObject.setId(id);
@@ -158,7 +158,7 @@ abstract class AbstractDao<T extends DatabaseObject> implements Dao<T> {
 	}
 	
 	@Override
-	public synchronized Collection<Long> create(Collection<T> dataObjects) {
+	public Collection<Long> create(Collection<T> dataObjects) {
 		Collection<Long> result = null;
 		
 		for (T dataObject : dataObjects) {
@@ -185,18 +185,18 @@ abstract class AbstractDao<T extends DatabaseObject> implements Dao<T> {
 	}
 
 	@Override
-	public synchronized int delete(long id) {
+	public int delete(long id) {
 		Uri uri = ContentUris.withAppendedId(getContentProviderUri(), id);
 		return cr.delete(uri, null, null);
 	}
 
 	@Override
-	public synchronized int delete(String keyValue) {
+	public int delete(String keyValue) {
 		return delete(getKeyColumnType(), getKeyColumnName(), keyValue);
 	}
 	
 	@Override
-	public synchronized int delete(SQLiteType keyType,
+	public int delete(SQLiteType keyType,
 			String keyColumnName, String keyValue) {
 		String[] whereArgs = { keyValue };
 		String where = String.format(getWhereFromSQLiteType(keyType), keyColumnName);
@@ -204,7 +204,7 @@ abstract class AbstractDao<T extends DatabaseObject> implements Dao<T> {
 		return cr.delete(getContentProviderUri(), where, whereArgs);
 	}
 
-	public synchronized int update(T daoObject) {
+	public int update(T daoObject) {
 		long id = daoObject.getId();
 		
 		String[] whereArgs;
@@ -221,7 +221,7 @@ abstract class AbstractDao<T extends DatabaseObject> implements Dao<T> {
 	}
 	
 	@Override
-	public synchronized boolean exist(long id) {
+	public boolean exist(long id) {
 		Uri uri = ContentUris.withAppendedId(getContentProviderUri(), id);
 		Cursor cur = null;
 		
@@ -241,7 +241,7 @@ abstract class AbstractDao<T extends DatabaseObject> implements Dao<T> {
 	}
 
 	@Override
-	public synchronized boolean exist(String key) {
+	public boolean exist(String key) {
 		String[] whereArgs = { key };
 		String where = String.format(getWhereFromSQLiteType(getKeyColumnType()), getKeyColumnName());
 		
@@ -262,7 +262,8 @@ abstract class AbstractDao<T extends DatabaseObject> implements Dao<T> {
 		}
 	}
 	
-	public synchronized Collection<String> readAllKeys() {
+	@Override
+	public Collection<String> readAllKeys() {
 		String[] projectionKeyOnly = {	getKeyColumnName() };
 			
 		Cursor cur = cr.query(
@@ -286,6 +287,31 @@ abstract class AbstractDao<T extends DatabaseObject> implements Dao<T> {
 		}
 	}
 	
+	@Override
+	public Collection<Long> readAllIds() {
+		String[] projectionIdOnly = { BaseColumns._ID };
+		
+		Cursor cur = cr.query(
+				getContentProviderUri(), 
+				projectionIdOnly,
+				null,
+				null,
+				null
+				);
+		
+		try {
+			Collection<Long> result = new ArrayList<Long>();
+			
+			while (cur.moveToNext()) {
+				result.add(cur.getLong(cur.getColumnIndexOrThrow(BaseColumns._ID)));
+			}
+
+			return result;
+		} finally {
+			cur.close();
+		}
+	}
+
 	protected ContentResolver getContentResolver() {
 		return cr;
 	}

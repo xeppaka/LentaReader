@@ -17,7 +17,6 @@ import cz.fit.lentaruand.data.db.SQLiteType;
 class CachedDao<T extends DatabaseObject> implements Dao<T> {
 	private final Dao<T> underlinedDao;
 	private final LruCache<Long, T> cacheId;
-	private final LruCache<String, T> cacheKey;
 	
 	/**
 	 * used only in {@link CachedDao#read(Collection)} to not create temporary
@@ -33,11 +32,7 @@ class CachedDao<T extends DatabaseObject> implements Dao<T> {
 		return cacheId;
 	}
 	
-	private LruCache<String, T> getLruCacheKey() {
-		return cacheKey;
-	}
-	
-	public CachedDao(Dao<T> underlinedDao, LruCache<Long, T> cacheId, LruCache<String, T> cacheKey) {
+	public CachedDao(Dao<T> underlinedDao, LruCache<Long, T> cacheId) {
 		if (underlinedDao == null) {
 			throw new IllegalArgumentException("underlinedDao is null.");
 		}
@@ -46,13 +41,8 @@ class CachedDao<T extends DatabaseObject> implements Dao<T> {
 			throw new IllegalArgumentException("cacheId is null.");
 		}
 		
-		if (cacheKey == null) {
-			throw new IllegalArgumentException("cacheKey is null.");
-		}
-		
 		this.underlinedDao = underlinedDao;
 		this.cacheId = cacheId;
-		this.cacheKey = cacheKey;
 	}
 
 	@Override
@@ -70,28 +60,45 @@ class CachedDao<T extends DatabaseObject> implements Dao<T> {
 		long newId = getUnderlinedDao().create(dataObject);
 		
 		getLruCacheId().put(newId, dataObject);
-
-		String key = dataObject.getKeyValue();
-		
-		if (key != null) {
-			getLruCacheKey().put(key, dataObject);
-		}
 		
 		return newId;
 	}
 
 	@Override
-	public synchronized Collection<Long> create(Collection<T> dataObjects) {
-		return getUnderlinedDao().create(dataObjects);
+	public Collection<Long> create(Collection<T> dataObjects) {
+		Collection<Long> result = getUnderlinedDao().create(dataObjects);
+		
+		for (T dataObject : dataObjects) {
+			cacheId.put(dataObject.getId(), dataObject);
+		}
+		
+		return result;
 	}
 
 	@Override
-	public synchronized Collection<T> read() {
-		return getUnderlinedDao().read();
+	public Collection<T> read() {
+		Collection<Long> allIds = getUnderlinedDao().readAllIds();
+		Collection<T> result = new ArrayList<T>();
+		
+		missed.clear();
+		
+		for (Long id : allIds) {
+			T newsObject = cacheId.get(id);
+			
+			if (newsObject == null) {
+				missed.add(id);
+			} else {
+				result.add(newsObject);
+			}
+		}
+		
+		result.addAll(getUnderlinedDao().read(missed));
+		
+		return result;
 	}
 
 	@Override
-	public synchronized T read(long id) {
+	public T read(long id) {
 		T dataObject = getLruCacheId().get(id);
 		
 		if (dataObject != null) {
@@ -102,7 +109,7 @@ class CachedDao<T extends DatabaseObject> implements Dao<T> {
 	}
 
 	@Override
-	public synchronized Collection<T> read(Collection<Long> ids) {
+	public Collection<T> read(Collection<Long> ids) {
 		missed.clear();
 		Collection<T> result = new ArrayList<T>();
 		
@@ -124,23 +131,17 @@ class CachedDao<T extends DatabaseObject> implements Dao<T> {
 	}
 
 	@Override
-	public synchronized T read(String key) {
-		T dataObject = getLruCacheKey().get(key);
-		
-		if (dataObject != null) {
-			return dataObject;
-		}
-		
+	public T read(String key) {
 		return getUnderlinedDao().read(key);
 	}
 
 	@Override
-	public synchronized T read(SQLiteType keyType, String keyColumnName, String keyValue) {
+	public T read(SQLiteType keyType, String keyColumnName, String keyValue) {
 		return getUnderlinedDao().read(keyType, keyColumnName, keyValue);
 	}
 
 	@Override
-	public synchronized boolean exist(long id) {
+	public boolean exist(long id) {
 		if (getLruCacheId().get(id) != null) {
 			return true;
 		}
@@ -150,10 +151,6 @@ class CachedDao<T extends DatabaseObject> implements Dao<T> {
 
 	@Override
 	public boolean exist(String key) {
-		if (getLruCacheKey().get(key) != null) {
-			return true;
-		}
-		
 		return getUnderlinedDao().exist(key);
 	}
 
@@ -164,48 +161,32 @@ class CachedDao<T extends DatabaseObject> implements Dao<T> {
 	}
 
 	@Override
-	public synchronized int update(T dataObject) {
+	public int update(T dataObject) {
 		getLruCacheId().put(dataObject.getId(), dataObject);
-		
-		String key = dataObject.getKeyValue();
-		if (key != null) {		
-			getLruCacheKey().put(key, dataObject);
-		}
 		
 		return getUnderlinedDao().update(dataObject);
 	}
 
 	@Override
-	public synchronized int delete(long id) {
-		T dataObject = getLruCacheId().remove(id);
-		
-		if (dataObject != null) {
-			String key = dataObject.getKeyValue();
-			
-			if (key != null) {
-				getLruCacheKey().remove(key);
-			}
-		}
+	public int delete(long id) {
+		getLruCacheId().remove(id);
 		
 		return getUnderlinedDao().delete(id);
 	}
 
 	@Override
-	public synchronized int delete(String key) {
-		int result = getUnderlinedDao().delete(key);
-		
-		T dataObject = getLruCacheKey().remove(key);
-		
-		if (dataObject != null) {
-			getLruCacheId().remove(dataObject.getId());
-		}
-		
-		return result;
+	public int delete(String key) {
+		throw new UnsupportedOperationException("This operation is very slow by using key. Don't use it or implement if cannot work without it.");
 	}
 
 	@Override
-	public synchronized int delete(SQLiteType keyType, String keyColumnName, String keyValue) {
+	public int delete(SQLiteType keyType, String keyColumnName, String keyValue) {
 		return getUnderlinedDao().delete(keyType, keyColumnName, keyValue);
+	}
+
+	@Override
+	public Collection<Long> readAllIds() {
+		return getUnderlinedDao().readAllIds();
 	}
 
 	@Override

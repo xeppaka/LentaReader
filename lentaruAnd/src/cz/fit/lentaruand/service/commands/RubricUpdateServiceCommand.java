@@ -66,10 +66,13 @@ public final class RubricUpdateServiceCommand extends RunnableServiceCommand {
 	}
 
 	private void executeNews() throws Exception {
+		Log.d(LentaConstants.LoggerServiceTag, "Command started: " + getClass().getSimpleName());
 		List<News> news;
 		
 		try {
 			news = new LentaNewsDownloader().downloadRubricBrief(rubric);
+			
+			Log.d(LentaConstants.LoggerServiceTag, "Downloaded " + news.size() + " news.");
 		} catch (ParseWithXPathException e) {
 			Log.e(LentaConstants.LoggerServiceTag, "Error downloading page, parse error.", e);
 			throw e;
@@ -90,9 +93,12 @@ public final class RubricUpdateServiceCommand extends RunnableServiceCommand {
 				nonExistingNews.add(n);
 			}
 		}
+
+		Log.d(LentaConstants.LoggerServiceTag, "New news from downloaded " + nonExistingNews.size());
 		
 		Collection<Long> newsIds = newsDao.create(nonExistingNews);
-		Log.d(LentaConstants.LoggerServiceTag, "Newly created news ids: " + newsIds + ".");
+		
+		Log.d(LentaConstants.LoggerServiceTag, "Newly created news ids: " + newsIds);
 		
 		prepareResultCreated(newsIds);
 		
@@ -103,6 +109,8 @@ public final class RubricUpdateServiceCommand extends RunnableServiceCommand {
 		for (News n : nonExistingNews) {
 			executor.execute(new NewsFullTextUpdateServiceCommand(getRequestId(), n, contentResolver, getResultReceiver(), false));
 		}
+		
+		Log.d(LentaConstants.LoggerServiceTag, "Command finished successfuly: " + getClass().getSimpleName());
 	}
 	
 	private void prepareResultCreated(Collection<Long> ids) {

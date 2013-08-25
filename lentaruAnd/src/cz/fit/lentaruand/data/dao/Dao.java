@@ -174,6 +174,13 @@ public interface Dao<T> {
 	 * 
 	 * @return Collection of keys. Not null. Could be empty.
 	 */
+	Collection<Long> readAllIds();
+	
+	/**
+	 * Reads all object keys from database.
+	 * 
+	 * @return Collection of keys. Not null. Could be empty.
+	 */
 	Collection<String> readAllKeys();
 	
 	/**

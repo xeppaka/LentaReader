@@ -1,6 +1,5 @@
 package cz.fit.lentaruand.data.dao;
 
-import java.net.MalformedURLException;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,7 +13,6 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.v4.util.LruCache;
 import android.text.TextUtils;
-import android.util.Log;
 import cz.fit.lentaruand.data.Link;
 import cz.fit.lentaruand.data.News;
 import cz.fit.lentaruand.data.Rubrics;
@@ -22,20 +20,20 @@ import cz.fit.lentaruand.data.db.NewsEntry;
 import cz.fit.lentaruand.data.db.SQLiteType;
 import cz.fit.lentaruand.data.provider.LentaProvider;
 import cz.fit.lentaruand.utils.LentaConstants;
-import cz.fit.lentaruand.utils.URLHelper;
 
 public final class NewsDao {
 	private static final int CACHE_MAX_OBJECTS = LentaConstants.DAO_CACHE_MAX_OBJECTS;
 	
 	private static final LruCache<Long, News> cacheId = new LruCache<Long, News>(CACHE_MAX_OBJECTS);
-	private static final LruCache<String, News> cacheKey = new LruCache<String, News>(CACHE_MAX_OBJECTS);
+	
+	private static final Object sync = new Object();
 	
 	public final static AsyncDao<News> getInstance(ContentResolver contentResolver) {
 		if (contentResolver == null) {
 			throw new IllegalArgumentException("contentResolver is null.");
 		}
 		
-		return new AsyncCachedDao<News>(new ContentResolverNewsDao(contentResolver), cacheId, cacheKey);
+		return new SynchronizedDao<News>(new AsyncCachedDao<News>(new ContentResolverNewsDao(contentResolver), cacheId), sync);
 	}
 
 	private NewsDao() {
@@ -65,7 +63,7 @@ public final class NewsDao {
 			newsLinksDao = NewsLinksDao.getInstance(cr);
 			imageDao = ImageDao.getInstance(cr);
 		}
-	
+
 		@Override
 		protected ContentValues prepareContentValues(News news) {
 			ContentValues values = new ContentValues();
@@ -148,12 +146,16 @@ public final class NewsDao {
 
 		@Override
 		public List<News> read() {
-			List<News> news = super.read();
+			List<News> news;
 			
-			for (News n : news) {
-				readOtherNewsParts(n);
+			synchronized(sync) {
+				news = super.read();
+				
+				for (News n : news) {
+					readOtherNewsParts(n);
+				}
 			}
-			
+				
 			Collections.sort(news);
 			
 			return news;
@@ -161,61 +163,71 @@ public final class NewsDao {
 
 		@Override
 		public News read(long id) {
-			News news = super.read(id);
-			
-			if (news == null)
+			synchronized(sync) {
+				News news = super.read(id);
+				
+				if (news == null)
+					return news;
+		
+				readOtherNewsParts(news);
+				
 				return news;
-	
-			readOtherNewsParts(news);
-			
-			return news;
+			}
 		}
 	
 		@Override
 		public News read(String key) {
-			News news = super.read(key);
-			
-			if (news == null)
+			synchronized(sync) {
+				News news = super.read(key);
+				
+				if (news == null)
+					return news;
+				
+				readOtherNewsParts(news);
+				
 				return news;
-			
-			readOtherNewsParts(news);
-			
-			return news;
+			}
 		}
 	
 		@Override
 		public News read(SQLiteType keyType,
 				String keyColumnName, String keyValue) {
-			News news = super.read(keyType, keyColumnName, keyValue);
-			
-			if (news == null)
+			synchronized(sync) {
+				News news = super.read(keyType, keyColumnName, keyValue);
+				
+				if (news == null)
+					return news;
+		
+				readOtherNewsParts(news);
+				
 				return news;
-	
-			readOtherNewsParts(news);
-			
-			return news;
+			}
 		}
 	
 		@Override
 		public long create(News news) {
-			long newsId = super.create(news);
-	
-			createNewsLinks(news);
-			
-			return newsId;
+			synchronized(sync) {
+				long newsId = super.create(news);
+		
+				createNewsLinks(news);
+				
+				return newsId;
+			}
 		}
-	
+		
 		@Override
 		public Collection<Long> create(Collection<News> dataObjects) {
-			Collection<Long> ids = super.create(dataObjects);
-			
-			for (News n : dataObjects) {
-				createNewsLinks(n);
+			synchronized(sync) {
+				Collection<Long> ids = super.create(dataObjects);
+				
+				for (News n : dataObjects) {
+					createNewsLinks(n);
+				}
+				
+				return ids;
 			}
-			
-			return ids;
 		}
-	
+
 		private void createNewsLinks(News news) {
 			Collection<Link> links = news.getLinks();
 			
@@ -228,11 +240,13 @@ public final class NewsDao {
 		
 		@Override
 		public int update(News news) {
-			int result = super.update(news);
-			
-			updateOtherNewsParts(news);
-			
-			return result;
+			synchronized(sync) {
+				int result = super.update(news);
+				
+				updateOtherNewsParts(news);
+				
+				return result;
+			}
 		}
 		
 		@Override
@@ -248,16 +262,21 @@ public final class NewsDao {
 			}
 			
 			BitmapReference imageRef = news.getImage();
-			String imageLink = news.getImageLink();
-			
 			Bitmap image = imageRef.getBitmap();
 			
-			if ( imageLink != null) {
+			if (image != null && image != ImageDao.getNotAvailableImage().getBitmap()) {
 				try {
-					BitmapReference newImageRef = imageDao.create(URLHelper.getImageId(imageLink), image);
-					news.setImage(newImageRef);
-				} catch (MalformedURLException e) {
-					Log.e(LentaConstants.LoggerAnyTag, "Error saving image to cache, cannot create id from URL: " + imageLink, e);
+					String imageLink = news.getImageLink();
+					
+					if (imageLink != null) {
+						BitmapReference newImageRef = imageDao.create(imageLink, image);
+						BitmapReference newThumbnailImageRef = imageDao.readThumbnail(imageLink);
+						
+						news.setImage(newImageRef);
+						news.setThumbnailImage(newThumbnailImageRef);
+					}
+				} finally {
+					imageRef.releaseBitmap();
 				}
 			}
 		}

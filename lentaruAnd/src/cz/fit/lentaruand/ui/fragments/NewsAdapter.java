@@ -70,6 +70,8 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
 			
 			newsTitleTextView = holder.getNewsTitle();
 			newsImageView = holder.getNewsImage();
+			newsImageView.setImageBitmap(null);
+			
 			holder.getImage().releaseBitmap();
 		}
 
