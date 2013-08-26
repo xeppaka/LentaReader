@@ -1,4 +1,4 @@
-package cz.fit.lentaruand.data.dao;
+package cz.fit.lentaruand.data.dao.newsobject;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

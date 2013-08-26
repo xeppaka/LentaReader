@@ -11,6 +11,9 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.support.v4.util.LruCache;
 import cz.fit.lentaruand.data.Link;
+import cz.fit.lentaruand.data.dao.async.AsyncCachedDao;
+import cz.fit.lentaruand.data.dao.async.AsyncDao;
+import cz.fit.lentaruand.data.dao.sync.SynchronizedDao;
 import cz.fit.lentaruand.data.db.NewsLinksEntry;
 import cz.fit.lentaruand.data.db.SQLiteType;
 import cz.fit.lentaruand.data.provider.LentaProvider;
@@ -23,7 +26,7 @@ public class NewsLinksDao {
 	
 	private static final Object sync = new Object();
 	
-	public final static Dao<Link> getInstance(ContentResolver contentResolver) {
+	public final static AsyncDao<Link> getInstance(ContentResolver contentResolver) {
 		if (contentResolver == null) {
 			throw new IllegalArgumentException("contentResolver is null.");
 		}
@@ -34,7 +37,7 @@ public class NewsLinksDao {
 	private NewsLinksDao() {
 	}
 	
-	private static class ContentResolverNewsLinksDao extends AbstractDao<Link> {
+	private static class ContentResolverNewsLinksDao extends ContentResolverDao<Link> {
 		private static final String[] projectionAll = {
 			NewsLinksEntry._ID,
 			NewsLinksEntry.COLUMN_NAME_NEWS_ID,

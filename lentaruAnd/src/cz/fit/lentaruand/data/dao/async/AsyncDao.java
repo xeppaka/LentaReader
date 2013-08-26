@@ -1,6 +1,8 @@
-package cz.fit.lentaruand.data.dao;
+package cz.fit.lentaruand.data.dao.async;
 
 import java.util.Collection;
+
+import cz.fit.lentaruand.data.dao.Dao;
 
 import android.content.ContentResolver;
 

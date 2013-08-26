@@ -1,8 +1,9 @@
-package cz.fit.lentaruand.data.dao;
+package cz.fit.lentaruand.data.dao.sync;
 
 import java.util.Collection;
 
 import cz.fit.lentaruand.data.DatabaseObject;
+import cz.fit.lentaruand.data.dao.async.AsyncDao;
 import cz.fit.lentaruand.data.db.SQLiteType;
 
 public class SynchronizedDao<T extends DatabaseObject> implements AsyncDao<T> {
@@ -149,45 +150,49 @@ public class SynchronizedDao<T extends DatabaseObject> implements AsyncDao<T> {
 	@Override
 	public void createAsync(
 			T dataObject,
-			cz.fit.lentaruand.data.dao.AsyncDao.DaoCreateSingleListener<T> listener) {
+			cz.fit.lentaruand.data.dao.async.AsyncDao.DaoCreateSingleListener<T> listener) {
 		decoratedDao.createAsync(dataObject, listener);
 	}
 
 	@Override
 	public void createAsync(
 			Collection<T> dataObjects,
-			cz.fit.lentaruand.data.dao.AsyncDao.DaoCreateMultiListener<T> listener) {
+			cz.fit.lentaruand.data.dao.async.AsyncDao.DaoCreateMultiListener<T> listener) {
 		decoratedDao.createAsync(dataObjects, listener);
 	}
 
 	@Override
 	public void readAsync(
-			cz.fit.lentaruand.data.dao.AsyncDao.DaoReadMultiListener<T> listener) {
+			cz.fit.lentaruand.data.dao.async.AsyncDao.DaoReadMultiListener<T> listener) {
 		decoratedDao.readAsync(listener);
 	}
 
 	@Override
 	public void readAsync(
 			long id,
-			cz.fit.lentaruand.data.dao.AsyncDao.DaoReadSingleListener<T> listener) {
+			cz.fit.lentaruand.data.dao.async.AsyncDao.DaoReadSingleListener<T> listener) {
 		decoratedDao.readAsync(id, listener);
 	}
 
 	@Override
 	public void readAsync(Collection<Long> ids,
-			cz.fit.lentaruand.data.dao.AsyncDao.DaoReadMultiListener<T> listener) {
+			cz.fit.lentaruand.data.dao.async.AsyncDao.DaoReadMultiListener<T> listener) {
 		decoratedDao.readAsync(ids, listener);
 	}
 
 	@Override
 	public void updateAsync(T dataObject,
-			cz.fit.lentaruand.data.dao.AsyncDao.DaoUpdateListener listener) {
+			cz.fit.lentaruand.data.dao.async.AsyncDao.DaoUpdateListener listener) {
 		decoratedDao.updateAsync(dataObject, listener);
 	}
 
 	@Override
 	public void deleteAsync(long id,
-			cz.fit.lentaruand.data.dao.AsyncDao.DaoDeleteListener listener) {
+			cz.fit.lentaruand.data.dao.async.AsyncDao.DaoDeleteListener listener) {
 		decoratedDao.deleteAsync(id, listener);
+	}
+	
+	protected AsyncDao<T> getUnderlinedDao() {
+		return decoratedDao;
 	}
 }

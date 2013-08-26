@@ -3,6 +3,7 @@ package cz.fit.lentaruand.service.commands;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 
@@ -14,7 +15,7 @@ import cz.fit.lentaruand.data.News;
 import cz.fit.lentaruand.data.NewsType;
 import cz.fit.lentaruand.data.Rubrics;
 import cz.fit.lentaruand.data.dao.Dao;
-import cz.fit.lentaruand.data.dao.NewsDao;
+import cz.fit.lentaruand.data.dao.newsobject.NewsDao;
 import cz.fit.lentaruand.downloader.LentaNewsDownloader;
 import cz.fit.lentaruand.downloader.exceptions.HttpStatusCodeException;
 import cz.fit.lentaruand.parser.exceptions.ParseWithXPathException;
@@ -97,17 +98,18 @@ public final class RubricUpdateServiceCommand extends RunnableServiceCommand {
 		Log.d(LentaConstants.LoggerServiceTag, "New news from downloaded " + nonExistingNews.size());
 		
 		Collection<Long> newsIds = newsDao.create(nonExistingNews);
-		
 		Log.d(LentaConstants.LoggerServiceTag, "Newly created news ids: " + newsIds);
 		
 		prepareResultCreated(newsIds);
-		
-		for (News n : nonExistingNews) {
-			executor.execute(new NewsImageUpdateServiceCommand(getRequestId(), n, contentResolver, getResultReceiver(), false));
-		}
+
+		Collections.sort(nonExistingNews, Collections.reverseOrder());
 		
 		for (News n : nonExistingNews) {
 			executor.execute(new NewsFullTextUpdateServiceCommand(getRequestId(), n, contentResolver, getResultReceiver(), false));
+		}
+		
+		for (News n : nonExistingNews) {
+			executor.execute(new NewsImageUpdateServiceCommand(getRequestId(), n, contentResolver, getResultReceiver(), false));
 		}
 		
 		Log.d(LentaConstants.LoggerServiceTag, "Command finished successfuly: " + getClass().getSimpleName());

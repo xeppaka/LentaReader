@@ -1,4 +1,4 @@
-package cz.fit.lentaruand.data.dao;
+package cz.fit.lentaruand.data.dao.newsobject;
 
 import java.sql.Date;
 import java.util.Collection;
@@ -9,11 +9,12 @@ import android.database.Cursor;
 import android.net.Uri;
 import cz.fit.lentaruand.data.Article;
 import cz.fit.lentaruand.data.Rubrics;
+import cz.fit.lentaruand.data.dao.ContentResolverDao;
 import cz.fit.lentaruand.data.db.ArticleEntry;
 import cz.fit.lentaruand.data.db.NewsEntry;
 import cz.fit.lentaruand.data.db.SQLiteType;
 
-public class ArticleDao extends AbstractDao<Article> {
+public class ArticleDao extends ContentResolverDao<Article> {
 	private static final String[] projectionAll = {
 		ArticleEntry._ID,
 		ArticleEntry.COLUMN_NAME_GUID,

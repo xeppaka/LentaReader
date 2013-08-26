@@ -5,8 +5,8 @@ import java.util.Collections;
 import java.util.Date;
 
 import android.util.Log;
-import cz.fit.lentaruand.data.dao.BitmapReference;
-import cz.fit.lentaruand.data.dao.ImageDao;
+import cz.fit.lentaruand.data.dao.newsobject.BitmapReference;
+import cz.fit.lentaruand.data.dao.newsobject.ImageDao;
 import cz.fit.lentaruand.parser.rss.LentaRssItem;
 
 public class News extends NewsObject implements NewsObjectWithImage {

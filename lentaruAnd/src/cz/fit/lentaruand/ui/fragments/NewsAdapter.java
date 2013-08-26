@@ -10,9 +10,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import cz.fit.lentaruand.R;
 import cz.fit.lentaruand.data.News;
-import cz.fit.lentaruand.data.dao.BitmapReference;
-import cz.fit.lentaruand.data.dao.BitmapReference.BitmapLoadListener;
-import cz.fit.lentaruand.data.dao.ImageDao;
+import cz.fit.lentaruand.data.dao.newsobject.BitmapReference;
+import cz.fit.lentaruand.data.dao.newsobject.ImageDao;
+import cz.fit.lentaruand.data.dao.newsobject.BitmapReference.BitmapLoadListener;
 
 public class NewsAdapter extends NewsObjectAdapter<News> {
 	

@@ -1,6 +1,6 @@
 package cz.fit.lentaruand.data;
 
-import cz.fit.lentaruand.data.dao.BitmapReference;
+import cz.fit.lentaruand.data.dao.newsobject.BitmapReference;
 
 /**
  * This interface represents contract for a news object (news, article, column,

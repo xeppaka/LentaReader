@@ -16,12 +16,12 @@ import cz.fit.lentaruand.data.DatabaseObject;
 import cz.fit.lentaruand.data.db.SQLiteType;
 import cz.fit.lentaruand.utils.LentaConstants;
 
-abstract class AbstractDao<T extends DatabaseObject> implements Dao<T> {
+public abstract class ContentResolverDao<T extends DatabaseObject> implements Dao<T> {
 	private final static String textKeyWhere;
 	private final static String intKeyWhere;
-	private final static String[] projectionId = {BaseColumns._ID};
+	private final static String[] projectionId = { BaseColumns._ID };
 	
-	private static String getWhereFromSQLiteType(SQLiteType type) {
+	protected static String getWhereFromSQLiteType(SQLiteType type) {
 		switch (type) {
 		case TEXT:
 			return textKeyWhere;
@@ -39,7 +39,7 @@ abstract class AbstractDao<T extends DatabaseObject> implements Dao<T> {
 	
 	private final ContentResolver cr;
 	
-	protected AbstractDao(ContentResolver cr) {
+	protected ContentResolverDao(ContentResolver cr) {
 		if (cr == null) {
 			throw new IllegalArgumentException("contentResolver is null.");
 		}

@@ -6,9 +6,9 @@ import android.content.ContentResolver;
 import android.os.Bundle;
 import android.os.ResultReceiver;
 import cz.fit.lentaruand.data.News;
-import cz.fit.lentaruand.data.dao.AsyncDao;
-import cz.fit.lentaruand.data.dao.ImageDao;
-import cz.fit.lentaruand.data.dao.NewsDao;
+import cz.fit.lentaruand.data.dao.async.AsyncDao;
+import cz.fit.lentaruand.data.dao.newsobject.ImageDao;
+import cz.fit.lentaruand.data.dao.newsobject.NewsDao;
 
 public class NewsUpdateServiceCommand extends RunnableServiceCommand {
 	private ContentResolver contentResolver;

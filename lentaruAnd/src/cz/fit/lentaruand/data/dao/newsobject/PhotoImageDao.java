@@ -1,4 +1,4 @@
-package cz.fit.lentaruand.data.dao;
+package cz.fit.lentaruand.data.dao.newsobject;
 
 import java.util.Collection;
 
@@ -7,10 +7,11 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
 import cz.fit.lentaruand.data.PhotoImage;
+import cz.fit.lentaruand.data.dao.ContentResolverDao;
 import cz.fit.lentaruand.data.db.PhotoImageEntry;
 import cz.fit.lentaruand.data.db.SQLiteType;
 
-public class PhotoImageDao extends AbstractDao<PhotoImage> {
+public class PhotoImageDao extends ContentResolverDao<PhotoImage> {
 	private static final String[] projectionAll = {
 		PhotoImageEntry._ID,
 		PhotoImageEntry.COLUMN_NAME_INDEX,

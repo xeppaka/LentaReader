@@ -12,11 +12,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import cz.fit.lentaruand.R;
 import cz.fit.lentaruand.data.News;
-import cz.fit.lentaruand.data.dao.AsyncDao;
-import cz.fit.lentaruand.data.dao.AsyncDao.DaoReadSingleListener;
-import cz.fit.lentaruand.data.dao.BitmapReference.BitmapLoadListener;
-import cz.fit.lentaruand.data.dao.ImageDao;
-import cz.fit.lentaruand.data.dao.NewsDao;
+import cz.fit.lentaruand.data.dao.async.AsyncDao;
+import cz.fit.lentaruand.data.dao.async.AsyncDao.DaoReadSingleListener;
+import cz.fit.lentaruand.data.dao.newsobject.ImageDao;
+import cz.fit.lentaruand.data.dao.newsobject.NewsDao;
+import cz.fit.lentaruand.data.dao.newsobject.BitmapReference.BitmapLoadListener;
 
 public class NewsFullFragment extends Fragment {
 	private long newsId;

@@ -1,4 +1,4 @@
-package cz.fit.lentaruand.data.dao;
+package cz.fit.lentaruand.data.dao.newsobject;
 
 import java.sql.Date;
 import java.util.ArrayList;
@@ -16,6 +16,11 @@ import android.text.TextUtils;
 import cz.fit.lentaruand.data.Link;
 import cz.fit.lentaruand.data.News;
 import cz.fit.lentaruand.data.Rubrics;
+import cz.fit.lentaruand.data.dao.Dao;
+import cz.fit.lentaruand.data.dao.NewsLinksDao;
+import cz.fit.lentaruand.data.dao.async.AsyncCachedNewsObjectDao;
+import cz.fit.lentaruand.data.dao.async.AsyncNewsObjectDao;
+import cz.fit.lentaruand.data.dao.sync.SynchronizedNewsObjectDao;
 import cz.fit.lentaruand.data.db.NewsEntry;
 import cz.fit.lentaruand.data.db.SQLiteType;
 import cz.fit.lentaruand.data.provider.LentaProvider;
@@ -28,18 +33,18 @@ public final class NewsDao {
 	
 	private static final Object sync = new Object();
 	
-	public final static AsyncDao<News> getInstance(ContentResolver contentResolver) {
+	public final static AsyncNewsObjectDao<News> getInstance(ContentResolver contentResolver) {
 		if (contentResolver == null) {
 			throw new IllegalArgumentException("contentResolver is null.");
 		}
 		
-		return new SynchronizedDao<News>(new AsyncCachedDao<News>(new ContentResolverNewsDao(contentResolver), cacheId), sync);
+		return new SynchronizedNewsObjectDao<News>(new AsyncCachedNewsObjectDao<News>(new ContentResolverNewsDao(contentResolver), cacheId), sync);
 	}
 
 	private NewsDao() {
 	}
 	
-	private static class ContentResolverNewsDao extends AbstractDao<News> {
+	private static class ContentResolverNewsDao extends ContentResolverNewsObjectDao<News> {
 		private static final String[] projectionAll = {
 			NewsEntry._ID,
 			NewsEntry.COLUMN_NAME_GUID,
@@ -142,6 +147,11 @@ public final class NewsDao {
 		@Override
 		protected String[] getProjectionAll() {
 			return projectionAll;
+		}
+
+		@Override
+		protected String getRubricColumnName() {
+			return NewsEntry.COLUMN_NAME_RUBRIC;
 		}
 
 		@Override

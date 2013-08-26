@@ -14,7 +14,7 @@ import cz.fit.lentaruand.data.db.SQLiteType;
  * 
  * @param <T> is the database object for Dao.
  */
-class CachedDao<T extends DatabaseObject> implements Dao<T> {
+public class CachedDao<T extends DatabaseObject> implements Dao<T> {
 	private final Dao<T> underlinedDao;
 	private final LruCache<Long, T> cacheId;
 	
@@ -24,11 +24,11 @@ class CachedDao<T extends DatabaseObject> implements Dao<T> {
 	 */
 	protected final Collection<Long> missed = new ArrayList<Long>();
 
-	private Dao<T> getUnderlinedDao() {
+	protected Dao<T> getUnderlinedDao() {
 		return underlinedDao;
 	}
 	
-	private LruCache<Long, T> getLruCacheId() {
+	protected LruCache<Long, T> getLruCacheId() {
 		return cacheId;
 	}
 	

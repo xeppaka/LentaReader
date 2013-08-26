@@ -1,18 +1,19 @@
-package cz.fit.lentaruand.data.dao;
+package cz.fit.lentaruand.data.dao.async;
 
 import java.util.Collection;
 
 import android.os.AsyncTask;
 import android.support.v4.util.LruCache;
 import cz.fit.lentaruand.data.DatabaseObject;
-
+import cz.fit.lentaruand.data.dao.Dao;
+import cz.fit.lentaruand.data.dao.CachedDao;
 
 public class AsyncCachedDao<T extends DatabaseObject> extends CachedDao<T> implements AsyncDao<T> {
 	public AsyncCachedDao(Dao<T> underlinedDao, LruCache<Long, T> cacheId) {
 		super(underlinedDao, cacheId);
 	}
 
-	private class AsyncCreateSingleTask extends AsyncTask<T, Void, Long> {
+	protected class AsyncCreateSingleTask extends AsyncTask<T, Void, Long> {
 		private AsyncDao.DaoCreateSingleListener<T> listener;
 		
 		public AsyncCreateSingleTask(AsyncDao.DaoCreateSingleListener<T> listener) {
@@ -30,7 +31,7 @@ public class AsyncCachedDao<T extends DatabaseObject> extends CachedDao<T> imple
 		}
 	}
 	
-	private class AsyncCreateMultiTask extends AsyncTask<Collection<T>, Void, Collection<Long>> {
+	protected class AsyncCreateMultiTask extends AsyncTask<Collection<T>, Void, Collection<Long>> {
 		private AsyncDao.DaoCreateMultiListener<T> listener;
 		
 		public AsyncCreateMultiTask(AsyncDao.DaoCreateMultiListener<T> listener) {
@@ -48,7 +49,7 @@ public class AsyncCachedDao<T extends DatabaseObject> extends CachedDao<T> imple
 		}
 	}
 	
-	private class AsyncReadSingleTask extends AsyncTask<Long, Void, T> {
+	protected class AsyncReadSingleTask extends AsyncTask<Long, Void, T> {
 		private AsyncDao.DaoReadSingleListener<T> listener;
 		
 		public AsyncReadSingleTask(AsyncDao.DaoReadSingleListener<T> listener) {
@@ -66,7 +67,7 @@ public class AsyncCachedDao<T extends DatabaseObject> extends CachedDao<T> imple
 		}
 	}
 	
-	private class AsyncDeleteSingleTask extends AsyncTask<Long, Void, Integer> {
+	protected class AsyncDeleteSingleTask extends AsyncTask<Long, Void, Integer> {
 		private AsyncDao.DaoDeleteListener listener;
 		
 		public AsyncDeleteSingleTask(AsyncDao.DaoDeleteListener listener) {
@@ -84,7 +85,7 @@ public class AsyncCachedDao<T extends DatabaseObject> extends CachedDao<T> imple
 		}
 	}
 	
-	private class AsyncReadMultiTask extends AsyncTask<Collection<Long>, Void, Collection<T>> {
+	protected class AsyncReadMultiTask extends AsyncTask<Collection<Long>, Void, Collection<T>> {
 		private AsyncDao.DaoReadMultiListener<T> listener;
 		
 		public AsyncReadMultiTask(AsyncDao.DaoReadMultiListener<T> listener) {
@@ -106,7 +107,7 @@ public class AsyncCachedDao<T extends DatabaseObject> extends CachedDao<T> imple
 		}
 	}
 	
-	private class AsyncUpdateSingleTask extends AsyncTask<T, Void, Integer> {
+	protected class AsyncUpdateSingleTask extends AsyncTask<T, Void, Integer> {
 		private AsyncDao.DaoUpdateListener listener;
 		
 		public AsyncUpdateSingleTask(AsyncDao.DaoUpdateListener listener) {

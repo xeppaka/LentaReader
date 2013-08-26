@@ -1,4 +1,4 @@
-package cz.fit.lentaruand.data.dao;
+package cz.fit.lentaruand.data.dao.newsobject;
 
 import java.util.Collection;
 import java.util.Date;
@@ -9,10 +9,11 @@ import android.database.Cursor;
 import android.net.Uri;
 import cz.fit.lentaruand.data.Photo;
 import cz.fit.lentaruand.data.Rubrics;
+import cz.fit.lentaruand.data.dao.ContentResolverDao;
 import cz.fit.lentaruand.data.db.PhotoEntry;
 import cz.fit.lentaruand.data.db.SQLiteType;
 
-public class PhotoDao extends AbstractDao<Photo> {
+public class PhotoDao extends ContentResolverDao<Photo> {
 	private static final String[] projectionAll = {
 		PhotoEntry._ID,
 		PhotoEntry.COLUMN_NAME_GUID,
