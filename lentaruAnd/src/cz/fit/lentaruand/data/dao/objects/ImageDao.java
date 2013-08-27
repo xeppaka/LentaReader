@@ -477,7 +477,7 @@ public class ImageDao {
 		 * @see cz.fit.lentaruand.data.dao.BitmapReference#getBitmapAsync(cz.fit.lentaruand.data.dao.BitmapReference.BitmapLoadListener)
 		 */
 		@Override
-		public synchronized void getBitmapAsync(BitmapLoadListener listener) {
+		public void getBitmapAsync(BitmapLoadListener listener) {
 			if (bitmap != null) {
 				listener.onBitmapLoaded(seizeBitmap());
 			} else {
@@ -506,7 +506,6 @@ public class ImageDao {
 		private synchronized void onRemoveFromCache() {
 			if (bitmapReferences <= 0) {
 				recycleBitmap();
-				bitmap = null;
 			}
 			
 			cached = false;
@@ -538,7 +537,7 @@ public class ImageDao {
 			return 0;
 		}
 
-		private Bitmap seizeBitmap() {
+		private synchronized Bitmap seizeBitmap() {
 			if (bitmap != null) {
 				++bitmapReferences;
 			}

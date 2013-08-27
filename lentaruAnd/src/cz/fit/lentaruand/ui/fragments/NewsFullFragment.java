@@ -66,6 +66,7 @@ public class NewsFullFragment extends Fragment {
 	@Override
 	public void onPause() {
 		super.onPause();
+		imageView.setImageBitmap(null);
 	}
 
 	@Override
@@ -77,8 +78,10 @@ public class NewsFullFragment extends Fragment {
 	}
 
 	private void showNews(News news) {
-		if (news.getFullText() != null) {
-			contentView.setText(Html.fromHtml(news.getFullText()));
+		String fullText = news.getFullText();
+		
+		if (fullText != null) {
+			contentView.setText(Html.fromHtml(fullText));
 			contentView.setMovementMethod(LinkMovementMethod.getInstance());
 		}
 		
