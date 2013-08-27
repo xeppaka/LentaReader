@@ -1,4 +1,4 @@
-package cz.fit.lentaruand.data.dao.newsobject;
+package cz.fit.lentaruand.data.dao.objects;
 
 import java.util.Collection;
 import java.util.Date;
@@ -8,7 +8,6 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
 import cz.fit.lentaruand.data.Link;
-import cz.fit.lentaruand.data.dao.ContentResolverDao;
 import cz.fit.lentaruand.data.db.ArticleLinksEntry;
 import cz.fit.lentaruand.data.db.SQLiteType;
 

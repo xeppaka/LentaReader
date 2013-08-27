@@ -13,7 +13,7 @@ import cz.fit.lentaruand.data.NewsType;
 import cz.fit.lentaruand.data.Rubrics;
 import cz.fit.lentaruand.data.dao.async.AsyncDao;
 import cz.fit.lentaruand.data.dao.async.AsyncDao.DaoReadMultiListener;
-import cz.fit.lentaruand.data.dao.newsobject.NewsDao;
+import cz.fit.lentaruand.data.dao.objects.NewsDao;
 import cz.fit.lentaruand.service.ServiceCallbackListener;
 import cz.fit.lentaruand.service.ServiceHelper;
 import cz.fit.lentaruand.ui.activities.NewsFullActivity;
@@ -31,7 +31,7 @@ public class SwipeNewsListFragment extends ListFragment {
 	private NewsObjectAdapter<News> newsObjectsAdapter;
 	private ServiceHelper serviceHelper;
 	private AsyncDao<News> dao;
-
+	
 	private class ListFragmentServiceListener implements ServiceCallbackListener {
 
 		@Override
@@ -84,15 +84,35 @@ public class SwipeNewsListFragment extends ListFragment {
 		setListAdapter(newsObjectsAdapter);
 		
 		serviceHelper = new ServiceHelper(this.getActivity(), new Handler());
-		dao = NewsDao.getInstance(this.getActivity().getContentResolver());
+		serviceHelper.updateRubric(NewsType.NEWS, Rubrics.ROOT);
+	}
+
+	@Override
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
 		
+		serviceHelper.addListener(serviceListener);
+		
+		dao = NewsDao.getInstance(this.getActivity().getContentResolver());
 		dao.readAsync(new DaoReadMultiListener<News>() {
 			@Override
 			public void finished(Collection<News> result) {
 				showNewsObjects(result);
-				serviceHelper.updateRubric(NewsType.NEWS, Rubrics.ROOT);
+				serviceHelper.syncRubric(NewsType.NEWS, Rubrics.ROOT);
 			}
 		});
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+		
+		serviceHelper.removeListener(serviceListener);
 	}
 
 	@Override
@@ -108,28 +128,5 @@ public class SwipeNewsListFragment extends ListFragment {
 	private void showNewsObjects(Collection<News> newsObjects) {
 		newsObjectsAdapter.setNewsObjects(newsObjects);
 		newsObjectsAdapter.notifyDataSetChanged();
-	}
-
-	@Override
-	public void onActivityCreated(Bundle savedInstanceState) {
-		super.onActivityCreated(savedInstanceState);
-		serviceHelper.updateRubric(NewsType.NEWS, Rubrics.ROOT);
-	}
-
-	@Override
-	public void onResume() {
-		super.onResume();
-		serviceHelper.addListener(serviceListener);
-	}
-
-	@Override
-	public void onPause() {
-		super.onPause();
-		serviceHelper.removeListener(serviceListener);
-	}
-
-	@Override
-	public void onViewCreated(View view, Bundle savedInstanceState) {
-		super.onViewCreated(view, savedInstanceState);
 	}
 }

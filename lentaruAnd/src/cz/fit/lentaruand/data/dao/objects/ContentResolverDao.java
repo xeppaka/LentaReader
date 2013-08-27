@@ -1,4 +1,4 @@
-package cz.fit.lentaruand.data.dao;
+package cz.fit.lentaruand.data.dao.objects;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,6 +13,7 @@ import android.net.Uri;
 import android.provider.BaseColumns;
 import android.util.Log;
 import cz.fit.lentaruand.data.DatabaseObject;
+import cz.fit.lentaruand.data.dao.Dao;
 import cz.fit.lentaruand.data.db.SQLiteType;
 import cz.fit.lentaruand.utils.LentaConstants;
 

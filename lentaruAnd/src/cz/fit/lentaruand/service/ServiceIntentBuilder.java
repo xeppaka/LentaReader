@@ -97,6 +97,10 @@ public class ServiceIntentBuilder {
 			 return buildUpdateItemFullTexts();
 		 case UPDATE_ITEM_IMAGES:
 			 return buildUpdateItemImages();
+		case SYNC_RUBRIC:
+			 return buildSyncRubric();
+		default:
+			break;
 		 }
 		 
 		 throw new AssertionError();
@@ -114,6 +118,28 @@ public class ServiceIntentBuilder {
 		Intent result = new Intent(context, LentaService.class);
 		result.putExtra(ServiceIntentKey.REQUEST_ID.name(), requestId);
 		result.putExtra(ServiceIntentKey.SERVICE_ACTION.name(), ServiceAction.UPDATE_RUBRIC.name());
+		result.putExtra(ServiceIntentKey.NEWS_TYPE.name(), newsType.name());
+		result.putExtra(ServiceIntentKey.RUBRIC.name(), rubric.name());
+
+		if (resultReceiver != null) {
+			result.putExtra(ServiceIntentKey.RESULT_RECEIVER.name(), resultReceiver);
+		}
+		
+		return result;
+	}
+	
+	private Intent buildSyncRubric() {
+		if (newsType == null) {
+			throw new NullPointerException("newsType is null.");
+		}
+
+		if (rubric == null) {
+			throw new NullPointerException("rubric is null.");
+		}
+		
+		Intent result = new Intent(context, LentaService.class);
+		result.putExtra(ServiceIntentKey.REQUEST_ID.name(), requestId);
+		result.putExtra(ServiceIntentKey.SERVICE_ACTION.name(), ServiceAction.SYNC_RUBRIC.name());
 		result.putExtra(ServiceIntentKey.NEWS_TYPE.name(), newsType.name());
 		result.putExtra(ServiceIntentKey.RUBRIC.name(), rubric.name());
 

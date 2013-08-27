@@ -1,15 +1,16 @@
-package cz.fit.lentaruand.data.dao.async;
+package cz.fit.lentaruand.data.dao.decorators;
 
 import java.util.Collection;
 
 import android.os.AsyncTask;
-import android.support.v4.util.LruCache;
 import cz.fit.lentaruand.data.NewsObject;
 import cz.fit.lentaruand.data.Rubrics;
-import cz.fit.lentaruand.data.dao.newsobject.NewsObjectDao;
+import cz.fit.lentaruand.data.dao.NODao;
+import cz.fit.lentaruand.data.dao.async.AsyncDao;
+import cz.fit.lentaruand.data.dao.async.AsyncNODao;
 
-public class AsyncCachedNewsObjectDao<T extends NewsObject> extends AsyncCachedDao<T> implements AsyncNewsObjectDao<T> {
-	protected NewsObjectDao<T> underlinedDao;
+public class AsyncNODaoDecorator<T extends NewsObject> extends AsyncDaoDecorator<T> implements AsyncNODao<T>, NODao<T> {
+	private NODao<T> decoratedDao;
 	
 	protected class AsyncReadMultiForRubricTask extends AsyncTask<Rubrics, Void, Collection<T>> {
 		private AsyncDao.DaoReadMultiListener<T> listener;
@@ -20,7 +21,7 @@ public class AsyncCachedNewsObjectDao<T extends NewsObject> extends AsyncCachedD
 
 		@Override
 		protected Collection<T> doInBackground(Rubrics... rubric) {
-			return getUnderlinedDao().readForRubric(rubric[0]);
+			return readForRubric(rubric[0]);
 		}
 
 		@Override
@@ -29,10 +30,10 @@ public class AsyncCachedNewsObjectDao<T extends NewsObject> extends AsyncCachedD
 		}
 	}
 	
-	public AsyncCachedNewsObjectDao(NewsObjectDao<T> underlinedDao, LruCache<Long, T> cacheId) {
-		super(underlinedDao, cacheId);
+	public AsyncNODaoDecorator(NODao<T> decoratedDao) {
+		super(decoratedDao);
 		
-		this.underlinedDao = underlinedDao;
+		this.decoratedDao = decoratedDao;
 	}
 
 	@Override
@@ -42,7 +43,12 @@ public class AsyncCachedNewsObjectDao<T extends NewsObject> extends AsyncCachedD
 	}
 
 	@Override
-	protected NewsObjectDao<T> getUnderlinedDao() {
-		return underlinedDao;
+	public Collection<T> readForRubric(Rubrics rubric) {
+		return getDecoratedDao().readForRubric(rubric);
+	}
+
+	@Override
+	protected NODao<T> getDecoratedDao() {
+		return decoratedDao;
 	}
 }

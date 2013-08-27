@@ -1,4 +1,4 @@
-package cz.fit.lentaruand.data.dao.newsobject;
+package cz.fit.lentaruand.data.dao.objects;
 
 import java.sql.Date;
 import java.util.ArrayList;
@@ -17,10 +17,10 @@ import cz.fit.lentaruand.data.Link;
 import cz.fit.lentaruand.data.News;
 import cz.fit.lentaruand.data.Rubrics;
 import cz.fit.lentaruand.data.dao.Dao;
-import cz.fit.lentaruand.data.dao.NewsLinksDao;
-import cz.fit.lentaruand.data.dao.async.AsyncCachedNewsObjectDao;
-import cz.fit.lentaruand.data.dao.async.AsyncNewsObjectDao;
-import cz.fit.lentaruand.data.dao.sync.SynchronizedNewsObjectDao;
+import cz.fit.lentaruand.data.dao.async.AsyncNODao;
+import cz.fit.lentaruand.data.dao.decorators.AsyncNODaoDecorator;
+import cz.fit.lentaruand.data.dao.decorators.CachedNODaoDecorator;
+import cz.fit.lentaruand.data.dao.decorators.SynchronizedNODaoDecorator;
 import cz.fit.lentaruand.data.db.NewsEntry;
 import cz.fit.lentaruand.data.db.SQLiteType;
 import cz.fit.lentaruand.data.provider.LentaProvider;
@@ -30,21 +30,20 @@ public final class NewsDao {
 	private static final int CACHE_MAX_OBJECTS = LentaConstants.DAO_CACHE_MAX_OBJECTS;
 	
 	private static final LruCache<Long, News> cacheId = new LruCache<Long, News>(CACHE_MAX_OBJECTS);
-	
 	private static final Object sync = new Object();
 	
-	public final static AsyncNewsObjectDao<News> getInstance(ContentResolver contentResolver) {
+	public final static AsyncNODao<News> getInstance(ContentResolver contentResolver) {
 		if (contentResolver == null) {
 			throw new IllegalArgumentException("contentResolver is null.");
 		}
 		
-		return new SynchronizedNewsObjectDao<News>(new AsyncCachedNewsObjectDao<News>(new ContentResolverNewsDao(contentResolver), cacheId), sync);
+		return new AsyncNODaoDecorator<News>(new SynchronizedNODaoDecorator<News>(new CachedNODaoDecorator<News>(new ContentResolverNewsDao(contentResolver), cacheId), sync));
 	}
 
 	private NewsDao() {
 	}
 	
-	private static class ContentResolverNewsDao extends ContentResolverNewsObjectDao<News> {
+	private static class ContentResolverNewsDao extends ContentResolverNODao<News> {
 		private static final String[] projectionAll = {
 			NewsEntry._ID,
 			NewsEntry.COLUMN_NAME_GUID,

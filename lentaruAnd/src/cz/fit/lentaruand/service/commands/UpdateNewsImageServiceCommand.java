@@ -11,9 +11,8 @@ import android.util.Log;
 import cz.fit.lentaruand.data.News;
 import cz.fit.lentaruand.data.NewsType;
 import cz.fit.lentaruand.data.dao.async.AsyncDao;
-import cz.fit.lentaruand.data.dao.newsobject.ImageDao;
-import cz.fit.lentaruand.data.dao.newsobject.NewsDao;
-import cz.fit.lentaruand.data.dao.newsobject.StrongBitmapReference;
+import cz.fit.lentaruand.data.dao.objects.NewsDao;
+import cz.fit.lentaruand.data.dao.objects.StrongBitmapReference;
 import cz.fit.lentaruand.downloader.LentaHttpImageDownloader;
 import cz.fit.lentaruand.downloader.exceptions.HttpStatusCodeException;
 import cz.fit.lentaruand.service.BundleConstants;
@@ -21,10 +20,10 @@ import cz.fit.lentaruand.service.ServiceResultAction;
 import cz.fit.lentaruand.service.commands.exceptions.ImageUpdateException;
 import cz.fit.lentaruand.utils.LentaConstants;
 
-public class NewsImageUpdateServiceCommand extends ImageUpdateServiceCommand<News> {
+public class UpdateNewsImageServiceCommand extends UpdateImageServiceCommand<News> {
 	private Bundle result;
 
-	public NewsImageUpdateServiceCommand(int requestId, News newsObject,
+	public UpdateNewsImageServiceCommand(int requestId, News newsObject,
 			ContentResolver contentResolver, ResultReceiver resultReceiver,
 			boolean reportError) {
 		super(requestId, newsObject, contentResolver, resultReceiver, reportError);
@@ -43,34 +42,26 @@ public class NewsImageUpdateServiceCommand extends ImageUpdateServiceCommand<New
 		}
 
 		if (news != null) {
-			Log.d(LentaConstants.LoggerServiceTag, "Update image for news guid: " + news.getGuid());
-			
 			String imageLink = news.getImageLink();
 			
 			if (imageLink != null && !TextUtils.isEmpty(imageLink)) {
-				ImageDao imageDao = ImageDao.getInstance(getContentResolver());
+				try {
+					Bitmap newBitmap = LentaHttpImageDownloader.downloadBitmap(imageLink);
+					news.setImage(new StrongBitmapReference(newBitmap));
+					
+					newsDao.update(news);
 
-				if (!imageDao.imageExist(imageLink)) {
-					try {
-						Log.d(LentaConstants.LoggerServiceTag, "Image doesn't exist in the cache: " + imageLink);
-						
-						Bitmap newBitmap = LentaHttpImageDownloader.downloadBitmap(imageLink);
-						news.setImage(new StrongBitmapReference(newBitmap));
-						
-						newsDao.update(news);
-
-						Log.d(LentaConstants.LoggerServiceTag, "Successfuly downloaded and saved image: " + imageLink);
-						
-						prepareResultUpdated(news.getId());
-					} catch (HttpStatusCodeException e) {
-						Log.e(LentaConstants.LoggerServiceTag,
-								"Error loading image from URL: " + imageLink, e);
-						throw e;
-					} catch (IOException e) {
-						Log.e(LentaConstants.LoggerServiceTag,
-								"Error loading image from URL: " + imageLink, e);
-						throw e;
-					}
+					Log.d(LentaConstants.LoggerServiceTag, "Successfuly downloaded and saved image: " + imageLink);
+					
+					prepareResultUpdated(news.getId());
+				} catch (HttpStatusCodeException e) {
+					Log.e(LentaConstants.LoggerServiceTag,
+							"Error loading image from URL: " + imageLink, e);
+					throw e;
+				} catch (IOException e) {
+					Log.e(LentaConstants.LoggerServiceTag,
+							"Error loading image from URL: " + imageLink, e);
+					throw e;
 				}
 			} else {
 				throw new ImageUpdateException("Unable to load images for news with guid " + news.getGuid() + ". Image link is empty.");
@@ -78,8 +69,6 @@ public class NewsImageUpdateServiceCommand extends ImageUpdateServiceCommand<New
 		} else {
 			throw new ImageUpdateException("Read news from database for guid " + getNewsId() + " failed.");
 		}
-		
-		Log.d(LentaConstants.LoggerServiceTag, "Command finished successfuly: " + getClass().getSimpleName());
 	}
 	
 	private void prepareResultUpdated(long id) {

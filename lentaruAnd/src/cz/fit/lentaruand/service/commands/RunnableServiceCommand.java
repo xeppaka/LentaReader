@@ -30,6 +30,8 @@ public abstract class RunnableServiceCommand implements ServiceCommand {
 	
 	@Override
 	public void run() {
+		Log.d(LentaConstants.LoggerServiceTag, "Command started: " + getClass().getSimpleName());
+
 		try {
 			execute();
 		} catch (Exception e) {
@@ -38,6 +40,9 @@ public abstract class RunnableServiceCommand implements ServiceCommand {
 			if (resultReceiver != null && reportError()) {
 				resultReceiver.send(ServiceResult.ERROR.ordinal(), prepareExceptionResult(e));
 			}
+			
+			Log.d(LentaConstants.LoggerServiceTag, "Command finished with exception: " + getClass().getSimpleName());
+			return;
 		}
 		
 		if (resultReceiver != null) {
@@ -47,6 +52,8 @@ public abstract class RunnableServiceCommand implements ServiceCommand {
 				resultReceiver.send(ServiceResult.SUCCESS.ordinal(), result);
 			}
 		}
+		
+		Log.d(LentaConstants.LoggerServiceTag, "Command finished successfuly: " + getClass().getSimpleName());
 	}
 	
 	protected abstract Bundle getResult();

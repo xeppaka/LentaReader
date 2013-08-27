@@ -2,9 +2,8 @@ package cz.fit.lentaruand.data.dao.async;
 
 import java.util.Collection;
 
-import cz.fit.lentaruand.data.dao.Dao;
-
 import android.content.ContentResolver;
+import cz.fit.lentaruand.data.dao.Dao;
 
 /**
  * Dao interface with extended asynchronous methods for CRUD operations.

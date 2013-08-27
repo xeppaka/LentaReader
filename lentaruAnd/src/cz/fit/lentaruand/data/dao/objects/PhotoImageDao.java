@@ -1,4 +1,4 @@
-package cz.fit.lentaruand.data.dao.newsobject;
+package cz.fit.lentaruand.data.dao.objects;
 
 import java.util.Collection;
 
@@ -7,7 +7,6 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
 import cz.fit.lentaruand.data.PhotoImage;
-import cz.fit.lentaruand.data.dao.ContentResolverDao;
 import cz.fit.lentaruand.data.db.PhotoImageEntry;
 import cz.fit.lentaruand.data.db.SQLiteType;
 

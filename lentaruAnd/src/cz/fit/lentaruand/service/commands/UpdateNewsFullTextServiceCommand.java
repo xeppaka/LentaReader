@@ -5,12 +5,11 @@ import java.io.IOException;
 import android.content.ContentResolver;
 import android.os.Bundle;
 import android.os.ResultReceiver;
-import android.text.TextUtils;
 import android.util.Log;
 import cz.fit.lentaruand.data.News;
 import cz.fit.lentaruand.data.NewsType;
 import cz.fit.lentaruand.data.dao.async.AsyncDao;
-import cz.fit.lentaruand.data.dao.newsobject.NewsDao;
+import cz.fit.lentaruand.data.dao.objects.NewsDao;
 import cz.fit.lentaruand.downloader.LentaNewsDownloader;
 import cz.fit.lentaruand.downloader.exceptions.HttpStatusCodeException;
 import cz.fit.lentaruand.parser.exceptions.ParseWithRegexException;
@@ -18,13 +17,13 @@ import cz.fit.lentaruand.service.BundleConstants;
 import cz.fit.lentaruand.service.ServiceResultAction;
 import cz.fit.lentaruand.utils.LentaConstants;
 
-public final class NewsFullTextUpdateServiceCommand extends RunnableServiceCommand {
+public final class UpdateNewsFullTextServiceCommand extends RunnableServiceCommand {
 	private long newsId;
 	private News news;
 	private ContentResolver contentResolver;
 	private Bundle result;
 	
-	public NewsFullTextUpdateServiceCommand(int requestId, News news, ContentResolver contentResolver, ResultReceiver resultReceiver, boolean reportError) {
+	public UpdateNewsFullTextServiceCommand(int requestId, News news, ContentResolver contentResolver, ResultReceiver resultReceiver, boolean reportError) {
 		super(requestId, resultReceiver, reportError);
 		
 		if (news == null) {
@@ -39,7 +38,7 @@ public final class NewsFullTextUpdateServiceCommand extends RunnableServiceComma
 		this.contentResolver = contentResolver;
 	}
 	
-	public NewsFullTextUpdateServiceCommand(int requestId, long newsId, ContentResolver contentResolver, ResultReceiver resultReceiver, boolean reportError) {
+	public UpdateNewsFullTextServiceCommand(int requestId, long newsId, ContentResolver contentResolver, ResultReceiver resultReceiver, boolean reportError) {
 		super(requestId, resultReceiver, reportError);
 		
 		if (newsId < 0) {
@@ -56,8 +55,6 @@ public final class NewsFullTextUpdateServiceCommand extends RunnableServiceComma
 	
 	@Override
 	public void execute() throws Exception {
-		Log.d(LentaConstants.LoggerServiceTag, "Command started: " + getClass().getSimpleName());
-		
 		AsyncDao<News> newsDao = NewsDao.getInstance(contentResolver);
 
 		if (news == null) {
@@ -66,10 +63,6 @@ public final class NewsFullTextUpdateServiceCommand extends RunnableServiceComma
 
 		if (news != null) {
 			Log.d(LentaConstants.LoggerServiceTag, "Update full text for news guid: " + news.getGuid());
-			
-			if (news.getFullText() != null && TextUtils.isEmpty(news.getFullText())) {
-				return;
-			}
 			
 			try {
 				new LentaNewsDownloader().downloadFull(news);
@@ -87,8 +80,6 @@ public final class NewsFullTextUpdateServiceCommand extends RunnableServiceComma
 				throw e;
 			}
 		}
-		
-		Log.d(LentaConstants.LoggerServiceTag, "Command finished successfuly: " + getClass().getSimpleName());
 	}
 
 	private void prepareResultUpdated(long id) {

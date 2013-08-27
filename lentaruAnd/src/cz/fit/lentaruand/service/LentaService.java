@@ -18,9 +18,10 @@ import cz.fit.lentaruand.data.DatabaseObject;
 import cz.fit.lentaruand.data.NewsType;
 import cz.fit.lentaruand.data.Rubrics;
 import cz.fit.lentaruand.service.ServiceIntentBuilder.ServiceIntentKey;
-import cz.fit.lentaruand.service.commands.NewsUpdateServiceCommand;
-import cz.fit.lentaruand.service.commands.RubricUpdateServiceCommand;
 import cz.fit.lentaruand.service.commands.ServiceCommand;
+import cz.fit.lentaruand.service.commands.SyncRubricServiceCommand;
+import cz.fit.lentaruand.service.commands.SyncNewsServiceCommand;
+import cz.fit.lentaruand.service.commands.UpdateRubricServiceCommand;
 import cz.fit.lentaruand.utils.LentaConstants;
 
 /**
@@ -95,6 +96,9 @@ public class LentaService extends Service {
 		case UPDATE_RUBRIC:
 			updateRubric(requestId, getRubric(intent), newsType, getReceiver(intent));
 			break;
+		case SYNC_RUBRIC:
+			syncRubric(requestId, getRubric(intent), newsType, getReceiver(intent));
+			break;
 		case UPDATE_ITEM:
 			updateItem(requestId, newsType, getItemId(intent), getReceiver(intent));
 			break;
@@ -102,13 +106,20 @@ public class LentaService extends Service {
 			break;
 		case UPDATE_ITEM_IMAGES:
 			break;
+		default:
+			break;
 		}
 		
 		return START_NOT_STICKY;
 	}
 
 	private void updateRubric(int requestId, Rubrics rubric, NewsType newsType, ResultReceiver resultReceiver) {
-		RubricUpdateServiceCommand command = new RubricUpdateServiceCommand(requestId, rubric, newsType, executor, getContentResolver(), resultReceiver, true);
+		UpdateRubricServiceCommand command = new UpdateRubricServiceCommand(requestId, rubric, newsType, executor, getContentResolver(), resultReceiver, true);
+		executor.execute(command);
+	}
+	
+	private void syncRubric(int requestId, Rubrics rubric, NewsType newsType, ResultReceiver resultReceiver) {
+		SyncRubricServiceCommand command = new SyncRubricServiceCommand(requestId, rubric, newsType, executor, getContentResolver(), resultReceiver, true);
 		executor.execute(command);
 	}
 	
@@ -129,7 +140,7 @@ public class LentaService extends Service {
 	}
 	
 	private void updateNewsItem(int requestId, long newsId, ContentResolver contentResolver, ExecutorService executor, ResultReceiver resultReceiver) {
-		NewsUpdateServiceCommand command = new NewsUpdateServiceCommand(requestId, newsId, contentResolver, executor, resultReceiver, false);
+		SyncNewsServiceCommand command = new SyncNewsServiceCommand(requestId, newsId, contentResolver, executor, resultReceiver, false);
 		executor.execute(command);
 	}
 	

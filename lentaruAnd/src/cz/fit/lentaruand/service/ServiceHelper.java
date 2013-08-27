@@ -53,6 +53,16 @@ public class ServiceHelper {
 		return requestId;
 	}
 	
+	public int syncRubric(NewsType newsType, Rubrics rubric) {
+		final int requestId = requestCounter.incrementAndGet();
+
+		startService(new ServiceIntentBuilder(context, requestId)
+				.forAction(ServiceAction.SYNC_RUBRIC).forNewsType(newsType)
+				.forResultReceiver(resultReceiver).forRubric(rubric).build());
+		
+		return requestId;
+	}
+	
 	private void startService(Intent intent) {
 		context.startService(intent);
 	}

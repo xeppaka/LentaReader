@@ -1,4 +1,4 @@
-package cz.fit.lentaruand.data.dao.newsobject;
+package cz.fit.lentaruand.data.dao.objects;
 
 import android.graphics.Bitmap;
 

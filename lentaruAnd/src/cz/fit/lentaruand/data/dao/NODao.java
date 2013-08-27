@@ -1,10 +1,9 @@
-package cz.fit.lentaruand.data.dao.newsobject;
+package cz.fit.lentaruand.data.dao;
 
 import java.util.Collection;
 
 import cz.fit.lentaruand.data.NewsObject;
 import cz.fit.lentaruand.data.Rubrics;
-import cz.fit.lentaruand.data.dao.Dao;
 
 /**
  * DAO interface that should implement every DAO implementation that represents
@@ -14,6 +13,6 @@ import cz.fit.lentaruand.data.dao.Dao;
  * 
  * @param <T>
  */
-public interface NewsObjectDao<T extends NewsObject> extends Dao<T> {
+public interface NODao<T extends NewsObject> extends Dao<T> {
 	Collection<T> readForRubric(Rubrics rubric);
 }

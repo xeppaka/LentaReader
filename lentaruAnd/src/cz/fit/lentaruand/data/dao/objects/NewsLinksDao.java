@@ -1,4 +1,4 @@
-package cz.fit.lentaruand.data.dao;
+package cz.fit.lentaruand.data.dao.objects;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,9 +11,10 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.support.v4.util.LruCache;
 import cz.fit.lentaruand.data.Link;
-import cz.fit.lentaruand.data.dao.async.AsyncCachedDao;
 import cz.fit.lentaruand.data.dao.async.AsyncDao;
-import cz.fit.lentaruand.data.dao.sync.SynchronizedDao;
+import cz.fit.lentaruand.data.dao.decorators.AsyncDaoDecorator;
+import cz.fit.lentaruand.data.dao.decorators.CachedDaoDecorator;
+import cz.fit.lentaruand.data.dao.decorators.SynchronizedDaoDecorator;
 import cz.fit.lentaruand.data.db.NewsLinksEntry;
 import cz.fit.lentaruand.data.db.SQLiteType;
 import cz.fit.lentaruand.data.provider.LentaProvider;
@@ -23,7 +24,6 @@ public class NewsLinksDao {
 	private static final int CACHE_MAX_OBJECTS = LentaConstants.DAO_CACHE_MAX_OBJECTS;
 	
 	private static final LruCache<Long, Link> cacheId = new LruCache<Long, Link>(CACHE_MAX_OBJECTS);
-	
 	private static final Object sync = new Object();
 	
 	public final static AsyncDao<Link> getInstance(ContentResolver contentResolver) {
@@ -31,7 +31,7 @@ public class NewsLinksDao {
 			throw new IllegalArgumentException("contentResolver is null.");
 		}
 		
-		return new SynchronizedDao<Link>(new AsyncCachedDao<Link>(new ContentResolverNewsLinksDao(contentResolver), cacheId), sync);
+		return new AsyncDaoDecorator<Link>(new SynchronizedDaoDecorator<Link>(new CachedDaoDecorator<Link>(new ContentResolverNewsLinksDao(contentResolver), cacheId), sync));
 	}
 
 	private NewsLinksDao() {

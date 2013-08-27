@@ -1,16 +1,22 @@
-package cz.fit.lentaruand.data.dao.async;
+package cz.fit.lentaruand.data.dao.decorators;
 
 import java.util.Collection;
 
 import android.os.AsyncTask;
-import android.support.v4.util.LruCache;
 import cz.fit.lentaruand.data.DatabaseObject;
 import cz.fit.lentaruand.data.dao.Dao;
-import cz.fit.lentaruand.data.dao.CachedDao;
+import cz.fit.lentaruand.data.dao.async.AsyncDao;
+import cz.fit.lentaruand.data.db.SQLiteType;
 
-public class AsyncCachedDao<T extends DatabaseObject> extends CachedDao<T> implements AsyncDao<T> {
-	public AsyncCachedDao(Dao<T> underlinedDao, LruCache<Long, T> cacheId) {
-		super(underlinedDao, cacheId);
+public class AsyncDaoDecorator<T extends DatabaseObject> implements AsyncDao<T> {
+	private Dao<T> decoratedDao;
+	
+	public AsyncDaoDecorator(Dao<T> decoratedDao) {
+		if (decoratedDao == null) {
+			throw new NullPointerException("decoratedDao is null.");
+		}
+		
+		this.decoratedDao = decoratedDao;
 	}
 
 	protected class AsyncCreateSingleTask extends AsyncTask<T, Void, Long> {
@@ -163,5 +169,101 @@ public class AsyncCachedDao<T extends DatabaseObject> extends CachedDao<T> imple
 	@Override
 	public synchronized void deleteAsync(long id, AsyncDao.DaoDeleteListener listener) {
 		new AsyncDeleteSingleTask(listener).execute(id);
+	}
+
+	protected Dao<T> getDecoratedDao() {
+		return decoratedDao;
+	}
+
+	@Override
+	public void registerContentObserver(
+			cz.fit.lentaruand.data.dao.Dao.Observer<T> observer) {
+		getDecoratedDao().registerContentObserver(observer);
+	}
+
+	@Override
+	public void unregisterContentObserver(
+			cz.fit.lentaruand.data.dao.Dao.Observer<T> observer) {
+		getDecoratedDao().unregisterContentObserver(observer);
+	}
+
+	@Override
+	public long create(T dataObject) {
+		return getDecoratedDao().create(dataObject);
+	}
+
+	@Override
+	public Collection<Long> create(Collection<T> dataObjects) {
+		return getDecoratedDao().create(dataObjects);
+	}
+
+	@Override
+	public Collection<T> read() {
+		return getDecoratedDao().read();
+	}
+
+	@Override
+	public T read(long id) {
+		return getDecoratedDao().read(id);
+	}
+
+	@Override
+	public Collection<T> read(Collection<Long> ids) {
+		return getDecoratedDao().read(ids);
+	}
+
+	@Override
+	public T read(String key) {
+		return getDecoratedDao().read(key);
+	}
+
+	@Override
+	public T read(SQLiteType keyType, String keyColumnName, String keyValue) {
+		return getDecoratedDao().read(keyType, keyColumnName, keyValue);
+	}
+
+	@Override
+	public boolean exist(long id) {
+		return getDecoratedDao().exist(id);
+	}
+
+	@Override
+	public boolean exist(String key) {
+		return getDecoratedDao().exist(key);
+	}
+
+	@Override
+	public int update(T dataObject) {
+		return getDecoratedDao().update(dataObject);
+	}
+
+	@Override
+	public int delete(long id) {
+		return getDecoratedDao().delete(id);
+	}
+
+	@Override
+	public int delete(String key) {
+		return getDecoratedDao().delete(key);
+	}
+
+	@Override
+	public int delete(SQLiteType keyType, String keyColumnName, String keyValue) {
+		return getDecoratedDao().delete(keyType, keyColumnName, keyValue);
+	}
+
+	@Override
+	public Collection<Long> readAllIds() {
+		return getDecoratedDao().readAllIds();
+	}
+
+	@Override
+	public Collection<String> readAllKeys() {
+		return getDecoratedDao().readAllKeys();
+	}
+
+	@Override
+	public Collection<T> readForParentObject(long parentId) {
+		return getDecoratedDao().readForParentObject(parentId);
 	}
 }

@@ -1,4 +1,4 @@
-package cz.fit.lentaruand.data.dao.newsobject;
+package cz.fit.lentaruand.data.dao.objects;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -8,12 +8,12 @@ import android.content.ContentResolver;
 import android.database.Cursor;
 import cz.fit.lentaruand.data.NewsObject;
 import cz.fit.lentaruand.data.Rubrics;
-import cz.fit.lentaruand.data.dao.ContentResolverDao;
+import cz.fit.lentaruand.data.dao.NODao;
 import cz.fit.lentaruand.data.db.SQLiteType;
 
-public abstract class ContentResolverNewsObjectDao<T extends NewsObject> extends ContentResolverDao<T> implements NewsObjectDao<T> {
+public abstract class ContentResolverNODao<T extends NewsObject> extends ContentResolverDao<T> implements NODao<T> {
 	
-	public ContentResolverNewsObjectDao(ContentResolver cr) {
+	public ContentResolverNODao(ContentResolver cr) {
 		super(cr);
 	}
 

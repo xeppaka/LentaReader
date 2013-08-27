@@ -14,14 +14,18 @@ import cz.fit.lentaruand.R;
 import cz.fit.lentaruand.data.News;
 import cz.fit.lentaruand.data.dao.async.AsyncDao;
 import cz.fit.lentaruand.data.dao.async.AsyncDao.DaoReadSingleListener;
-import cz.fit.lentaruand.data.dao.newsobject.ImageDao;
-import cz.fit.lentaruand.data.dao.newsobject.NewsDao;
-import cz.fit.lentaruand.data.dao.newsobject.BitmapReference.BitmapLoadListener;
+import cz.fit.lentaruand.data.dao.objects.ImageDao;
+import cz.fit.lentaruand.data.dao.objects.NewsDao;
+import cz.fit.lentaruand.data.dao.objects.BitmapReference.BitmapLoadListener;
 
 public class NewsFullFragment extends Fragment {
+	private TextView titleView;
+	private TextView contentView;
+	private ImageView imageView;
+	
 	private long newsId;
 	private News loadedNews;
-
+	
 	public NewsFullFragment(long newsId){
 		this.newsId = newsId;
 	}
@@ -37,8 +41,17 @@ public class NewsFullFragment extends Fragment {
 	}
 
 	@Override
-	public void onActivityCreated(Bundle savedInstanceState) {
-		super.onActivityCreated(savedInstanceState);
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+
+		titleView = (TextView) getActivity().findViewById(R.id.full_news_title);
+		contentView = (TextView) getActivity().findViewById(R.id.full_news_content);
+		imageView = (ImageView) getActivity().findViewById(R.id.full_news_image);
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
 		
 		AsyncDao<News> nd = NewsDao.getInstance(getActivity().getContentResolver());
 		nd.readAsync(newsId, new DaoReadSingleListener<News>() {
@@ -49,24 +62,21 @@ public class NewsFullFragment extends Fragment {
 			}
 		});
 	}
-
+	
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+	public void onPause() {
+		super.onPause();
 	}
 
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
 		
+		imageView.setImageBitmap(null);
 		loadedNews.getImage().releaseBitmap();
 	}
 
 	private void showNews(News news) {
-		final TextView titleView = (TextView) getActivity().findViewById(R.id.full_news_title);
-		TextView contentView = (TextView) getActivity().findViewById(R.id.full_news_content);
-		final ImageView imageView = (ImageView) getActivity().findViewById(R.id.full_news_image);
-		
 		if (news.getFullText() != null) {
 			contentView.setText(Html.fromHtml(news.getFullText()));
 			contentView.setMovementMethod(LinkMovementMethod.getInstance());

@@ -1,10 +1,11 @@
-package cz.fit.lentaruand.data.dao;
+package cz.fit.lentaruand.data.dao.decorators;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
 import android.support.v4.util.LruCache;
 import cz.fit.lentaruand.data.DatabaseObject;
+import cz.fit.lentaruand.data.dao.Dao;
 import cz.fit.lentaruand.data.db.SQLiteType;
 
 /**
@@ -14,25 +15,19 @@ import cz.fit.lentaruand.data.db.SQLiteType;
  * 
  * @param <T> is the database object for Dao.
  */
-public class CachedDao<T extends DatabaseObject> implements Dao<T> {
-	private final Dao<T> underlinedDao;
+public class CachedDaoDecorator<T extends DatabaseObject> implements Dao<T> {
+	private final Dao<T> decoratedDao;
 	private final LruCache<Long, T> cacheId;
 	
-	/**
-	 * used only in {@link CachedDao#read(Collection)} to not create temporary
-	 * object for every method invocation.
-	 */
-	protected final Collection<Long> missed = new ArrayList<Long>();
-
-	protected Dao<T> getUnderlinedDao() {
-		return underlinedDao;
+	protected Dao<T> getDecoratedDao() {
+		return decoratedDao;
 	}
 	
 	protected LruCache<Long, T> getLruCacheId() {
 		return cacheId;
 	}
 	
-	public CachedDao(Dao<T> underlinedDao, LruCache<Long, T> cacheId) {
+	public CachedDaoDecorator(Dao<T> underlinedDao, LruCache<Long, T> cacheId) {
 		if (underlinedDao == null) {
 			throw new IllegalArgumentException("underlinedDao is null.");
 		}
@@ -41,23 +36,23 @@ public class CachedDao<T extends DatabaseObject> implements Dao<T> {
 			throw new IllegalArgumentException("cacheId is null.");
 		}
 		
-		this.underlinedDao = underlinedDao;
+		this.decoratedDao = underlinedDao;
 		this.cacheId = cacheId;
 	}
 
 	@Override
 	public void registerContentObserver(Dao.Observer<T> observer) {
-		getUnderlinedDao().registerContentObserver(observer);
+		getDecoratedDao().registerContentObserver(observer);
 	}
 
 	@Override
 	public void unregisterContentObserver(Dao.Observer<T> observer) {
-		getUnderlinedDao().unregisterContentObserver(observer);
+		getDecoratedDao().unregisterContentObserver(observer);
 	}
 
 	@Override
 	public synchronized long create(T dataObject) {
-		long newId = getUnderlinedDao().create(dataObject);
+		long newId = getDecoratedDao().create(dataObject);
 		
 		getLruCacheId().put(newId, dataObject);
 		
@@ -66,7 +61,7 @@ public class CachedDao<T extends DatabaseObject> implements Dao<T> {
 
 	@Override
 	public Collection<Long> create(Collection<T> dataObjects) {
-		Collection<Long> result = getUnderlinedDao().create(dataObjects);
+		Collection<Long> result = getDecoratedDao().create(dataObjects);
 		
 		for (T dataObject : dataObjects) {
 			cacheId.put(dataObject.getId(), dataObject);
@@ -77,10 +72,9 @@ public class CachedDao<T extends DatabaseObject> implements Dao<T> {
 
 	@Override
 	public Collection<T> read() {
-		Collection<Long> allIds = getUnderlinedDao().readAllIds();
-		Collection<T> result = new ArrayList<T>();
-		
-		missed.clear();
+		Collection<Long> allIds = getDecoratedDao().readAllIds();
+		Collection<T> result = new ArrayList<T>(allIds.size());
+		Collection<Long> missed = new ArrayList<Long>();
 		
 		for (Long id : allIds) {
 			T newsObject = cacheId.get(id);
@@ -92,7 +86,12 @@ public class CachedDao<T extends DatabaseObject> implements Dao<T> {
 			}
 		}
 		
-		result.addAll(getUnderlinedDao().read(missed));
+		Collection<T> dbResult = getDecoratedDao().read(missed);
+		result.addAll(dbResult);
+		
+		for (T object : dbResult) {
+			getLruCacheId().put(object.getId(), object);
+		}
 		
 		return result;
 	}
@@ -105,13 +104,13 @@ public class CachedDao<T extends DatabaseObject> implements Dao<T> {
 			return dataObject;
 		}
 		
-		return getUnderlinedDao().read(id);
+		return getDecoratedDao().read(id);
 	}
 
 	@Override
 	public Collection<T> read(Collection<Long> ids) {
-		missed.clear();
-		Collection<T> result = new ArrayList<T>();
+		Collection<Long> missed = new ArrayList<Long>();
+		Collection<T> result = new ArrayList<T>(ids.size());
 		
 		for (Long id : ids) {
 			T dataObject = getLruCacheId().get(id);
@@ -124,7 +123,13 @@ public class CachedDao<T extends DatabaseObject> implements Dao<T> {
 		}
 		
 		if (!missed.isEmpty()) {
-			result.addAll(getUnderlinedDao().read(missed));
+			Collection<T> dbResult = getDecoratedDao().read(missed);
+			
+			result.addAll(dbResult);
+			
+			for (T object : dbResult) {
+				getLruCacheId().put(object.getId(), object);
+			}
 		}
 		
 		return result;
@@ -132,12 +137,12 @@ public class CachedDao<T extends DatabaseObject> implements Dao<T> {
 
 	@Override
 	public T read(String key) {
-		return getUnderlinedDao().read(key);
+		return getDecoratedDao().read(key);
 	}
 
 	@Override
 	public T read(SQLiteType keyType, String keyColumnName, String keyValue) {
-		return getUnderlinedDao().read(keyType, keyColumnName, keyValue);
+		return getDecoratedDao().read(keyType, keyColumnName, keyValue);
 	}
 
 	@Override
@@ -146,32 +151,50 @@ public class CachedDao<T extends DatabaseObject> implements Dao<T> {
 			return true;
 		}
 		
-		return getUnderlinedDao().exist(id);
+		return getDecoratedDao().exist(id);
 	}
 
 	@Override
 	public boolean exist(String key) {
-		return getUnderlinedDao().exist(key);
+		return getDecoratedDao().exist(key);
 	}
 
 	@Override
 	public Collection<T> readForParentObject(long parentId) {
-		// TODO: consider if cache can be used in that case.
-		return getUnderlinedDao().readForParentObject(parentId);
+		Collection<T> dbResult = getDecoratedDao().readForParentObject(parentId);
+		
+		if (dbResult.isEmpty()) {
+			return dbResult;
+		}
+		
+		Collection<T> result = new ArrayList<T>(dbResult.size());
+		
+		for (T object : dbResult) {
+			T cachedObject = getLruCacheId().get(object.getId());
+			
+			if (cachedObject != null) {
+				result.add(cachedObject);
+			} else {
+				result.add(object);
+				getLruCacheId().put(object.getId(), object);
+			}
+		}
+		
+		return result;
 	}
 
 	@Override
 	public int update(T dataObject) {
 		getLruCacheId().put(dataObject.getId(), dataObject);
 		
-		return getUnderlinedDao().update(dataObject);
+		return getDecoratedDao().update(dataObject);
 	}
 
 	@Override
 	public int delete(long id) {
 		getLruCacheId().remove(id);
 		
-		return getUnderlinedDao().delete(id);
+		return getDecoratedDao().delete(id);
 	}
 
 	@Override
@@ -181,16 +204,16 @@ public class CachedDao<T extends DatabaseObject> implements Dao<T> {
 
 	@Override
 	public int delete(SQLiteType keyType, String keyColumnName, String keyValue) {
-		return getUnderlinedDao().delete(keyType, keyColumnName, keyValue);
+		return getDecoratedDao().delete(keyType, keyColumnName, keyValue);
 	}
 
 	@Override
 	public Collection<Long> readAllIds() {
-		return getUnderlinedDao().readAllIds();
+		return getDecoratedDao().readAllIds();
 	}
 
 	@Override
 	public Collection<String> readAllKeys() {
-		return getUnderlinedDao().readAllKeys();
+		return getDecoratedDao().readAllKeys();
 	}
 }

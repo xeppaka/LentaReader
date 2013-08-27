@@ -1,10 +1,11 @@
-package cz.fit.lentaruand.data.dao;
+package cz.fit.lentaruand.data.dao.objects;
 
 import java.util.Collection;
 
 import android.database.ContentObserver;
 import android.os.Handler;
 import android.util.Log;
+import cz.fit.lentaruand.data.dao.Dao;
 import cz.fit.lentaruand.utils.LentaConstants;
 
 public abstract class DaoObserver<T> implements Dao.Observer<T> {

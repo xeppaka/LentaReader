@@ -15,7 +15,7 @@ import cz.fit.lentaruand.data.News;
 import cz.fit.lentaruand.data.NewsType;
 import cz.fit.lentaruand.data.Rubrics;
 import cz.fit.lentaruand.data.dao.Dao;
-import cz.fit.lentaruand.data.dao.newsobject.NewsDao;
+import cz.fit.lentaruand.data.dao.objects.NewsDao;
 import cz.fit.lentaruand.downloader.LentaNewsDownloader;
 import cz.fit.lentaruand.downloader.exceptions.HttpStatusCodeException;
 import cz.fit.lentaruand.parser.exceptions.ParseWithXPathException;
@@ -23,14 +23,14 @@ import cz.fit.lentaruand.service.BundleConstants;
 import cz.fit.lentaruand.service.ServiceResultAction;
 import cz.fit.lentaruand.utils.LentaConstants;
 
-public final class RubricUpdateServiceCommand extends RunnableServiceCommand {
+public final class UpdateRubricServiceCommand extends RunnableServiceCommand {
 	private Rubrics rubric;
 	private ExecutorService executor;
 	private ContentResolver contentResolver;
 	private NewsType newsType;
 	private Bundle result;
 
-	public RubricUpdateServiceCommand(int requestId, Rubrics rubric, NewsType newsType, ExecutorService executor, ContentResolver contentResolver, ResultReceiver resultReceiver, boolean reportError) {
+	public UpdateRubricServiceCommand(int requestId, Rubrics rubric, NewsType newsType, ExecutorService executor, ContentResolver contentResolver, ResultReceiver resultReceiver, boolean reportError) {
 		super(requestId, resultReceiver, reportError);
 		
 		if (rubric == null) {
@@ -67,7 +67,6 @@ public final class RubricUpdateServiceCommand extends RunnableServiceCommand {
 	}
 
 	private void executeNews() throws Exception {
-		Log.d(LentaConstants.LoggerServiceTag, "Command started: " + getClass().getSimpleName());
 		List<News> news;
 		
 		try {
@@ -105,14 +104,12 @@ public final class RubricUpdateServiceCommand extends RunnableServiceCommand {
 		Collections.sort(nonExistingNews, Collections.reverseOrder());
 		
 		for (News n : nonExistingNews) {
-			executor.execute(new NewsFullTextUpdateServiceCommand(getRequestId(), n, contentResolver, getResultReceiver(), false));
+			executor.execute(new UpdateNewsFullTextServiceCommand(getRequestId(), n, contentResolver, getResultReceiver(), false));
 		}
 		
 		for (News n : nonExistingNews) {
-			executor.execute(new NewsImageUpdateServiceCommand(getRequestId(), n, contentResolver, getResultReceiver(), false));
+			executor.execute(new UpdateNewsImageServiceCommand(getRequestId(), n, contentResolver, getResultReceiver(), false));
 		}
-		
-		Log.d(LentaConstants.LoggerServiceTag, "Command finished successfuly: " + getClass().getSimpleName());
 	}
 	
 	private void prepareResultCreated(Collection<Long> ids) {
