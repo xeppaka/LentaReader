@@ -64,10 +64,10 @@ public class UpdateNewsImageServiceCommand extends UpdateImageServiceCommand<New
 					throw e;
 				}
 			} else {
-				throw new ImageUpdateException("Unable to load images for news with guid " + news.getGuid() + ". Image link is empty.");
+				throw new ImageUpdateException("Image link is empty for news with guid " + news.getGuid());
 			}
 		} else {
-			throw new ImageUpdateException("Read news from database for guid " + getNewsId() + " failed.");
+			throw new ImageUpdateException("Cannot find in database news with guid " + getNewsId());
 		}
 	}
 	

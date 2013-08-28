@@ -15,6 +15,7 @@ import cz.fit.lentaruand.downloader.exceptions.HttpStatusCodeException;
 import cz.fit.lentaruand.parser.exceptions.ParseWithRegexException;
 import cz.fit.lentaruand.service.BundleConstants;
 import cz.fit.lentaruand.service.ServiceResultAction;
+import cz.fit.lentaruand.service.commands.exceptions.NewsItemUpdateException;
 import cz.fit.lentaruand.utils.LentaConstants;
 
 public final class UpdateNewsFullTextServiceCommand extends RunnableServiceCommand {
@@ -79,6 +80,8 @@ public final class UpdateNewsFullTextServiceCommand extends RunnableServiceComma
 				Log.e(LentaConstants.LoggerServiceTag, "Error downloading page, status code returned: " + e.getHttpStatusCode() + ".", e);
 				throw e;
 			}
+		} else {
+			throw new NewsItemUpdateException("Cannot find in database news with guid " + news.getGuid());
 		}
 	}
 

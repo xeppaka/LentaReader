@@ -263,6 +263,19 @@ public final class NewsDao {
 			return null;
 		}
 
+		@Override
+		public List<News> readForRubric(Rubrics rubric) {
+			List<News> news = super.readForRubric(rubric);
+			
+			for (News n : news) {
+				readOtherNewsParts(n);
+			}
+			
+			Collections.sort(news);
+			
+			return news;
+		}
+
 		private void updateOtherNewsParts(News news) {
 			Collection<Link> links = news.getLinks();
 			
@@ -291,7 +304,6 @@ public final class NewsDao {
 		}
 
 		private void readOtherNewsParts(News news) {
-			// read news links
 			List<Link> links = new ArrayList<Link>(newsLinksDao.readForParentObject(news.getId()));
 			Collections.sort(links);
 			

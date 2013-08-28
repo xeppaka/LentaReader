@@ -63,7 +63,7 @@ public class SwipeNewsListFragment extends ListFragment {
 		}
 
 		@Override
-		public void onFailed(int requestId, Exception e, boolean rootAction) {
+		public void onFailed(int requestId, Exception e) {
 		}
 	}
 	

@@ -9,5 +9,5 @@ public interface ServiceCallbackListener {
     void onDatabaseObjectsUpdate(int requestId, NewsType newsType, Collection<Long> ids);
     void onImagesUpdate(int requestId, NewsType newsType, Collection<Long> ids);
     
-    void onFailed(int requestId, Exception e, boolean rootAction);
+    void onFailed(int requestId, Exception e);
 }

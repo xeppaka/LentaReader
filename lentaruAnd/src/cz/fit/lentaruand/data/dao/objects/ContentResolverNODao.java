@@ -1,7 +1,6 @@
 package cz.fit.lentaruand.data.dao.objects;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import android.content.ContentResolver;
@@ -18,7 +17,7 @@ public abstract class ContentResolverNODao<T extends NewsObject> extends Content
 	}
 
 	@Override
-	public Collection<T> readForRubric(Rubrics rubric) {
+	public List<T> readForRubric(Rubrics rubric) {
 		String where = getWhereFromSQLiteType(SQLiteType.TEXT);
 		String[] whereArgs = { rubric.name() };
 		

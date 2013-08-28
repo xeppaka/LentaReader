@@ -94,7 +94,7 @@ public final class UpdateRubricServiceCommand extends RunnableServiceCommand {
 			}
 		}
 
-		Log.d(LentaConstants.LoggerServiceTag, "New news from downloaded " + nonExistingNews.size());
+		Log.d(LentaConstants.LoggerServiceTag, "Number of new news from downloaded: " + nonExistingNews.size());
 		
 		Collection<Long> newsIds = newsDao.create(nonExistingNews);
 		Log.d(LentaConstants.LoggerServiceTag, "Newly created news ids: " + newsIds);
