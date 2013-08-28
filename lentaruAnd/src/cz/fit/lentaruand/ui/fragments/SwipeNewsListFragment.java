@@ -32,6 +32,8 @@ public class SwipeNewsListFragment extends ListFragment {
 	private ServiceHelper serviceHelper;
 	private AsyncDao<News> dao;
 	
+	private boolean updateRubric = true;
+	
 	private class ListFragmentServiceListener implements ServiceCallbackListener {
 
 		@Override
@@ -84,7 +86,11 @@ public class SwipeNewsListFragment extends ListFragment {
 		setListAdapter(newsObjectsAdapter);
 		
 		serviceHelper = new ServiceHelper(this.getActivity(), new Handler());
-		serviceHelper.updateRubric(NewsType.NEWS, Rubrics.ROOT);
+		
+		if (updateRubric) {
+			serviceHelper.updateRubric(NewsType.NEWS, Rubrics.ROOT);
+			updateRubric = false;
+		}
 	}
 
 	@Override

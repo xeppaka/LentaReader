@@ -76,7 +76,11 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
 			newsImageView = holder.getNewsImage();
 			newsImageView.setImageBitmap(null);
 			
-			holder.getImage().releaseBitmap();
+			BitmapReference prevImageRef = holder.getImage();
+			if (prevImageRef != null) {
+				prevImageRef.releaseBitmap();
+			}
+			
 			holder.setImage(imageRef);
 		}
 

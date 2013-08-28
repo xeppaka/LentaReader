@@ -66,14 +66,12 @@ public class NewsFullFragment extends Fragment {
 	@Override
 	public void onPause() {
 		super.onPause();
-		imageView.setImageBitmap(null);
 	}
 
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
 		
-		imageView.setImageBitmap(null);
 		loadedNews.getImage().releaseBitmap();
 	}
 

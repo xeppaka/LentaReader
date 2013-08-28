@@ -203,10 +203,10 @@ public class ImageDao {
 		
 		CachedLazyLoadBitmapReference imageRef = new CachedLazyLoadBitmapReference(imageKey, bitmap);
 		try {
+			createBitmapOnDisk(imageKey, bitmap);
+			
 			fullBitmapCache.put(imageKey, imageRef);
 			Log.d(LentaConstants.LoggerAnyTag, "Put bitmap to cache. Cache size: " + fullBitmapCache.size());
-			
-			createBitmapOnDisk(imageKey, bitmap);
 			
 			if (withThumbnail) {
 				CachedLazyLoadBitmapReference thumbnailBitmapRef = new CachedLazyLoadBitmapReference(imageKey, createThumbnailBitmap(bitmap));
