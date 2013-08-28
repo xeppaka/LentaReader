@@ -19,7 +19,7 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
 	private static class ViewHolder {
 		private final TextView newsTitle;
 		private final ImageView newsImage;
-		private final BitmapReference imageRef;
+		private BitmapReference imageRef;
 		
 		public ViewHolder(ImageView newsImage, TextView newsTitle, BitmapReference imageRef) {
 			this.newsImage = newsImage;
@@ -37,6 +37,10 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
 		
 		public BitmapReference getImage() {
 			return imageRef;
+		}
+		
+		public void setImage(BitmapReference imageRef) {
+			this.imageRef = imageRef;
 		}
 	}
 
@@ -73,6 +77,7 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
 			newsImageView.setImageBitmap(null);
 			
 			holder.getImage().releaseBitmap();
+			holder.setImage(imageRef);
 		}
 
 		newsTitleTextView.setText(news.getTitle());

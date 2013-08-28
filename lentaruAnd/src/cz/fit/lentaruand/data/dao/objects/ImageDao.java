@@ -422,7 +422,11 @@ public class ImageDao {
 				Bitmap fullBitmap = fullBitmapRef.getBitmapIfCached();
 				
 				if (fullBitmap != null) {
-					return createThumbnailBitmap(fullBitmap);
+					try {
+						return createThumbnailBitmap(fullBitmap);
+					} finally {
+						fullBitmapRef.releaseBitmap();
+					}
 				}
 			}
 			
@@ -478,8 +482,9 @@ public class ImageDao {
 		 */
 		@Override
 		public void getBitmapAsync(BitmapLoadListener listener) {
-			if (bitmap != null) {
-				listener.onBitmapLoaded(seizeBitmap());
+			Bitmap seizedBitmap = seizeBitmap();
+			if (seizedBitmap != null) {
+				listener.onBitmapLoaded(seizedBitmap);
 			} else {
 				new BitmapLoadTask().execute(listener);
 			}
@@ -487,8 +492,11 @@ public class ImageDao {
 
 		public synchronized void releaseBitmap() {
 			if (bitmap != null && --bitmapReferences <= 0 && !isCached()) {
+				Log.d(LentaConstants.LoggerAnyTag, "releaseBitmap(): " + cacheKey + ", number of references: " + bitmapReferences);
 				recycleBitmap();
 			}
+			
+			Log.d(LentaConstants.LoggerAnyTag, "releaseBitmap(): " + cacheKey + ", number of references: " + bitmapReferences);
 		}
 
 		public synchronized boolean isRecycled() {
@@ -540,6 +548,7 @@ public class ImageDao {
 		private synchronized Bitmap seizeBitmap() {
 			if (bitmap != null) {
 				++bitmapReferences;
+				Log.d(LentaConstants.LoggerAnyTag, "seizeBitmap(): " + cacheKey + ", number of references: " + bitmapReferences);
 			}
 			
 			return bitmap;
@@ -547,6 +556,7 @@ public class ImageDao {
 		
 		private void recycleBitmap() {
 			if (bitmap != null) {
+				Log.d(LentaConstants.LoggerAnyTag, "recycleBitmap(): " + cacheKey + ", number of references: " + bitmapReferences);
 				bitmap.recycle();
 				bitmap = null;
 			}

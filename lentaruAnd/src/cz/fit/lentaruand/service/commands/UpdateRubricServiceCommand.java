@@ -113,6 +113,11 @@ public final class UpdateRubricServiceCommand extends RunnableServiceCommand {
 	}
 	
 	private void prepareResultCreated(Collection<Long> ids) {
+		if (ids.isEmpty()) {
+			result = null;
+			return;
+		}
+		
 		result = new Bundle();
 		result.putInt(BundleConstants.KEY_REQUEST_ID.name(), getRequestId());
 		result.putString(BundleConstants.KEY_ACTION.name(), ServiceResultAction.DATABASE_OBJECT_CREATED.name());

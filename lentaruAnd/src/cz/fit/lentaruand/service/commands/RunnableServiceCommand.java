@@ -99,4 +99,9 @@ public abstract class RunnableServiceCommand implements ServiceCommand {
 	protected boolean reportError() {
 		return reportError;
 	}
+
+	@Override
+	public String getCommandName() {
+		return getClass().getSimpleName();
+	}
 }
