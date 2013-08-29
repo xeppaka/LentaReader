@@ -14,9 +14,9 @@ import cz.fit.lentaruand.R;
 import cz.fit.lentaruand.data.News;
 import cz.fit.lentaruand.data.dao.async.AsyncDao;
 import cz.fit.lentaruand.data.dao.async.AsyncDao.DaoReadSingleListener;
+import cz.fit.lentaruand.data.dao.objects.BitmapReference.BitmapLoadListener;
 import cz.fit.lentaruand.data.dao.objects.ImageDao;
 import cz.fit.lentaruand.data.dao.objects.NewsDao;
-import cz.fit.lentaruand.data.dao.objects.BitmapReference.BitmapLoadListener;
 
 public class NewsFullFragment extends Fragment {
 	private TextView titleView;
@@ -47,6 +47,8 @@ public class NewsFullFragment extends Fragment {
 		titleView = (TextView) getActivity().findViewById(R.id.full_news_title);
 		contentView = (TextView) getActivity().findViewById(R.id.full_news_content);
 		imageView = (ImageView) getActivity().findViewById(R.id.full_news_image);
+		
+		imageView.setImageBitmap(null);
 	}
 
 	@Override

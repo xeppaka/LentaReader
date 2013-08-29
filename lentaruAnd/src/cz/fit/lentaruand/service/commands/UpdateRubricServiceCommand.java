@@ -103,9 +103,9 @@ public final class UpdateRubricServiceCommand extends RunnableServiceCommand {
 
 		Collections.sort(nonExistingNews, Collections.reverseOrder());
 		
-		for (News n : nonExistingNews) {
-			executor.execute(new UpdateNewsFullTextServiceCommand(getRequestId(), n, contentResolver, getResultReceiver(), false));
-		}
+//		for (News n : nonExistingNews) {
+//			executor.execute(new UpdateNewsFullTextServiceCommand(getRequestId(), n, contentResolver, getResultReceiver(), false));
+//		}
 		
 		for (News n : nonExistingNews) {
 			executor.execute(new UpdateNewsImageServiceCommand(getRequestId(), n, contentResolver, getResultReceiver(), false));
