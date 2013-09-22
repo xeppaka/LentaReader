@@ -4,12 +4,12 @@ import android.content.ContentResolver;
 import android.os.ResultReceiver;
 import cz.fit.lentaruand.data.NewsObject;
 
-public abstract class UpdateImageServiceCommand<T extends NewsObject> extends RunnableServiceCommand {
+public abstract class RetrieveImageServiceCommand<T extends NewsObject> extends RunnableServiceCommand {
 	private long newsId;
 	private T newsObject;
 	private ContentResolver contentResolver;
 	
-	public UpdateImageServiceCommand(int requestId, T newsObject, ContentResolver contentResolver, ResultReceiver resultReceiver, boolean reportError) {
+	public RetrieveImageServiceCommand(int requestId, T newsObject, ContentResolver contentResolver, ResultReceiver resultReceiver, boolean reportError) {
 		super(requestId, resultReceiver, reportError);
 		
 		if (newsObject == null) {

@@ -71,12 +71,12 @@ public class SyncNewsServiceCommand extends RunnableServiceCommand {
 			String imageLink = news.getImageLink();
 			if (imageLink != null && !TextUtils.isEmpty(imageLink)) {
 				if (!imageDao.imageExist(imageLink)) {
-					executor.execute(new UpdateNewsImageServiceCommand(getRequestId(), news, contentResolver, getResultReceiver(), false));
+					executor.execute(new RetrieveNewsImageServiceCommand(getRequestId(), news, contentResolver, getResultReceiver(), false));
 				}
 			}
 			
 			if (news.getFullText() == null) {
-				executor.execute(new UpdateNewsFullTextServiceCommand(getRequestId(), news, contentResolver, getResultReceiver(), false));
+				executor.execute(new RetrieveNewsFullTextServiceCommand(getRequestId(), news, contentResolver, getResultReceiver(), false));
 			}
 		}
 	}

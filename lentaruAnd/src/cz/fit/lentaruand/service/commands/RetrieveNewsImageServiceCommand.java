@@ -20,10 +20,10 @@ import cz.fit.lentaruand.service.ServiceResultAction;
 import cz.fit.lentaruand.service.commands.exceptions.ImageUpdateException;
 import cz.fit.lentaruand.utils.LentaConstants;
 
-public class UpdateNewsImageServiceCommand extends UpdateImageServiceCommand<News> {
+public class RetrieveNewsImageServiceCommand extends RetrieveImageServiceCommand<News> {
 	private Bundle result;
 
-	public UpdateNewsImageServiceCommand(int requestId, News newsObject,
+	public RetrieveNewsImageServiceCommand(int requestId, News newsObject,
 			ContentResolver contentResolver, ResultReceiver resultReceiver,
 			boolean reportError) {
 		super(requestId, newsObject, contentResolver, resultReceiver, reportError);

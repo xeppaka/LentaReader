@@ -18,13 +18,13 @@ import cz.fit.lentaruand.service.ServiceResultAction;
 import cz.fit.lentaruand.service.commands.exceptions.NewsItemUpdateException;
 import cz.fit.lentaruand.utils.LentaConstants;
 
-public final class UpdateNewsFullTextServiceCommand extends RunnableServiceCommand {
+public final class RetrieveNewsFullTextServiceCommand extends RunnableServiceCommand {
 	private long newsId;
 	private News news;
 	private ContentResolver contentResolver;
 	private Bundle result;
 	
-	public UpdateNewsFullTextServiceCommand(int requestId, News news, ContentResolver contentResolver, ResultReceiver resultReceiver, boolean reportError) {
+	public RetrieveNewsFullTextServiceCommand(int requestId, News news, ContentResolver contentResolver, ResultReceiver resultReceiver, boolean reportError) {
 		super(requestId, resultReceiver, reportError);
 		
 		if (news == null) {
@@ -39,7 +39,7 @@ public final class UpdateNewsFullTextServiceCommand extends RunnableServiceComma
 		this.contentResolver = contentResolver;
 	}
 	
-	public UpdateNewsFullTextServiceCommand(int requestId, long newsId, ContentResolver contentResolver, ResultReceiver resultReceiver, boolean reportError) {
+	public RetrieveNewsFullTextServiceCommand(int requestId, long newsId, ContentResolver contentResolver, ResultReceiver resultReceiver, boolean reportError) {
 		super(requestId, resultReceiver, reportError);
 		
 		if (newsId < 0) {
