@@ -10,7 +10,7 @@ import javax.xml.bind.annotation.XmlRootElement
 object Main extends App {
   val xml = XML.load(new URL("http://lenta.ru/rss"))
   val items = (xml \\ "item").toArray
-  val res = for (item <- items) yield LentaNewsItem.createItem(item)
+  val res = for (item <- items) yield LentaNewsItem.create(item)
   
   val nn = new LentaNews(res)
   
