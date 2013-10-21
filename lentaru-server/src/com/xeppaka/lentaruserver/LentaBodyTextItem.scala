@@ -10,6 +10,4 @@ import javax.xml.bind.annotation.{XmlAccessorType, XmlRootElement, XmlAccessType
  * To change this template use File | Settings | File Templates.
  */
 
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
 class LentaBodyTextItem(val text: String) extends LentaBodyItem {}

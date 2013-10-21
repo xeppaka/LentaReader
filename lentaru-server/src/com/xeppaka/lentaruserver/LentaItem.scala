@@ -1,17 +1,12 @@
 package com.xeppaka.lentaruserver
 
-import javax.xml.bind.annotation.XmlAccessorType
-import javax.xml.bind.annotation.XmlAccessType
+abstract class LentaItem (
+  val guid: String = null,
+  val title: String = null,
+  val pubDate: Long = 0,
+  val image: String = null,
+  val description: String = null,
+  val body: LentaItemBody) extends LentaItemBase {
 
-@XmlAccessorType(XmlAccessType.FIELD)
-trait LentaItem {
-  var guid: String = null
-  var title: String = null
-  var pubDate: Long = 0
-  var image: String = null
-  var description: String = null
-
-  override def toString() = {
-    s"LentaItem[guid=$guid, title=$title, pubDate=$pubDate, image=$image, description=$description]" 
-  }
+  override def toString() = s"LentaItem[guid=$guid, title=$title, pubDate=$pubDate, image=$image, description=$description]"
 }

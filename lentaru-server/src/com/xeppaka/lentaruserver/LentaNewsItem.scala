@@ -5,10 +5,8 @@ import javax.xml.bind.annotation.XmlAccessorType
 import javax.xml.bind.annotation.XmlAccessType
 import javax.xml.bind.annotation.XmlRootElement
 
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "news")
-class LentaNewsItem() extends LentaItem {
-  var body: LentaNewsBody = null
+class LentaNewsItem extends LentaItem {
+  //def body: LentaNewsBody = body
 
   override def toString() = {
     s"LentaNewsItem[guid=$guid, title=$title, pubDate=$pubDate, image=$image, description=$description]" 
@@ -16,7 +14,7 @@ class LentaNewsItem() extends LentaItem {
 }
 
 object LentaNewsItem {
-  def create(rssItem: Node): LentaNewsItem = {
+  def apply(rssItem: Node): LentaNewsItem = {
     val newsItem = new LentaNewsItem()
     newsItem.guid = (rssItem \\ "guid").text
     newsItem.title = (rssItem \\ "title").text

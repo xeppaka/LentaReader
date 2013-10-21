@@ -1,5 +1,5 @@
 package com.xeppaka.lentaruserver
 
-trait LentaBodyItem {
+abstract class LentaBodyItem {
   
 }
