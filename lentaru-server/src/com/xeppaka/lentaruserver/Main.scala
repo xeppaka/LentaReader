@@ -7,8 +7,7 @@ import javax.xml.bind.JAXBContext
 
 
 object Main extends App {
+  val nn = Lenta.download(NewsType.NEWS)
 
-
-//  val items = (xml \\ "item").toArray
-//  val res = for (item <- items) yield LentaNewsItem(item)
+  println(nn)
 }

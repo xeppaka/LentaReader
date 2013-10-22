@@ -2,21 +2,21 @@ package com.xeppaka.lentaruserver
 
 import scala.xml.Node
 
-case class LentaItem (
+class LentaItem (
   val guid: String,
-  val title: String = null,
-  val pubDate: Long = 0,
-  val image: String = null,
-  val description: String = null,
-  val link: String = null,
+  val title: String,
+  val pubDate: Long,
+  val image: String,
+  val description: String,
+  val link: String,
   val body: LentaBody) extends LentaItemBase {
 
-  override def toString() = s"LentaItem[guid=$guid, title=$title, pubDate=$pubDate, image=$image, description=$description]"
+  override def toString() = s"LentaItem[guid=$guid, title=$title, pubDate=$pubDate, image=$image, description=$description, link=$link, body=$body]"
   override def toXml() = ""
 }
 
 object LentaItem {
-  def createFromRssItem(node: Node): LentaItem = {
+  def createFromRssNode(node: Node): LentaItem = {
     val guid = (node \\ "guid").text
     val title = (node \\ "title").text
     val description = (node \\ "description").text

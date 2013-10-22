@@ -103,7 +103,7 @@ public final class NewsDao {
 			
 			return values;
 		}
-	
+		
 		@Override
 		protected News createDataObject(Cursor cur) {
 			long id = cur.getLong(cur.getColumnIndexOrThrow(NewsEntry._ID));

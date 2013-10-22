@@ -14,11 +14,8 @@ import java.net.URL
  * To change this template use File | Settings | File Templates.
  */
 
-case class Lenta(
-  val newsType: NewsType,
-  val rubrics: Rubrics,
-  val items: Seq[LentaItem]
-  ) extends LentaItemBase {
+class Lenta(val newsType: NewsType, val rubrics: Rubrics, val items: Seq[LentaItem]) extends LentaItemBase {
+  override def toString() = s"[newsType = $newsType, rubrics = $rubrics, items = $items]"
   override def toXml() = ""
 }
 
@@ -35,7 +32,11 @@ object Lenta {
 
   def download(newsType: NewsType, rubric: Rubrics): Lenta = {
     val xml = XML.load(new URL(url(newsType, rubric)))
+    val rssitems = xml \\ "item"
 
-    null
+    val items = rssitems.foldLeft(List[LentaItem]())((a, b) => LentaItem.createFromRssNode(b) :: a)
+    Lenta(newsType, rubric, items)
   }
+
+  def apply(newsType: NewsType, rubrics: Rubrics, items: Seq[LentaItem]) = new Lenta(newsType, rubrics, items)
 }

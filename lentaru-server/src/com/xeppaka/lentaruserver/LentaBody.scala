@@ -8,6 +8,7 @@ import scala.annotation.meta.field
 import scala.io.Source
 
 class LentaBody(val items: Seq[_ <: LentaBodyItem]) extends LentaItemBase {
+  override def toString =
   override def toXml(): String = {
     "123"
   }
