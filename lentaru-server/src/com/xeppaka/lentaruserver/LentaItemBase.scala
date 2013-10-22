@@ -8,5 +8,5 @@ package com.xeppaka.lentaruserver
  * To change this template use File | Settings | File Templates.
  */
 abstract class LentaItemBase {
-  def toXML(): String
+  def toXml(): String
 }

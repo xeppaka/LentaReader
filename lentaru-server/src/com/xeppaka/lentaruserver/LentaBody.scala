@@ -7,15 +7,15 @@ import javax.xml.bind.annotation.XmlAnyElement
 import scala.annotation.meta.field
 import scala.io.Source
 
-@XmlRootElement(name = "body")
-@XmlAccessorType(XmlAccessType.FIELD)
-class LentaNewsBody(@(XmlAnyElement @field) val bodyitems: Array[_ <: LentaBodyItem]) {
-  
+class LentaBody(val items: Seq[_ <: LentaBodyItem]) extends LentaItemBase {
+  override def toXml(): String = {
+    "123"
+  }
 }
 
-object LentaNewsBody {
-  def create(url: String) = {
+object LentaBody {
+  def createFromUrl(url: String): LentaBody = {
     val page = Source.fromURL(url, "UTF-8").mkString
-    "rrr".r.findAllIn(page)
+    null
   }
 }
