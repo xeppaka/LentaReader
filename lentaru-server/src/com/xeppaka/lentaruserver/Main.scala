@@ -7,7 +7,7 @@ import javax.xml.bind.JAXBContext
 
 
 object Main extends App {
-  val nn = Lenta.download(NewsType.NEWS)
+  val nn = LentaSnapshot.download(NewsType.NEWS)
 
   println(nn)
 }
