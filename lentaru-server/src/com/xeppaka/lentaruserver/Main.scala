@@ -9,5 +9,5 @@ import javax.xml.bind.JAXBContext
 object Main extends App {
   val nn = LentaSnapshot.download(NewsType.NEWS)
 
-  println(nn)
+  println(nn.toXml())
 }

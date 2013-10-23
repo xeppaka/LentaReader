@@ -10,9 +10,7 @@ package com.xeppaka.lentaruserver
 object Rubrics extends Enumeration {
   type Rubrics = RubricsValue
 
-  class RubricsValue(val name: String, val path: String) extends Val {
-    override def toString() = s"[name = $name, path = $path]"
-  }
+  class RubricsValue(val name: String, val path: String) extends Val
 
   object RubricsValue {
     def apply(name: String, path: String) = new RubricsValue(name, path)

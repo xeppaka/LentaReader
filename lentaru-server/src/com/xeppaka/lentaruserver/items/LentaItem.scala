@@ -1,8 +1,8 @@
 package com.xeppaka.lentaruserver.items
 
-import com.xeppaka.lentaruserver.items.body.LentaBody
 import com.xeppaka.lentaruserver.NewsType
 import com.xeppaka.lentaruserver.NewsType.NewsType
+import com.xeppaka.lentaruserver.items.body.LentaBody
 
 /**
  * Created with IntelliJ IDEA.
@@ -17,7 +17,7 @@ abstract class LentaItem (
   val link: String,
   val description: String,
   val pubDate: Long,
-  val body: LentaBody) extends LentaItemBase
+  val body: LentaBody) extends ItemBase
 {
   override def toString() = s"LentaItem[guid=$guid, title=$title, link=$link, description=$description, pubDate=$pubDate, body=$body]"
 }

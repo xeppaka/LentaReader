@@ -1,12 +1,12 @@
-package com.xeppaka.lentaruserver.items.body
+package com.xeppaka.lentaruserver.items
 
 /**
  * Created with IntelliJ IDEA.
- * User: kacpa01
+ * User: nnm
  * Date: 10/23/13
- * Time: 7:15 PM
+ * Time: 10:27 PM
  * To change this template use File | Settings | File Templates.
  */
-trait LentaBodyItemBase {
+abstract class ItemBase {
   def toXml(): String
 }

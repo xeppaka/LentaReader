@@ -17,7 +17,17 @@ class LentaNews(
   pubDate: Long,
   body: LentaBody) extends LentaItem(guid, title, link, description, pubDate, body)
 {
-  def toXml(): String = "123"
+  override def toString() = s"LentaNews[guid=$guid, title=$title, link=$link, description=$description, pubDate=$pubDate, body=$body]"
+  def toXml(): String = {
+    val builder = new StringBuilder("<lentanews>\n")
+    builder.append(s"<guid>$guid</guid>\n")
+    builder.append(s"<title>$title</title>\n")
+    builder.append(s"<link>$link</link>\n")
+    builder.append(s"<description>$description</description>\n")
+    builder.append(s"<pubDate>$pubDate</pubDate>\n")
+    builder.append(body.toXml())
+    builder.append("</lentanews>\n").toString()
+  }
 }
 
 object LentaNews {
