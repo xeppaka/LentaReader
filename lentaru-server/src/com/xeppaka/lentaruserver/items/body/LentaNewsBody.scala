@@ -9,7 +9,11 @@ import com.xeppaka.lentaruserver.items.ItemBase
  * Time: 9:58 PM
  * To change this template use File | Settings | File Templates.
  */
-class LentaNewsBody(val photoTitle: String, val photoCredits: String, items: Seq[ItemBase])
+class LentaNewsBody(val imageTitle: String, val imageCredits: String, items: Seq[ItemBase])
   extends LentaBody(items) {
 
+}
+
+object LentaNewsBody {
+  def apply(imageTitle: String, imageCredits: String, items: Seq[ItemBase]) = new LentaNewsBody(imageTitle, imageCredits, items)
 }
