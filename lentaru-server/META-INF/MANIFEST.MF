@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Class-Path: lib/jline.jar lib/scalap.jar lib/diffutils.jar lib/akka-ac
+ tors.jar lib/scala-swing.jar lib/scala-actors.jar lib/scala-library.j
+ ar lib/scala-partest.jar lib/scala-reflect.jar lib/scala-compiler.jar
+  lib/typesafe-config.jar lib/scala-actors-migration.jar
+Main-Class: com.xeppaka.lentaruserver.Main
+

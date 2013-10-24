@@ -33,7 +33,11 @@ object LentaBody {
       case None => null
     }
 
-    val newsBodyWithoutAside = newsBodyAsidePattern.replaceAllIn(page, "[ASIDE]\n")
+//    val newsAsides = newsBodyAsidePattern.findAllMatchIn(page)
+//    newsAsides.foreach(item => println(item))
+
+    //val newsBodyWithoutAside = newsBodyAsidePattern.replaceAllIn(page, "[ASIDE]\n")
+    val newsBodyWithoutAside = newsBodyAsidePattern.replaceAllIn(page, "")
     val newsBody = newsBodyPattern.findFirstIn(newsBodyWithoutAside) match {
       case Some(newsBodyPattern(body)) => List(LentaBodyItemText(body))
       case None => Nil

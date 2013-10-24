@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Class-Path: jline.jar scalap.jar diffutils.jar akka-actors.jar scala-s
+ wing.jar scala-actors.jar scala-library.jar scala-partest.jar scala-r
+ eflect.jar scala-compiler.jar typesafe-config.jar scala-actors-migrat
+ ion.jar
+Main-Class: com.xeppaka.lentaruserver.Main
+

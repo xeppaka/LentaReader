@@ -31,11 +31,11 @@ object RssItem {
   val dateFormat = new SimpleDateFormat(rssDatePattern, Locale.US)
 
   def apply(rssnode: Node): RssItem = {
-    val guid = (rssnode \\ "guid").text
-    val title = (rssnode \\ "title").text
-    val author = (rssnode \\ "author").text
-    val link = (rssnode \\ "link").text
-    val description = (rssnode \\ "description").text
+    val guid = (rssnode \\ "guid").text.trim
+    val title = (rssnode \\ "title").text.trim
+    val author = (rssnode \\ "author").text.trim
+    val link = (rssnode \\ "link").text.trim
+    val description = (rssnode \\ "description").text.trim
     val pubDate = dateFormat.parse((rssnode \\ "pubDate").text)
 
     new RssItem(guid, title, author, link, description, pubDate.getTime)
