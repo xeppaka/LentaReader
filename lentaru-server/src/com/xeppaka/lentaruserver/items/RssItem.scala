@@ -14,16 +14,15 @@ import java.util.Locale
  * To change this template use File | Settings | File Templates.
  */
 class RssItem(
-//  val newsType: NewsType,
-//  val rubrics: Rubrics,
   val guid: String,
   val title: String,
   val author: String,
   val link: String,
+  val image: String,
   val description: String,
   val pubDate: Long)
 {
-  override def toString() = s"RssItem[guid=$guid, title=$title, author=$author, link=$link, description=$description, pubDate=$pubDate]"
+  override def toString() = s"RssItem[guid=$guid, title=$title, author=$author, link=$link, image=$image, description=$description, pubDate=$pubDate]"
 }
 
 object RssItem {
@@ -35,9 +34,10 @@ object RssItem {
     val title = (rssnode \\ "title").text.trim
     val author = (rssnode \\ "author").text.trim
     val link = (rssnode \\ "link").text.trim
+    val image = (rssnode \\ "enclosure/@url").text.trim
     val description = (rssnode \\ "description").text.trim
     val pubDate = dateFormat.parse((rssnode \\ "pubDate").text)
 
-    new RssItem(guid, title, author, link, description, pubDate.getTime)
+    new RssItem(guid, title, author, link, image, description, pubDate.getTime)
   }
 }

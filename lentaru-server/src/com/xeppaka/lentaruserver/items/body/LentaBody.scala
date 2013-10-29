@@ -18,12 +18,12 @@ object LentaBody {
   val newsBodyAsidePattern = "(?s)<aside .+?</aside>\\s*".r
   val newsBodyPattern = "(?s)<div.+?itemprop=\"articleBody\">(.+?)</div>".r
 
-  def downloadNews(url: String): LentaBody = {
+  def downloadNews(url: String): LentaNewsBody = {
     val page = Source.fromURL(url, "UTF-8").mkString
     parseNews(page)
   }
 
-  private def parseNews(page: String): LentaBody = {
+  private def parseNews(page: String): LentaNewsBody = {
     val imageTitle = imageTitlePattern.findFirstIn(page) match {
       case Some(imageTitlePattern(title)) => title
       case None => null

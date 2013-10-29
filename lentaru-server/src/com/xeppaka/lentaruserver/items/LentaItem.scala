@@ -15,11 +15,14 @@ abstract class LentaItem (
   val guid: String,
   val title: String,
   val link: String,
+  val image: String,
+  val imageTitle: String,
+  val imageCredits: String,
   val description: String,
   val pubDate: Long,
   val body: LentaBody) extends ItemBase
 {
-  override def toString() = s"LentaItem[guid=$guid, title=$title, link=$link, description=$description, pubDate=$pubDate, body=$body]"
+  override def toString() = s"LentaItem[guid=$guid, title=$title, link=$link, image=$image, imageTitle=$imageTitle, imageCredits=$imageCredits, description=$description, pubDate=$pubDate, body=$body]"
 }
 
 object LentaItem {

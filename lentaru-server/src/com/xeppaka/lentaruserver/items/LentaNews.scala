@@ -13,9 +13,12 @@ class LentaNews(
   guid: String,
   title: String,
   link: String,
+  image: String,
+  imageTitle: String,
+  imageCredits: String,
   description: String,
   pubDate: Long,
-  body: LentaBody) extends LentaItem(guid, title, link, description, pubDate, body)
+  body: LentaBody) extends LentaItem(guid, title, link, image, imageTitle, imageCredits, description, pubDate, body)
 {
   override def toString() = s"LentaNews[guid=$guid, title=$title, link=$link, description=$description, pubDate=$pubDate, body=$body]"
   def toXml(indent: String): String = {
@@ -24,6 +27,9 @@ class LentaNews(
     builder.append(s"$indentInternal<guid>$guid</guid>\n")
     builder.append(s"$indentInternal<title>$title</title>\n")
     builder.append(s"$indentInternal<link>$link</link>\n")
+    builder.append(s"$indentInternal<link>$image</link>\n")
+    builder.append(s"$indentInternal<link>$imageTitle</link>\n")
+    builder.append(s"$indentInternal<link>$imageCredits</link>\n")
     builder.append(s"$indentInternal<description>$description</description>\n")
     builder.append(s"$indentInternal<pubDate>$pubDate</pubDate>\n")
     builder.append(body.toXml(indentInternal))
@@ -34,6 +40,6 @@ class LentaNews(
 object LentaNews {
   def apply(rssItem: RssItem): LentaNews = {
     val body = LentaBody.downloadNews(rssItem.link)
-    new LentaNews(rssItem.guid, rssItem.title, rssItem.link, rssItem.description, rssItem.pubDate, body)
+    new LentaNews(rssItem.guid, rssItem.title, rssItem.link, rssItem.image, body.imageTitle, body.imageCredits, rssItem.description, rssItem.pubDate, body)
   }
 }
