@@ -4,10 +4,11 @@ import com.xeppaka.lentaruserver.items.{LentaNews, ItemBase}
 import scala.io.Source
 
 abstract class LentaBody(val items: Seq[ItemBase]) extends ItemBase {
-  override def toXml(): String = {
-    val builder = new StringBuilder("<lentabody>\n")
-    items.foreach((item) => builder.append(item.toXml()))
-    builder.append("</lentabody>\n").toString()
+  override def toXml(indent: String): String = {
+    val indentInternal = indent + "  "
+    val builder = new StringBuilder(s"$indent<lentabody>\n")
+    items.foreach((item) => builder.append(item.toXml(indentInternal)))
+    builder.append(s"$indent</lentabody>\n").toString()
   }
 }
 

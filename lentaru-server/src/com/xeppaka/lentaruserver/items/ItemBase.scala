@@ -8,5 +8,6 @@ package com.xeppaka.lentaruserver.items
  * To change this template use File | Settings | File Templates.
  */
 abstract class ItemBase {
-  def toXml(): String
+  def toXml(): String = toXml("")
+  def toXml(indent: String): String
 }

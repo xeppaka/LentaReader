@@ -5,6 +5,7 @@ import _root_.com.xeppaka.lentaruserver.Rubrics.Rubrics
 import scala.xml.XML
 import java.net.URL
 import com.xeppaka.lentaruserver.items.{ItemBase, RssItem, LentaItem}
+import org.apache.commons.lang3.StringEscapeUtils
 
 /**
  * Created with IntelliJ IDEA.
@@ -15,10 +16,13 @@ import com.xeppaka.lentaruserver.items.{ItemBase, RssItem, LentaItem}
  */
 class LentaSnapshot(val newsType: NewsType, val rubric: Rubrics, val items: Seq[ItemBase]) extends ItemBase {
   override def toString() = s"[newsType=$newsType, rubrics=$rubric, items=$items]"
-  def toXml(): String = {
-    val builder = new StringBuilder(s"""<lentasnapshot type="$newsType" rubric="$rubric">\n""")
-    items.foreach((item) => builder.append(item.toXml()))
-    builder.append("</lentasnapshot>\n").toString()
+  def toXml(indent: String): String = {
+    val indentInternal = indent + "  "
+    val builder = new StringBuilder(s"""$indent<lentasnapshot type="$newsType" rubric="$rubric">\n""")
+    items.foreach((item) => builder.append(item.toXml(indentInternal)))
+    builder.append(s"$indent</lentasnapshot>\n")
+
+    StringEscapeUtils.escapeXml(builder.toString())
   }
 }
 

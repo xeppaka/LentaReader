@@ -11,8 +11,8 @@ import com.xeppaka.lentaruserver.items.ItemBase
  */
 
 class LentaBodyItemText(val text: String) extends ItemBase {
-  override def toXml(): String = {
-    return s"<text>$text</text>\n"
+  override def toXml(indent: String): String = {
+    return s"$indent<text>$text</text>\n"
   }
 }
 
