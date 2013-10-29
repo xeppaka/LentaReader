@@ -1,6 +1,7 @@
 package com.xeppaka.lentaruserver.items.body
 
 import com.xeppaka.lentaruserver.items.ItemBase
+import org.apache.commons.lang3.StringEscapeUtils
 
 /**
  * Created with IntelliJ IDEA.
@@ -12,7 +13,8 @@ import com.xeppaka.lentaruserver.items.ItemBase
 
 class LentaBodyItemText(val text: String) extends ItemBase {
   override def toXml(indent: String): String = {
-    return s"$indent<text>$text</text>\n"
+    val escaped = StringEscapeUtils.escapeXml(text)
+    return s"$indent<text>$escaped</text>\n"
   }
 }
 
