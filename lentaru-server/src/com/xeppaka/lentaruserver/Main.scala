@@ -11,7 +11,7 @@ object Main extends App {
       val nn = LentaSnapshot.download(NewsType.NEWS)
       println("Writing to file: " + args(0))
       val f = new File(args(0))
-      val out = new PrintWriter(f)
+      val out = new PrintWriter(f, "UTF-8")
       try {
         out.println(nn.toXml())
       } finally {

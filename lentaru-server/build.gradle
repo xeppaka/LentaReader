@@ -1,1 +1,28 @@
 apply plugin: 'scala'
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  compile "org.scala-lang:scala-library:2.10.3" 
+}
+
+sourceSets {
+  main {
+    scala {
+      srcDirs = ['src']
+    }
+  }
+}
+
+jar {
+  manifest {
+    attributes 'Main-Class': 'com.xeppaka.lentaruserver.Main'
+    attributes 'Class-Path': configurations.runtime.files.collect {File file -> "libs/${file.getName()}" }.join(' ')
+  }
+}
+
+task listJars << {
+ configurations.compile.each { File file -> println(file.name) }
+} 
