@@ -2,6 +2,7 @@ package com.xeppaka.lentaruserver.items.body
 
 import com.xeppaka.lentaruserver.items.{LentaNews, ItemBase}
 import scala.io.Source
+import org.apache.commons.lang3.StringEscapeUtils
 
 abstract class LentaBody(val items: Seq[ItemBase]) extends ItemBase {
   override def toXml(indent: String): String = {
@@ -25,13 +26,13 @@ object LentaBody {
 
   private def parseNews(page: String): LentaNewsBody = {
     val imageTitle = imageTitlePattern.findFirstIn(page) match {
-      case Some(imageTitlePattern(title)) => title
-      case None => null
+      case Some(imageTitlePattern(title)) => StringEscapeUtils.escapeXml(title)
+      case None => ""
     }
 
     val imageCredits = imageCreditsPattern.findFirstIn(page) match {
-      case Some(imageCreditsPattern(credits)) => credits
-      case None => null
+      case Some(imageCreditsPattern(credits)) => StringEscapeUtils.escapeXml(credits.replaceAll("<!--.+?-->", ""))
+      case None => ""
     }
 
 //    val newsAsides = newsBodyAsidePattern.findAllMatchIn(page)

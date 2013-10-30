@@ -24,6 +24,7 @@ class LentaNews(
   def toXml(indent: String): String = {
     val indentInternal = indent + "  "
     val builder = new StringBuilder(s"$indent<lentanews>\n")
+
     builder.append(s"$indentInternal<guid>$guid</guid>\n")
     builder.append(s"$indentInternal<title>$title</title>\n")
     builder.append(s"$indentInternal<link>$link</link>\n")
