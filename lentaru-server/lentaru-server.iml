@@ -18,6 +18,7 @@
     <orderEntry type="library" name="scala" level="project" />
     <orderEntry type="library" name="scala" level="project" />
     <orderEntry type="library" name="org.apache.commons:commons-lang3:3.1" level="project" />
+    <orderEntry type="library" name="org.apache.commons:commons-lang3:3.1" level="project" />
   </component>
 </module>
 

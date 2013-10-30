@@ -1,6 +1,6 @@
 package com.xeppaka.lentaruserver.items.body
 
-import com.xeppaka.lentaruserver.items.{LentaNews, ItemBase}
+import com.xeppaka.lentaruserver.items.ItemBase
 import scala.io.Source
 import org.apache.commons.lang3.StringEscapeUtils
 

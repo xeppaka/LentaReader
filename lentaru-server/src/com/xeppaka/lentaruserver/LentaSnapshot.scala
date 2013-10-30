@@ -5,6 +5,7 @@ import _root_.com.xeppaka.lentaruserver.Rubrics.Rubrics
 import scala.xml.{Node, XML}
 import java.net.URL
 import com.xeppaka.lentaruserver.items.{ItemBase, RssItem, LentaItem}
+import java.io.PrintWriter
 
 /**
  * Created with IntelliJ IDEA.
@@ -13,14 +14,35 @@ import com.xeppaka.lentaruserver.items.{ItemBase, RssItem, LentaItem}
  * Time: 12:25 PM
  * To change this template use File | Settings | File Templates.
  */
-class LentaSnapshot(val newsType: NewsType, val rubric: Rubrics, val items: Seq[ItemBase]) extends ItemBase {
+class LentaSnapshot(val newsType: NewsType, val rubric: Rubrics, val items: Seq[LentaItem]) extends ItemBase {
   override def toString() = s"[newsType=$newsType, rubrics=$rubric, items=$items]"
+
   def toXml(indent: String): String = {
     val indentInternal = indent + "  "
     val builder = new StringBuilder(s"""$indent<lentasnapshot type="$newsType" rubric="$rubric">\n""")
     items.foreach((item) => builder.append(item.toXml(indentInternal)))
     builder.append(s"$indent</lentasnapshot>\n").toString()
   }
+
+  def dropLast(): Option[(LentaSnapshot, Option[LentaItem])] = {
+    if (items.isEmpty)
+      None
+    else {
+      val sp = items.splitAt(items.length - 1)
+      new Some((LentaSnapshot(newsType, rubric, sp._1), Some(sp._2.head)))
+    }
+  }
+
+  def writeXml(fileName: String) = {
+    val out = new PrintWriter(fileName, "UTF-8")
+    try {
+      out.println(toXml())
+    } finally {
+      out.close()
+    }
+  }
+
+  def isEmpty: Boolean = items.isEmpty
 }
 
 object LentaSnapshot {
