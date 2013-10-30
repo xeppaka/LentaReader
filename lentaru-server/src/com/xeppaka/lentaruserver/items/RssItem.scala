@@ -34,7 +34,7 @@ object RssItem {
     val title = (rssnode \\ "title").text.trim
     val author = (rssnode \\ "author").text.trim
     val link = (rssnode \\ "link").text.trim
-    val image = (rssnode \\ "enclosure/@url").text.trim
+    val image = ((rssnode \\ "enclosure") \\ "@url").text.trim
     val description = (rssnode \\ "description").text.trim
     val pubDate = dateFormat.parse((rssnode \\ "pubDate").text)
 

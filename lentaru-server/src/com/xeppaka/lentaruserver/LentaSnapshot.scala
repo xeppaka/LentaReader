@@ -2,10 +2,9 @@ package com.xeppaka.lentaruserver
 
 import _root_.com.xeppaka.lentaruserver.NewsType.NewsType
 import _root_.com.xeppaka.lentaruserver.Rubrics.Rubrics
-import scala.xml.XML
+import scala.xml.{Node, XML}
 import java.net.URL
 import com.xeppaka.lentaruserver.items.{ItemBase, RssItem, LentaItem}
-import org.apache.commons.lang3.StringEscapeUtils
 
 /**
  * Created with IntelliJ IDEA.
@@ -55,9 +54,9 @@ object LentaSnapshot {
    */
   def download(newsType: NewsType, rubric: Rubrics): LentaSnapshot = {
     val xml = XML.load(new URL(url(newsType, rubric)))
-    val rssRawItems = xml \\ "item"
+    val rssItems = xml \\ "item"
 
-    val lentaItems = rssRawItems.map((item) => LentaItem(newsType, RssItem(item)))
+    val lentaItems = rssItems.map((item) => LentaItem(newsType, RssItem(item)))
 
     LentaSnapshot(newsType, rubric, lentaItems)
   }
