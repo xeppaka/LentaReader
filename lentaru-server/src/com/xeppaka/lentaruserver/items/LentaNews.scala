@@ -1,6 +1,7 @@
 package com.xeppaka.lentaruserver.items
 
 import com.xeppaka.lentaruserver.items.body.LentaBody
+import com.xeppaka.lentaruserver.CDataEscaper
 
 /**
  * Created with IntelliJ IDEA.
@@ -41,6 +42,6 @@ class LentaNews(
 object LentaNews {
   def apply(rssItem: RssItem): LentaNews = {
     val body = LentaBody.downloadNews(rssItem.link)
-    new LentaNews(rssItem.guid, rssItem.title, rssItem.link, rssItem.image, body.imageTitle, body.imageCredits, rssItem.description, rssItem.pubDate, body)
+    new LentaNews(rssItem.guid, rssItem.title, rssItem.link, rssItem.image, body.imageTitle, body.imageCredits, CDataEscaper.escapeText(rssItem.description), rssItem.pubDate, body)
   }
 }

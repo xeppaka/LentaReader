@@ -13,7 +13,7 @@ import org.apache.commons.lang3.StringEscapeUtils
 
 class LentaBodyItemText(val text: String) extends ItemBase {
   override def toXml(indent: String): String = {
-    val escaped = StringEscapeUtils.escapeXml(text)
+    val escaped = CDataEscaper(text)
     return s"$indent<text>$escaped</text>\n"
   }
 }
