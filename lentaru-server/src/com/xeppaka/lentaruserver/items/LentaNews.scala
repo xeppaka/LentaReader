@@ -40,8 +40,8 @@ class LentaNews(
 }
 
 object LentaNews {
-  def apply(rssItem: RssItem): LentaNews = {
-    val body = LentaBody.downloadNews(rssItem.link)
-    new LentaNews(rssItem.guid, rssItem.title, rssItem.link, rssItem.image, body.imageTitle, body.imageCredits, CDataEscaper.escapeText(rssItem.description), rssItem.pubDate, body)
+  def apply(rssItem: RssItem): Option[LentaNews] = {
+    LentaBody.downloadNews(rssItem.link).map(newsBody => new LentaNews(rssItem.guid, rssItem.title, rssItem.link, rssItem.image, newsBody.imageTitle,
+      newsBody.imageCredits, CDataEscaper.escapeText(rssItem.description), rssItem.pubDate, newsBody))
   }
 }

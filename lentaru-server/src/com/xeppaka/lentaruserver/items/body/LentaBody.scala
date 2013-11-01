@@ -3,6 +3,9 @@ package com.xeppaka.lentaruserver.items.body
 import com.xeppaka.lentaruserver.items.ItemBase
 import scala.io.Source
 import org.apache.commons.lang3.StringEscapeUtils
+import java.io.IOException
+import scala.util.{Success, Failure, Try}
+import java.util.logging.{Level, Logger}
 
 abstract class LentaBody(val items: Seq[ItemBase]) extends ItemBase {
   override def toXml(indent: String): String = {
@@ -14,14 +17,18 @@ abstract class LentaBody(val items: Seq[ItemBase]) extends ItemBase {
 }
 
 object LentaBody {
+  val logger = Logger.getLogger(LentaBody.getClass.getName)
+
   val imageTitlePattern = "<div.+?itemprop=\"description\">(.+?)</div>".r
   val imageCreditsPattern = "<div.+?itemprop=\"author\">(.+?)</div>".r
   val newsBodyAsidePattern = "(?s)<aside .+?</aside>\\s*".r
   val newsBodyPattern = "(?s)<div.+?itemprop=\"articleBody\">(.+?)</div>".r
 
-  def downloadNews(url: String): LentaNewsBody = {
-    val page = Source.fromURL(url, "UTF-8").mkString
-    parseNews(page)
+  def downloadNews(url: String): Option[LentaNewsBody] = {
+    Try(Source.fromURL(url, "UTF-8").mkString) match {
+      case Success(page) => Some(parseNews(page))
+      case Failure(e) => {logger.log(Level.ALL, s"Error while loading page: $url", e); None}
+    }
   }
 
   private def parseNews(page: String): LentaNewsBody = {
@@ -31,7 +38,7 @@ object LentaBody {
     }
 
     val imageCredits = imageCreditsPattern.findFirstIn(page) match {
-      case Some(imageCreditsPattern(credits)) => StringEscapeUtils.escapeXml(credits.replaceAll("<!--.+?-->", ""))
+      case Some(imageCreditsPattern(credits)) => StringEscapeUtils.escapeXml(credits.replaceAll("(<!--) | (-->)", ""))
       case None => ""
     }
 

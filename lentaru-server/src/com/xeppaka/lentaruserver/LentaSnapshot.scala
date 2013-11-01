@@ -5,7 +5,9 @@ import _root_.com.xeppaka.lentaruserver.Rubrics.Rubrics
 import scala.xml.{Node, XML}
 import java.net.URL
 import com.xeppaka.lentaruserver.items.{ItemBase, RssItem, LentaItem}
-import java.io.PrintWriter
+import java.io.{File, PrintWriter}
+import com.xeppaka.lentaruserver.fs.FileSystem
+import java.nio.file.Path
 
 /**
  * Created with IntelliJ IDEA.
@@ -24,22 +26,38 @@ class LentaSnapshot(val newsType: NewsType, val rubric: Rubrics, val items: Seq[
     builder.append(s"$indent</lentasnapshot>\n").toString()
   }
 
-  def dropLast(): Option[(LentaSnapshot, Option[LentaItem])] = {
+  def dropLastItem(): Option[(LentaSnapshot, LentaItem)] = {
     if (items.isEmpty)
       None
     else {
-      val sp = items.splitAt(items.length - 1)
-      new Some((LentaSnapshot(newsType, rubric, sp._1), Some(sp._2.head)))
+      val flitems = items.splitAt(items.length - 1)
+      new Some((LentaSnapshot(newsType, rubric, flitems._1), flitems._2.head))
     }
   }
 
-  def writeXml(fileName: String) = {
-    val out = new PrintWriter(fileName, "UTF-8")
+  def writeXml(fileName: Path) = {
+    val out = new PrintWriter(fileName.toString, "UTF-8")
     try {
       out.println(toXml())
     } finally {
       out.close()
     }
+  }
+
+  def writeXmlSet(dir: Path) = {
+    def writeXmls(cursnap: LentaSnapshot, filename: Path): Unit = {
+      cursnap.writeXml(filename)
+      val nextsnappair = cursnap.dropLastItem()
+      nextsnappair match {
+        case None => Unit
+        case Some((nextsnap, lastitem)) => {
+          val nextfilename = FileSystem.createFullPath(dir.toString, newsType, rubric, lastitem.pubDate.toString + ".xml")
+          writeXmls(nextsnap, nextfilename)
+        }
+      }
+    }
+
+    writeXmls(this, FileSystem.createFullPath(dir.toString, newsType, rubric))
   }
 
   def isEmpty: Boolean = items.isEmpty
@@ -59,7 +77,7 @@ object LentaSnapshot {
   private def url(newsType: NewsType, rubric: Rubrics): String =
     LENTA_URL + RSS_PATH + newsType.path + rubric.path
 
-  /** Download news with provided type
+  /** Download news with provided type and rubric default to ROOT
     *
     * @param newsType is the type of news
     * @return LentaSnapshot instance filled with downloaded and parsed pages
@@ -78,7 +96,7 @@ object LentaSnapshot {
     val xml = XML.load(new URL(url(newsType, rubric)))
     val rssItems = xml \\ "item"
 
-    val lentaItems = rssItems.map((item) => LentaItem(newsType, RssItem(item)))
+    val lentaItems = rssItems.map(item => LentaItem(newsType, RssItem(item))).filter(item => item.isDefined).map(item => item.get)
 
     LentaSnapshot(newsType, rubric, lentaItems)
   }

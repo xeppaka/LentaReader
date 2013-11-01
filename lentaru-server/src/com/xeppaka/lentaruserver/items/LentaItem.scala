@@ -26,7 +26,7 @@ abstract class LentaItem (
 }
 
 object LentaItem {
-  def apply(newsType: NewsType, rssItem: RssItem): LentaItem = {
+  def apply(newsType: NewsType, rssItem: RssItem): Option[LentaItem] = {
     newsType match {
       case NewsType.NEWS => LentaNews(rssItem)
     }
