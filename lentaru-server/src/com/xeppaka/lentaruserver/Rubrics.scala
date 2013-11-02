@@ -1,5 +1,7 @@
 package com.xeppaka.lentaruserver
 
+import scala.language.implicitConversions
+
 /**
  * Created with IntelliJ IDEA.
  * User: kacpa01
@@ -15,6 +17,8 @@ object Rubrics extends Enumeration {
   object RubricsValue {
     def apply(name: String, path: String) = new RubricsValue(name, path)
   }
+
+  implicit def valueToRubricsValue(x: Value) = x.asInstanceOf[RubricsValue]
 
   val ROOT = RubricsValue("root", "")
   val RUSSIA = RubricsValue("russia", "/russia")

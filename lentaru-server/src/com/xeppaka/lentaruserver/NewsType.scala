@@ -1,5 +1,6 @@
 package com.xeppaka.lentaruserver
 
+import scala.language.implicitConversions
 
 /**
  * Created with IntelliJ IDEA.
@@ -16,6 +17,8 @@ object NewsType extends Enumeration {
   object NewsTypeValue {
     def apply(path: String) = new NewsTypeValue(path)
   }
+
+  implicit def valueToNewsTypeValue(x: Value) = x.asInstanceOf[NewsTypeValue]
 
   val NEWS = NewsTypeValue("/news")
   val ARTICLE = NewsTypeValue("/article")

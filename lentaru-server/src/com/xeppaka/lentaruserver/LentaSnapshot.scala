@@ -47,17 +47,18 @@ class LentaSnapshot(val newsType: NewsType, val rubric: Rubrics, val items: Seq[
   def writeXmlSet(dir: Path) = {
     def writeXmls(cursnap: LentaSnapshot, filename: Path): Unit = {
       cursnap.writeXml(filename)
+
       val nextsnappair = cursnap.dropLastItem()
       nextsnappair match {
         case None => Unit
         case Some((nextsnap, lastitem)) => {
-          val nextfilename = FileSystem.createFullPath(dir.toString, newsType, rubric, lastitem.pubDate.toString + ".xml")
+          val nextfilename = dir.resolve(lastitem.pubDate.toString + ".xml")
           writeXmls(nextsnap, nextfilename)
         }
       }
     }
 
-    writeXmls(this, FileSystem.createFullPath(dir.toString, newsType, rubric))
+    writeXmls(this, dir.resolve(FileSystem.FILENAME_ROOT_SNAPSHOT))
   }
 
   def isEmpty: Boolean = items.isEmpty

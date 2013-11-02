@@ -1,9 +1,5 @@
 package com.xeppaka.lentaruserver
 
-import java.io.{PrintWriter, File}
-import com.xeppaka.lentaruserver.NewsType.NewsType
-import com.xeppaka.lentaruserver.Rubrics.Rubrics
-import com.xeppaka.lentaruserver.items.LentaItem
 import com.xeppaka.lentaruserver.fs.FileSystem
 import java.nio.file.FileSystems
 
@@ -15,10 +11,16 @@ object Main extends App {
     FileSystem.createfs(rootPath)
 
     while (true) {
-      println("Downloading news")
-      val nn = LentaSnapshot.download(NewsType.NEWS, Rubrics.ECONOMICS)
+      Rubrics.values.foreach(rubric => {
+        val curdir = FileSystem.createFullPath(rootPath.toString, NewsType.NEWS, rubric)
 
-      nn.writeXmlSet(rootPath)
+        println("Downloading " + rubric.toString)
+        val nn = LentaSnapshot.download(NewsType.NEWS, rubric)
+        println("Deleting xmls in " + curdir.toString)
+        FileSystem.clean(curdir)
+        println("Writing xmls in " + curdir.toString)
+        nn.writeXmlSet(curdir)
+      })
 
       println("Sleep for 60 seconds...")
       Thread.sleep(1000 * 60)

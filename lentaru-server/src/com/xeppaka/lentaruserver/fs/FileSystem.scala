@@ -1,12 +1,13 @@
 package com.xeppaka.lentaruserver.fs
 
 import java.io.{IOException, File}
-import com.xeppaka.lentaruserver.{NewsType, Rubrics}
-import com.xeppaka.lentaruserver.NewsType._
-import com.xeppaka.lentaruserver.Rubrics._
-import com.xeppaka.lentaruserver.NewsType
 import java.nio.file._
 import java.nio.file.attribute.BasicFileAttributes
+import com.xeppaka.lentaruserver.{NewsType, Rubrics}
+import com.xeppaka.lentaruserver.NewsType.NewsType
+import com.xeppaka.lentaruserver.NewsType
+import com.xeppaka.lentaruserver.Rubrics.Rubrics
+import com.xeppaka.lentaruserver.Rubrics
 
 /**
  * Created with IntelliJ IDEA.
@@ -21,7 +22,7 @@ object FileSystem {
 
   private def createRubricFolders(dir: Path): List[Path] = {
     Rubrics.values.foldLeft(List[Path]())((z, item) => {
-      val path = FileSystems.getDefault.getPath(dir + FileSystems.getDefault.getSeparator + item.toString)
+      val path = dir.resolve(item.toString)
       try {
         Files.createDirectory(path)
         path :: z
@@ -33,9 +34,9 @@ object FileSystem {
 
   private def createNewsTypeFolders(dir: Path): List[Path] = {
     NewsType.values.foldLeft(List[Path]())((z, item) => {
-      val path = FileSystems.getDefault.getPath(dir + FileSystems.getDefault.getSeparator + item.toString)
+      val path = dir.resolve(item.toString)
       try {
-        Files.createDirectory(path);
+        Files.createDirectory(path)
         path :: z
       } catch {
         case e: FileAlreadyExistsException => z
@@ -44,31 +45,35 @@ object FileSystem {
   }
 
   def createfs(dir: Path) = {
-    val newsFolders = createNewsTypeFolders(dir)
-    newsFolders.foreach(item => createRubricFolders(item))
+    createNewsTypeFolders(dir)
+    NewsType.values.foreach(item => createRubricFolders(dir.resolve(item.toString)))
   }
 
-  def cleanfs(dir: Path): Unit = {
-    val deleteVisitor = new SimpleFileVisitor[Path]() {
-      override def visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult = {
-        Files.delete(file)
-        FileVisitResult.CONTINUE;
-      }
+  def clean(dir: Path): Unit = {
+    if (Files.exists(dir)) {
+      val deleteVisitor = new SimpleFileVisitor[Path]() {
+        override def visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult = {
+          if (file.getFileName.toString != FILENAME_ROOT_SNAPSHOT)
+            Files.delete(file)
+          FileVisitResult.CONTINUE
+        }
 
-      override def postVisitDirectory(dir: Path, exc: IOException): FileVisitResult = {
-        if (exc == null) {
-          Files.delete(dir)
-          FileVisitResult.CONTINUE;
-        } else {
-          throw exc
+        override def postVisitDirectory(curdir: Path, exc: IOException): FileVisitResult = {
+          if (exc == null) {
+            if (curdir != dir)
+              Files.delete(curdir)
+            FileVisitResult.CONTINUE
+          } else {
+            throw exc
+          }
         }
       }
-    }
 
-    Files.walkFileTree(dir, deleteVisitor)
+      Files.walkFileTree(dir, deleteVisitor)
+    }
   }
 
-  def createFullPath(root: String, newsType: NewsType, rubric: Rubrics, filename: String = FILENAME_ROOT_SNAPSHOT): Path = {
-    FileSystems.getDefault.getPath(root, newsType.toString, rubric.toString, filename)
+  def createFullPath(root: String, newsType: NewsType, rubric: Rubrics): Path = {
+    FileSystems.getDefault.getPath(root, newsType.toString, rubric.toString)
   }
 }
