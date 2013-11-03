@@ -23,6 +23,31 @@ class RssItem(
   val pubDate: Long)
 {
   override def toString() = s"RssItem[guid=$guid, title=$title, author=$author, link=$link, image=$image, description=$description, pubDate=$pubDate]"
+
+  override def hashCode(): Int = {
+    var hash = 1
+    hash = hash * 31 + guid.hashCode
+    hash = hash * 31 + title.hashCode
+    hash = hash * 31 + author.hashCode
+    hash = hash * 31 + link.hashCode
+    hash = hash * 31 + image.hashCode
+    hash = hash * 31 + description.hashCode
+    hash = hash * 31 + pubDate.hashCode
+
+    hash
+  }
+
+  override def equals(obj: scala.Any): Boolean = {
+    if (!obj.isInstanceOf[RssItem])
+      false
+
+    val other = obj.asInstanceOf[RssItem]
+    if (guid != other.guid || title != other.title || author != other.author ||
+    link != other.link || image != other.image || description != other.description || pubDate != other.pubDate)
+      false
+
+    true
+  }
 }
 
 object RssItem {

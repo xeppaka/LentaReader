@@ -16,6 +16,24 @@ class LentaBodyItemText(val text: String) extends ItemBase {
     val escaped = CDataEscaper.escapeText(text)
     return s"$indent<text>$escaped</text>\n"
   }
+
+  override def hashCode(): Int = {
+    var hash = 1
+    hash = hash * 31 + text.hashCode
+
+    hash
+  }
+
+  override def equals(obj: scala.Any): Boolean = {
+    if (!obj.isInstanceOf[LentaBodyItemText])
+      false
+
+    val other = obj.asInstanceOf[LentaBodyItemText]
+    if (text != other.text)
+      false
+
+    true
+  }
 }
 
 object LentaBodyItemText {

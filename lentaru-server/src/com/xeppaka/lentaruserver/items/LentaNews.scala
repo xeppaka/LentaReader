@@ -35,7 +35,35 @@ class LentaNews(
     builder.append(s"$indentInternal<description>$description</description>\n")
     builder.append(s"$indentInternal<pubDate>$pubDate</pubDate>\n")
     builder.append(body.toXml(indentInternal))
-    builder.append(s"$indent</lentanews>\n").toString()
+    builder.append(s"$indent</lentanews>\n").toString
+  }
+
+  override def hashCode(): Int = {
+    var hash = 1
+    hash = hash * 31 + guid.hashCode
+    hash = hash * 31 + title.hashCode
+    hash = hash * 31 + link.hashCode
+    hash = hash * 31 + image.hashCode
+    hash = hash * 31 + imageTitle.hashCode
+    hash = hash * 31 + imageCredits.hashCode
+    hash = hash * 31 + description.hashCode
+    hash = hash * 31 + pubDate.hashCode
+    hash = hash * 31 + body.hashCode
+
+    hash
+  }
+
+  override def equals(obj: scala.Any): Boolean = {
+    if (!obj.isInstanceOf[LentaNews])
+      false
+
+    val other = obj.asInstanceOf[LentaNews]
+    if (guid != other.guid || title != other.title || link != other.link || image != other.image ||
+    imageTitle != other.imageTitle || imageCredits != other.imageCredits || description != other.description ||
+    pubDate != other.pubDate || body != other.body)
+      false
+
+    true
   }
 }
 

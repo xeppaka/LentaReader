@@ -4,10 +4,12 @@ import _root_.com.xeppaka.lentaruserver.NewsType.NewsType
 import _root_.com.xeppaka.lentaruserver.Rubrics.Rubrics
 import scala.xml.{Node, XML}
 import java.net.URL
-import com.xeppaka.lentaruserver.items.{ItemBase, RssItem, LentaItem}
+import com.xeppaka.lentaruserver.items._
 import java.io.{File, PrintWriter}
 import com.xeppaka.lentaruserver.fs.FileSystem
 import java.nio.file.Path
+import scala.Some
+import com.xeppaka.lentaruserver.items.RssSnapshot
 
 /**
  * Created with IntelliJ IDEA.
@@ -16,7 +18,7 @@ import java.nio.file.Path
  * Time: 12:25 PM
  * To change this template use File | Settings | File Templates.
  */
-class LentaSnapshot(val newsType: NewsType, val rubric: Rubrics, val items: Seq[LentaItem]) extends ItemBase {
+class LentaSnapshot(val newsType: NewsType, val rubric: Rubrics, val items: List[LentaItem]) extends ItemBase {
   override def toString() = s"[newsType=$newsType, rubrics=$rubric, items=$items]"
 
   def toXml(indent: String): String = {
@@ -61,46 +63,53 @@ class LentaSnapshot(val newsType: NewsType, val rubric: Rubrics, val items: Seq[
     writeXmls(this, dir.resolve(FileSystem.FILENAME_ROOT_SNAPSHOT))
   }
 
+  def latestDate(): Long = {
+    if (isEmpty) 0 else items.head.pubDate
+  }
+
+  def merge(other: LentaSnapshot): LentaSnapshot = {
+    if (other.newsType != newsType || other.rubric != rubric)
+      throw new IllegalArgumentException("Other snapshot has not the same news type and/or rubric")
+
+    val newItems: List[LentaItem] = (other.items ::: items).sortWith(_.pubDate > _.pubDate)
+
+    LentaSnapshot(newsType, rubric, newItems)
+  }
+
   def isEmpty: Boolean = items.isEmpty
+
+  override def equals(obj: scala.Any): Boolean = {
+    if (!obj.isInstanceOf[LentaSnapshot])
+      false
+
+    val other = obj.asInstanceOf[LentaSnapshot]
+    if (newsType != other.newsType || rubric != other.rubric || items != other.items)
+      false
+
+    true
+  }
+
+  override def hashCode(): Int = {
+    var hash: Int = 1
+    hash = hash * 31 + newsType.hashCode
+    hash = hash * 31 + rubric.hashCode
+    hash = hash * 31 + items.hashCode
+
+    hash
+  }
 }
 
 object LentaSnapshot {
-  /* Lenta.ru constants */
-  val RSS_PATH = "/rss"
-  val LENTA_URL = "http://www.lenta.ru"
-
-  /** Create URL to RSS from news type and rubric
-    *
-    * @param newsType is the type of news
-    * @param rubric is the rubric
-    * @return URL to RSS as a String
-    */
-  private def url(newsType: NewsType, rubric: Rubrics): String =
-    LENTA_URL + RSS_PATH + newsType.path + rubric.path
-
-  /** Download news with provided type and rubric default to ROOT
-    *
-    * @param newsType is the type of news
-    * @return LentaSnapshot instance filled with downloaded and parsed pages
-    */
-  def download(newsType: NewsType): LentaSnapshot = {
-    download(newsType, Rubrics.ROOT)
-  }
-
-  /** Download news with provided type and rubric
+  /** Download full news from previously downloaded RSS snapshot
    *
-   * @param newsType is the type of news
-   * @param rubric is the rubric
-   * @return LentaSnapshot instance filled with downloaded and parsed pages
+   * @param rss is the previously downloaded RSS snapshot
+   * @return LentaSnapshot instance filled with downloaded and parsed news
    */
-  def download(newsType: NewsType, rubric: Rubrics): LentaSnapshot = {
-    val xml = XML.load(new URL(url(newsType, rubric)))
-    val rssItems = xml \\ "item"
+  def download(rss: RssSnapshot): LentaSnapshot = {
+    val lentaItems = rss.items.map(item => LentaItem(rss.newsType, item)).filter(item => item.isDefined).map(item => item.get)
 
-    val lentaItems = rssItems.map(item => LentaItem(newsType, RssItem(item))).filter(item => item.isDefined).map(item => item.get)
-
-    LentaSnapshot(newsType, rubric, lentaItems)
+    LentaSnapshot(rss.newsType, rss.rubric, lentaItems)
   }
 
-  def apply(newsType: NewsType, rubrics: Rubrics, items: Seq[LentaItem]): LentaSnapshot = new LentaSnapshot(newsType, rubrics, items)
+  def apply(newsType: NewsType, rubrics: Rubrics, items: List[LentaItem]): LentaSnapshot = new LentaSnapshot(newsType, rubrics, items)
 }
