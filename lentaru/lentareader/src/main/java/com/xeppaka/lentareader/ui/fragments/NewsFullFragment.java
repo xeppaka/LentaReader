@@ -79,7 +79,7 @@ public class NewsFullFragment extends Fragment {
 	}
 
 	private void showNews(News news) {
-		String fullText = news.getFullText();
+		String fullText = news.getBody();
 		
 		if (fullText != null) {
 			contentView.setText(Html.fromHtml(fullText));

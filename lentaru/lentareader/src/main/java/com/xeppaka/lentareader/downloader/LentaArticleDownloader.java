@@ -21,7 +21,7 @@ public class LentaArticleDownloader extends LentaNewsObjectDownloader<Article> {
 		Page mobilePage = LentaHttpPageDownloader.downloadPage(URLHelper.createMobileUrl(brief.getLink()));
 		
 		MobileArticle mobileArticle = articleParser.parse(mobilePage);
-		brief.setFullText(mobileArticle.getText());
+		brief.setBody(mobileArticle.getText());
 		brief.setImageCaption(mobileArticle.getImageCaption());
 		brief.setImageCredits(mobileArticle.getImageCredits());
 		brief.setSecondTitle(mobileArticle.getSecondTitle());

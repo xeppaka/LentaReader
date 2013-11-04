@@ -12,34 +12,29 @@ public class Article extends News {
 	private String author;
 
 	public Article(long id, String guid, String title, String secondTitle,
-			String author, String link, String briefText, String fullText,
-			Date pubDate, String imageLink, String imageCaption,
-			String imageCredits, Collection<Link> links, Rubrics rubric, boolean rubricUpdateNeed) {
-		super(id, guid, title, link, briefText, fullText, pubDate, imageLink, imageCaption,
-				imageCredits, links, rubric, rubricUpdateNeed);
+			String author, String link, Date pubDate, String imageLink, String imageCaption,
+			String imageCredits, Rubrics rubric, String description, String body) {
+		super(id, guid, title, link, pubDate, imageLink, imageCaption, imageCredits,
+                rubric, description, body);
 		
 		setSecondTitle(secondTitle);
 		setAuthor(author);
 	}
 
 	public Article(String guid, String title, String secondTitle,
-			String author, String link, String briefText, String fullText,
-			Date pubDate, String imageLink, String imageCaption,
-			String imageCredits, Collection<Link> links, Rubrics rubric, boolean rubricUpdateNeed) {
-		super(guid, title, link, briefText, fullText, pubDate, imageLink, imageCaption,
-				imageCredits, links, rubric, rubricUpdateNeed);
+			String author, String link, Date pubDate, String imageLink, String imageCaption,
+			String imageCredits, Collection<Link> links, Rubrics rubric, String description, String body) {
+		super(guid, title, link, pubDate, imageLink, imageCaption, imageCredits, rubric,
+                description, body);
 		
 		setSecondTitle(secondTitle);
 		setAuthor(author);
 	}
 	
 	public Article(LentaRssItem rssItem) {
-		super(rssItem.getGuid(), rssItem.getTitle(), rssItem.getLink(), rssItem
-				.getDescription(), null, rssItem.getPubDate(), rssItem
-				.getImageLink(), null, null, null, rssItem.getRubric(), rssItem
-				.isRubricUpdateNeed());
+		super(rssItem);
 		
-		setSecondTitle(rssItem.getAuthor());
+		//setSecondTitle(rssItem.getAuthor());
 		setAuthor(rssItem.getAuthor());
 	}
 	

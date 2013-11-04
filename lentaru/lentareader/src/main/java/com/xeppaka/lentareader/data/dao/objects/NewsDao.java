@@ -54,9 +54,8 @@ public final class NewsDao {
 			NewsEntry.COLUMN_NAME_IMAGECREDITS,
 			NewsEntry.COLUMN_NAME_PUBDATE,
 			NewsEntry.COLUMN_NAME_RUBRIC,
-			NewsEntry.COLUMN_NAME_RUBRIC_UPDATE,
-			NewsEntry.COLUMN_NAME_BRIEFTEXT,
-			NewsEntry.COLUMN_NAME_FULLTEXT
+			NewsEntry.COLUMN_NAME_DESCRIPTION,
+			NewsEntry.COLUMN_NAME_BODY
 		};
 		
 		private final Dao<Link> newsLinksDao;
@@ -93,13 +92,12 @@ public final class NewsDao {
 			
 			values.put(NewsEntry.COLUMN_NAME_PUBDATE, news.getPubDate().getTime());
 			values.put(NewsEntry.COLUMN_NAME_RUBRIC, news.getRubric().name());
-			values.put(NewsEntry.COLUMN_NAME_BRIEFTEXT, news.getBriefText());
-			values.put(NewsEntry.COLUMN_NAME_RUBRIC_UPDATE, news.isRubricUpdateNeed() ? 1 : 0);
-			
-			if (news.getFullText() == null)
-				values.putNull(NewsEntry.COLUMN_NAME_FULLTEXT);
+			values.put(NewsEntry.COLUMN_NAME_DESCRIPTION, news.getDescription());
+
+			if (news.getBody() == null)
+				values.putNull(NewsEntry.COLUMN_NAME_BODY);
 			else
-				values.put(NewsEntry.COLUMN_NAME_FULLTEXT, news.getFullText());
+				values.put(NewsEntry.COLUMN_NAME_BODY, news.getBody());
 			
 			return values;
 		}
@@ -115,12 +113,11 @@ public final class NewsDao {
 			String imageCredits = cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_IMAGECREDITS));
 			Date pubDate = new Date(cur.getLong(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_PUBDATE)));
 			Rubrics rubric = Rubrics.valueOf(cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_RUBRIC)));
-			boolean rubricUpdateNeed = cur.getInt(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_RUBRIC_UPDATE)) > 0;
+
+			String description = cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_DESCRIPTION));
+			String body = cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_BODY));
 			
-			String briefText = cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_BRIEFTEXT));
-			String fullText = cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_FULLTEXT));
-			
-			return new News(id, guidDb, title, link, briefText, fullText, pubDate, imageLink, imageCaption, imageCredits, null, rubric, rubricUpdateNeed);
+			return new News(id, guidDb, title, link, pubDate, imageLink, imageCaption, imageCredits, rubric, description, body);
 		}
 	
 		@Override
@@ -214,40 +211,6 @@ public final class NewsDao {
 		}
 	
 		@Override
-		public long create(News news) {
-			synchronized(sync) {
-				long newsId = super.create(news);
-		
-				createNewsLinks(news);
-				
-				return newsId;
-			}
-		}
-		
-		@Override
-		public Collection<Long> create(Collection<News> dataObjects) {
-			synchronized(sync) {
-				Collection<Long> ids = super.create(dataObjects);
-				
-				for (News n : dataObjects) {
-					createNewsLinks(n);
-				}
-				
-				return ids;
-			}
-		}
-
-		private void createNewsLinks(News news) {
-			Collection<Link> links = news.getLinks();
-			
-			for (Link link : links) {
-				link.setNewsId(news.getId());
-			}
-			
-			newsLinksDao.create(links);
-		}
-		
-		@Override
 		public int update(News news) {
 			synchronized(sync) {
 				int result = super.update(news);
@@ -277,12 +240,6 @@ public final class NewsDao {
 		}
 
 		private void updateOtherNewsParts(News news) {
-			Collection<Link> links = news.getLinks();
-			
-			for (Link link : links) {
-				newsLinksDao.update(link);
-			}
-			
 			BitmapReference imageRef = news.getImage();
 			Bitmap image = imageRef.getBitmap();
 			
@@ -304,11 +261,6 @@ public final class NewsDao {
 		}
 
 		private void readOtherNewsParts(News news) {
-			List<Link> links = new ArrayList<Link>(newsLinksDao.readForParentObject(news.getId()));
-			Collections.sort(links);
-			
-			news.setLinks(links);
-			
 			String imageLink = news.getImageLink();
 			if (imageLink != null && !TextUtils.isEmpty(imageLink)) {
 				news.setImage(imageDao.read(imageLink));

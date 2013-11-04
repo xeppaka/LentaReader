@@ -26,9 +26,8 @@ public class ArticleDao extends ContentResolverDao<Article> {
 		ArticleEntry.COLUMN_NAME_IMAGECREDITS,
 		ArticleEntry.COLUMN_NAME_PUBDATE,
 		ArticleEntry.COLUMN_NAME_RUBRIC,
-		ArticleEntry.COLUMN_NAME_RUBRIC_UPDATE,
 		ArticleEntry.COLUMN_NAME_BRIEFTEXT,
-		ArticleEntry.COLUMN_NAME_FULLTEXT
+        ArticleEntry.COLUMN_NAME_BODY
 	};
 	
 	public ArticleDao(ContentResolver cr) {
@@ -46,29 +45,28 @@ public class ArticleDao extends ContentResolverDao<Article> {
 		values.put(ArticleEntry.COLUMN_NAME_LINK, article.getLink());
 		
 		if (article.getImageLink() == null)
-			values.putNull(NewsEntry.COLUMN_NAME_IMAGELINK);
+			values.putNull(ArticleEntry.COLUMN_NAME_IMAGELINK);
 		else
-			values.put(NewsEntry.COLUMN_NAME_IMAGELINK, article.getImageLink());
+			values.put(ArticleEntry.COLUMN_NAME_IMAGELINK, article.getImageLink());
 		
 		if (article.getImageCaption() == null)
-			values.putNull(NewsEntry.COLUMN_NAME_IMAGECAPTION);
+			values.putNull(ArticleEntry.COLUMN_NAME_IMAGECAPTION);
 		else
-			values.put(NewsEntry.COLUMN_NAME_IMAGECAPTION, article.getImageCaption());
+			values.put(ArticleEntry.COLUMN_NAME_IMAGECAPTION, article.getImageCaption());
 		
 		if (article.getImageCredits() == null)
-			values.putNull(NewsEntry.COLUMN_NAME_IMAGECREDITS);
+			values.putNull(ArticleEntry.COLUMN_NAME_IMAGECREDITS);
 		else
-			values.put(NewsEntry.COLUMN_NAME_IMAGECREDITS, article.getImageCredits());
+			values.put(ArticleEntry.COLUMN_NAME_IMAGECREDITS, article.getImageCredits());
 		
-		values.put(NewsEntry.COLUMN_NAME_PUBDATE, article.getPubDate().getTime());
-		values.put(NewsEntry.COLUMN_NAME_RUBRIC, article.getRubric().name());
-		values.put(NewsEntry.COLUMN_NAME_BRIEFTEXT, article.getBriefText());
-		values.put(NewsEntry.COLUMN_NAME_RUBRIC_UPDATE, article.isRubricUpdateNeed() ? 1 : 0);
-		
-		if (article.getFullText() == null)
-			values.putNull(NewsEntry.COLUMN_NAME_FULLTEXT);
+		values.put(ArticleEntry.COLUMN_NAME_PUBDATE, article.getPubDate().getTime());
+		values.put(ArticleEntry.COLUMN_NAME_RUBRIC, article.getRubric().name());
+		values.put(ArticleEntry.COLUMN_NAME_BRIEFTEXT, article.getDescription());
+
+		if (article.getBody() == null)
+			values.putNull(NewsEntry.COLUMN_NAME_BODY);
 		else
-			values.put(NewsEntry.COLUMN_NAME_FULLTEXT, article.getFullText());
+			values.put(ArticleEntry.COLUMN_NAME_BODY, article.getBody());
 		
 		return values;
 	}
@@ -86,12 +84,12 @@ public class ArticleDao extends ContentResolverDao<Article> {
 		String imageCredits = cur.getString(cur.getColumnIndexOrThrow(ArticleEntry.COLUMN_NAME_IMAGECREDITS));
 		Date pubDate = new Date(cur.getLong(cur.getColumnIndexOrThrow(ArticleEntry.COLUMN_NAME_PUBDATE)));
 		Rubrics rubric = Rubrics.valueOf(cur.getString(cur.getColumnIndexOrThrow(ArticleEntry.COLUMN_NAME_RUBRIC)));
-		boolean rubricUpdateNeed = cur.getInt(cur.getColumnIndexOrThrow(ArticleEntry.COLUMN_NAME_RUBRIC_UPDATE)) > 0;
+
+		String description = cur.getString(cur.getColumnIndexOrThrow(ArticleEntry.COLUMN_NAME_BRIEFTEXT));
+		String body = cur.getString(cur.getColumnIndexOrThrow(ArticleEntry.COLUMN_NAME_BODY));
 		
-		String briefText = cur.getString(cur.getColumnIndexOrThrow(ArticleEntry.COLUMN_NAME_BRIEFTEXT));
-		String fullText = cur.getString(cur.getColumnIndexOrThrow(ArticleEntry.COLUMN_NAME_FULLTEXT));
-		
-		return new Article(id, guidDb, title, secondTitle, author, link, briefText, fullText, pubDate, imageLink, imageCaption, imageCredits, null, rubric, rubricUpdateNeed);
+		//return new Article(id, guidDb, title, secondTitle, author, link, briefText, fullText, pubDate, imageLink, imageCaption, imageCredits, rubric);
+        return null;
 	}
 
 	@Override

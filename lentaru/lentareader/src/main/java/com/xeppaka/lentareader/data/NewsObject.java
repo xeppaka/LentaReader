@@ -13,22 +13,24 @@ public abstract class NewsObject implements Comparable<NewsObject>, DatabaseObje
 	private String link;
 	private Date pubDate;
 	private Rubrics rubric;
-	private boolean rubricUpdateNeed;
+    private String description;
+    private String body;
 
 	public NewsObject(long id, String guid, String title, String link, Date pubDate,
-			Rubrics rubric, boolean rubricUpdateNeed) {
+			Rubrics rubric, String description, String body) {
 		setId(id);
 		setGuid(guid);
 		setTitle(title);
 		setLink(link);
 		setPubDate(pubDate);
 		setRubric(rubric);
-		setRubricUpdateNeed(rubricUpdateNeed);
+        setDescription(description);
+        setBody(body);
 	}
 	
-	public NewsObject(String guid, String title, String link, Date pubDate,
-			Rubrics rubric, boolean rubricUpdateNeed) {
-		this(ID_NONE, guid, title, link, pubDate, rubric, rubricUpdateNeed);
+	public NewsObject(String guid, String title, String link, Date pubDate, Rubrics rubric,
+                      String description, String body) {
+		this(ID_NONE, guid, title, link, pubDate, rubric, description, body);
 	}
 	
 	public NewsObject(LentaRssItem rssItem) {
@@ -37,7 +39,7 @@ public abstract class NewsObject implements Comparable<NewsObject>, DatabaseObje
 		setLink(rssItem.getLink());
 		setPubDate(rssItem.getPubDate());
 		setRubric(rssItem.getRubric());
-		setRubricUpdateNeed(rssItem.isRubricUpdateNeed());
+        setDescription(rssItem.getDescription());
 	}
 	
 	public abstract NewsType getType();
@@ -104,16 +106,24 @@ public abstract class NewsObject implements Comparable<NewsObject>, DatabaseObje
 		
 		this.rubric = rubric;
 	}
-	
-	public boolean isRubricUpdateNeed() {
-		return rubricUpdateNeed;
-	}
 
-	public void setRubricUpdateNeed(boolean rubricUpdateNeed) {
-		this.rubricUpdateNeed = rubricUpdateNeed;
-	}
+    public String getBody() {
+        return body;
+    }
 
-	/**
+    public void setBody(String body) {
+        this.body = body;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    /**
 	 * Standard comparator compares dates ==> we will have all news 
 	 * sorter by date.
 	 */
@@ -150,9 +160,6 @@ public abstract class NewsObject implements Comparable<NewsObject>, DatabaseObje
 		if (getRubric() != otherNewsObject.getRubric() && (getRubric() != null && !getRubric().equals(otherNewsObject.getRubric())))
 			return false;
 		
-		if (isRubricUpdateNeed() != otherNewsObject.isRubricUpdateNeed())
-			return false;
-		
 		return true;
 	}
 
@@ -165,8 +172,7 @@ public abstract class NewsObject implements Comparable<NewsObject>, DatabaseObje
 		hash = 37 * hash + (getLink() == null ? 0 : getLink().hashCode());
 		hash = 37 * hash + (getPubDate() == null ? 0 : getPubDate().hashCode());
 		hash = 37 * hash + (getRubric() == null ? 0 : getRubric().hashCode());
-		hash = 37 * hash + (isRubricUpdateNeed() ? 1 : 0);
-		
+
 		return hash;
 	}
 

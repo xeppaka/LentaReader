@@ -75,7 +75,7 @@ public class SyncNewsServiceCommand extends RunnableServiceCommand {
 				}
 			}
 			
-			if (news.getFullText() == null) {
+			if (news.getBody() == null) {
 				executor.execute(new RetrieveNewsFullTextServiceCommand(getRequestId(), news, contentResolver, getResultReceiver(), false));
 			}
 		}
