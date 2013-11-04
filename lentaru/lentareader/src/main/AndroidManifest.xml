@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.xeppaka.lentareader"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk
+        android:minSdkVersion="15"
+        android:targetSdkVersion="19" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
+        <activity
+            android:name=".ui.activities.NewsBriefActivity"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".ui.activities.NewsFullActivity"
+            android:label="@string/title_activity_full_news" >
+        </activity>
+
+        <service android:name=".service.LentaService"
+            android:label="LentaService">
+        </service>
+
+        <provider
+            android:authorities="@string/provider_authority"
+            android:name="com.xeppaka.lentareader.data.provider.LentaProvider"
+            android:exported="false">
+        </provider>
+
+    </application>
+    
+    <uses-permission android:name="android.permission.INTERNET" />
+
+</manifest>

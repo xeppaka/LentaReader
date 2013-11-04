@@ -1,3 +1,3 @@
 #!/bin/bash
 
-adb pull /data/data/cz.fit.lentaruand/databases/LentaNews.db LentaNews.db
+adb pull /data/data/com.xeppaka.lentareader/databases/LentaNews.db LentaNews.db
