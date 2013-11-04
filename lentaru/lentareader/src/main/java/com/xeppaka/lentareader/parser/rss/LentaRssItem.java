@@ -115,11 +115,4 @@ public class LentaRssItem {
 	public Rubrics getRubric() {
 		return rubric;
 	}
-	
-	public boolean isRubricUpdateNeed() {
-		if (rubric == null)
-			return true;
-		
-		return rubric.isRubricUpdateNeed();
-	}
 }

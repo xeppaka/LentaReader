@@ -1,5 +1,7 @@
 package com.xeppaka.lentareader.parser;
 
+import com.xeppaka.lentareader.data.body.Body;
+
 public class MobileNews {
 	private String imageCaption;
 	private String imageCredits;
@@ -27,8 +29,8 @@ public class MobileNews {
 		this.imageCredits = imageCredits;
 	}
 	
-	public String getText() {
-		return text;
+	public Body getText() {
+		return null;
 	}
 	
 	public void setText(String text) {

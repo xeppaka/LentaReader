@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import com.xeppaka.lentareader.data.Article;
 import com.xeppaka.lentareader.data.NewsType;
+import com.xeppaka.lentareader.data.body.LentaBody;
 import com.xeppaka.lentareader.downloader.exceptions.HttpStatusCodeException;
 import com.xeppaka.lentareader.parser.LentaMobileArticleParser;
 import com.xeppaka.lentareader.parser.MobileArticle;
@@ -18,10 +19,11 @@ public class LentaArticleDownloader extends LentaNewsObjectDownloader<Article> {
 	
 	@Override
 	public void downloadFull(Article brief) throws HttpStatusCodeException, IOException, ParseWithRegexException {
-		Page mobilePage = LentaHttpPageDownloader.downloadPage(URLHelper.createMobileUrl(brief.getLink()));
+        String url = URLHelper.createMobileUrl(brief.getLink());
+		Page mobilePage = new Page(url, brief.getRubric(), NewsType.ARTICLE, HttpDownloader.download(url));
 		
 		MobileArticle mobileArticle = articleParser.parse(mobilePage);
-		brief.setBody(mobileArticle.getText());
+		brief.setBody(LentaBody.create(mobileArticle.getText().toXml()));
 		brief.setImageCaption(mobileArticle.getImageCaption());
 		brief.setImageCredits(mobileArticle.getImageCredits());
 		brief.setSecondTitle(mobileArticle.getSecondTitle());

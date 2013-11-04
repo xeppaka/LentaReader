@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.xeppaka.lentareader.R;
 
 import com.xeppaka.lentareader.data.News;
+import com.xeppaka.lentareader.data.body.Body;
 import com.xeppaka.lentareader.data.dao.async.AsyncDao;
 import com.xeppaka.lentareader.data.dao.objects.BitmapReference;
 import com.xeppaka.lentareader.data.dao.objects.ImageDao;
@@ -79,10 +80,10 @@ public class NewsFullFragment extends Fragment {
 	}
 
 	private void showNews(News news) {
-		String fullText = news.getBody();
+		Body body = news.getBody();
 		
-		if (fullText != null) {
-			contentView.setText(Html.fromHtml(fullText));
+		if (body != null) {
+			contentView.setText(Html.fromHtml(body.toXml()));
 			contentView.setMovementMethod(LinkMovementMethod.getInstance());
 		}
 		

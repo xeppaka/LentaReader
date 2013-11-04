@@ -16,6 +16,8 @@ import android.text.TextUtils;
 import com.xeppaka.lentareader.data.Link;
 import com.xeppaka.lentareader.data.News;
 import com.xeppaka.lentareader.data.Rubrics;
+import com.xeppaka.lentareader.data.body.Body;
+import com.xeppaka.lentareader.data.body.LentaBody;
 import com.xeppaka.lentareader.data.dao.Dao;
 import com.xeppaka.lentareader.data.dao.async.AsyncNODao;
 import com.xeppaka.lentareader.data.dao.decorators.AsyncNODaoDecorator;
@@ -97,7 +99,7 @@ public final class NewsDao {
 			if (news.getBody() == null)
 				values.putNull(NewsEntry.COLUMN_NAME_BODY);
 			else
-				values.put(NewsEntry.COLUMN_NAME_BODY, news.getBody());
+				values.put(NewsEntry.COLUMN_NAME_BODY, news.getBody().toXml());
 			
 			return values;
 		}
@@ -115,7 +117,7 @@ public final class NewsDao {
 			Rubrics rubric = Rubrics.valueOf(cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_RUBRIC)));
 
 			String description = cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_DESCRIPTION));
-			String body = cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_BODY));
+			Body body = LentaBody.create(cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_BODY)));
 			
 			return new News(id, guidDb, title, link, pubDate, imageLink, imageCaption, imageCredits, rubric, description, body);
 		}

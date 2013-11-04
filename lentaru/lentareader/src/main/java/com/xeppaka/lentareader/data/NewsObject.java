@@ -2,6 +2,7 @@ package com.xeppaka.lentareader.data;
 
 import java.util.Date;
 
+import com.xeppaka.lentareader.data.body.Body;
 import com.xeppaka.lentareader.parser.rss.LentaRssItem;
 
 public abstract class NewsObject implements Comparable<NewsObject>, DatabaseObject {
@@ -14,10 +15,10 @@ public abstract class NewsObject implements Comparable<NewsObject>, DatabaseObje
 	private Date pubDate;
 	private Rubrics rubric;
     private String description;
-    private String body;
+    private Body body;
 
 	public NewsObject(long id, String guid, String title, String link, Date pubDate,
-			Rubrics rubric, String description, String body) {
+			Rubrics rubric, String description, Body body) {
 		setId(id);
 		setGuid(guid);
 		setTitle(title);
@@ -29,7 +30,7 @@ public abstract class NewsObject implements Comparable<NewsObject>, DatabaseObje
 	}
 	
 	public NewsObject(String guid, String title, String link, Date pubDate, Rubrics rubric,
-                      String description, String body) {
+                      String description, Body body) {
 		this(ID_NONE, guid, title, link, pubDate, rubric, description, body);
 	}
 	
@@ -107,11 +108,11 @@ public abstract class NewsObject implements Comparable<NewsObject>, DatabaseObje
 		this.rubric = rubric;
 	}
 
-    public String getBody() {
+    public Body getBody() {
         return body;
     }
 
-    public void setBody(String body) {
+    public void setBody(Body body) {
         this.body = body;
     }
 

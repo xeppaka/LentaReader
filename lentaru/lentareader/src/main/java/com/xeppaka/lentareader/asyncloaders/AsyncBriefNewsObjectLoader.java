@@ -39,11 +39,11 @@ public abstract class AsyncBriefNewsObjectLoader<T extends NewsObject> extends A
 		try {
 			return downloader.downloadRubricBrief(rubric);
 		} catch (ParseWithXPathException e) {
-			Log.e(LentaConstants.LoggerMainAppTag, "Error occured during downloading RSS for rubric:" + rubric.getName(), e);
+			Log.e(LentaConstants.LoggerMainAppTag, "Error occured during downloading RSS for rubric:" + rubric, e);
 		} catch (IOException e) {
-			Log.e(LentaConstants.LoggerMainAppTag, "Error occured during downloading RSS for rubric:" + rubric.getName(), e);
+			Log.e(LentaConstants.LoggerMainAppTag, "Error occured during downloading RSS for rubric:" + rubric, e);
 		} catch (HttpStatusCodeException e) {
-			Log.e(LentaConstants.LoggerMainAppTag, "Error occured during downloading RSS for rubric:" + rubric.getName(), e);
+			Log.e(LentaConstants.LoggerMainAppTag, "Error occured during downloading RSS for rubric:" + rubric, e);
 		}
 		
 		return Collections.emptyList();

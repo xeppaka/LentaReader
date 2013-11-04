@@ -25,11 +25,12 @@ public class URLHelper {
 	 * @return URL that can be used to download RSS page.
 	 */
 	public static String getRssForRubric(Rubrics rubric, NewsType type) {
-		if (rubric == null)
-			throw new IllegalArgumentException("Argument rubric must not be null");
-		
-		return LentaConstants.URL_ROOT + rubric.getRssPath(type);
+		return LentaConstants.LENTA_URL_ROOT + rubric.getRssPath(type);
 	}
+
+    public static String getXmlForRubric(Rubrics rubric, NewsType type) {
+        return LentaConstants.OWNSERVER_URL_ROOT + rubric.getXmlPath(type);
+    }
 
 	/**
 	 * Returns URL to mobile version of the site created from the link to the

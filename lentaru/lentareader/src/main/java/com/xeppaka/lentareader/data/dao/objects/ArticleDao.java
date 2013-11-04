@@ -66,7 +66,7 @@ public class ArticleDao extends ContentResolverDao<Article> {
 		if (article.getBody() == null)
 			values.putNull(NewsEntry.COLUMN_NAME_BODY);
 		else
-			values.put(ArticleEntry.COLUMN_NAME_BODY, article.getBody());
+			values.put(ArticleEntry.COLUMN_NAME_BODY, article.getBody().toXml());
 		
 		return values;
 	}

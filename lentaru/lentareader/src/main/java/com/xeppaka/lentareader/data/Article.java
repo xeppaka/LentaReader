@@ -3,6 +3,7 @@ package com.xeppaka.lentareader.data;
 import java.util.Collection;
 import java.util.Date;
 
+import com.xeppaka.lentareader.data.body.Body;
 import com.xeppaka.lentareader.parser.rss.LentaRssItem;
 
 public class Article extends News {
@@ -13,7 +14,7 @@ public class Article extends News {
 
 	public Article(long id, String guid, String title, String secondTitle,
 			String author, String link, Date pubDate, String imageLink, String imageCaption,
-			String imageCredits, Rubrics rubric, String description, String body) {
+			String imageCredits, Rubrics rubric, String description, Body body) {
 		super(id, guid, title, link, pubDate, imageLink, imageCaption, imageCredits,
                 rubric, description, body);
 		
@@ -23,7 +24,7 @@ public class Article extends News {
 
 	public Article(String guid, String title, String secondTitle,
 			String author, String link, Date pubDate, String imageLink, String imageCaption,
-			String imageCredits, Collection<Link> links, Rubrics rubric, String description, String body) {
+			String imageCredits, Collection<Link> links, Rubrics rubric, String description, Body body) {
 		super(guid, title, link, pubDate, imageLink, imageCaption, imageCredits, rubric,
                 description, body);
 		

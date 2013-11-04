@@ -5,6 +5,7 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URL;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -19,7 +20,7 @@ import com.xeppaka.lentareader.downloader.exceptions.HttpStatusCodeException;
 import com.xeppaka.lentareader.utils.LentaConstants;
 import com.xeppaka.lentareader.utils.URLHelper;
 
-public class LentaHttpPageDownloader {
+public class HttpDownloader {
 	
 	private static class FlushedInputStream extends FilterInputStream {
 	    public FlushedInputStream(InputStream inputStream) {
@@ -45,7 +46,7 @@ public class LentaHttpPageDownloader {
 		}
 	}
 	
-	public static Page downloadPage(String url) throws HttpStatusCodeException, IOException {
+	public static String download(String url) throws HttpStatusCodeException, IOException {
 		final AndroidHttpClient client = AndroidHttpClient.newInstance(LentaConstants.UserAgent);
 		final HttpGet getRequest = new HttpGet(url);
 		//getRequest.addHeader("Accept", "text/html,application/xml");
@@ -65,7 +66,7 @@ public class LentaHttpPageDownloader {
 			if (entity != null) {
 				BufferedReader br = null;
 				try {
-					String line = null;
+					String line;
 					br = new BufferedReader(new InputStreamReader(new FlushedInputStream(entity.getContent())));
 					final StringBuilder result = new StringBuilder();
 					
@@ -73,7 +74,7 @@ public class LentaHttpPageDownloader {
 						result.append(line);
 					}
 					
-					return new Page(url, result.toString());
+					return result.toString();
 				} finally {
 					if (br != null) {
 						br.close();
@@ -82,8 +83,7 @@ public class LentaHttpPageDownloader {
 					entity.consumeContent();
 				}
 			}
-			
-		} finally {		
+		} finally {
 			if (client != null) {
 				client.close();
 			}
@@ -92,16 +92,17 @@ public class LentaHttpPageDownloader {
 		return null;
 	}
 	
-	public static Page downloadPage(Rubrics rubric, NewsType type) throws HttpStatusCodeException, IOException {
-		Page page = downloadPage(URLHelper.getRssForRubric(rubric, type));
+	public static Page downloadRss(Rubrics rubric, NewsType type) throws HttpStatusCodeException, IOException {
+        String url = URLHelper.getRssForRubric(rubric, type);
+		String pageText = download(url);
 		
-		if (page == null) {
-			return page;
-		}
-		
-		page.setRubric(rubric);
-		page.setType(type);
-		
-		return page;
+        return new Page(url, rubric, type, pageText);
 	}
+
+    public static Page downloadXml(Rubrics rubric, NewsType type) throws HttpStatusCodeException, IOException {
+        String url = URLHelper.getXmlForRubric(rubric, type);
+        String pageText = download(url);
+
+        return new Page(url, rubric, type, pageText);
+    }
 }

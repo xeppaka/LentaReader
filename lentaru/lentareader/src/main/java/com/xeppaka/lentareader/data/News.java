@@ -2,6 +2,7 @@ package com.xeppaka.lentareader.data;
 
 import java.util.Date;
 
+import com.xeppaka.lentareader.data.body.Body;
 import com.xeppaka.lentareader.data.dao.objects.BitmapReference;
 import com.xeppaka.lentareader.data.dao.objects.ImageDao;
 import com.xeppaka.lentareader.parser.rss.LentaRssItem;
@@ -18,7 +19,7 @@ public class News extends NewsObject implements NewsObjectWithImage {
 
 	public News(long id, String guid, String title, String link, Date pubDate, String imageLink,
 			String imageCaption, String imageCredits, Rubrics rubric, String description,
-            String body) {
+            Body body) {
 		super(id, guid, title, link, pubDate, rubric, description, body);
 		
 		setImageLink(imageLink);
@@ -31,7 +32,7 @@ public class News extends NewsObject implements NewsObjectWithImage {
 	
 	public News(String guid, String title, String link, Date pubDate, String imageLink,
 			String imageCaption, String imageCredits, Rubrics rubric, String description,
-            String body) {
+            Body body) {
 		super(guid, title, link, pubDate, rubric, description, body);
 		
 		setImageLink(imageLink);
