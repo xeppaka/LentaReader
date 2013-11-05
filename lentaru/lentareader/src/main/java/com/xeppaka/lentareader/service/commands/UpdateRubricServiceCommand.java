@@ -68,48 +68,52 @@ public final class UpdateRubricServiceCommand extends RunnableServiceCommand {
 
 	private void executeNews() throws Exception {
 		List<News> news;
-		
-		try {
-			news = new LentaNewsDownloader().downloadRubricBrief(rubric);
-			
-			Log.d(LentaConstants.LoggerServiceTag, "Downloaded " + news.size() + " news.");
-		} catch (ParseWithXPathException e) {
-			Log.e(LentaConstants.LoggerServiceTag, "Error downloading page, parse error.", e);
-			throw e;
-		} catch (IOException e) {
-			Log.e(LentaConstants.LoggerServiceTag, "Error downloading page, I/O error.", e);
-			throw e;
-		} catch (HttpStatusCodeException e) {
-			Log.e(LentaConstants.LoggerServiceTag, "Error downloading page, status code returned: " + e.getHttpStatusCode() + ".", e);
-			throw e;
-		}
-		
-		Dao<News> newsDao = NewsDao.getInstance(contentResolver);
-		
-		List<News> nonExistingNews = new ArrayList<News>();
-		
-		for (News n : news) {
-			if (!newsDao.exist(n.getGuid())) {
-				nonExistingNews.add(n);
-			}
-		}
 
-		Log.d(LentaConstants.LoggerServiceTag, "Number of new news from downloaded: " + nonExistingNews.size());
-		
-		Collection<Long> newsIds = newsDao.create(nonExistingNews);
-		Log.d(LentaConstants.LoggerServiceTag, "Newly created news ids: " + newsIds);
-		
-		prepareResultCreated(newsIds);
+        Collection<News> nnn = new LentaNewsDownloader().download(rubric);
+        Dao<News> nd = NewsDao.getInstance(contentResolver);
+        nd.create(nnn);
 
-		Collections.sort(nonExistingNews, Collections.reverseOrder());
-		
-//		for (News n : nonExistingNews) {
-//			executor.execute(new RetrieveNewsFullTextServiceCommand(getRequestId(), n, contentResolver, getResultReceiver(), false));
+//		try {
+//			news = new LentaNewsDownloader().downloadRubricBrief(rubric);
+//
+//			Log.d(LentaConstants.LoggerServiceTag, "Downloaded " + news.size() + " news.");
+//		} catch (ParseWithXPathException e) {
+//			Log.e(LentaConstants.LoggerServiceTag, "Error downloading page, parse error.", e);
+//			throw e;
+//		} catch (IOException e) {
+//			Log.e(LentaConstants.LoggerServiceTag, "Error downloading page, I/O error.", e);
+//			throw e;
+//		} catch (HttpStatusCodeException e) {
+//			Log.e(LentaConstants.LoggerServiceTag, "Error downloading page, status code returned: " + e.getHttpStatusCode() + ".", e);
+//			throw e;
 //		}
-		
-		for (News n : nonExistingNews) {
-			executor.execute(new RetrieveNewsImageServiceCommand(getRequestId(), n, contentResolver, getResultReceiver(), false));
-		}
+//
+//		Dao<News> newsDao = NewsDao.getInstance(contentResolver);
+//
+//		List<News> nonExistingNews = new ArrayList<News>();
+//
+//		for (News n : news) {
+//			if (!newsDao.exist(n.getGuid())) {
+//				nonExistingNews.add(n);
+//			}
+//		}
+//
+//		Log.d(LentaConstants.LoggerServiceTag, "Number of new news from downloaded: " + nonExistingNews.size());
+//
+//		Collection<Long> newsIds = newsDao.create(nonExistingNews);
+//		Log.d(LentaConstants.LoggerServiceTag, "Newly created news ids: " + newsIds);
+//
+//		prepareResultCreated(newsIds);
+//
+//		Collections.sort(nonExistingNews, Collections.reverseOrder());
+//
+////		for (News n : nonExistingNews) {
+////			executor.execute(new RetrieveNewsFullTextServiceCommand(getRequestId(), n, contentResolver, getResultReceiver(), false));
+////		}
+//
+//		for (News n : nonExistingNews) {
+//			executor.execute(new RetrieveNewsImageServiceCommand(getRequestId(), n, contentResolver, getResultReceiver(), false));
+//		}
 	}
 	
 	private void prepareResultCreated(Collection<Long> ids) {

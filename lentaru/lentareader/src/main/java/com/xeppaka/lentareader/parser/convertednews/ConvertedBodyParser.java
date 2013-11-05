@@ -8,6 +8,11 @@ import com.xeppaka.lentareader.data.body.Body;
 public class ConvertedBodyParser implements BodyParser {
     @Override
     public Body parse(String body) {
-
+        return new Body() {
+            @Override
+            public String toXml() {
+                return "test str";
+            }
+        };
     }
 }

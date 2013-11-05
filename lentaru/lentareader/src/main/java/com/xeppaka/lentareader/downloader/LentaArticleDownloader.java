@@ -1,17 +1,22 @@
 package com.xeppaka.lentareader.downloader;
 
 import java.io.IOException;
+import java.util.Collection;
 
 import com.xeppaka.lentareader.data.Article;
 import com.xeppaka.lentareader.data.NewsType;
+import com.xeppaka.lentareader.data.Rubrics;
 import com.xeppaka.lentareader.data.body.LentaBody;
 import com.xeppaka.lentareader.downloader.exceptions.HttpStatusCodeException;
+import com.xeppaka.lentareader.parser.exceptions.ParseWithXPathException;
 import com.xeppaka.lentareader.parser.originalnews.LentaMobileArticleParser;
 import com.xeppaka.lentareader.parser.originalnews.MobileArticle;
 import com.xeppaka.lentareader.parser.originalnews.NewsParser;
 import com.xeppaka.lentareader.parser.exceptions.ParseWithRegexException;
 import com.xeppaka.lentareader.parser.rss.LentaRssItem;
 import com.xeppaka.lentareader.utils.URLHelper;
+
+import org.xmlpull.v1.XmlPullParserException;
 
 public class LentaArticleDownloader extends LentaNewsObjectDownloader<Article> {
 
@@ -29,7 +34,12 @@ public class LentaArticleDownloader extends LentaNewsObjectDownloader<Article> {
 		brief.setSecondTitle(mobileArticle.getSecondTitle());
 	}
 
-	@Override
+    @Override
+    public Collection<Article> download(Rubrics rubric) throws HttpStatusCodeException, IOException, XmlPullParserException {
+        return null;
+    }
+
+    @Override
 	protected NewsType getNewsType() {
 		return NewsType.ARTICLE;
 	}
