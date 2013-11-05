@@ -33,12 +33,12 @@ object LentaBody {
 
   private def parseNews(page: String): LentaNewsBody = {
     val imageTitle = imageTitlePattern.findFirstIn(page) match {
-      case Some(imageTitlePattern(title)) => StringEscapeUtils.escapeXml(title)
+      case Some(imageTitlePattern(title)) => title
       case None => ""
     }
 
     val imageCredits = imageCreditsPattern.findFirstIn(page) match {
-      case Some(imageCreditsPattern(credits)) => StringEscapeUtils.escapeXml(credits.replaceAll("(<!--) | (-->)", ""))
+      case Some(imageCreditsPattern(credits)) => credits.replaceAll("(<!--) | (-->)", "")
       case None => ""
     }
 

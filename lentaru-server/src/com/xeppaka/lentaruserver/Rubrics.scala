@@ -12,22 +12,29 @@ import scala.language.implicitConversions
 object Rubrics extends Enumeration {
   type Rubrics = RubricsValue
 
-  class RubricsValue(val name: String, val path: String) extends Val
+  class RubricsValue(val name: String, val path: String, val russianText: String) extends Val
 
   object RubricsValue {
-    def apply(name: String, path: String) = new RubricsValue(name, path)
+    def apply(name: String, path: String, russianText: String) = new RubricsValue(name, path, russianText)
   }
 
   implicit def valueToRubricsValue(x: Value) = x.asInstanceOf[RubricsValue]
 
-  val ROOT = RubricsValue("root", "")
-  val RUSSIA = RubricsValue("russia", "/russia")
-  val WORLD = RubricsValue("world", "/world")
-  val USSR = RubricsValue("ussr", "/ussr")
-  val ECONOMICS = RubricsValue("economics", "/economics")
-  val SCIENCE = RubricsValue("science", "/science")
-  val SPORT = RubricsValue("sport", "/sport")
-  val CULTURE = RubricsValue("culture", "/culture")
-  val MEDIA = RubricsValue("media", "/media")
-  val LIFE = RubricsValue("life", "/life")
+  val ROOT = RubricsValue("root", "", "")
+  val RUSSIA = RubricsValue("russia", "/russia", "Россия")
+  val WORLD = RubricsValue("world", "/world", "Мир")
+  val USSR = RubricsValue("ussr", "/ussr", "Бывший СССР")
+  val ECONOMICS = RubricsValue("economics", "/economics", "Экономика")
+  val SCIENCE = RubricsValue("science", "/science", "Наука и техника")
+  val SPORT = RubricsValue("sport", "/sport", "Спорт")
+  val CULTURE = RubricsValue("culture", "/culture", "Культура")
+  val MEDIA = RubricsValue("media", "/media", "Интернет и СМИ")
+  val LIFE = RubricsValue("life", "/life", "Жизнь")
+
+  def getRubric(russianCategory: String): Rubrics = {
+    values.find(item => valueToRubricsValue(item).russianText == russianCategory) match {
+      case None => ROOT
+      case Some(category) => category
+    }
+  }
 }

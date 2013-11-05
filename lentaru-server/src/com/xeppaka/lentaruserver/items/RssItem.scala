@@ -5,6 +5,8 @@ import com.xeppaka.lentaruserver.Rubrics.Rubrics
 import scala.xml.Node
 import java.text.SimpleDateFormat
 import java.util.Locale
+import com.xeppaka.lentaruserver.Rubrics
+import com.xeppaka.lentaruserver.Rubrics.Rubrics
 
 /**
  * Created with IntelliJ IDEA.
@@ -20,7 +22,8 @@ class RssItem(
   val link: String,
   val image: String,
   val description: String,
-  val pubDate: Long)
+  val pubDate: Long,
+  val rubric: Rubrics)
 {
   override def toString() = s"RssItem[guid=$guid, title=$title, author=$author, link=$link, image=$image, description=$description, pubDate=$pubDate]"
 
@@ -33,6 +36,7 @@ class RssItem(
     hash = hash * 31 + image.hashCode
     hash = hash * 31 + description.hashCode
     hash = hash * 31 + pubDate.hashCode
+    hash = hash * 31 + rubric.hashCode
 
     hash
   }
@@ -43,7 +47,8 @@ class RssItem(
 
     val other = obj.asInstanceOf[RssItem]
     if (guid != other.guid || title != other.title || author != other.author ||
-    link != other.link || image != other.image || description != other.description || pubDate != other.pubDate)
+    link != other.link || image != other.image || description != other.description ||
+    pubDate != other.pubDate || rubric != other.rubric)
       false
 
     true
@@ -62,7 +67,8 @@ object RssItem {
     val image = ((rssnode \\ "enclosure") \\ "@url").text.trim
     val description = (rssnode \\ "description").text.trim
     val pubDate = dateFormat.parse((rssnode \\ "pubDate").text)
+    val rubric = Rubrics.getRubric((rssnode \\ "category").text.trim)
 
-    new RssItem(guid, title, author, link, image, description, pubDate.getTime)
+    new RssItem(guid, title, author, link, image, description, pubDate.getTime, rubric)
   }
 }
