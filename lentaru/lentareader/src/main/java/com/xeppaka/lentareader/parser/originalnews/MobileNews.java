@@ -1,4 +1,4 @@
-package com.xeppaka.lentareader.parser;
+package com.xeppaka.lentareader.parser.originalnews;
 
 import com.xeppaka.lentareader.data.body.Body;
 

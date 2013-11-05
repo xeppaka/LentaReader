@@ -1,4 +1,4 @@
-package com.xeppaka.lentareader.parser;
+package com.xeppaka.lentareader.parser.originalnews;
 
 import java.util.Iterator;
 import java.util.List;

@@ -1,16 +1,15 @@
 package com.xeppaka.lentareader.downloader;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.Collection;
 
 import com.xeppaka.lentareader.data.News;
 import com.xeppaka.lentareader.data.NewsType;
 import com.xeppaka.lentareader.data.Rubrics;
 import com.xeppaka.lentareader.downloader.exceptions.HttpStatusCodeException;
-import com.xeppaka.lentareader.parser.LentaMobileNewsParser;
-import com.xeppaka.lentareader.parser.MobileNews;
-import com.xeppaka.lentareader.parser.NewsParser;
+import com.xeppaka.lentareader.parser.originalnews.LentaMobileNewsParser;
+import com.xeppaka.lentareader.parser.originalnews.MobileNews;
+import com.xeppaka.lentareader.parser.originalnews.NewsParser;
 import com.xeppaka.lentareader.parser.exceptions.ParseWithRegexException;
 import com.xeppaka.lentareader.parser.exceptions.ParseWithXPathException;
 import com.xeppaka.lentareader.parser.rss.LentaRssItem;
@@ -35,6 +34,8 @@ public class LentaNewsDownloader extends LentaNewsObjectDownloader<News> {
     public Collection<News> download(Rubrics rubric) throws HttpStatusCodeException, IOException, ParseWithXPathException {
         String url = URLHelper.getXmlForRubric(rubric, NewsType.NEWS);
         Page xml = new Page(url, rubric, NewsType.NEWS, HttpDownloader.download(url));
+
+
     }
 
     @Override

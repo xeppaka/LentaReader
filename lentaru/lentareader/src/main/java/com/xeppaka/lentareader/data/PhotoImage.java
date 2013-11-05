@@ -1,6 +1,6 @@
 package com.xeppaka.lentareader.data;
 
-import com.xeppaka.lentareader.parser.MobilePhotoImage;
+import com.xeppaka.lentareader.parser.originalnews.MobilePhotoImage;
 
 public class PhotoImage implements DatabaseObject, Comparable<PhotoImage> {
 	private static final long serialVersionUID = 1L;

@@ -5,12 +5,14 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.URL;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.util.EntityUtils;
 
 import android.net.http.AndroidHttpClient;
 import android.util.Log;
@@ -22,29 +24,29 @@ import com.xeppaka.lentareader.utils.URLHelper;
 
 public class HttpDownloader {
 	
-	private static class FlushedInputStream extends FilterInputStream {
-	    public FlushedInputStream(InputStream inputStream) {
-	        super(inputStream);
-	    }
-
-		@Override
-		public long skip(long n) throws IOException {
-			long totalBytesSkipped = 0L;
-			while (totalBytesSkipped < n) {
-				long bytesSkipped = in.skip(n - totalBytesSkipped);
-				if (bytesSkipped == 0L) {
-					int byteRead = read();
-					if (byteRead < 0) {
-						break; // we reached EOF
-					} else {
-						bytesSkipped = 1; // we read one byte
-					}
-				}
-				totalBytesSkipped += bytesSkipped;
-			}
-			return totalBytesSkipped;
-		}
-	}
+//	private static class FlushedInputStream extends FilterInputStream {
+//	    public FlushedInputStream(InputStream inputStream) {
+//	        super(inputStream);
+//	    }
+//
+//		@Override
+//		public long skip(long n) throws IOException {
+//			long totalBytesSkipped = 0L;
+//			while (totalBytesSkipped < n) {
+//				long bytesSkipped = in.skip(n - totalBytesSkipped);
+//				if (bytesSkipped == 0L) {
+//					int byteRead = read();
+//					if (byteRead < 0) {
+//						break; // we reached EOF
+//					} else {
+//						bytesSkipped = 1; // we read one byte
+//					}
+//				}
+//				totalBytesSkipped += bytesSkipped;
+//			}
+//			return totalBytesSkipped;
+//		}
+//	}
 	
 	public static String download(String url) throws HttpStatusCodeException, IOException {
 		final AndroidHttpClient client = AndroidHttpClient.newInstance(LentaConstants.UserAgent);
@@ -64,24 +66,7 @@ public class HttpDownloader {
 			
 			final HttpEntity entity = response.getEntity();
 			if (entity != null) {
-				BufferedReader br = null;
-				try {
-					String line;
-					br = new BufferedReader(new InputStreamReader(new FlushedInputStream(entity.getContent())));
-					final StringBuilder result = new StringBuilder();
-					
-					while ((line = br.readLine()) != null) {
-						result.append(line);
-					}
-					
-					return result.toString();
-				} finally {
-					if (br != null) {
-						br.close();
-					}
-					
-					entity.consumeContent();
-				}
+                return EntityUtils.toString(entity);
 			}
 		} finally {
 			if (client != null) {

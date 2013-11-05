@@ -1,4 +1,4 @@
-package com.xeppaka.lentareader.parser;
+package com.xeppaka.lentareader.parser.originalnews;
 
 public class MobileArticle extends MobileNews {
 	private String secondTitle;
