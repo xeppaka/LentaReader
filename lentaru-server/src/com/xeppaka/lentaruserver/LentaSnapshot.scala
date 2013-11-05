@@ -23,7 +23,7 @@ class LentaSnapshot(val newsType: NewsType, val rubric: Rubrics, val items: List
 
   def toXml(indent: String): String = {
     val indentInternal = indent + "  "
-    val builder = new StringBuilder(s"""$indent<lentasnapshot type="$newsType" rubric="$rubric">\n""")
+    val builder = new StringBuilder(s"""$indent<lentasnapshot type="$newsType">\n""")
     items.foreach((item) => builder.append(item.toXml(indentInternal)))
     builder.append(s"$indent</lentasnapshot>\n").toString()
   }
