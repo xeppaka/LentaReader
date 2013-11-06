@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * Created by nnm on 11/4/13.
  */
-public class ConvertedNewsParser implements ConvertedNewsObjectsParser<News> {
+public class ConvertedNewsParser extends ConvertedNewsPullParser<News> {
     private static final String ns = null;
 
     @Override
@@ -130,23 +130,5 @@ public class ConvertedNewsParser implements ConvertedNewsObjectsParser<News> {
 
         parser.require(XmlPullParser.END_TAG, ns, tagName);
         return value;
-    }
-
-    private void skip(XmlPullParser parser) throws XmlPullParserException, IOException {
-        if (parser.getEventType() != XmlPullParser.START_TAG) {
-            throw new IllegalStateException();
-        }
-
-        int depth = 1;
-        while (depth != 0) {
-            switch (parser.next()) {
-                case XmlPullParser.END_TAG:
-                    depth--;
-                    break;
-                case XmlPullParser.START_TAG:
-                    depth++;
-                    break;
-            }
-        }
     }
 }
