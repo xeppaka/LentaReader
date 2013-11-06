@@ -12,7 +12,9 @@ import com.xeppaka.lentareader.parser.exceptions.ParseWithRegexException;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -83,6 +85,8 @@ public class ConvertedNewsParser implements ConvertedNewsObjectsParser<News> {
                 guid = readValue(parser, "guid");
             } else if (name.equals("title")) {
                 title = readValue(parser, "title");
+            } else if (name.equals("link")) {
+                link = readValue(parser, "link");
             } else if (name.equals("image")) {
                 image = readValue(parser, "image");
             } else if (name.equals("imageTitle")) {
@@ -94,7 +98,7 @@ public class ConvertedNewsParser implements ConvertedNewsObjectsParser<News> {
             } else if (name.equals("pubDate")) {
                 pubDate = new Date(Long.parseLong(readValue(parser, "pubDate")));
             } else if (name.equals("lentabody")) {
-                body = readBody();
+                body = readBody(parser);
             } else if (name.equals("rubric")) {
                 try {
                     rubric = Rubrics.valueOf(readValue(parser, "rubric"));
@@ -109,13 +113,16 @@ public class ConvertedNewsParser implements ConvertedNewsObjectsParser<News> {
         return new News(guid, title, link, pubDate, image, imageTitle, imageCredits, rubric, description, body);
     }
 
-    private LentaBody readBody() throws XmlPullParserException, IOException {
+    private LentaBody readBody(XmlPullParser parser) throws XmlPullParserException, IOException {
+        skip(parser);
+
         return null;
     }
 
     private String readValue(XmlPullParser parser, String tagName) throws XmlPullParserException, IOException {
         parser.require(XmlPullParser.START_TAG, ns, tagName);
         String value = "";
+
         if (parser.next() == XmlPullParser.TEXT) {
             value = parser.getText();
             parser.nextTag();

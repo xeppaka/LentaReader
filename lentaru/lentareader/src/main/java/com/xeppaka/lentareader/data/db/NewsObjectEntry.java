@@ -20,5 +20,5 @@ public abstract class NewsObjectEntry implements BaseColumns {
 			COLUMN_NAME_PUBDATE + " INTEGER, " +
 			COLUMN_NAME_RUBRIC + " TEXT, " +
             COLUMN_NAME_DESCRIPTION + " TEXT, " +
-            COLUMN_NAME_BODY + "TEXT";
+            COLUMN_NAME_BODY + " TEXT";
 }

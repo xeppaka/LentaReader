@@ -66,7 +66,7 @@ public class HttpDownloader {
 			
 			final HttpEntity entity = response.getEntity();
 			if (entity != null) {
-                return EntityUtils.toString(entity);
+                return EntityUtils.toString(entity, "UTF-8");
 			}
 		} finally {
 			if (client != null) {

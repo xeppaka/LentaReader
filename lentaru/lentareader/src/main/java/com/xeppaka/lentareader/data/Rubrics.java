@@ -10,7 +10,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 public enum Rubrics {
-	ROOT("", ""),
+	ROOT("", "/ROOT"),
 	RUSSIA("/russia", "/RUSSIA"),
 	WORLD("/world", "/WORLD"),
 	USSR("/ussr", "/USSR"),
@@ -32,15 +32,14 @@ public enum Rubrics {
         this.xmlSubpath = xmlSubpath;
 		
 		for (NewsType nt : NewsType.values()) {
-			rssPaths[nt.ordinal()] = LentaConstants.RSS_PATH_ROOT + nt.getRssSubpath() + this.rssSubpath;
-            xmlPaths[nt.ordinal()] = LentaConstants.XML_PATH_ROOT + nt.getXmlSubpath() + this.xmlSubpath;
+			rssPaths[nt.ordinal()] = LentaConstants.RSS_PATH_ROOT + nt.getRssSubpath() + this.rssSubpath + '/';
+            xmlPaths[nt.ordinal()] = LentaConstants.XML_PATH_ROOT + nt.getXmlSubpath() + this.xmlSubpath + '/';
 		}
 	}
 
     public String getRssSubpath() {
         return rssSubpath;
     }
-
     public String getXmlSubpath() {
         return xmlSubpath;
     }

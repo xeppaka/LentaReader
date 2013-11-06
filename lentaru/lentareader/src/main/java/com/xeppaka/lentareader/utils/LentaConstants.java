@@ -12,7 +12,7 @@ public class LentaConstants {
 	public static final String UserAgent = "Android LentaReader";
 
     public static final String RSS_PATH_ROOT = "/rss";
-    public static final String XML_PATH_ROOT = "/";
+    public static final String XML_PATH_ROOT = "";
 
     public static final int DAO_CACHE_MAX_OBJECTS = 100;
 	public static final int BITMAP_CACHE_MAX_SIZE_IN_BYTES = 4 * 1024 * 1024; // 4 MB

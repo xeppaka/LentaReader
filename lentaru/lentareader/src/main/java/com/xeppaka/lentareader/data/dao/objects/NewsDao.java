@@ -60,12 +60,10 @@ public final class NewsDao {
 			NewsEntry.COLUMN_NAME_BODY
 		};
 		
-		private final Dao<Link> newsLinksDao;
 		private final ImageDao imageDao;
 		
 		public ContentResolverNewsDao(ContentResolver cr) {
 			super(cr);
-			newsLinksDao = NewsLinksDao.getInstance(cr);
 			imageDao = ImageDao.getInstance(cr);
 		}
 
