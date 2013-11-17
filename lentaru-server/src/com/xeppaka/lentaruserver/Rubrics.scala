@@ -20,10 +20,9 @@ object Rubrics extends Enumeration {
 
   implicit def valueToRubricsValue(x: Value) = x.asInstanceOf[RubricsValue]
 
-  val WORLD = RubricsValue("world", "/world", "Мир")
   val ROOT = RubricsValue("root", "", "")
   val RUSSIA = RubricsValue("russia", "/russia", "Россия")
-//  val WORLD = RubricsValue("world", "/world", "Мир")
+  val WORLD = RubricsValue("world", "/world", "Мир")
   val USSR = RubricsValue("ussr", "/ussr", "Бывший СССР")
   val ECONOMICS = RubricsValue("economics", "/economics", "Экономика")
   val SCIENCE = RubricsValue("science", "/science", "Наука и техника")

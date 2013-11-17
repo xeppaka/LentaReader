@@ -9,6 +9,7 @@ import java.util.logging.{Level, Logger}
 import scala.util.matching.Regex
 import scala.util.parsing.json.JSON
 import scala.xml.Utility
+import java.net.{URLDecoder, URLEncoder, URL}
 
 abstract class LentaBody extends ItemBase {
   val items: List[ItemBase]
@@ -33,7 +34,7 @@ object LentaBody {
   val SEPARATOR_PLACEHOLDER_REGEX: String = "\\[\\[SEP\\]\\]"
 
   val imageTitlePattern = "<div.+?itemprop=\"description\">(.+?)</div>".r
-  val imageCreditsPattern = "<div.+?itemprop=\"author\">(.+?)</div>".r
+  val imageCreditsPattern = "<div.+?itemprop=\"author\">.+?decodeURIComponent\\('(.+?)\'\\).+?</div>".r
   val newsBodyAsidePattern = "(?s)<aside .+?</aside>\\s*".r
   val newsBodyIframePattern = "(?s)<iframe.+?</iframe>\\s*".r
   val newsBodyPattern = "(?s)<div.+?itemprop=\"articleBody\">(.+?)</div>".r
@@ -55,7 +56,7 @@ object LentaBody {
     }
 
     val imageCredits = imageCreditsPattern.findFirstIn(page) match {
-      case Some(imageCreditsPattern(credits)) => credits.replaceAll("(<!--) | (-->)", "")
+      case Some(imageCreditsPattern(credits)) => URLDecoder.decode(credits, "UTF-8")
       case None => ""
     }
 
