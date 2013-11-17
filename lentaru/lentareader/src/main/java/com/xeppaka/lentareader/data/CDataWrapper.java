@@ -5,6 +5,6 @@ package com.xeppaka.lentareader.data;
  */
 public class CDataWrapper {
     public static String wrapWithCData(String body) {
-        return "<![CDATA[" + body + "]]";
+        return "<![CDATA[" + body + "]]>";
     }
 }

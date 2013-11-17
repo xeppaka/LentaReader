@@ -10,7 +10,7 @@ import java.io.IOException;
 /**
  * Created by kacpa01 on 11/6/13.
  */
-public abstract class ConvertedNewsPullParser<T extends NewsObject> implements ConvertedNewsObjectsParser<T> {
+public abstract class PullParserBase {
     protected void skip(XmlPullParser parser) throws XmlPullParserException, IOException {
         if (parser.getEventType() != XmlPullParser.START_TAG) {
             throw new IllegalStateException();
@@ -28,4 +28,19 @@ public abstract class ConvertedNewsPullParser<T extends NewsObject> implements C
             }
         }
     }
+
+    protected String readValue(XmlPullParser parser, String tagName, String ns) throws XmlPullParserException, IOException {
+        parser.require(XmlPullParser.START_TAG, ns, tagName);
+        String value = "";
+
+        final int next = parser.next();
+        if (next == XmlPullParser.TEXT || next == XmlPullParser.CDSECT) {
+            value = parser.getText();
+            parser.nextTag();
+        }
+
+        parser.require(XmlPullParser.END_TAG, ns, tagName);
+        return value;
+    }
+
 }

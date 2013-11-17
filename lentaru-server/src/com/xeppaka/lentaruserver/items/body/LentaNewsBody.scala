@@ -9,8 +9,8 @@ import com.xeppaka.lentaruserver.items.ItemBase
  * Time: 9:58 PM
  * To change this template use File | Settings | File Templates.
  */
-class LentaNewsBody(val imageTitle: String, val imageCredits: String, items: List[ItemBase])
-  extends LentaBody(items) {
+case class LentaNewsBody(val imageTitle: String, val imageCredits: String, items: List[ItemBase])
+  extends LentaBody {
 
   override def hashCode(): Int = {
     var hash = 1
@@ -24,15 +24,9 @@ class LentaNewsBody(val imageTitle: String, val imageCredits: String, items: Lis
   override def equals(obj: scala.Any): Boolean = {
     if (!obj.isInstanceOf[LentaNewsBody])
       false
-
-    val other = obj.asInstanceOf[LentaNewsBody]
-    if (imageTitle != other.imageTitle || imageCredits != other.imageCredits || items != other.items)
-      false
-
-    true
+    else {
+      val other = obj.asInstanceOf[LentaNewsBody]
+      imageTitle == other.imageTitle && imageCredits == other.imageCredits && items == other.items
+    }
   }
-}
-
-object LentaNewsBody {
-  def apply(imageTitle: String, imageCredits: String, items: List[ItemBase]) = new LentaNewsBody(imageTitle, imageCredits, items)
 }

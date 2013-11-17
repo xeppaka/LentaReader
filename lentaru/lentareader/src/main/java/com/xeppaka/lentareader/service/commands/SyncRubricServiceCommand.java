@@ -22,22 +22,6 @@ public class SyncRubricServiceCommand extends RunnableServiceCommand {
 			ResultReceiver resultReceiver, boolean reportError) {
 		super(requestId, resultReceiver, reportError);
 		
-		if (rubric == null) {
-			throw new NullPointerException("rubric is null.");
-		}
-		
-		if (newsType == null) {
-			throw new NullPointerException("newsType is null.");
-		}
-		
-		if (executor == null) {
-			throw new NullPointerException("executor is null.");
-		}
-		
-		if (contentResolver == null) {
-			throw new NullPointerException("contentResolver is null.");
-		}
-		
 		this.rubric = rubric;
 		this.newsType = newsType;
 		this.executor = executor;

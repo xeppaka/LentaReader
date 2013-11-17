@@ -12,5 +12,5 @@ import java.util.Collection;
  * Created by nnm on 11/4/13.
  */
 public interface ConvertedNewsObjectsParser<T extends NewsObject> {
-    Collection<T> parse(Page page) throws XmlPullParserException, IOException;
+    Collection<T> parse(String xml) throws XmlPullParserException, IOException;
 }

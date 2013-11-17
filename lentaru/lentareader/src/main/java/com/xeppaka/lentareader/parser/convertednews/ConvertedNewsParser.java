@@ -1,42 +1,44 @@
 package com.xeppaka.lentareader.parser.convertednews;
 
+import android.util.Log;
 import android.util.Xml;
 
 import com.xeppaka.lentareader.data.News;
 import com.xeppaka.lentareader.data.Rubrics;
+import com.xeppaka.lentareader.data.body.Body;
 import com.xeppaka.lentareader.data.body.LentaBody;
 import com.xeppaka.lentareader.downloader.Page;
-import com.xeppaka.lentareader.parser.originalnews.NewsParser;
-import com.xeppaka.lentareader.parser.exceptions.ParseWithRegexException;
+import com.xeppaka.lentareader.utils.LentaConstants;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Created by nnm on 11/4/13.
  */
-public class ConvertedNewsParser extends ConvertedNewsPullParser<News> {
+public class ConvertedNewsParser extends PullParserBase implements ConvertedNewsObjectsParser<News> {
     private static final String ns = null;
 
+    private ConvertedBodyParser bodyParser = new ConvertedBodyParser();
+
     @Override
-    public Collection<News> parse(Page page) throws XmlPullParserException, IOException {
+    public List<News> parse(String xml) throws XmlPullParserException, IOException {
         XmlPullParser parser = Xml.newPullParser();
-        parser.setInput(new StringReader(page.getText()));
+        parser.setInput(new StringReader(xml));
         parser.nextTag();
 
         return readItems(parser);
     }
 
-    private Collection<News> readItems(XmlPullParser parser) throws XmlPullParserException, IOException {
+    private List<News> readItems(XmlPullParser parser) throws XmlPullParserException, IOException {
         List<News> entries = new ArrayList<News>();
 
         parser.require(XmlPullParser.START_TAG, ns, "lentasnapshot");
@@ -48,9 +50,15 @@ public class ConvertedNewsParser extends ConvertedNewsPullParser<News> {
             final String name = parser.getName();
 
             if (name.equals("lentanews")) {
-                final News n = readNewsEntry(parser);
-                if (n != null) {
-                    entries.add(n);
+                try {
+                    final News n = readNewsEntry(parser);
+                    if (n != null) {
+                        entries.add(n);
+                    }
+                } catch (XmlPullParserException e) {
+                    Log.d(LentaConstants.LoggerAnyTag, "Error while parsing news.", e);
+                } catch (IOException e) {
+                    Log.d(LentaConstants.LoggerAnyTag, "Error while parsing news.", e);
                 }
             } else {
                 skip(parser);
@@ -72,7 +80,7 @@ public class ConvertedNewsParser extends ConvertedNewsPullParser<News> {
         String description = null;
         Date pubDate = null;
         Rubrics rubric = null;
-        LentaBody body = null;
+        Body body = null;
 
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
@@ -82,26 +90,26 @@ public class ConvertedNewsParser extends ConvertedNewsPullParser<News> {
             String name = parser.getName();
 
             if (name.equals("guid")) {
-                guid = readValue(parser, "guid");
+                guid = readValue(parser, "guid", ns);
             } else if (name.equals("title")) {
-                title = readValue(parser, "title");
+                title = readValue(parser, "title", ns);
             } else if (name.equals("link")) {
-                link = readValue(parser, "link");
+                link = readValue(parser, "link", ns);
             } else if (name.equals("image")) {
-                image = readValue(parser, "image");
+                image = readValue(parser, "image", ns);
             } else if (name.equals("imageTitle")) {
-                imageTitle = readValue(parser, "imageTitle");
+                imageTitle = readValue(parser, "imageTitle", ns);
             } else if (name.equals("imageCredits")) {
-                imageCredits = readValue(parser, "imageCredits");
+                imageCredits = readValue(parser, "imageCredits", ns);
             } else if (name.equals("description")) {
-                description = readValue(parser, "description");
+                description = readValue(parser, "description", ns);
             } else if (name.equals("pubDate")) {
-                pubDate = new Date(Long.parseLong(readValue(parser, "pubDate")));
+                pubDate = new Date(Long.parseLong(readValue(parser, "pubDate", ns)));
             } else if (name.equals("lentabody")) {
-                body = readBody(parser);
+                body = bodyParser.parse(parser, ns);
             } else if (name.equals("rubric")) {
                 try {
-                    rubric = Rubrics.valueOf(readValue(parser, "rubric"));
+                    rubric = Rubrics.valueOf(readValue(parser, "rubric", ns));
                 } catch (IllegalArgumentException e) {
                     return null;
                 }
@@ -111,24 +119,5 @@ public class ConvertedNewsParser extends ConvertedNewsPullParser<News> {
         }
 
         return new News(guid, title, link, pubDate, image, imageTitle, imageCredits, rubric, description, body);
-    }
-
-    private LentaBody readBody(XmlPullParser parser) throws XmlPullParserException, IOException {
-        skip(parser);
-
-        return null;
-    }
-
-    private String readValue(XmlPullParser parser, String tagName) throws XmlPullParserException, IOException {
-        parser.require(XmlPullParser.START_TAG, ns, tagName);
-        String value = "";
-
-        if (parser.next() == XmlPullParser.TEXT) {
-            value = parser.getText();
-            parser.nextTag();
-        }
-
-        parser.require(XmlPullParser.END_TAG, ns, tagName);
-        return value;
     }
 }

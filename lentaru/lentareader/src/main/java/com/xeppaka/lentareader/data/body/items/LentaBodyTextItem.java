@@ -16,4 +16,9 @@ public class LentaBodyTextItem implements Item {
     public String toXml() {
         return "<text>" + CDataWrapper.wrapWithCData(text) + "</text>";
     }
+
+    @Override
+    public String toString() {
+        return text;
+    }
 }

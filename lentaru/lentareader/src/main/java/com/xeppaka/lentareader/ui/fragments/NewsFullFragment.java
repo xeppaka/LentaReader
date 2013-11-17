@@ -83,7 +83,7 @@ public class NewsFullFragment extends Fragment {
 		Body body = news.getBody();
 		
 		if (body != null) {
-			contentView.setText(Html.fromHtml(body.toXml()));
+			contentView.setText(Html.fromHtml(body.getItems().get(0).toString()));
 			contentView.setMovementMethod(LinkMovementMethod.getInstance());
 		}
 		

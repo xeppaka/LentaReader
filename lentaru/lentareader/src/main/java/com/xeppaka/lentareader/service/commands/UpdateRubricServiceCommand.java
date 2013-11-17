@@ -33,22 +33,6 @@ public final class UpdateRubricServiceCommand extends RunnableServiceCommand {
 	public UpdateRubricServiceCommand(int requestId, Rubrics rubric, NewsType newsType, ExecutorService executor, ContentResolver contentResolver, ResultReceiver resultReceiver, boolean reportError) {
 		super(requestId, resultReceiver, reportError);
 		
-		if (rubric == null) {
-			throw new NullPointerException("rubric is null.");
-		}
-		
-		if (newsType == null) {
-			throw new NullPointerException("newsType is null.");
-		}
-		
-		if (executor == null) {
-			throw new NullPointerException("executor is null.");
-		}
-		
-		if (contentResolver == null) {
-			throw new NullPointerException("contentResolver is null.");
-		}
-		
 		this.executor = executor;
 		this.contentResolver = contentResolver;
 		this.newsType = newsType;
@@ -69,51 +53,44 @@ public final class UpdateRubricServiceCommand extends RunnableServiceCommand {
 	private void executeNews() throws Exception {
 		List<News> news;
 
-        Collection<News> nnn = new LentaNewsDownloader().download(rubric);
-        Dao<News> nd = NewsDao.getInstance(contentResolver);
-        nd.create(nnn);
+		try {
+			news = new LentaNewsDownloader().download(rubric);
 
-//		try {
-//			news = new LentaNewsDownloader().downloadRubricBrief(rubric);
-//
-//			Log.d(LentaConstants.LoggerServiceTag, "Downloaded " + news.size() + " news.");
-//		} catch (ParseWithXPathException e) {
-//			Log.e(LentaConstants.LoggerServiceTag, "Error downloading page, parse error.", e);
-//			throw e;
-//		} catch (IOException e) {
-//			Log.e(LentaConstants.LoggerServiceTag, "Error downloading page, I/O error.", e);
-//			throw e;
-//		} catch (HttpStatusCodeException e) {
-//			Log.e(LentaConstants.LoggerServiceTag, "Error downloading page, status code returned: " + e.getHttpStatusCode() + ".", e);
-//			throw e;
-//		}
-//
-//		Dao<News> newsDao = NewsDao.getInstance(contentResolver);
-//
-//		List<News> nonExistingNews = new ArrayList<News>();
-//
-//		for (News n : news) {
-//			if (!newsDao.exist(n.getGuid())) {
-//				nonExistingNews.add(n);
-//			}
-//		}
-//
-//		Log.d(LentaConstants.LoggerServiceTag, "Number of new news from downloaded: " + nonExistingNews.size());
-//
-//		Collection<Long> newsIds = newsDao.create(nonExistingNews);
-//		Log.d(LentaConstants.LoggerServiceTag, "Newly created news ids: " + newsIds);
-//
-//		prepareResultCreated(newsIds);
-//
-//		Collections.sort(nonExistingNews, Collections.reverseOrder());
-//
-////		for (News n : nonExistingNews) {
-////			executor.execute(new RetrieveNewsFullTextServiceCommand(getRequestId(), n, contentResolver, getResultReceiver(), false));
-////		}
-//
+			Log.d(LentaConstants.LoggerServiceTag, "Downloaded " + news.size() + " news.");
+		} catch (IOException e) {
+			Log.e(LentaConstants.LoggerServiceTag, "Error downloading page, I/O error.", e);
+			throw e;
+		} catch (HttpStatusCodeException e) {
+			Log.e(LentaConstants.LoggerServiceTag, "Error downloading page, status code returned: " + e.getHttpStatusCode() + ".", e);
+			throw e;
+		}
+
+		Dao<News> newsDao = NewsDao.getInstance(contentResolver);
+
+		List<News> nonExistingNews = new ArrayList<News>();
+
+		for (News n : news) {
+			if (!newsDao.exist(n.getGuid())) {
+				nonExistingNews.add(n);
+			}
+		}
+
+		Log.d(LentaConstants.LoggerServiceTag, "Number of new news from downloaded: " + nonExistingNews.size());
+
+		Collection<Long> newsIds = newsDao.create(nonExistingNews);
+		Log.d(LentaConstants.LoggerServiceTag, "Newly created news ids: " + newsIds);
+
+		prepareResultCreated(newsIds);
+
+		Collections.sort(nonExistingNews, Collections.reverseOrder());
+
 //		for (News n : nonExistingNews) {
-//			executor.execute(new RetrieveNewsImageServiceCommand(getRequestId(), n, contentResolver, getResultReceiver(), false));
+//			executor.execute(new RetrieveNewsFullTextServiceCommand(getRequestId(), n, contentResolver, getResultReceiver(), false));
 //		}
+
+		for (News n : nonExistingNews) {
+			executor.execute(new RetrieveNewsImageServiceCommand(getRequestId(), n, contentResolver, getResultReceiver(), false));
+		}
 	}
 	
 	private void prepareResultCreated(Collection<Long> ids) {

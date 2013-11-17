@@ -12,14 +12,6 @@ public abstract class RetrieveImageServiceCommand<T extends NewsObject> extends 
 	public RetrieveImageServiceCommand(int requestId, T newsObject, ContentResolver contentResolver, ResultReceiver resultReceiver, boolean reportError) {
 		super(requestId, resultReceiver, reportError);
 		
-		if (newsObject == null) {
-			throw new NullPointerException("newsObject is null.");
-		}
-		
-		if (contentResolver == null) {
-			throw new NullPointerException("contentResolver is null.");
-		}
-		
 		this.newsObject = newsObject;
 		this.contentResolver = contentResolver;
 	}

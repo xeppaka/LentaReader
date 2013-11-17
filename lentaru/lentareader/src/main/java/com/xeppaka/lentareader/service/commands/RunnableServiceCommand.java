@@ -18,10 +18,6 @@ public abstract class RunnableServiceCommand implements ServiceCommand {
 			throw new IllegalArgumentException("requestId is invalid. Use -1 if there is no request id.");
 		}
 		
-		if (resultReceiver == null) {
-			throw new NullPointerException("resultReceiver is null.");
-		}
-		
 		creationTime = System.currentTimeMillis();
 		
 		this.requestId = requestId;

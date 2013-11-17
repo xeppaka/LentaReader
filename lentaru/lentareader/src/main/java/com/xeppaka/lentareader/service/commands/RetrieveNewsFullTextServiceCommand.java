@@ -18,6 +18,7 @@ import com.xeppaka.lentareader.service.ServiceResultAction;
 import com.xeppaka.lentareader.service.commands.exceptions.NewsItemUpdateException;
 import com.xeppaka.lentareader.utils.LentaConstants;
 
+@Deprecated
 public final class RetrieveNewsFullTextServiceCommand extends RunnableServiceCommand {
 	private long newsId;
 	private News news;
@@ -26,14 +27,6 @@ public final class RetrieveNewsFullTextServiceCommand extends RunnableServiceCom
 	
 	public RetrieveNewsFullTextServiceCommand(int requestId, News news, ContentResolver contentResolver, ResultReceiver resultReceiver, boolean reportError) {
 		super(requestId, resultReceiver, reportError);
-		
-		if (news == null) {
-			throw new NullPointerException("news is null.");
-		}
-		
-		if (contentResolver == null) {
-			throw new NullPointerException("contentResolver is null.");
-		}
 		
 		this.news = news;
 		this.contentResolver = contentResolver;
@@ -44,10 +37,6 @@ public final class RetrieveNewsFullTextServiceCommand extends RunnableServiceCom
 		
 		if (newsId < 0) {
 			throw new IllegalArgumentException("newsId is negative.");
-		}
-		
-		if (contentResolver == null) {
-			throw new NullPointerException("contentResolver is null.");
 		}
 		
 		this.newsId = newsId;

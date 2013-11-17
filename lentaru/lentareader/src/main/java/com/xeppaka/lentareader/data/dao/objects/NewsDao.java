@@ -1,7 +1,7 @@
 package com.xeppaka.lentareader.data.dao.objects;
 
+import java.io.IOException;
 import java.sql.Date;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -13,12 +13,11 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.v4.util.LruCache;
 import android.text.TextUtils;
-import com.xeppaka.lentareader.data.Link;
+
 import com.xeppaka.lentareader.data.News;
 import com.xeppaka.lentareader.data.Rubrics;
 import com.xeppaka.lentareader.data.body.Body;
-import com.xeppaka.lentareader.data.body.LentaBody;
-import com.xeppaka.lentareader.data.dao.Dao;
+import com.xeppaka.lentareader.data.body.EmptyBody;
 import com.xeppaka.lentareader.data.dao.async.AsyncNODao;
 import com.xeppaka.lentareader.data.dao.decorators.AsyncNODaoDecorator;
 import com.xeppaka.lentareader.data.dao.decorators.CachedNODaoDecorator;
@@ -26,15 +25,20 @@ import com.xeppaka.lentareader.data.dao.decorators.SynchronizedNODaoDecorator;
 import com.xeppaka.lentareader.data.db.NewsEntry;
 import com.xeppaka.lentareader.data.db.SQLiteType;
 import com.xeppaka.lentareader.data.provider.LentaProvider;
+import com.xeppaka.lentareader.parser.convertednews.ConvertedBodyParser;
 import com.xeppaka.lentareader.utils.LentaConstants;
+
+import org.xmlpull.v1.XmlPullParserException;
 
 public final class NewsDao {
 	private static final int CACHE_MAX_OBJECTS = LentaConstants.DAO_CACHE_MAX_OBJECTS;
 	
 	private static final LruCache<Long, News> cacheId = new LruCache<Long, News>(CACHE_MAX_OBJECTS);
 	private static final Object sync = new Object();
-	
-	public final static AsyncNODao<News> getInstance(ContentResolver contentResolver) {
+
+    private static final ConvertedBodyParser bodyParser = new ConvertedBodyParser();
+
+    public final static AsyncNODao<News> getInstance(ContentResolver contentResolver) {
 		if (contentResolver == null) {
 			throw new IllegalArgumentException("contentResolver is null.");
 		}
@@ -115,9 +119,16 @@ public final class NewsDao {
 			Rubrics rubric = Rubrics.valueOf(cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_RUBRIC)));
 
 			String description = cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_DESCRIPTION));
-			Body body = LentaBody.create(cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_BODY)));
-			
-			return new News(id, guidDb, title, link, pubDate, imageLink, imageCaption, imageCredits, rubric, description, body);
+            Body body;
+            try {
+			    body = bodyParser.parse(cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_BODY)));
+            } catch (XmlPullParserException e) {
+                body = EmptyBody.getInstance();
+            } catch (IOException e) {
+                body = EmptyBody.getInstance();
+            }
+
+            return new News(id, guidDb, title, link, pubDate, imageLink, imageCaption, imageCredits, rubric, description, body);
 		}
 	
 		@Override

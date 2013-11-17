@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/lentareader/lentareader.iml" filepath="$PROJECT_DIR$/lentareader/lentareader.iml" />
       <module fileurl="file://$PROJECT_DIR$/lentaru.iml" filepath="$PROJECT_DIR$/lentaru.iml" />
+      <module fileurl="file://$PROJECT_DIR$/libraries/libraries.iml" filepath="$PROJECT_DIR$/libraries/libraries.iml" />
       <module fileurl="file://$PROJECT_DIR$/libraries/viewpagerindicator/viewpagerindicator.iml" filepath="$PROJECT_DIR$/libraries/viewpagerindicator/viewpagerindicator.iml" />
     </modules>
   </component>

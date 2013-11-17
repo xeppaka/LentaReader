@@ -53,7 +53,7 @@ public class News extends NewsObject implements NewsObjectWithImage {
 		setImage(ImageDao.getNotAvailableImage());
 		setThumbnailImage(ImageDao.getNotAvailableImage());
 	}
-	
+
 	public String getImageLink() {
 		return imageLink;
 	}

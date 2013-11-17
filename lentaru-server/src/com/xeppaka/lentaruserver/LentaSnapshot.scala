@@ -71,7 +71,7 @@ class LentaSnapshot(val newsType: NewsType, val rubric: Rubrics, val items: List
     if (other.newsType != newsType || other.rubric != rubric)
       throw new IllegalArgumentException("Other snapshot has not the same news type and/or rubric")
 
-    val newItems: List[LentaItem] = (other.items ::: items).sortWith(_.pubDate > _.pubDate)
+    val newItems: List[LentaItem] = (other.items ::: items).sortWith(_.pubDate > _.pubDate).take(LentaSnapshot.MAX_ITEMS)
 
     LentaSnapshot(newsType, rubric, newItems)
   }
@@ -100,6 +100,8 @@ class LentaSnapshot(val newsType: NewsType, val rubric: Rubrics, val items: List
 }
 
 object LentaSnapshot {
+  val MAX_ITEMS = 40
+
   /** Download full news from previously downloaded RSS snapshot
    *
    * @param rss is the previously downloaded RSS snapshot

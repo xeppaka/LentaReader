@@ -11,10 +11,10 @@ import com.xeppaka.lentaruserver.CDataEscaper
  * To change this template use File | Settings | File Templates.
  */
 
-class LentaBodyItemText(val text: String) extends ItemBase {
+case class LentaBodyItemText(val text: String) extends ItemBase {
   override def toXml(indent: String): String = {
     val escaped = CDataEscaper.escapeText(text)
-    return s"$indent<text>$escaped</text>\n"
+    return s"$indent<text>\n$escaped\n$indent</text>\n"
   }
 
   override def hashCode(): Int = {
@@ -27,15 +27,9 @@ class LentaBodyItemText(val text: String) extends ItemBase {
   override def equals(obj: scala.Any): Boolean = {
     if (!obj.isInstanceOf[LentaBodyItemText])
       false
-
-    val other = obj.asInstanceOf[LentaBodyItemText]
-    if (text != other.text)
-      false
-
-    true
+    else {
+      val other = obj.asInstanceOf[LentaBodyItemText]
+      text == other.text
+    }
   }
-}
-
-object LentaBodyItemText {
-  def apply(text: String): LentaBodyItemText = new LentaBodyItemText(text)
 }

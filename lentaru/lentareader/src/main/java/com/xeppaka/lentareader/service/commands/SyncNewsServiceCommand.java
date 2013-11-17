@@ -20,14 +20,6 @@ public class SyncNewsServiceCommand extends RunnableServiceCommand {
 	public SyncNewsServiceCommand(int requestId, long newsId, ContentResolver contentResolver, ExecutorService executor, ResultReceiver resultReceiver, boolean reportError) {
 		super(requestId, resultReceiver, reportError);
 		
-		if (contentResolver == null) {
-			throw new NullPointerException("contentResolver is null.");
-		}
-		
-		if (executor == null) {
-			throw new NullPointerException("executor is null.");
-		}
-		
 		if (newsId < 0) {
 			throw new NullPointerException("newsId is negative.");
 		}
@@ -39,18 +31,6 @@ public class SyncNewsServiceCommand extends RunnableServiceCommand {
 
 	public SyncNewsServiceCommand(int requestId, News news, ContentResolver contentResolver, ExecutorService executor, ResultReceiver resultReceiver, boolean reportError) {
 		super(requestId, resultReceiver, reportError);
-		
-		if (contentResolver == null) {
-			throw new NullPointerException("contentResolver is null.");
-		}
-		
-		if (executor == null) {
-			throw new NullPointerException("executor is null.");
-		}
-
-		if (news == null) {
-			throw new NullPointerException("news is null.");
-		}
 		
 		this.contentResolver = contentResolver;
 		this.executor = executor;

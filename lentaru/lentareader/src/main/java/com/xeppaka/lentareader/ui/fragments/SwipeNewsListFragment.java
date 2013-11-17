@@ -24,8 +24,6 @@ import com.xeppaka.lentareader.ui.activities.NewsFullActivity;
  * used list adapter that is passed as an argument in constructor.
  * 
  * @author nnm
- * 
- * @param <T>
  */
 public class SwipeNewsListFragment extends ListFragment {
 	private NewsObjectAdapter<News> newsObjectsAdapter;
@@ -109,7 +107,7 @@ public class SwipeNewsListFragment extends ListFragment {
 			@Override
 			public void finished(Collection<News> result) {
 				showNewsObjects(result);
-				serviceHelper.syncRubric(NewsType.NEWS, Rubrics.ROOT);
+				serviceHelper.updateRubric(NewsType.NEWS, Rubrics.ROOT);
 			}
 		});
 	}
