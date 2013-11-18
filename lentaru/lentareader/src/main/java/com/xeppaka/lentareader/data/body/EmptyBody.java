@@ -2,7 +2,6 @@ package com.xeppaka.lentareader.data.body;
 
 import com.xeppaka.lentareader.data.body.items.Item;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 

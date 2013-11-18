@@ -19,8 +19,9 @@
             android:layout_height="wrap_content"
             android:contentDescription="@string/full_news_image_desc" />
 
-        <TextView
+        <LinearLayout
             android:id="@+id/full_news_content"
+            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </LinearLayout>

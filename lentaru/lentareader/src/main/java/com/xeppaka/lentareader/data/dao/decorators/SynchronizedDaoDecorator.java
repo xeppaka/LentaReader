@@ -1,10 +1,11 @@
 package com.xeppaka.lentareader.data.dao.decorators;
 
-import java.util.Collection;
-
 import com.xeppaka.lentareader.data.DatabaseObject;
 import com.xeppaka.lentareader.data.dao.Dao;
 import com.xeppaka.lentareader.data.db.SQLiteType;
+
+import java.util.Collection;
+import java.util.List;
 
 public class SynchronizedDaoDecorator<T extends DatabaseObject> implements Dao<T> {
 	private Dao<T> decoratedDao;
@@ -31,14 +32,14 @@ public class SynchronizedDaoDecorator<T extends DatabaseObject> implements Dao<T
 	}
 
 	@Override
-	public Collection<Long> create(Collection<T> dataObjects) {
+	public List<Long> create(List<T> dataObjects) {
 		synchronized (sync) {
 			return getDecoratedDao().create(dataObjects);
 		}
 	}
 
 	@Override
-	public Collection<T> read() {
+	public List<T> read() {
 		synchronized (sync) {
 			return getDecoratedDao().read();
 		}
@@ -52,7 +53,7 @@ public class SynchronizedDaoDecorator<T extends DatabaseObject> implements Dao<T
 	}
 
 	@Override
-	public Collection<T> read(Collection<Long> ids) {
+	public List<T> read(List<Long> ids) {
 		synchronized (sync) {
 			return getDecoratedDao().read(ids);
 		}
@@ -115,21 +116,21 @@ public class SynchronizedDaoDecorator<T extends DatabaseObject> implements Dao<T
 	}
 
 	@Override
-	public Collection<Long> readAllIds() {
+	public List<Long> readAllIds() {
 		synchronized (sync) {
 			return getDecoratedDao().readAllIds();
 		}
 	}
 
 	@Override
-	public Collection<String> readAllKeys() {
+	public List<String> readAllKeys() {
 		synchronized (sync) {
 			return getDecoratedDao().readAllKeys();
 		}
 	}
 
 	@Override
-	public Collection<T> readForParentObject(long parentId) {
+	public List<T> readForParentObject(long parentId) {
 		synchronized (sync) {
 			return getDecoratedDao().readForParentObject(parentId);
 		}

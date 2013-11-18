@@ -1,11 +1,5 @@
 package com.xeppaka.lentareader.data.dao.objects;
 
-import java.io.IOException;
-import java.sql.Date;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -29,6 +23,12 @@ import com.xeppaka.lentareader.parser.convertednews.ConvertedBodyParser;
 import com.xeppaka.lentareader.utils.LentaConstants;
 
 import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.IOException;
+import java.sql.Date;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 public final class NewsDao {
 	private static final int CACHE_MAX_OBJECTS = LentaConstants.DAO_CACHE_MAX_OBJECTS;
@@ -233,7 +233,7 @@ public final class NewsDao {
 		}
 		
 		@Override
-		public Collection<News> readForParentObject(long parentId) {
+		public List<News> readForParentObject(long parentId) {
 			return null;
 		}
 

@@ -1,15 +1,16 @@
 package com.xeppaka.lentareader.service.commands;
 
-import java.util.concurrent.ExecutorService;
-
 import android.content.ContentResolver;
 import android.os.Bundle;
 import android.os.ResultReceiver;
 import android.text.TextUtils;
+
 import com.xeppaka.lentareader.data.News;
 import com.xeppaka.lentareader.data.dao.async.AsyncNODao;
 import com.xeppaka.lentareader.data.dao.objects.ImageDao;
 import com.xeppaka.lentareader.data.dao.objects.NewsDao;
+
+import java.util.concurrent.ExecutorService;
 
 public class SyncNewsServiceCommand extends RunnableServiceCommand {
 	private ContentResolver contentResolver;

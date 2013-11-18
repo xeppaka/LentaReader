@@ -1,18 +1,19 @@
 package com.xeppaka.lentareader.asyncloaders;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-
 import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
 import android.util.Log;
+
 import com.xeppaka.lentareader.data.NewsObject;
 import com.xeppaka.lentareader.data.Rubrics;
 import com.xeppaka.lentareader.downloader.LentaNewsObjectDownloader;
 import com.xeppaka.lentareader.downloader.exceptions.HttpStatusCodeException;
 import com.xeppaka.lentareader.parser.exceptions.ParseWithXPathException;
 import com.xeppaka.lentareader.utils.LentaConstants;
+
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * 

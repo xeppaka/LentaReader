@@ -1,11 +1,10 @@
 package com.xeppaka.lentareader.service.commands;
 
-import java.io.IOException;
-
 import android.content.ContentResolver;
 import android.os.Bundle;
 import android.os.ResultReceiver;
 import android.util.Log;
+
 import com.xeppaka.lentareader.data.News;
 import com.xeppaka.lentareader.data.NewsType;
 import com.xeppaka.lentareader.data.dao.async.AsyncDao;
@@ -17,6 +16,8 @@ import com.xeppaka.lentareader.service.BundleConstants;
 import com.xeppaka.lentareader.service.ServiceResultAction;
 import com.xeppaka.lentareader.service.commands.exceptions.NewsItemUpdateException;
 import com.xeppaka.lentareader.utils.LentaConstants;
+
+import java.io.IOException;
 
 @Deprecated
 public final class RetrieveNewsFullTextServiceCommand extends RunnableServiceCommand {

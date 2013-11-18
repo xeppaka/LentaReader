@@ -1,15 +1,11 @@
 package com.xeppaka.lentareader.data.dao.objects;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.v4.util.LruCache;
+
 import com.xeppaka.lentareader.data.Link;
 import com.xeppaka.lentareader.data.dao.async.AsyncDao;
 import com.xeppaka.lentareader.data.dao.decorators.AsyncDaoDecorator;
@@ -19,6 +15,11 @@ import com.xeppaka.lentareader.data.db.NewsLinksEntry;
 import com.xeppaka.lentareader.data.db.SQLiteType;
 import com.xeppaka.lentareader.data.provider.LentaProvider;
 import com.xeppaka.lentareader.utils.LentaConstants;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
 
 public class NewsLinksDao {
 	private static final int CACHE_MAX_OBJECTS = LentaConstants.DAO_CACHE_MAX_OBJECTS;
@@ -106,7 +107,7 @@ public class NewsLinksDao {
 			return projectionAll;
 		}
 		
-		public Collection<Link> readForParentObject(long newsId) {
+		public List<Link> readForParentObject(long newsId) {
 			List<Link> result = new ArrayList<Link>();
 			
 			String[] keyWhereArgs = { String.valueOf(newsId) };

@@ -1,5 +1,16 @@
 package com.xeppaka.lentareader.parser.rss;
 
+import android.util.Log;
+
+import com.xeppaka.lentareader.downloader.Page;
+import com.xeppaka.lentareader.parser.exceptions.ParseWithXPathException;
+import com.xeppaka.lentareader.utils.LentaConstants;
+
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+
 import java.io.StringReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -14,16 +25,6 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-
-import android.util.Log;
-import com.xeppaka.lentareader.downloader.Page;
-import com.xeppaka.lentareader.parser.exceptions.ParseWithXPathException;
-import com.xeppaka.lentareader.utils.LentaConstants;
 
 /**
  * LentaRssParser is used for parsing RSS page from Lenta.ru site. It could be

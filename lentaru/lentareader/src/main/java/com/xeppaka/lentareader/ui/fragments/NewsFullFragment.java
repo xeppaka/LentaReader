@@ -9,12 +9,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.xeppaka.lentareader.R;
-
 import com.xeppaka.lentareader.data.News;
 import com.xeppaka.lentareader.data.body.Body;
+import com.xeppaka.lentareader.data.body.items.Item;
 import com.xeppaka.lentareader.data.dao.async.AsyncDao;
 import com.xeppaka.lentareader.data.dao.objects.BitmapReference;
 import com.xeppaka.lentareader.data.dao.objects.ImageDao;
@@ -22,9 +23,9 @@ import com.xeppaka.lentareader.data.dao.objects.NewsDao;
 
 public class NewsFullFragment extends Fragment {
 	private TextView titleView;
-	private TextView contentView;
 	private ImageView imageView;
-	
+    private LinearLayout contentView;
+
 	private long newsId;
 	private News loadedNews;
 	
@@ -47,9 +48,9 @@ public class NewsFullFragment extends Fragment {
 		super.onViewCreated(view, savedInstanceState);
 
 		titleView = (TextView) getActivity().findViewById(R.id.full_news_title);
-		contentView = (TextView) getActivity().findViewById(R.id.full_news_content);
 		imageView = (ImageView) getActivity().findViewById(R.id.full_news_image);
-		
+        contentView = (LinearLayout) getActivity().findViewById(R.id.full_news_content);
+
 		imageView.setImageBitmap(null);
 	}
 
@@ -83,8 +84,9 @@ public class NewsFullFragment extends Fragment {
 		Body body = news.getBody();
 		
 		if (body != null) {
-			contentView.setText(Html.fromHtml(body.getItems().get(0).toString()));
-			contentView.setMovementMethod(LinkMovementMethod.getInstance());
+            for (Item item : body.getItems()) {
+                contentView.addView(item.createView(getActivity()));
+            }
 		}
 		
 		titleView.setText(news.getTitle());
@@ -92,11 +94,11 @@ public class NewsFullFragment extends Fragment {
 		news.getImage().getBitmapAsync(new BitmapReference.BitmapLoadListener() {
 			@Override
 			public void onBitmapLoaded(Bitmap bitmap) {
-				if (bitmap == null) {
-					bitmap = ImageDao.getNotAvailableImage().getBitmap();
-				}
-				
-				imageView.setImageBitmap(bitmap);
+            if (bitmap == null) {
+                bitmap = ImageDao.getNotAvailableImage().getBitmap();
+            }
+
+            imageView.setImageBitmap(bitmap);
 			}
 		});
 	}

@@ -1,19 +1,20 @@
 package com.xeppaka.lentareader.downloader;
 
-import java.io.IOException;
-import java.io.InputStream;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.http.AndroidHttpClient;
+import android.util.Log;
+
+import com.xeppaka.lentareader.downloader.exceptions.HttpStatusCodeException;
+import com.xeppaka.lentareader.utils.LentaConstants;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.http.AndroidHttpClient;
-import android.util.Log;
-import com.xeppaka.lentareader.downloader.exceptions.HttpStatusCodeException;
-import com.xeppaka.lentareader.utils.LentaConstants;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class LentaHttpImageDownloader {
 	public static Bitmap downloadBitmap(String url) throws HttpStatusCodeException, IOException {

@@ -1,9 +1,9 @@
 package com.xeppaka.lentareader.data;
 
-import java.util.Date;
-
 import com.xeppaka.lentareader.data.body.Body;
 import com.xeppaka.lentareader.parser.rss.LentaRssItem;
+
+import java.util.Date;
 
 public abstract class NewsObject implements Comparable<NewsObject>, DatabaseObject {
 	private static final long serialVersionUID = 1L;

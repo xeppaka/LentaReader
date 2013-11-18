@@ -1,8 +1,5 @@
 package com.xeppaka.lentareader.data.provider;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-
 import android.content.ContentProvider;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -12,9 +9,13 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
+
 import com.xeppaka.lentareader.data.db.LentaDbHelper;
 import com.xeppaka.lentareader.data.db.NewsEntry;
 import com.xeppaka.lentareader.data.db.NewsLinksEntry;
+
+import java.io.File;
+import java.io.FileNotFoundException;
 
 public class LentaProvider extends ContentProvider {
 	private static final String CONTENT_URI_STRING = "com.xeppaka.lentareader.provider";

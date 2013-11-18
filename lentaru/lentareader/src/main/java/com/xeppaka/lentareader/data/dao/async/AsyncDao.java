@@ -1,9 +1,11 @@
 package com.xeppaka.lentareader.data.dao.async;
 
-import java.util.Collection;
-
 import android.content.ContentResolver;
+
 import com.xeppaka.lentareader.data.dao.Dao;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Dao interface with extended asynchronous methods for CRUD operations.
@@ -53,7 +55,7 @@ public interface AsyncDao<T> extends Dao<T> {
 	 * @param <T>
 	 */
 	public interface DaoReadMultiListener<T> {	
-		void finished(Collection<T> result);
+		void finished(List<T> result);
 	}
 	
 	/**
@@ -99,7 +101,7 @@ public interface AsyncDao<T> extends Dao<T> {
 	 * @return database ids for the newly created object in the same order as
 	 *         objects were.
 	 */
-	void createAsync(Collection<T> dataObjects, DaoCreateMultiListener<T> listener);
+	void createAsync(List<T> dataObjects, DaoCreateMultiListener<T> listener);
 	
 	/**
 	 * Read all news objects from database.
@@ -138,7 +140,7 @@ public interface AsyncDao<T> extends Dao<T> {
 	 * @return Collection of News objects created from the database. Not null.
 	 *         Could be empty.
 	 */
-	void readAsync(Collection<Long> ids, DaoReadMultiListener<T> listener);
+	void readAsync(List<Long> ids, DaoReadMultiListener<T> listener);
 	
 	/**
 	 * Update object's information in database.

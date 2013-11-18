@@ -1,14 +1,16 @@
 package com.xeppaka.lentareader.data.dao.objects;
 
-import java.util.Collection;
-
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
+
 import com.xeppaka.lentareader.data.PhotoImage;
 import com.xeppaka.lentareader.data.db.PhotoImageEntry;
 import com.xeppaka.lentareader.data.db.SQLiteType;
+
+import java.util.Collection;
+import java.util.List;
 
 public class PhotoImageDao extends ContentResolverDao<PhotoImage> {
 	private static final String[] projectionAll = {
@@ -92,7 +94,7 @@ public class PhotoImageDao extends ContentResolverDao<PhotoImage> {
 	}
 
 	@Override
-	public Collection<PhotoImage> readForParentObject(long parentId) {
+	public List<PhotoImage> readForParentObject(long parentId) {
 		return null;
 	}
 

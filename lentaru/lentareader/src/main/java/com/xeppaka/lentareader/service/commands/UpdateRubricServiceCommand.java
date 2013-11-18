@@ -1,16 +1,10 @@
 package com.xeppaka.lentareader.service.commands;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-
 import android.content.ContentResolver;
 import android.os.Bundle;
 import android.os.ResultReceiver;
 import android.util.Log;
+
 import com.xeppaka.lentareader.data.News;
 import com.xeppaka.lentareader.data.NewsType;
 import com.xeppaka.lentareader.data.Rubrics;
@@ -18,10 +12,16 @@ import com.xeppaka.lentareader.data.dao.Dao;
 import com.xeppaka.lentareader.data.dao.objects.NewsDao;
 import com.xeppaka.lentareader.downloader.LentaNewsDownloader;
 import com.xeppaka.lentareader.downloader.exceptions.HttpStatusCodeException;
-import com.xeppaka.lentareader.parser.exceptions.ParseWithXPathException;
 import com.xeppaka.lentareader.service.BundleConstants;
 import com.xeppaka.lentareader.service.ServiceResultAction;
 import com.xeppaka.lentareader.utils.LentaConstants;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 public final class UpdateRubricServiceCommand extends RunnableServiceCommand {
 	private Rubrics rubric;

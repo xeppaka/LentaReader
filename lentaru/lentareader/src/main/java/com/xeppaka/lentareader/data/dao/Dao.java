@@ -1,9 +1,10 @@
 package com.xeppaka.lentareader.data.dao;
 
-import java.util.Collection;
-
 import android.content.ContentResolver;
+
 import com.xeppaka.lentareader.data.db.SQLiteType;
+
+import java.util.List;
 
 /**
  * DAO object by default must support CRUD operations.
@@ -17,7 +18,7 @@ public interface Dao<T> {
 	
 	interface Observer<T> {	
 		void onDataChanged(boolean selfChange, T dataObject);
-		void onDataChanged(boolean selfChange, Collection<T> dataObjects);
+		void onDataChanged(boolean selfChange, List<T> dataObjects);
 	}
 	
 	void registerContentObserver(Observer<T> observer);
@@ -40,15 +41,15 @@ public interface Dao<T> {
 	 * @return database ids for the newly created object in the same order as
 	 *         objects were.
 	 */
-	Collection<Long> create(Collection<T> dataObjects);
+    List<Long> create(List<T> dataObjects);
 	
 	/**
 	 * Read all news objects from database.
 	 * 
-	 * @return Collection of the news objects. Null if error occurred while reading
+	 * @return List of the news objects. Null if error occurred while reading
 	 *         data from the database.
 	 */
-	Collection<T> read();
+    List<T> read();
 	
 	/**
 	 * Read some news object from the database specifying its id.
@@ -63,7 +64,7 @@ public interface Dao<T> {
 	T read(long id);
 	
 	/**
-	 * Read some news objects from the database specifying its collection of
+	 * Read some news objects from the database specifying its list of
 	 * ids.
 	 * 
 	 * @param ids
@@ -73,7 +74,7 @@ public interface Dao<T> {
 	 * @return Collection of News objects created from the database. Not null.
 	 *         Could be empty.
 	 */
-	Collection<T> read(Collection<Long> ids);
+    List<T> read(List<Long> ids);
 	
 	/**
 	 * Read some news object from the database specifying its key.
@@ -174,14 +175,14 @@ public interface Dao<T> {
 	 * 
 	 * @return Collection of keys. Not null. Could be empty.
 	 */
-	Collection<Long> readAllIds();
+    List<Long> readAllIds();
 	
 	/**
 	 * Reads all object keys from database.
 	 * 
 	 * @return Collection of keys. Not null. Could be empty.
 	 */
-	Collection<String> readAllKeys();
+    List<String> readAllKeys();
 	
 	/**
 	 * Read all data objects that are connected to the id of the parent object
@@ -192,5 +193,5 @@ public interface Dao<T> {
 	 * @return Collection of objects or null if there is no foreign key for this
 	 *         table.
 	 */
-	Collection<T> readForParentObject(long parentId);
+    List<T> readForParentObject(long parentId);
 }

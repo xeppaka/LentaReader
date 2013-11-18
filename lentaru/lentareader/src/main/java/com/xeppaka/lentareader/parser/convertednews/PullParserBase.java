@@ -1,7 +1,5 @@
 package com.xeppaka.lentareader.parser.convertednews;
 
-import com.xeppaka.lentareader.data.NewsObject;
-
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 

@@ -1,10 +1,5 @@
 package com.xeppaka.lentareader.data.dao.objects;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -12,10 +7,16 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.BaseColumns;
 import android.util.Log;
+
 import com.xeppaka.lentareader.data.DatabaseObject;
 import com.xeppaka.lentareader.data.dao.Dao;
 import com.xeppaka.lentareader.data.db.SQLiteType;
 import com.xeppaka.lentareader.utils.LentaConstants;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 public abstract class ContentResolverDao<T extends DatabaseObject> implements Dao<T> {
 	private final static String textKeyWhere;
@@ -107,7 +108,7 @@ public abstract class ContentResolverDao<T extends DatabaseObject> implements Da
 	}
 
 	@Override
-	public List<T> read(Collection<Long> ids) {
+	public List<T> read(List<Long> ids) {
 		List<T> result = new ArrayList<T>(ids.size());
 		
 		for (long id : ids) {
@@ -173,8 +174,8 @@ public abstract class ContentResolverDao<T extends DatabaseObject> implements Da
 	}
 	
 	@Override
-	public Collection<Long> create(Collection<T> dataObjects) {
-		Collection<Long> result = null;
+	public List<Long> create(List<T> dataObjects) {
+        List<Long> result = null;
 		
 		for (T dataObject : dataObjects) {
 			Uri uri = cr.insert(getContentProviderUri(), prepareContentValues(dataObject));
@@ -278,7 +279,7 @@ public abstract class ContentResolverDao<T extends DatabaseObject> implements Da
 	}
 	
 	@Override
-	public Collection<String> readAllKeys() {
+	public List<String> readAllKeys() {
 		String[] projectionKeyOnly = {	getKeyColumnName() };
 			
 		Cursor cur = cr.query(
@@ -294,7 +295,7 @@ public abstract class ContentResolverDao<T extends DatabaseObject> implements Da
         }
 
 		try {
-			Collection<String> result = new ArrayList<String>();
+            List<String> result = new ArrayList<String>();
 			
 			while (cur.moveToNext()) {
 				result.add(cur.getString(cur.getColumnIndexOrThrow(getKeyColumnName())));
@@ -309,7 +310,7 @@ public abstract class ContentResolverDao<T extends DatabaseObject> implements Da
 	}
 	
 	@Override
-	public Collection<Long> readAllIds() {
+	public List<Long> readAllIds() {
 		String[] projectionIdOnly = { BaseColumns._ID };
 		
 		Cursor cur = cr.query(
@@ -325,7 +326,7 @@ public abstract class ContentResolverDao<T extends DatabaseObject> implements Da
         }
 		
 		try {
-			Collection<Long> result = new ArrayList<Long>();
+            List<Long> result = new ArrayList<Long>();
 
 			while (cur.moveToNext()) {
 				result.add(cur.getLong(cur.getColumnIndexOrThrow(BaseColumns._ID)));

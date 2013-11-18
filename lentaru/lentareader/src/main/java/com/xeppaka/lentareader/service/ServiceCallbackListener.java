@@ -1,8 +1,8 @@
 package com.xeppaka.lentareader.service;
 
-import java.util.Collection;
-
 import com.xeppaka.lentareader.data.NewsType;
+
+import java.util.Collection;
 
 public interface ServiceCallbackListener {
     void onDatabaseObjectsCreate(int requestId, NewsType newsType, Collection<Long> newIds);

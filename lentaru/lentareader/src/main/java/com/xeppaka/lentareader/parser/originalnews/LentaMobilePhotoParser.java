@@ -1,15 +1,16 @@
 package com.xeppaka.lentareader.parser.originalnews;
 
+import android.util.Log;
+
+import com.xeppaka.lentareader.downloader.Page;
+import com.xeppaka.lentareader.parser.exceptions.ParseWithRegexException;
+import com.xeppaka.lentareader.utils.LentaConstants;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
-
-import android.util.Log;
-import com.xeppaka.lentareader.downloader.Page;
-import com.xeppaka.lentareader.parser.exceptions.ParseWithRegexException;
-import com.xeppaka.lentareader.utils.LentaConstants;
 
 /**
  * LentaMobilePhotoParser is NewsParser implementation that can parse mobile

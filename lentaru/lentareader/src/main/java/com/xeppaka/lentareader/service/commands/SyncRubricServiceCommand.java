@@ -1,16 +1,17 @@
 package com.xeppaka.lentareader.service.commands;
 
-import java.util.Collection;
-import java.util.concurrent.ExecutorService;
-
 import android.content.ContentResolver;
 import android.os.Bundle;
 import android.os.ResultReceiver;
+
 import com.xeppaka.lentareader.data.News;
 import com.xeppaka.lentareader.data.NewsType;
 import com.xeppaka.lentareader.data.Rubrics;
 import com.xeppaka.lentareader.data.dao.async.AsyncNODao;
 import com.xeppaka.lentareader.data.dao.objects.NewsDao;
+
+import java.util.Collection;
+import java.util.concurrent.ExecutorService;
 
 public class SyncRubricServiceCommand extends RunnableServiceCommand {
 	private Rubrics rubric;

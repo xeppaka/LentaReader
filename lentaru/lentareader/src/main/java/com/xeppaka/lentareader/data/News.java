@@ -1,11 +1,11 @@
 package com.xeppaka.lentareader.data;
 
-import java.util.Date;
-
 import com.xeppaka.lentareader.data.body.Body;
 import com.xeppaka.lentareader.data.dao.objects.BitmapReference;
 import com.xeppaka.lentareader.data.dao.objects.ImageDao;
 import com.xeppaka.lentareader.parser.rss.LentaRssItem;
+
+import java.util.Date;
 
 public class News extends NewsObject implements NewsObjectWithImage {
 	private static final long serialVersionUID = 1L;

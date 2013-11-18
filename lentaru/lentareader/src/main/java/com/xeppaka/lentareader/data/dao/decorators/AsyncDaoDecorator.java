@@ -1,12 +1,14 @@
 package com.xeppaka.lentareader.data.dao.decorators;
 
-import java.util.Collection;
-
 import android.os.AsyncTask;
+
 import com.xeppaka.lentareader.data.DatabaseObject;
 import com.xeppaka.lentareader.data.dao.Dao;
 import com.xeppaka.lentareader.data.dao.async.AsyncDao;
 import com.xeppaka.lentareader.data.db.SQLiteType;
+
+import java.util.Collection;
+import java.util.List;
 
 public class AsyncDaoDecorator<T extends DatabaseObject> implements AsyncDao<T> {
 	private Dao<T> decoratedDao;
@@ -37,7 +39,7 @@ public class AsyncDaoDecorator<T extends DatabaseObject> implements AsyncDao<T> 
 		}
 	}
 	
-	protected class AsyncCreateMultiTask extends AsyncTask<Collection<T>, Void, Collection<Long>> {
+	protected class AsyncCreateMultiTask extends AsyncTask<List<T>, Void, List<Long>> {
 		private AsyncDao.DaoCreateMultiListener<T> listener;
 		
 		public AsyncCreateMultiTask(AsyncDao.DaoCreateMultiListener<T> listener) {
@@ -45,12 +47,12 @@ public class AsyncDaoDecorator<T extends DatabaseObject> implements AsyncDao<T> 
 		}
 
 		@Override
-		protected Collection<Long> doInBackground(Collection<T>... dataObjects) {
+		protected List<Long> doInBackground(List<T>... dataObjects) {
 			return create(dataObjects[0]);
 		}
 
 		@Override
-		protected void onPostExecute(Collection<Long> result) {
+		protected void onPostExecute(List<Long> result) {
 			listener.finished(result);
 		}
 	}
@@ -91,7 +93,7 @@ public class AsyncDaoDecorator<T extends DatabaseObject> implements AsyncDao<T> 
 		}
 	}
 	
-	protected class AsyncReadMultiTask extends AsyncTask<Collection<Long>, Void, Collection<T>> {
+	protected class AsyncReadMultiTask extends AsyncTask<List<Long>, Void, List<T>> {
 		private AsyncDao.DaoReadMultiListener<T> listener;
 		
 		public AsyncReadMultiTask(AsyncDao.DaoReadMultiListener<T> listener) {
@@ -99,7 +101,7 @@ public class AsyncDaoDecorator<T extends DatabaseObject> implements AsyncDao<T> 
 		}
 
 		@Override
-		protected Collection<T> doInBackground(Collection<Long>... ids) {
+		protected List<T> doInBackground(List<Long>... ids) {
 			if (ids.length > 0) {
 				return read(ids[0]);
 			} else {
@@ -108,7 +110,7 @@ public class AsyncDaoDecorator<T extends DatabaseObject> implements AsyncDao<T> 
 		}
 
 		@Override
-		protected void onPostExecute(Collection<T> result) {
+		protected void onPostExecute(List<T> result) {
 			listener.finished(result);
 		}
 	}
@@ -139,7 +141,7 @@ public class AsyncDaoDecorator<T extends DatabaseObject> implements AsyncDao<T> 
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public synchronized void createAsync(Collection<T> dataObjects, AsyncDao.DaoCreateMultiListener<T> listener) {
+	public synchronized void createAsync(List<T> dataObjects, AsyncDao.DaoCreateMultiListener<T> listener) {
 		new AsyncCreateMultiTask(listener).execute(dataObjects);
 	}
 
@@ -156,7 +158,7 @@ public class AsyncDaoDecorator<T extends DatabaseObject> implements AsyncDao<T> 
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public synchronized void readAsync(Collection<Long> ids, AsyncDao.DaoReadMultiListener<T> listener) {
+	public synchronized void readAsync(List<Long> ids, AsyncDao.DaoReadMultiListener<T> listener) {
 		new AsyncReadMultiTask(listener).execute(ids);
 	}
 
@@ -193,12 +195,12 @@ public class AsyncDaoDecorator<T extends DatabaseObject> implements AsyncDao<T> 
 	}
 
 	@Override
-	public Collection<Long> create(Collection<T> dataObjects) {
+	public List<Long> create(List<T> dataObjects) {
 		return getDecoratedDao().create(dataObjects);
 	}
 
 	@Override
-	public Collection<T> read() {
+	public List<T> read() {
 		return getDecoratedDao().read();
 	}
 
@@ -208,7 +210,7 @@ public class AsyncDaoDecorator<T extends DatabaseObject> implements AsyncDao<T> 
 	}
 
 	@Override
-	public Collection<T> read(Collection<Long> ids) {
+	public List<T> read(List<Long> ids) {
 		return getDecoratedDao().read(ids);
 	}
 
@@ -253,17 +255,17 @@ public class AsyncDaoDecorator<T extends DatabaseObject> implements AsyncDao<T> 
 	}
 
 	@Override
-	public Collection<Long> readAllIds() {
+	public List<Long> readAllIds() {
 		return getDecoratedDao().readAllIds();
 	}
 
 	@Override
-	public Collection<String> readAllKeys() {
+	public List<String> readAllKeys() {
 		return getDecoratedDao().readAllKeys();
 	}
 
 	@Override
-	public Collection<T> readForParentObject(long parentId) {
+	public List<T> readForParentObject(long parentId) {
 		return getDecoratedDao().readForParentObject(parentId);
 	}
 }

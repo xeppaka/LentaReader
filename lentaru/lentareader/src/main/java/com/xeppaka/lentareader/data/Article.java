@@ -1,10 +1,10 @@
 package com.xeppaka.lentareader.data;
 
-import java.util.Collection;
-import java.util.Date;
-
 import com.xeppaka.lentareader.data.body.Body;
 import com.xeppaka.lentareader.parser.rss.LentaRssItem;
+
+import java.util.Collection;
+import java.util.Date;
 
 public class Article extends News {
 	private static final long serialVersionUID = 1L;

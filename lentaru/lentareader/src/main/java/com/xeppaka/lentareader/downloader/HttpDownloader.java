@@ -1,12 +1,13 @@
 package com.xeppaka.lentareader.downloader;
 
-import java.io.BufferedReader;
-import java.io.FilterInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.URL;
+import android.net.http.AndroidHttpClient;
+import android.util.Log;
+
+import com.xeppaka.lentareader.data.NewsType;
+import com.xeppaka.lentareader.data.Rubrics;
+import com.xeppaka.lentareader.downloader.exceptions.HttpStatusCodeException;
+import com.xeppaka.lentareader.utils.LentaConstants;
+import com.xeppaka.lentareader.utils.URLHelper;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -14,13 +15,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.util.EntityUtils;
 
-import android.net.http.AndroidHttpClient;
-import android.util.Log;
-import com.xeppaka.lentareader.data.NewsType;
-import com.xeppaka.lentareader.data.Rubrics;
-import com.xeppaka.lentareader.downloader.exceptions.HttpStatusCodeException;
-import com.xeppaka.lentareader.utils.LentaConstants;
-import com.xeppaka.lentareader.utils.URLHelper;
+import java.io.IOException;
 
 public class HttpDownloader {
 	

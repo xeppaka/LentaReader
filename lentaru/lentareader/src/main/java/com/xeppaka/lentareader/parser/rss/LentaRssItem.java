@@ -1,9 +1,9 @@
 package com.xeppaka.lentareader.parser.rss;
 
-import java.util.Date;
-
 import com.xeppaka.lentareader.data.NewsType;
 import com.xeppaka.lentareader.data.Rubrics;
+
+import java.util.Date;
 
 /**
  * LentaRssItem is the data holder for the parsed RSS page.

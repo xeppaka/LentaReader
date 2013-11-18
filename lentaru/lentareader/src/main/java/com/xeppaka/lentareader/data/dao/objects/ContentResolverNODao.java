@@ -1,15 +1,16 @@
 package com.xeppaka.lentareader.data.dao.objects;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import android.content.ContentResolver;
 import android.database.Cursor;
+
 import com.xeppaka.lentareader.data.NewsObject;
 import com.xeppaka.lentareader.data.Rubrics;
 import com.xeppaka.lentareader.data.dao.NODao;
 import com.xeppaka.lentareader.data.db.SQLiteType;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public abstract class ContentResolverNODao<T extends NewsObject> extends ContentResolverDao<T> implements NODao<T> {
 	

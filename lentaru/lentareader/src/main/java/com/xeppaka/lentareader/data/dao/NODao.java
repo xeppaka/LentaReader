@@ -1,9 +1,9 @@
 package com.xeppaka.lentareader.data.dao;
 
-import java.util.Collection;
-
 import com.xeppaka.lentareader.data.NewsObject;
 import com.xeppaka.lentareader.data.Rubrics;
+
+import java.util.List;
 
 /**
  * DAO interface that should implement every DAO implementation that represents
@@ -14,5 +14,5 @@ import com.xeppaka.lentareader.data.Rubrics;
  * @param <T>
  */
 public interface NODao<T extends NewsObject> extends Dao<T> {
-	Collection<T> readForRubric(Rubrics rubric);
+    List<T> readForRubric(Rubrics rubric);
 }

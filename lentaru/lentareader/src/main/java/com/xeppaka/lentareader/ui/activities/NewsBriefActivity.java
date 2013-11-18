@@ -7,7 +7,6 @@ import android.support.v4.view.ViewPager;
 
 import com.viewpagerindicator.TitlePageIndicator;
 import com.xeppaka.lentareader.R;
-
 import com.xeppaka.lentareader.ui.fragments.SwipeNewsObjectsListAdapter;
 import com.xeppaka.lentareader.utils.LentaUtils;
 

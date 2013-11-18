@@ -1,5 +1,22 @@
 package com.xeppaka.lentareader.service;
 
+import android.app.Service;
+import android.content.ContentResolver;
+import android.content.Intent;
+import android.os.IBinder;
+import android.os.ResultReceiver;
+import android.util.Log;
+
+import com.xeppaka.lentareader.data.DatabaseObject;
+import com.xeppaka.lentareader.data.NewsType;
+import com.xeppaka.lentareader.data.Rubrics;
+import com.xeppaka.lentareader.service.ServiceIntentBuilder.ServiceIntentKey;
+import com.xeppaka.lentareader.service.commands.ServiceCommand;
+import com.xeppaka.lentareader.service.commands.SyncNewsServiceCommand;
+import com.xeppaka.lentareader.service.commands.SyncRubricServiceCommand;
+import com.xeppaka.lentareader.service.commands.UpdateRubricServiceCommand;
+import com.xeppaka.lentareader.utils.LentaConstants;
+
 import java.util.Comparator;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -7,22 +24,6 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import android.app.Service;
-import android.content.ContentResolver;
-import android.content.Intent;
-import android.os.IBinder;
-import android.os.ResultReceiver;
-import android.util.Log;
-import com.xeppaka.lentareader.data.DatabaseObject;
-import com.xeppaka.lentareader.data.NewsType;
-import com.xeppaka.lentareader.data.Rubrics;
-import com.xeppaka.lentareader.service.ServiceIntentBuilder.ServiceIntentKey;
-import com.xeppaka.lentareader.service.commands.ServiceCommand;
-import com.xeppaka.lentareader.service.commands.SyncRubricServiceCommand;
-import com.xeppaka.lentareader.service.commands.SyncNewsServiceCommand;
-import com.xeppaka.lentareader.service.commands.UpdateRubricServiceCommand;
-import com.xeppaka.lentareader.utils.LentaConstants;
 
 /**
  * 

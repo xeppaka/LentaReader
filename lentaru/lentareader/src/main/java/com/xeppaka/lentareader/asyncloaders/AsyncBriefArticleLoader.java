@@ -1,6 +1,7 @@
 package com.xeppaka.lentareader.asyncloaders;
 
 import android.content.Context;
+
 import com.xeppaka.lentareader.data.Article;
 import com.xeppaka.lentareader.data.Rubrics;
 import com.xeppaka.lentareader.downloader.LentaArticleDownloader;

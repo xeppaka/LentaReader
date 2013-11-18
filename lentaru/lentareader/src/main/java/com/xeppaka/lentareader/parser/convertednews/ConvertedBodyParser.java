@@ -6,7 +6,11 @@ import android.util.Xml;
 import com.xeppaka.lentareader.data.body.Body;
 import com.xeppaka.lentareader.data.body.EmptyBody;
 import com.xeppaka.lentareader.data.body.LentaBody;
+import com.xeppaka.lentareader.data.body.VideoType;
 import com.xeppaka.lentareader.data.body.items.Item;
+import com.xeppaka.lentareader.data.body.items.LentaBodyItemImage;
+import com.xeppaka.lentareader.data.body.items.LentaBodyItemImageGallery;
+import com.xeppaka.lentareader.data.body.items.LentaBodyItemVideo;
 import com.xeppaka.lentareader.data.body.items.LentaBodyTextItem;
 
 import org.xmlpull.v1.XmlPullParser;
@@ -15,7 +19,6 @@ import org.xmlpull.v1.XmlPullParserException;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 
@@ -38,25 +41,51 @@ public class ConvertedBodyParser extends PullParserBase implements BodyParser {
 
             if (name.equals("text")) {
                 items.add(new LentaBodyTextItem(readValue(parser, "text", ns)));
+            } else if (name.equals("images")) {
+                items.add(parseGallery(parser, ns));
+            } else if (name.equals("video")) {
+                items.add(parseVideo(parser, ns));
             } else {
                 skip(parser);
             }
         }
 
+        parser.require(XmlPullParser.END_TAG, ns, "lentabody");
         return new LentaBody(items);
     }
 
-    private String readTextItem(XmlPullParser parser, String ns) throws XmlPullParserException, IOException {
-        parser.require(XmlPullParser.START_TAG, ns, "text");
+    private LentaBodyItemVideo parseVideo(XmlPullParser parser, String ns) throws XmlPullParserException, IOException {
+        parser.require(XmlPullParser.START_TAG, ns, "video");
+        LentaBodyItemVideo result = new LentaBodyItemVideo(parser.getAttributeValue(ns, "url"), VideoType.valueOf(parser.getAttributeValue(ns, "type")));
 
-        String result = "";
-        final int token = parser.nextToken();
-        if (token == XmlPullParser.CDSECT || token == XmlPullParser.TEXT) {
-            result = parser.getText();
+        parser.nextTag();
+
+        parser.require(XmlPullParser.END_TAG, ns, "video");
+        return result;
+    }
+
+    private LentaBodyItemImageGallery parseGallery(XmlPullParser parser, String ns) throws XmlPullParserException, IOException {
+        parser.require(XmlPullParser.START_TAG, ns, "images");
+
+        List<LentaBodyItemImage> images = new ArrayList<LentaBodyItemImage>();
+
+        while (parser.next() != XmlPullParser.END_TAG) {
+            if (parser.getEventType() != XmlPullParser.START_TAG) {
+                continue;
+            }
+
+            final String name = parser.getName();
+
+            if (name.equals("image")) {
+                images.add(new LentaBodyItemImage(parser.getAttributeValue(ns, "url")));
+                parser.nextTag();
+            } else {
+                skip(parser);
+            }
         }
 
-        parser.next();
-        return result;
+        parser.require(XmlPullParser.END_TAG, ns, "images");
+        return new LentaBodyItemImageGallery(images);
     }
 
     @Override

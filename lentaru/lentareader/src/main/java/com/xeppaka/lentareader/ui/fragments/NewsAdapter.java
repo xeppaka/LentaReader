@@ -1,7 +1,5 @@
 package com.xeppaka.lentareader.ui.fragments;
 
-import java.util.Collection;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.view.View;
@@ -10,11 +8,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.xeppaka.lentareader.R;
-
 import com.xeppaka.lentareader.data.News;
 import com.xeppaka.lentareader.data.dao.objects.BitmapReference;
-import com.xeppaka.lentareader.data.dao.objects.ImageDao;
 import com.xeppaka.lentareader.data.dao.objects.BitmapReference.BitmapLoadListener;
+import com.xeppaka.lentareader.data.dao.objects.ImageDao;
 
 public class NewsAdapter extends NewsObjectAdapter<News> {
 	
@@ -44,10 +41,6 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
 		public void setImage(BitmapReference imageRef) {
 			this.imageRef = imageRef;
 		}
-	}
-
-	public NewsAdapter(Context context, Collection<News> newsObjects) {
-		super(context, newsObjects);
 	}
 
 	public NewsAdapter(Context context) {
@@ -93,11 +86,11 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
 		imageRef.getBitmapAsync(new BitmapLoadListener() {
 			@Override
 			public void onBitmapLoaded(final Bitmap bitmap) {
-				if (bitmap != null) {
-					newsImageViewForAsync.setImageBitmap(bitmap);
-				} else {
-					newsImageViewForAsync.setImageBitmap(ImageDao.getNotAvailableImage().getBitmap());
-				}
+            if (bitmap != null) {
+                newsImageViewForAsync.setImageBitmap(bitmap);
+            } else {
+                newsImageViewForAsync.setImageBitmap(ImageDao.getNotAvailableImage().getBitmap());
+            }
 			}
 		});
 		

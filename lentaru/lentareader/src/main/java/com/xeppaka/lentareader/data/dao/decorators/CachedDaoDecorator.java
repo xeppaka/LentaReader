@@ -1,12 +1,14 @@
 package com.xeppaka.lentareader.data.dao.decorators;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import android.support.v4.util.LruCache;
+
 import com.xeppaka.lentareader.data.DatabaseObject;
 import com.xeppaka.lentareader.data.dao.Dao;
 import com.xeppaka.lentareader.data.db.SQLiteType;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * This class is a decorator for the Dao which adds caching abilities into it.
@@ -60,8 +62,8 @@ public class CachedDaoDecorator<T extends DatabaseObject> implements Dao<T> {
 	}
 
 	@Override
-	public Collection<Long> create(Collection<T> dataObjects) {
-		Collection<Long> result = getDecoratedDao().create(dataObjects);
+	public List<Long> create(List<T> dataObjects) {
+        List<Long> result = getDecoratedDao().create(dataObjects);
 		
 		for (T dataObject : dataObjects) {
 			cacheId.put(dataObject.getId(), dataObject);
@@ -71,11 +73,11 @@ public class CachedDaoDecorator<T extends DatabaseObject> implements Dao<T> {
 	}
 
 	@Override
-	public Collection<T> read() {
-		Collection<Long> allIds = getDecoratedDao().readAllIds();
-		Collection<T> result = new ArrayList<T>(allIds.size());
-		Collection<Long> missed = new ArrayList<Long>();
-		
+	public List<T> read() {
+        List<Long> allIds = getDecoratedDao().readAllIds();
+        List<Long> missed = new ArrayList<Long>();
+        List<T> result = new ArrayList<T>(allIds.size());
+
 		for (Long id : allIds) {
 			T newsObject = cacheId.get(id);
 			
@@ -85,14 +87,14 @@ public class CachedDaoDecorator<T extends DatabaseObject> implements Dao<T> {
 				result.add(newsObject);
 			}
 		}
-		
-		Collection<T> dbResult = getDecoratedDao().read(missed);
+
+        List<T> dbResult = getDecoratedDao().read(missed);
 		result.addAll(dbResult);
 		
 		for (T object : dbResult) {
 			getLruCacheId().put(object.getId(), object);
 		}
-		
+
 		return result;
 	}
 
@@ -108,9 +110,9 @@ public class CachedDaoDecorator<T extends DatabaseObject> implements Dao<T> {
 	}
 
 	@Override
-	public Collection<T> read(Collection<Long> ids) {
-		Collection<Long> missed = new ArrayList<Long>();
-		Collection<T> result = new ArrayList<T>(ids.size());
+	public List<T> read(List<Long> ids) {
+        List<Long> missed = new ArrayList<Long>();
+        List<T> result = new ArrayList<T>(ids.size());
 		
 		for (Long id : ids) {
 			T dataObject = getLruCacheId().get(id);
@@ -123,7 +125,7 @@ public class CachedDaoDecorator<T extends DatabaseObject> implements Dao<T> {
 		}
 		
 		if (!missed.isEmpty()) {
-			Collection<T> dbResult = getDecoratedDao().read(missed);
+            List<T> dbResult = getDecoratedDao().read(missed);
 			
 			result.addAll(dbResult);
 			
@@ -160,14 +162,14 @@ public class CachedDaoDecorator<T extends DatabaseObject> implements Dao<T> {
 	}
 
 	@Override
-	public Collection<T> readForParentObject(long parentId) {
-		Collection<T> dbResult = getDecoratedDao().readForParentObject(parentId);
+	public List<T> readForParentObject(long parentId) {
+        List<T> dbResult = getDecoratedDao().readForParentObject(parentId);
 		
 		if (dbResult.isEmpty()) {
 			return dbResult;
 		}
-		
-		Collection<T> result = new ArrayList<T>(dbResult.size());
+
+        List<T> result = new ArrayList<T>(dbResult.size());
 		
 		for (T object : dbResult) {
 			T cachedObject = getLruCacheId().get(object.getId());
@@ -208,12 +210,12 @@ public class CachedDaoDecorator<T extends DatabaseObject> implements Dao<T> {
 	}
 
 	@Override
-	public Collection<Long> readAllIds() {
+	public List<Long> readAllIds() {
 		return getDecoratedDao().readAllIds();
 	}
 
 	@Override
-	public Collection<String> readAllKeys() {
+	public List<String> readAllKeys() {
 		return getDecoratedDao().readAllKeys();
 	}
 }

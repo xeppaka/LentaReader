@@ -3,6 +3,7 @@ package com.xeppaka.lentareader.service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.ResultReceiver;
+
 import com.xeppaka.lentareader.data.NewsType;
 import com.xeppaka.lentareader.data.Rubrics;
 

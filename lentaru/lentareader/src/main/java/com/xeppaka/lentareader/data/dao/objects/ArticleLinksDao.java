@@ -1,15 +1,17 @@
 package com.xeppaka.lentareader.data.dao.objects;
 
-import java.util.Collection;
-import java.util.Date;
-
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
+
 import com.xeppaka.lentareader.data.Link;
 import com.xeppaka.lentareader.data.db.ArticleLinksEntry;
 import com.xeppaka.lentareader.data.db.SQLiteType;
+
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
 
 public class ArticleLinksDao extends ContentResolverDao<Link> {
 	private static final String[] projectionAll = {
@@ -82,7 +84,7 @@ public class ArticleLinksDao extends ContentResolverDao<Link> {
 	}
 
 	@Override
-	public Collection<Link> readForParentObject(long parentId) {
+	public List<Link> readForParentObject(long parentId) {
 		return null;
 	}
 

@@ -1,14 +1,17 @@
 package com.xeppaka.lentareader.data.dao.decorators;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import android.support.v4.util.LruCache;
 import android.util.Log;
+
 import com.xeppaka.lentareader.data.NewsObject;
 import com.xeppaka.lentareader.data.Rubrics;
 import com.xeppaka.lentareader.data.dao.NODao;
 import com.xeppaka.lentareader.utils.LentaConstants;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 public class CachedNODaoDecorator<T extends NewsObject> extends CachedDaoDecorator<T> implements NODao<T> {
 	protected NODao<T> decoratedDao;
@@ -20,14 +23,14 @@ public class CachedNODaoDecorator<T extends NewsObject> extends CachedDaoDecorat
 	}
 
 	@Override
-	public Collection<T> readForRubric(Rubrics rubric) {
-		Collection<T> dbResult = getDecoratedDao().readForRubric(rubric);
+	public List<T> readForRubric(Rubrics rubric) {
+        List<T> dbResult = getDecoratedDao().readForRubric(rubric);
 		
 		if (dbResult.isEmpty()) {
 			return dbResult;
 		}
-		
-		Collection<T> result = new ArrayList<T>(dbResult.size());
+
+        List<T> result = new ArrayList<T>(dbResult.size());
 		
 		for (T object : dbResult) {
 			T cachedObject = getLruCacheId().get(object.getId());			
@@ -45,7 +48,15 @@ public class CachedNODaoDecorator<T extends NewsObject> extends CachedDaoDecorat
 		return result;
 	}
 
-	@Override
+    @Override
+    public List<T> read() {
+        List<T> result = super.read();
+        Collections.sort(result);
+
+        return result;
+    }
+
+    @Override
 	protected NODao<T> getDecoratedDao() {
 		return decoratedDao;
 	}

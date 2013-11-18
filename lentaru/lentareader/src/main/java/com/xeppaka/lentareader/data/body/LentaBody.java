@@ -2,7 +2,6 @@ package com.xeppaka.lentareader.data.body;
 
 import com.xeppaka.lentareader.data.body.items.Item;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -22,6 +21,10 @@ public class LentaBody implements Body {
 
     @Override
     public String toXml() {
+        if (items.isEmpty()) {
+            return "<lentabody />";
+        }
+
         StringBuilder sb = new StringBuilder("<lentabody>");
 
         for (Item item : getItems()) {

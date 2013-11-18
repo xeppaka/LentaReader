@@ -1,8 +1,5 @@
 package com.xeppaka.lentareader.ui.fragments;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -10,6 +7,9 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.ListFragment;
 
 import com.xeppaka.lentareader.R;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class represents pager adapter -> it contains all page definitions
@@ -31,8 +31,7 @@ public class SwipeNewsObjectsListAdapter extends FragmentPagerAdapter {
 		this.context = context;
 		
 		fragments = new ArrayList<ListFragment>();
-		fragments.add(new SwipeNewsListFragment(new NewsAdapter(context)));
-		//fragments.add(new SwipeNewsListFragment(new NewsAdapter(context)));
+		fragments.add(new NewsListFragment());
 	}
 
 	@Override

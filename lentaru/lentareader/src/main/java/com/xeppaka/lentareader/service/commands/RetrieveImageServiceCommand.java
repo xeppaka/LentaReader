@@ -2,6 +2,7 @@ package com.xeppaka.lentareader.service.commands;
 
 import android.content.ContentResolver;
 import android.os.ResultReceiver;
+
 import com.xeppaka.lentareader.data.NewsObject;
 
 public abstract class RetrieveImageServiceCommand<T extends NewsObject> extends RunnableServiceCommand {

@@ -1,9 +1,5 @@
 package com.xeppaka.lentareader.data.dao.objects;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.MalformedURLException;
-
 import android.content.ContentResolver;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -14,9 +10,14 @@ import android.os.AsyncTask;
 import android.os.ParcelFileDescriptor;
 import android.support.v4.util.LruCache;
 import android.util.Log;
+
 import com.xeppaka.lentareader.data.provider.LentaProvider;
 import com.xeppaka.lentareader.utils.LentaConstants;
 import com.xeppaka.lentareader.utils.URLHelper;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.MalformedURLException;
 
 /**
  * This class is responsible for maintaining all images in the application that

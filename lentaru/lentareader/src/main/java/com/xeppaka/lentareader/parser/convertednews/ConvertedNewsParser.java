@@ -6,8 +6,6 @@ import android.util.Xml;
 import com.xeppaka.lentareader.data.News;
 import com.xeppaka.lentareader.data.Rubrics;
 import com.xeppaka.lentareader.data.body.Body;
-import com.xeppaka.lentareader.data.body.LentaBody;
-import com.xeppaka.lentareader.downloader.Page;
 import com.xeppaka.lentareader.utils.LentaConstants;
 
 import org.xmlpull.v1.XmlPullParser;
@@ -16,10 +14,8 @@ import org.xmlpull.v1.XmlPullParserException;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * Created by nnm on 11/4/13.

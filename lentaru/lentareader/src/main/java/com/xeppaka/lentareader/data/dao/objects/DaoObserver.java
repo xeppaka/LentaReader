@@ -1,12 +1,14 @@
 package com.xeppaka.lentareader.data.dao.objects;
 
-import java.util.Collection;
-
 import android.database.ContentObserver;
 import android.os.Handler;
 import android.util.Log;
+
 import com.xeppaka.lentareader.data.dao.Dao;
 import com.xeppaka.lentareader.utils.LentaConstants;
+
+import java.util.Collection;
+import java.util.List;
 
 public abstract class DaoObserver<T> implements Dao.Observer<T> {
 	private ContentObserver contentObserver;
@@ -49,7 +51,7 @@ public abstract class DaoObserver<T> implements Dao.Observer<T> {
 
 			@Override
 			public void onChange(boolean selfChange) {
-				Collection<T> dataObjects = dao.read();
+                List<T> dataObjects = dao.read();
 				
 				if (dataObjects == null || dataObjects.isEmpty()) {
 					// something went wrong...
