@@ -17,6 +17,14 @@ case class LentaBodyItemText(val text: String) extends ItemBase {
     return s"$indent<text>\n$escaped\n$indent</text>\n"
   }
 
+  def merge(other: LentaBodyItemText): LentaBodyItemText = {
+    LentaBodyItemText(text + other.text)
+  }
+
+  def merge(other: String): LentaBodyItemText = {
+    LentaBodyItemText(text + other)
+  }
+
   override def hashCode(): Int = {
     var hash = 1
     hash = hash * 31 + text.hashCode

@@ -69,7 +69,7 @@ class LentaSnapshot(val newsType: NewsType, val rubric: Rubrics, val items: List
 
   def merge(other: LentaSnapshot): LentaSnapshot = {
     if (other.newsType != newsType || other.rubric != rubric)
-      throw new IllegalArgumentException("Other snapshot has not the same news type and/or rubric")
+      throw new IllegalArgumentException("Other snapshot has different news type and/or rubric")
 
     val newItems: List[LentaItem] = (other.items ::: items).sortWith(_.pubDate > _.pubDate).take(LentaSnapshot.MAX_ITEMS)
 

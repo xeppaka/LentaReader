@@ -77,20 +77,32 @@ object LentaBody {
   }
 
   private def parseBody(body: List[String], asides: List[Option[ItemBase]], iframes: List[Option[ItemBase]]): List[ItemBase] = {
-    body match {
-      case Nil => Nil
-      case x :: xs => x match {
-        case ASIDE_PLACEHOLDER => asides.head match {
-          case Some(item) => item :: parseBody(body.tail, asides.tail, iframes)
-          case None => parseBody(body.tail, asides.tail, iframes)
+    def parseBodyMergingText(body: List[String], prevTextItem: Option[LentaBodyItemText], asides: List[Option[ItemBase]], iframes: List[Option[ItemBase]]): List[ItemBase] = {
+      body match {
+        case Nil => Nil
+        case x :: xs => x match {
+          case ASIDE_PLACEHOLDER => asides.head match {
+            case Some(item) => item :: parseBodyMergingText(body.tail, None, asides.tail, iframes)
+            case None => parseBodyMergingText(body.tail, prevTextItem, asides.tail, iframes)
+          }
+          case IFRAME_PLACEHOLDER => iframes.head match {
+            case Some(item) => item :: parseBodyMergingText(body.tail, None, asides, iframes.tail)
+            case None => parseBodyMergingText(body.tail, prevTextItem, asides, iframes.tail)
+          }
+          case _ => {
+            prevTextItem match {
+              case Some(text) => {
+                val newTextItem = text.merge(x)
+                newTextItem :: parseBodyMergingText(body.tail, Some(newTextItem), asides, iframes)
+              }
+              case None => new LentaBodyItemText(x) :: parseBodyMergingText(body.tail, None, asides, iframes)
+            }
+          }
         }
-        case IFRAME_PLACEHOLDER => iframes.head match {
-          case Some(item) => item :: parseBody(body.tail, asides, iframes.tail)
-          case None => parseBody(body.tail, asides, iframes.tail)
-        }
-        case _ => new LentaBodyItemText(x) :: parseBody(body.tail, asides, iframes)
       }
     }
+
+    parseBodyMergingText(body, None, asides, iframes)
   }
 
   private def parseAside(aside: String): Option[ItemBase] = {
