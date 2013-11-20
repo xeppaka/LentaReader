@@ -77,25 +77,31 @@ object LentaBody {
   }
 
   private def parseBody(body: List[String], asides: List[Option[ItemBase]], iframes: List[Option[ItemBase]]): List[ItemBase] = {
-    def parseBodyMergingText(body: List[String], prevTextItem: Option[LentaBodyItemText], asides: List[Option[ItemBase]], iframes: List[Option[ItemBase]]): List[ItemBase] = {
+    def parseBodyMergingText(body: List[String], mergedTextItem: Option[LentaBodyItemText], asides: List[Option[ItemBase]], iframes: List[Option[ItemBase]]): List[ItemBase] = {
       body match {
-        case Nil => Nil
+        case Nil => mergedTextItem match {
+          case Some(textItem) => textItem :: Nil
+          case None => Nil
+        }
         case x :: xs => x match {
           case ASIDE_PLACEHOLDER => asides.head match {
-            case Some(item) => item :: parseBodyMergingText(body.tail, None, asides.tail, iframes)
-            case None => parseBodyMergingText(body.tail, prevTextItem, asides.tail, iframes)
+            case Some(item) => mergedTextItem match {
+              case Some(text) => text :: item :: parseBodyMergingText(body.tail, None, asides.tail, iframes)
+              case None => item :: parseBodyMergingText(body.tail, None, asides.tail, iframes)
+            }
+            case None => parseBodyMergingText(body.tail, mergedTextItem, asides.tail, iframes)
           }
           case IFRAME_PLACEHOLDER => iframes.head match {
-            case Some(item) => item :: parseBodyMergingText(body.tail, None, asides, iframes.tail)
-            case None => parseBodyMergingText(body.tail, prevTextItem, asides, iframes.tail)
+            case Some(item) => mergedTextItem match {
+              case Some(text) => text :: item :: parseBodyMergingText(body.tail, None, asides, iframes.tail)
+              case None => item :: parseBodyMergingText(body.tail, None, asides.tail, iframes)
+            }
+            case None => parseBodyMergingText(body.tail, mergedTextItem, asides, iframes.tail)
           }
           case _ => {
-            prevTextItem match {
-              case Some(text) => {
-                val newTextItem = text.merge(x)
-                newTextItem :: parseBodyMergingText(body.tail, Some(newTextItem), asides, iframes)
-              }
-              case None => new LentaBodyItemText(x) :: parseBodyMergingText(body.tail, None, asides, iframes)
+            mergedTextItem match {
+              case Some(textItem) => parseBodyMergingText(body.tail, Some(textItem.merge(x)), asides, iframes)
+              case None => parseBodyMergingText(body.tail, Some(new LentaBodyItemText(x)), asides, iframes)
             }
           }
         }
@@ -127,12 +133,13 @@ object LentaBody {
         jsondata match {
           case x: List[Map[String, Any]] => {
             val result = x.map(item => {
-              val url = getJsonField(item, "original_url")
+              val preview_url = getJsonField(item, "preview_url")
+              val original_url = getJsonField(item, "original_url")
 
-              url match {
-                case Some(urldata) => Some(LentaBodyItemImage(urldata, getJsonField(item, "caption"), getJsonField(item, "credits")))
-                case None => None
-              }
+              if (original_url.isDefined && preview_url.isDefined)
+                Some(LentaBodyItemImage(preview_url.get, original_url.get, getJsonField(item, "caption"), getJsonField(item, "credits")))
+              else
+                None
             }).flatMap(item => item)
 
             if (result.isEmpty)

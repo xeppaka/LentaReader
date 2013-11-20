@@ -50,11 +50,13 @@ class RssSnapshot(val newsType: NewsType, val rubric: Rubrics, val items: List[R
 }
 
 object RssSnapshot {
+  val MAX_ITEMS = 40
+
   def downloadRss(newsType: NewsType, rubric: Rubrics): RssSnapshot = {
     val xml = XML.load(new URL(Lenta.url(newsType, rubric)))
     val rawRssItems = xml \\ "item"
 
-    val rssItems = rawRssItems.map(item => RssItem(item)).toList
+    val rssItems = rawRssItems.map(item => RssItem(item)).toList.take(MAX_ITEMS)
 
     RssSnapshot(newsType, rubric, rssItems)
   }

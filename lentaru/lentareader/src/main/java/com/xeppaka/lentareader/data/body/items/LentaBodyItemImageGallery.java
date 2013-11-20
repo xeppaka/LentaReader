@@ -40,7 +40,15 @@ public class LentaBodyItemImageGallery implements Item {
     @Override
     public View createView(Context context) {
         TextView view = new TextView(context);
-        view.setText(Html.fromHtml("HERE IMAGE GALLERY"));
+
+        StringBuilder sb = new StringBuilder("IMAGE GALLERY CREDITS:\n");
+
+        for (LentaBodyItemImage image : images) {
+            if (image.getCredits() != null)
+                sb.append(image.getCredits()).append("\n");
+        }
+
+        view.setText(Html.fromHtml(sb.toString()));
         view.setMovementMethod(LinkMovementMethod.getInstance());
 
         return view;
