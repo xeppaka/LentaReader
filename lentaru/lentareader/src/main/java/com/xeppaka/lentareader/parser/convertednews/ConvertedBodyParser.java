@@ -82,9 +82,8 @@ public class ConvertedBodyParser extends PullParserBase implements BodyParser {
                 String original_url = parser.getAttributeValue(ns, "original_url");
                 String caption = parser.getAttributeValue(ns, "caption");
                 String credits = parser.getAttributeValue(ns, "credits");
-                String creditsEncoded = credits != null ? URLDecoder.decode(credits, "UTF-8") : null;
 
-                images.add(new LentaBodyItemImage(preview_url, original_url, caption, creditsEncoded));
+                images.add(new LentaBodyItemImage(preview_url, original_url, caption, credits));
                 parser.nextTag();
             } else {
                 skip(parser);

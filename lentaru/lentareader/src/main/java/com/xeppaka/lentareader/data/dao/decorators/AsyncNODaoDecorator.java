@@ -8,7 +8,6 @@ import com.xeppaka.lentareader.data.dao.NODao;
 import com.xeppaka.lentareader.data.dao.async.AsyncDao;
 import com.xeppaka.lentareader.data.dao.async.AsyncNODao;
 
-import java.util.Collection;
 import java.util.List;
 
 public class AsyncNODaoDecorator<T extends NewsObject> extends AsyncDaoDecorator<T> implements AsyncNODao<T>, NODao<T> {

@@ -26,7 +26,7 @@ public class LentaNewsDownloader extends LentaNewsObjectDownloader<News> {
 	@Override
 	public void downloadFull(News brief) throws ParseWithRegexException, IOException, HttpStatusCodeException {
         String url = URLHelper.createMobileUrl(brief.getLink());
-		Page mobilePage = new Page(url, brief.getRubric(), NewsType.NEWS, HttpDownloader.download(url));
+		Page mobilePage = new Page(url, brief.getRubric(), NewsType.NEWS, HttpPageDownloader.download(url));
 		
 		MobileNews mobileNews = newsParser.parse(mobilePage);
 		brief.setBody(mobileNews.getText());
@@ -37,9 +37,9 @@ public class LentaNewsDownloader extends LentaNewsObjectDownloader<News> {
     @Override
     public List<News> download(Rubrics rubric) throws HttpStatusCodeException, IOException, XmlPullParserException {
         String url = URLHelper.getXmlForRubric(rubric, NewsType.NEWS);
-        //Page xml = new Page(url, rubric, NewsType.NEWS, HttpDownloader.download(url));
+        //Page xml = new Page(url, rubric, NewsType.NEWS, HttpPageDownloader.download(url));
 
-        return parser.parse(HttpDownloader.download(url));
+        return parser.parse(HttpPageDownloader.download(url));
     }
 
     @Override

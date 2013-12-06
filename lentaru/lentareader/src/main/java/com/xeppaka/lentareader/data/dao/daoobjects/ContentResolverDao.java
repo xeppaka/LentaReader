@@ -1,4 +1,4 @@
-package com.xeppaka.lentareader.data.dao.objects;
+package com.xeppaka.lentareader.data.dao.daoobjects;
 
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -10,11 +10,11 @@ import android.util.Log;
 
 import com.xeppaka.lentareader.data.DatabaseObject;
 import com.xeppaka.lentareader.data.dao.Dao;
+import com.xeppaka.lentareader.data.dao.DaoObservable;
 import com.xeppaka.lentareader.data.db.SQLiteType;
 import com.xeppaka.lentareader.utils.LentaConstants;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -345,7 +345,7 @@ public abstract class ContentResolverDao<T extends DatabaseObject> implements Da
 	}
 	
 	@Override
-	public void registerContentObserver(final Dao.Observer<T> observer) {
+	public void registerContentObserver(DaoObservable.Observer<T> observer) {
 		DaoObserver<T> daoObserver;
 		
 		if (observer instanceof DaoObserver) {
@@ -366,12 +366,12 @@ public abstract class ContentResolverDao<T extends DatabaseObject> implements Da
 			throw new IllegalArgumentException("observer is not derived from DaoObserver which is not supported now. You should create observer by extending DaoObserver abstract class.");
 		}
 		
-		daoObserver.setDao(this);
+//		daoObserver.setDao(this);
 		cr.registerContentObserver(getContentProviderUri(), true, daoObserver.getContentObserver());
 	}
 	
 	@Override
-	public void unregisterContentObserver(Dao.Observer<T> observer) {
+	public void unregisterContentObserver(DaoObservable.Observer<T> observer) {
 		DaoObserver<T> daoObserver;
 		
 		if (observer instanceof DaoObserver) {

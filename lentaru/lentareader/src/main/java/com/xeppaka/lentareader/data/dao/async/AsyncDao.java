@@ -62,8 +62,6 @@ public interface AsyncDao<T> extends Dao<T> {
 	 * Listener of deleting from database.
 	 * 
 	 * @author nnm
-	 *
-	 * @param <T>
 	 */
 	public interface DaoDeleteListener {	
 		void finished(int rowsDeleted);
@@ -73,8 +71,6 @@ public interface AsyncDao<T> extends Dao<T> {
 	 * Listener of updating objects in database.
 	 * 
 	 * @author nnm
-	 *
-	 * @param <T>
 	 */
 	public interface DaoUpdateListener {	
 		void finished(int rowsUpdated);
@@ -117,9 +113,6 @@ public interface AsyncDao<T> extends Dao<T> {
 	 * Read some news object from the database specifying its id.
 	 * 
 	 * @param id
-	 *            id the id returned by
-	 *            {@link ContentResolver#create(android.database.sqlite.ContentResolver.CursorFactory)}
-	 *            method. Only one object can be identified by id.
 	 * @param listener
 	 *            is a listener for result.
 	 * @return News object created from the database. Null if object is not
@@ -132,9 +125,6 @@ public interface AsyncDao<T> extends Dao<T> {
 	 * ids.
 	 * 
 	 * @param ids
-	 *            collections of ids returned by
-	 *            {@link ContentResolver#create(android.database.sqlite.ContentResolver.CursorFactory)}
-	 *            method. Only one object can be identified by id.
 	 * @param listener
 	 *            is a listener for result.
 	 * @return Collection of News objects created from the database. Not null.
@@ -159,9 +149,6 @@ public interface AsyncDao<T> extends Dao<T> {
 	 * Deletes object from the database.
 	 * 
 	 * @param id
-	 *            id the id returned by
-	 *            {@link ContentResolver#create(android.database.sqlite.ContentResolver.CursorFactory)}
-	 *            method. Only one object can be identified by id.
 	 * @param listener
 	 *            is a listener for result.
 	 * @return number of rows deleted.

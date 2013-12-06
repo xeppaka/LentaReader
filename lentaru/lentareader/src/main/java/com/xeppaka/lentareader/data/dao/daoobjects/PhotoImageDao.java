@@ -1,4 +1,4 @@
-package com.xeppaka.lentareader.data.dao.objects;
+package com.xeppaka.lentareader.data.dao.daoobjects;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -9,7 +9,6 @@ import com.xeppaka.lentareader.data.PhotoImage;
 import com.xeppaka.lentareader.data.db.PhotoImageEntry;
 import com.xeppaka.lentareader.data.db.SQLiteType;
 
-import java.util.Collection;
 import java.util.List;
 
 public class PhotoImageDao extends ContentResolverDao<PhotoImage> {

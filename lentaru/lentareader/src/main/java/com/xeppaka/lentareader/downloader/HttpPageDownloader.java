@@ -17,7 +17,7 @@ import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
 
-public class HttpDownloader {
+public class HttpPageDownloader {
 	
 //	private static class FlushedInputStream extends FilterInputStream {
 //	    public FlushedInputStream(InputStream inputStream) {

@@ -7,7 +7,6 @@ import com.xeppaka.lentareader.data.dao.Dao;
 import com.xeppaka.lentareader.data.db.SQLiteType;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**

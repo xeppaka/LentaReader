@@ -1,24 +1,25 @@
 package com.xeppaka.lentareader.service;
 
 import android.app.Service;
-import android.content.ContentResolver;
 import android.content.Intent;
+import android.content.UriMatcher;
+import android.net.Uri;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.os.ResultReceiver;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.xeppaka.lentareader.data.DatabaseObject;
 import com.xeppaka.lentareader.data.NewsType;
 import com.xeppaka.lentareader.data.Rubrics;
 import com.xeppaka.lentareader.service.ServiceIntentBuilder.ServiceIntentKey;
+import com.xeppaka.lentareader.service.commands.DownloadImageServiceCommand;
 import com.xeppaka.lentareader.service.commands.ServiceCommand;
-import com.xeppaka.lentareader.service.commands.SyncNewsServiceCommand;
-import com.xeppaka.lentareader.service.commands.SyncRubricServiceCommand;
 import com.xeppaka.lentareader.service.commands.UpdateRubricServiceCommand;
 import com.xeppaka.lentareader.utils.LentaConstants;
 
 import java.util.Comparator;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -32,13 +33,23 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class LentaService extends Service {
 
-	private static final int POOL_SIZE = 2;
+    public enum Action {
+        UPDATE_RUBRIC,
+        DOWNLOAD_IMAGE
+    }
+
+    public enum Result {
+        SUCCESS,
+        FAILURE
+    }
+
+    private static final int POOL_SIZE = 2;
 	private static final int KEEP_ALIVE_TIME = 60;
 	private static final TimeUnit KEEP_ALIVE_TIME_UNITS = TimeUnit.SECONDS;
 
 	private ThreadPoolExecutor executor;
 	private AtomicInteger threads = new AtomicInteger();
-	
+
 	class CountableThread extends Thread {
 		public CountableThread(Runnable runnable) {
 			super(runnable);
@@ -63,7 +74,29 @@ public class LentaService extends Service {
 			return new CountableThread(runnable);
 		}
 	}
-	
+
+    public static final Bundle resultFail;
+    public static final Bundle resultSuccess;
+
+    private static final String URI_BASE_STRING = "com.xeppaka.lentareader.service";
+
+    public static final Uri BASE_URI = new Uri.Builder().scheme("content").authority(URI_BASE_STRING).build();
+
+    private static final int NEWS = 0;
+
+    private static final UriMatcher uriMatcher;
+
+    static {
+        uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
+        uriMatcher.addURI(URI_BASE_STRING, NewsType.NEWS.name() + "/*", NEWS);
+
+        resultFail = new Bundle();
+        resultFail.putString(BundleConstants.RESULT.name(), Result.FAILURE.name());
+        resultSuccess = new Bundle();
+        resultSuccess.putString(BundleConstants.RESULT.name(), Result.SUCCESS.name());
+    }
+
+
 	public LentaService() {
 		Comparator<Runnable> comparator = new Comparator<Runnable>() {
 			@Override
@@ -89,69 +122,76 @@ public class LentaService extends Service {
 		Log.d(LentaConstants.LoggerServiceTag, "Got the intent, checking the command");
 		
 		int requestId = intent.getIntExtra(ServiceIntentKey.REQUEST_ID.name(), ServiceIntentBuilder.NO_REQUEST_ID);
-		
-		ServiceAction action = ServiceAction.valueOf(intent.getStringExtra(ServiceIntentBuilder.ServiceIntentKey.SERVICE_ACTION.name()));
-		NewsType newsType = NewsType.valueOf(intent.getStringExtra(ServiceIntentBuilder.ServiceIntentKey.NEWS_TYPE.name()));
-		
-		switch (action) {
-		case UPDATE_RUBRIC:
-			updateRubric(requestId, getRubric(intent), newsType, getReceiver(intent));
-			break;
-		case SYNC_RUBRIC:
-			syncRubric(requestId, getRubric(intent), newsType, getReceiver(intent));
-			break;
-		case UPDATE_ITEM:
-			updateItem(requestId, newsType, getItemId(intent), getReceiver(intent));
-			break;
-		case UPDATE_ITEM_FULL_TEXTS:
-			break;
-		case UPDATE_ITEM_IMAGES:
-			break;
-		default:
-			break;
-		}
-		
+        ResultReceiver receiver = intent.getParcelableExtra(ServiceIntentBuilder.ServiceIntentKey.RESULT_RECEIVER.name());
+
+		Action action = Action.valueOf(intent.getAction());
+
+        switch (action) {
+            case UPDATE_RUBRIC:
+                NewsType newsType = getNewsType(intent.getData());
+                Rubrics rubric = getRubric(intent.getData());
+
+                if (newsType == null || rubric == null) {
+                    failStart(requestId, receiver);
+                    stopSelf(startId);
+                    return START_NOT_STICKY;
+                }
+
+                updateRubric(requestId, rubric, newsType, receiver);
+                break;
+            case DOWNLOAD_IMAGE:
+                String url = intent.getStringExtra("url");
+
+                if (url == null || TextUtils.isEmpty(url)) {
+                    failStart(requestId, receiver);
+                    stopSelf(startId);
+                    return START_NOT_STICKY;
+                }
+
+                downloadImage(requestId, url, receiver);
+                break;
+        }
+
 		return START_NOT_STICKY;
 	}
 
+    private void failStart(int requestId, ResultReceiver receiver) {
+        if (receiver != null) {
+            receiver.send(requestId, resultFail);
+        }
+    }
+
+    private Rubrics getRubric(Uri uri) {
+        return Rubrics.valueOf(uri.getLastPathSegment());
+    }
+
+    private NewsType getNewsType(Uri uri) {
+        switch (uriMatcher.match(uri)) {
+            case NEWS:
+                return NewsType.NEWS;
+            default:
+                return null;
+        }
+    }
+
 	private void updateRubric(int requestId, Rubrics rubric, NewsType newsType, ResultReceiver resultReceiver) {
-		UpdateRubricServiceCommand command = new UpdateRubricServiceCommand(requestId, rubric, newsType, executor, getContentResolver(), resultReceiver, true);
+		UpdateRubricServiceCommand command = new UpdateRubricServiceCommand(requestId, newsType, rubric, executor, getContentResolver(), resultReceiver);
 		executor.execute(command);
 	}
+
+    private void downloadImage(int requestId, String url, ResultReceiver resultReceiver) {
+        DownloadImageServiceCommand command = new DownloadImageServiceCommand(requestId, this, url, resultReceiver);
+        executor.execute(command);
+    }
+
+//	private void updateNewsItem(int requestId, long newsId, ContentResolver contentResolver, ExecutorService executor, ResultReceiver resultReceiver) {
+//		SyncNewsServiceCommand command = new SyncNewsServiceCommand(requestId, newsId, contentResolver, executor, resultReceiver, false);
+//		executor.execute(command);
+//	}
 	
-	private void syncRubric(int requestId, Rubrics rubric, NewsType newsType, ResultReceiver resultReceiver) {
-		SyncRubricServiceCommand command = new SyncRubricServiceCommand(requestId, rubric, newsType, executor, getContentResolver(), resultReceiver, true);
-		executor.execute(command);
-	}
-	
-	private void updateItem(int requestId, NewsType newsType, long itemId, ResultReceiver resultReceiver) {
-		switch (newsType) {
-		case NEWS:
-			updateNewsItem(requestId, itemId, getContentResolver(), executor, resultReceiver);
-			break;
-		case ARTICLE:
-			break;
-		case COLUMN:
-			break;
-		case PHOTO:
-			break;
-		case VIDEO:
-			break;
-		}
-	}
-	
-	private void updateNewsItem(int requestId, long newsId, ContentResolver contentResolver, ExecutorService executor, ResultReceiver resultReceiver) {
-		SyncNewsServiceCommand command = new SyncNewsServiceCommand(requestId, newsId, contentResolver, executor, resultReceiver, false);
-		executor.execute(command);
-	}
-	
-	private ResultReceiver getReceiver(Intent intent) {
-		return intent.getParcelableExtra(ServiceIntentBuilder.ServiceIntentKey.RESULT_RECEIVER.name());
-	}
-	
-	private Rubrics getRubric(Intent intent) {
-		return Rubrics.valueOf(intent.getStringExtra(ServiceIntentKey.RUBRIC.name()));
-	}
+//	private Rubrics getRubric(Intent intent) {
+//		return Rubrics.valueOf(intent.getStringExtra(ServiceIntentKey.RUBRIC.name()));
+//	}
 	
 	private long getItemId(Intent intent) {
 		return intent.getLongExtra(ServiceIntentBuilder.ServiceIntentKey.ITEM_ID.name(), DatabaseObject.ID_NONE);

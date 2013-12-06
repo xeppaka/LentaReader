@@ -5,20 +5,15 @@ import android.os.ResultReceiver;
 import android.util.Log;
 
 import com.xeppaka.lentareader.service.BundleConstants;
-import com.xeppaka.lentareader.service.ServiceResult;
+import com.xeppaka.lentareader.service.LentaService;
 import com.xeppaka.lentareader.utils.LentaConstants;
 
 public abstract class RunnableServiceCommand implements ServiceCommand {
 	private ResultReceiver resultReceiver;
 	private int requestId;
 	private long creationTime;
-	private boolean reportError;
 
-	public RunnableServiceCommand(int requestId, ResultReceiver resultReceiver, boolean reportError) {
-		if (requestId < NO_REQUEST_ID) {
-			throw new IllegalArgumentException("requestId is invalid. Use -1 if there is no request id.");
-		}
-		
+	public RunnableServiceCommand(int requestId, ResultReceiver resultReceiver) {
 		creationTime = System.currentTimeMillis();
 		
 		this.requestId = requestId;
@@ -34,35 +29,19 @@ public abstract class RunnableServiceCommand implements ServiceCommand {
 		} catch (Exception e) {
 			Log.d(LentaConstants.LoggerServiceTag, "Exception occured during running the command " + getClass().getSimpleName(), e);
 			
-			if (resultReceiver != null && reportError()) {
-				resultReceiver.send(ServiceResult.ERROR.ordinal(), prepareExceptionResult(e));
-			}
-			
+            resultReceiver.send(requestId, LentaService.resultFail);
+
 			Log.d(LentaConstants.LoggerServiceTag, "Command finished with exception: " + getClass().getSimpleName());
 			return;
 		}
 		
 		if (resultReceiver != null) {
-			Bundle result = getResult();
-			
-			if (result != null) {
-				resultReceiver.send(ServiceResult.SUCCESS.ordinal(), result);
-			}
+            resultReceiver.send(requestId, LentaService.resultSuccess);
 		}
 		
 		Log.d(LentaConstants.LoggerServiceTag, "Command finished successfuly: " + getClass().getSimpleName());
 	}
 	
-	protected abstract Bundle getResult();
-	
-	protected Bundle prepareExceptionResult(Exception e) {
-		Bundle bundle = new Bundle();
-		bundle.putInt(BundleConstants.KEY_REQUEST_ID.name(), getRequestId());
-		bundle.putSerializable(BundleConstants.KEY_EXCEPTION.name(), e);
-		
-		return bundle;
-	}
-
 	@Override
 	public int compareTo(ServiceCommand otherCommand) {
 		long time1 = getCreationTime();
@@ -93,10 +72,6 @@ public abstract class RunnableServiceCommand implements ServiceCommand {
 		return resultReceiver;
 	}
 	
-	protected boolean reportError() {
-		return reportError;
-	}
-
 	@Override
 	public String getCommandName() {
 		return getClass().getSimpleName();

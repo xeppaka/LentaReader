@@ -1,4 +1,4 @@
-package com.xeppaka.lentareader.data.dao.objects;
+package com.xeppaka.lentareader.data.dao.daoobjects;
 
 import android.graphics.Bitmap;
 
@@ -16,12 +16,13 @@ public interface BitmapReference {
 	 * @author kacpa01
 	 *
 	 */
-	public interface BitmapLoadListener {	
-		void onBitmapLoaded(final Bitmap bitmap);
+	public interface Callback {
+		void onSuccess(final Bitmap bitmap);
+        void onFailure();
 	}
 	
 	Bitmap getBitmap();
 	Bitmap getBitmapIfCached();
-	void getBitmapAsync(final BitmapLoadListener listener);
+	void getBitmapAsync(final Callback callback);
 	void releaseBitmap();
 }

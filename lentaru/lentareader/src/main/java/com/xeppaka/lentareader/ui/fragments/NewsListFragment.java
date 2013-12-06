@@ -10,14 +10,17 @@ import android.widget.ListView;
 import com.xeppaka.lentareader.data.News;
 import com.xeppaka.lentareader.data.NewsType;
 import com.xeppaka.lentareader.data.Rubrics;
+import com.xeppaka.lentareader.data.dao.Dao;
 import com.xeppaka.lentareader.data.dao.async.AsyncDao;
 import com.xeppaka.lentareader.data.dao.async.AsyncDao.DaoReadMultiListener;
-import com.xeppaka.lentareader.data.dao.objects.NewsDao;
-import com.xeppaka.lentareader.service.ServiceCallbackListener;
+import com.xeppaka.lentareader.data.dao.daoobjects.BitmapReference;
+import com.xeppaka.lentareader.data.dao.daoobjects.DaoObserver;
+import com.xeppaka.lentareader.data.dao.daoobjects.NewsDao;
+import com.xeppaka.lentareader.service.Callback;
 import com.xeppaka.lentareader.service.ServiceHelper;
 import com.xeppaka.lentareader.ui.activities.NewsFullActivity;
 
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -31,44 +34,44 @@ public class NewsListFragment extends ListFragment {
 	private NewsAdapter newsAdapter;
 	private ServiceHelper serviceHelper;
 	private AsyncDao<News> dao;
-    private Rubrics currentRubric = Rubrics.SCIENCE;
-	
-	private class ListFragmentServiceListener implements ServiceCallbackListener {
+    private Rubrics currentRubric = Rubrics.ROOT;
 
-		@Override
-		public void onDatabaseObjectsCreate(int requestId, NewsType newsType,
-				Collection<Long> newIds) {
-			if (newIds.size() <= 0) {
-				return;
-			}
-			
-			AsyncDao<News> newsDao = NewsDao.getInstance(getActivity().getContentResolver());
-			newsDao.readAsync(new DaoReadMultiListener<News>() {
-				@Override
-				public void finished(List<News> result) {
-					showNewsObjects(result);
-				}
-			});
-		}
+	private class ListFragmentServiceListener implements Callback {
+        @Override
+        public void onSuccess() {
+        }
 
-		@Override
-		public void onDatabaseObjectsUpdate(int requestId, NewsType newsType,
-				Collection<Long> ids) {
-		}
-
-		@Override
-		public void onImagesUpdate(int requestId, NewsType newsType,
-				Collection<Long> ids) {
-            newsAdapter.notifyDataSetChanged();
-		}
-
-		@Override
-		public void onFailed(int requestId, Exception e) {
-		}
+        @Override
+        public void onFailure() {
+        }
 	}
 	
 	private ListFragmentServiceListener serviceListener = new ListFragmentServiceListener();
-	
+
+    private Dao.Observer<News> newsDaoObserver = new DaoObserver<News>(new Handler()) {
+        @Override
+        public void onDataChanged(boolean selfChange, News dataObject) {
+            showNewsObjects(Arrays.asList(dataObject));
+        }
+
+        @Override
+        public void onDataChanged(boolean selfChange) {
+            showNewsObjects(dao.read());
+        }
+    };
+
+    private Dao.Observer<BitmapReference> bitmapsDaoObserver = new DaoObserver<BitmapReference>(new Handler()) {
+        @Override
+        public void onDataChanged(boolean selfChange, BitmapReference dataObject) {
+            newsAdapter.notifyDataSetChanged();
+        }
+
+        @Override
+        public void onDataChanged(boolean selfChange) {
+            newsAdapter.notifyDataSetChanged();
+        }
+    };
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -89,22 +92,24 @@ public class NewsListFragment extends ListFragment {
 	@Override
 	public void onResume() {
 		super.onResume();
-		
-		serviceHelper.addListener(serviceListener);
+
+        dao.registerContentObserver(newsDaoObserver);
+
 		dao.readAsync(new DaoReadMultiListener<News>() {
-			@Override
-			public void finished(List<News> result) {
+            @Override
+            public void finished(List<News> result) {
                 showNewsObjects(result);
-                serviceHelper.updateRubric(NewsType.NEWS, currentRubric);
-			}
-		});
+                serviceHelper.updateRubric(NewsType.NEWS, currentRubric, serviceListener);
+            }
+        });
+
 	}
 
 	@Override
 	public void onPause() {
 		super.onPause();
-		
-		serviceHelper.removeListener(serviceListener);
+
+        dao.unregisterContentObserver(newsDaoObserver);
 	}
 
 	@Override
@@ -122,6 +127,6 @@ public class NewsListFragment extends ListFragment {
 	}
 
     public void refresh() {
-        serviceHelper.updateRubric(NewsType.NEWS, currentRubric);
+        serviceHelper.updateRubric(NewsType.NEWS, currentRubric, serviceListener);
     }
 }

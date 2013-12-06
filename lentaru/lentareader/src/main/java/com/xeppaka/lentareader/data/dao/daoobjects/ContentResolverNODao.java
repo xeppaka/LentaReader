@@ -1,4 +1,4 @@
-package com.xeppaka.lentareader.data.dao.objects;
+package com.xeppaka.lentareader.data.dao.daoobjects;
 
 import android.content.ContentResolver;
 import android.database.Cursor;

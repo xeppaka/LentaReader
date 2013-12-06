@@ -1,37 +1,33 @@
 package com.xeppaka.lentareader.service.commands;
 
 import android.content.ContentResolver;
-import android.os.Bundle;
 import android.os.ResultReceiver;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.xeppaka.lentareader.data.News;
 import com.xeppaka.lentareader.data.NewsType;
 import com.xeppaka.lentareader.data.Rubrics;
 import com.xeppaka.lentareader.data.dao.Dao;
-import com.xeppaka.lentareader.data.dao.objects.NewsDao;
+import com.xeppaka.lentareader.data.dao.daoobjects.NewsDao;
 import com.xeppaka.lentareader.downloader.LentaNewsDownloader;
 import com.xeppaka.lentareader.downloader.exceptions.HttpStatusCodeException;
-import com.xeppaka.lentareader.service.BundleConstants;
-import com.xeppaka.lentareader.service.ServiceResultAction;
 import com.xeppaka.lentareader.utils.LentaConstants;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 public final class UpdateRubricServiceCommand extends RunnableServiceCommand {
+    private NewsType newsType;
 	private Rubrics rubric;
 	private ExecutorService executor;
 	private ContentResolver contentResolver;
-	private NewsType newsType;
-	private Bundle result;
 
-	public UpdateRubricServiceCommand(int requestId, Rubrics rubric, NewsType newsType, ExecutorService executor, ContentResolver contentResolver, ResultReceiver resultReceiver, boolean reportError) {
-		super(requestId, resultReceiver, reportError);
+	public UpdateRubricServiceCommand(int requestId, NewsType newsType, Rubrics rubric, ExecutorService executor, ContentResolver contentResolver, ResultReceiver resultReceiver) {
+		super(requestId, resultReceiver);
 		
 		this.executor = executor;
 		this.contentResolver = contentResolver;
@@ -80,41 +76,42 @@ public final class UpdateRubricServiceCommand extends RunnableServiceCommand {
 		Collection<Long> newsIds = newsDao.create(nonExistingNews);
 		Log.d(LentaConstants.LoggerServiceTag, "Newly created news ids: " + newsIds);
 
-		prepareResultCreated(newsIds);
+//        for (News n : nonExistingNews) {
+//            if (n.getImageLink() != null && !TextUtils.isEmpty(n.getImageLink())) {
+//                executor.execute(new DownloadImageServiceCommand(getRequestId(),  n.getImageLink(), getResultReceiver()));
+//            }
+//        }
 
-		Collections.sort(nonExistingNews, Collections.reverseOrder());
+//		prepareResultCreated(newsIds);
+
+//		Collections.sort(nonExistingNews, Collections.reverseOrder());
 
 //		for (News n : nonExistingNews) {
 //			executor.execute(new RetrieveNewsFullTextServiceCommand(getRequestId(), n, contentResolver, getResultReceiver(), false));
 //		}
 
-		for (News n : nonExistingNews) {
-			executor.execute(new RetrieveNewsImageServiceCommand(getRequestId(), n, contentResolver, getResultReceiver(), false));
-		}
+//		for (News n : nonExistingNews) {
+//			executor.execute(new RetrieveNewsImageServiceCommand(getRequestId(), n, contentResolver, getResultReceiver()));
+//		}
 	}
 	
 	private void prepareResultCreated(Collection<Long> ids) {
-		if (ids.isEmpty()) {
-			result = null;
-			return;
-		}
-		
-		result = new Bundle();
-		result.putInt(BundleConstants.KEY_REQUEST_ID.name(), getRequestId());
-		result.putString(BundleConstants.KEY_ACTION.name(), ServiceResultAction.DATABASE_OBJECT_CREATED.name());
-		result.putString(BundleConstants.KEY_NEWS_TYPE.name(), newsType.name());
-		
-		long[] createdIds = new long[ids.size()];
-		int index = 0;
-		for (Long id : ids) {
-			createdIds[index++] = id;
-		}
-		
-		result.putLongArray(BundleConstants.KEY_IDS.name(), createdIds);
-	}
-	
-	@Override
-	protected Bundle getResult() {
-		return result;
+//		if (ids.isEmpty()) {
+//			result = null;
+//			return;
+//		}
+//
+//		result = new Bundle();
+//		result.putInt(BundleConstants.KEY_REQUEST_ID.name(), getRequestId());
+//		result.putString(BundleConstants.KEY_ACTION.name(), ServiceResultAction.DATABASE_OBJECT_CREATED.name());
+//		result.putString(BundleConstants.KEY_NEWS_TYPE.name(), newsType.name());
+//
+//		long[] createdIds = new long[ids.size()];
+//		int index = 0;
+//		for (Long id : ids) {
+//			createdIds[index++] = id;
+//		}
+//
+//		result.putLongArray(BundleConstants.KEY_IDS.name(), createdIds);
 	}
 }

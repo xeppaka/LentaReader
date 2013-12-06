@@ -4,7 +4,6 @@ import com.xeppaka.lentareader.data.DatabaseObject;
 import com.xeppaka.lentareader.data.dao.Dao;
 import com.xeppaka.lentareader.data.db.SQLiteType;
 
-import java.util.Collection;
 import java.util.List;
 
 public class SynchronizedDaoDecorator<T extends DatabaseObject> implements Dao<T> {

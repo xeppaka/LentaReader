@@ -18,7 +18,7 @@ public abstract class LentaNewsObjectDownloader<T extends NewsObject> implements
 	private final LentaRssParser rssParser = new LentaRssParser();
 	
 	public List<T> downloadRubricBrief(Rubrics rubric) throws ParseWithXPathException, HttpStatusCodeException, IOException {
-		Page xmlPage = HttpDownloader.downloadRss(rubric, getNewsType());
+		Page xmlPage = HttpPageDownloader.downloadRss(rubric, getNewsType());
 		
 		Collection<LentaRssItem> items = rssParser.parseItems(xmlPage);
 		List<T> result = new ArrayList<T>();

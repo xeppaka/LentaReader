@@ -2,15 +2,20 @@ package com.xeppaka.lentareader.service;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.ResultReceiver;
+import android.util.Log;
 
 import com.xeppaka.lentareader.data.NewsType;
 import com.xeppaka.lentareader.data.Rubrics;
+import com.xeppaka.lentareader.utils.LentaConstants;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -19,127 +24,122 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  */
 public class ServiceHelper {
-	private static ArrayList<ServiceCallbackListener> listeners = new ArrayList<ServiceCallbackListener>();
+	private static Map<Integer, ServiceRequest> serviceRequests = new HashMap<Integer, ServiceRequest>();
 	private static AtomicInteger requestCounter = new AtomicInteger();
 
-	private class ServiceResultReceiver extends ResultReceiver {
+    private static final Object sync = new Object();
+
+    /**
+     * Represents request to the service
+     */
+    private static class ServiceRequest {
+        private Intent intent;
+        private List<Callback> listeners;
+
+        private ServiceRequest(Intent intent, Callback listener) {
+            this.intent = intent;
+
+            this.listeners = new ArrayList<Callback>(4);
+            this.listeners.add(listener);
+        }
+
+        public List<Callback> getListeners() {
+            return listeners;
+        }
+
+        public Intent getIntent() {
+            return intent;
+        }
+    }
+
+	private static class ServiceResultReceiver extends ResultReceiver {
 		public ServiceResultReceiver(Handler handler) {
 			super(handler);
 		}
 
 		@Override
-		protected void onReceiveResult(int resultCode, Bundle resultData) {
-			if (resultCode == ServiceResult.SUCCESS.ordinal()) {
-				notifySucessResult(resultData);
-			} else {
-				notifyFailResult(resultData);
-			}
+		protected void onReceiveResult(int requestId, Bundle resultData) {
+            ServiceRequest request;
+
+            synchronized (sync) {
+                request = serviceRequests.get(requestId);
+                serviceRequests.remove(requestId);
+            }
+
+            if (request == null) {
+                Log.e(LentaConstants.LoggerServiceTag, "Result is received with unknown request id");
+                return;
+            }
+
+            LentaService.Result result = LentaService.Result.valueOf(resultData.getString(BundleConstants.RESULT.name()));
+            List<Callback> requestListeners = request.getListeners();
+
+            if (requestListeners.isEmpty()) {
+                return;
+            }
+
+            switch (result) {
+                case SUCCESS:
+                    for (Callback listener : requestListeners) {
+                        listener.onSuccess();
+                    }
+                    break;
+                case FAILURE:
+                    for (Callback listener : requestListeners) {
+                        listener.onFailure();
+                    }
+                    break;
+            }
 		}
 	}
 
-	private ServiceResultReceiver resultReceiver;
 	private Context context;
 	
     public ServiceHelper(Context context, Handler handler) {
     	this.context = context;
-		resultReceiver = new ServiceResultReceiver(handler);
 	}
 
-	public int updateRubric(NewsType newsType, Rubrics rubric) {
+	public void updateRubric(NewsType newsType, Rubrics rubric, Callback callback) {
 		final int requestId = requestCounter.incrementAndGet();
 
-		startService(new ServiceIntentBuilder(context, requestId)
-				.forAction(ServiceAction.UPDATE_RUBRIC).forNewsType(newsType)
-				.forResultReceiver(resultReceiver).forRubric(rubric).build());
-		
-		return requestId;
-	}
-	
-	public int syncRubric(NewsType newsType, Rubrics rubric) {
-		final int requestId = requestCounter.incrementAndGet();
+        Uri uri = LentaService.BASE_URI.buildUpon().appendPath(newsType.name()).appendPath(rubric.name()).build();
+        Intent intent = new Intent(LentaService.Action.UPDATE_RUBRIC.name(), uri, context, LentaService.class);
 
-		startService(new ServiceIntentBuilder(context, requestId)
-				.forAction(ServiceAction.SYNC_RUBRIC).forNewsType(newsType)
-				.forResultReceiver(resultReceiver).forRubric(rubric).build());
-		
-		return requestId;
+        synchronized (sync) {
+            for (ServiceRequest request : serviceRequests.values()) {
+                if (request.getIntent().filterEquals(intent)) {
+                    request.getListeners().add(callback);
+                    return;
+                }
+            }
+
+            serviceRequests.put(requestId, new ServiceRequest(intent, callback));
+        }
+
+        startService(intent);
 	}
-	
+
+    public void downloadImage(String url, Callback callback) {
+        final int requestId = requestCounter.incrementAndGet();
+
+        Intent intent = new Intent(LentaService.Action.DOWNLOAD_IMAGE.name(), Uri.EMPTY, context, LentaService.class);
+        intent.putExtra("url", url);
+
+        synchronized (sync) {
+            for (ServiceRequest request : serviceRequests.values()) {
+                if (request.getIntent().filterEquals(intent) && url.equals(request.getIntent().getStringExtra("url"))) {
+                    request.getListeners().add(callback);
+                    return;
+                }
+            }
+
+            serviceRequests.put(requestId, new ServiceRequest(intent, callback));
+        }
+
+        startService(intent);
+    }
+
 	private void startService(Intent intent) {
 		context.startService(intent);
-	}
-	
-	private void notifySucessResult(Bundle bundle) {
-		ServiceResultAction resultAction = ServiceResultAction.valueOf(bundle.getString(BundleConstants.KEY_ACTION.name()));
-		
-		switch (resultAction) {
-		case DATABASE_OBJECT_CREATED:
-			notifyDatabaseObjectsCreated(bundle);
-			break;
-		case DATABASE_OBJECT_UPDATED:
-			break;
-		case IMAGE_UPDATED:
-			notifyImageUpdated(bundle);
-			break;
-		}
-	}
-	
-	private void notifyFailResult(Bundle bundle) {
-	}
-	
-	private void notifyDatabaseObjectsCreated(Bundle bundle) {
-		int requestId = bundle.getInt(BundleConstants.KEY_REQUEST_ID.name());
-		long[] ids = bundle.getLongArray(BundleConstants.KEY_IDS.name());
-		NewsType newsType = NewsType.valueOf(bundle.getString(BundleConstants.KEY_NEWS_TYPE.name()));
-		
-		List<Long> newIds = new ArrayList<Long>(ids.length);
-		
-		for (long id : ids) {
-			newIds.add(id);
-		}
-		
-		List<ServiceCallbackListener> currentListeners;
-		
-		synchronized (listeners) {
-			currentListeners = new ArrayList<ServiceCallbackListener>(listeners);
-		}
-		
-		for (ServiceCallbackListener listener : currentListeners) {
-			listener.onDatabaseObjectsCreate(requestId, newsType, newIds);
-		}
-	}
-	
-	private void notifyImageUpdated(Bundle bundle) {
-		int requestId = bundle.getInt(BundleConstants.KEY_REQUEST_ID.name());
-		long[] ids = bundle.getLongArray(BundleConstants.KEY_IDS.name());
-		NewsType newsType = NewsType.valueOf(bundle.getString(BundleConstants.KEY_NEWS_TYPE.name()));
-		
-		List<Long> newIds = new ArrayList<Long>(ids.length);
-		
-		for (long id : ids) {
-			newIds.add(id);
-		}
-		
-		List<ServiceCallbackListener> currentListeners;
-		
-		synchronized (listeners) {
-			currentListeners = new ArrayList<ServiceCallbackListener>(listeners);
-		}
-		
-		for (ServiceCallbackListener listener : currentListeners) {
-			listener.onImagesUpdate(requestId, newsType, newIds);
-		}
-	}
-	
-	public void addListener(ServiceCallbackListener currentListener) {
-		synchronized (listeners) {
-			listeners.add(currentListener);
-		}
-	}
-
-	public void removeListener(ServiceCallbackListener currentListener) {
-		synchronized (listeners) {
-			listeners.remove(currentListener);
-		}
 	}
 }

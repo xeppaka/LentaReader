@@ -1,4 +1,4 @@
-package com.xeppaka.lentareader.data.dao.objects;
+package com.xeppaka.lentareader.data.dao.daoobjects;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -17,7 +17,6 @@ import com.xeppaka.lentareader.data.provider.LentaProvider;
 import com.xeppaka.lentareader.utils.LentaConstants;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 

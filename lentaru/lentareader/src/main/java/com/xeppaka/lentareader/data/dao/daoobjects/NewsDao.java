@@ -1,4 +1,4 @@
-package com.xeppaka.lentareader.data.dao.objects;
+package com.xeppaka.lentareader.data.dao.daoobjects;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.v4.util.LruCache;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.xeppaka.lentareader.data.News;
 import com.xeppaka.lentareader.data.Rubrics;
@@ -26,7 +27,6 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.sql.Date;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -39,10 +39,6 @@ public final class NewsDao {
     private static final ConvertedBodyParser bodyParser = new ConvertedBodyParser();
 
     public final static AsyncNODao<News> getInstance(ContentResolver contentResolver) {
-		if (contentResolver == null) {
-			throw new IllegalArgumentException("contentResolver is null.");
-		}
-		
 		return new AsyncNODaoDecorator<News>(new SynchronizedNODaoDecorator<News>(new CachedNODaoDecorator<News>(new ContentResolverNewsDao(contentResolver), cacheId), sync));
 	}
 
@@ -64,11 +60,11 @@ public final class NewsDao {
 			NewsEntry.COLUMN_NAME_BODY
 		};
 		
-		private final ImageDao imageDao;
+		private final ImageDaoOld imageDao;
 		
 		public ContentResolverNewsDao(ContentResolver cr) {
 			super(cr);
-			imageDao = ImageDao.getInstance(cr);
+			imageDao = ImageDaoOld.getInstance(cr);
 		}
 
 		@Override
@@ -123,8 +119,10 @@ public final class NewsDao {
             try {
 			    body = bodyParser.parse(cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_BODY)));
             } catch (XmlPullParserException e) {
+                Log.e(LentaConstants.LoggerAnyTag, "Error occured while parsing body of news with id = " + id, e);
                 body = EmptyBody.getInstance();
             } catch (IOException e) {
+                Log.e(LentaConstants.LoggerAnyTag, "Error occured while parsing body of news with id = " + id, e);
                 body = EmptyBody.getInstance();
             }
 
@@ -168,9 +166,9 @@ public final class NewsDao {
 			synchronized(sync) {
 				news = super.read();
 				
-				for (News n : news) {
-					readOtherNewsParts(n);
-				}
+//				for (News n : news) {
+//					readOtherNewsParts(n);
+//				}
 			}
 				
 			Collections.sort(news);
@@ -186,7 +184,7 @@ public final class NewsDao {
 				if (news == null)
 					return news;
 		
-				readOtherNewsParts(news);
+				//readOtherNewsParts(news);
 				
 				return news;
 			}
@@ -200,7 +198,7 @@ public final class NewsDao {
 				if (news == null)
 					return news;
 				
-				readOtherNewsParts(news);
+				//readOtherNewsParts(news);
 				
 				return news;
 			}
@@ -215,7 +213,7 @@ public final class NewsDao {
 				if (news == null)
 					return news;
 		
-				readOtherNewsParts(news);
+				//readOtherNewsParts(news);
 				
 				return news;
 			}
@@ -226,7 +224,7 @@ public final class NewsDao {
 			synchronized(sync) {
 				int result = super.update(news);
 				
-				updateOtherNewsParts(news);
+				//updateOtherNewsParts(news);
 				
 				return result;
 			}
@@ -241,45 +239,45 @@ public final class NewsDao {
 		public List<News> readForRubric(Rubrics rubric) {
 			List<News> news = super.readForRubric(rubric);
 			
-			for (News n : news) {
-				readOtherNewsParts(n);
-			}
+//			for (News n : news) {
+//				readOtherNewsParts(n);
+//			}
 			
 			Collections.sort(news);
 			
 			return news;
 		}
 
-		private void updateOtherNewsParts(News news) {
-			BitmapReference imageRef = news.getImage();
-			Bitmap image = imageRef.getBitmap();
-			
-			if (image != null && image != ImageDao.getNotAvailableImage().getBitmap()) {
-				try {
-					String imageLink = news.getImageLink();
-					
-					if (imageLink != null) {
-						BitmapReference newImageRef = imageDao.create(imageLink, image);
-						BitmapReference newThumbnailImageRef = imageDao.readThumbnail(imageLink);
-						
-						news.setImage(newImageRef);
-						news.setThumbnailImage(newThumbnailImageRef);
-					}
-				} finally {
-					imageRef.releaseBitmap();
-				}
-			}
-		}
-
-		private void readOtherNewsParts(News news) {
-			String imageLink = news.getImageLink();
-			if (imageLink != null && !TextUtils.isEmpty(imageLink)) {
-				news.setImage(imageDao.read(imageLink));
-				news.setThumbnailImage(imageDao.readThumbnail(imageLink));
-			} else {
-				news.setImage(ImageDao.getNotAvailableImage());
-				news.setThumbnailImage(ImageDao.getNotAvailableImage());
-			}
-		}
+//		private void updateOtherNewsParts(News news) {
+//			BitmapReference imageRef = news.getImage();
+//			Bitmap image = imageRef.getBitmap();
+//
+//			if (image != null && image != ImageDaoOld.getNotAvailableImage().getBitmap()) {
+//				try {
+//					String imageLink = news.getImageLink();
+//
+//					if (imageLink != null) {
+//						BitmapReference newImageRef = imageDao.create(imageLink, image);
+//						BitmapReference newThumbnailImageRef = imageDao.readThumbnail(imageLink);
+//
+//						news.setImage(newImageRef);
+//						news.setThumbnailImage(newThumbnailImageRef);
+//					}
+//				} finally {
+//					imageRef.releaseBitmap();
+//				}
+//			}
+//		}
+//
+//		private void readOtherNewsParts(News news) {
+//			String imageLink = news.getImageLink();
+//			if (imageLink != null && !TextUtils.isEmpty(imageLink)) {
+//				news.setImage(imageDao.read(imageLink));
+//				news.setThumbnailImage(imageDao.readThumbnail(imageLink));
+//			} else {
+//				news.setImage(ImageDaoOld.getNotAvailableImage());
+//				news.setThumbnailImage(ImageDaoOld.getNotAvailableImage());
+//			}
+//		}
 	}
 }

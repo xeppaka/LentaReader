@@ -1,21 +1,18 @@
 package com.xeppaka.lentareader.data;
 
 import com.xeppaka.lentareader.data.body.Body;
-import com.xeppaka.lentareader.data.dao.objects.BitmapReference;
-import com.xeppaka.lentareader.data.dao.objects.ImageDao;
+import com.xeppaka.lentareader.data.dao.daoobjects.BitmapReference;
+import com.xeppaka.lentareader.data.dao.daoobjects.ImageDaoOld;
 import com.xeppaka.lentareader.parser.rss.LentaRssItem;
 
 import java.util.Date;
 
-public class News extends NewsObject implements NewsObjectWithImage {
+public class News extends NewsObject {
 	private static final long serialVersionUID = 1L;
 	
 	private String imageLink;
 	private String imageCaption;
 	private String imageCredits;
-
-	private BitmapReference imageRef;
-	private BitmapReference thumbnailImageRef;
 
 	public News(long id, String guid, String title, String link, Date pubDate, String imageLink,
 			String imageCaption, String imageCredits, Rubrics rubric, String description,
@@ -25,9 +22,6 @@ public class News extends NewsObject implements NewsObjectWithImage {
 		setImageLink(imageLink);
 		setImageCaption(imageCaption);
 		setImageCredits(imageCredits);
-
-		setImage(ImageDao.getNotAvailableImage());
-		setThumbnailImage(ImageDao.getNotAvailableImage());
 	}
 	
 	public News(String guid, String title, String link, Date pubDate, String imageLink,
@@ -38,9 +32,6 @@ public class News extends NewsObject implements NewsObjectWithImage {
 		setImageLink(imageLink);
 		setImageCaption(imageCaption);
 		setImageCredits(imageCredits);
-
-		setImage(ImageDao.getNotAvailableImage());
-		setThumbnailImage(ImageDao.getNotAvailableImage());
 	}
 
 	public News(LentaRssItem rssItem) {
@@ -49,9 +40,6 @@ public class News extends NewsObject implements NewsObjectWithImage {
 		setImageLink(rssItem.getImageLink());
 		setImageCaption(null);
 		setImageCredits(null);
-
-		setImage(ImageDao.getNotAvailableImage());
-		setThumbnailImage(ImageDao.getNotAvailableImage());
 	}
 
 	public String getImageLink() {
@@ -76,22 +64,6 @@ public class News extends NewsObject implements NewsObjectWithImage {
 
 	public void setImageCredits(String imageCredits) {
 		this.imageCredits = imageCredits;
-	}
-
-	public BitmapReference getImage() {
-		return imageRef;
-	}
-
-	public void setImage(BitmapReference imageRef) {
-		this.imageRef = imageRef;
-	}
-
-	public BitmapReference getThumbnailImage() {
-		return thumbnailImageRef;
-	}
-
-	public void setThumbnailImage(BitmapReference thumbnailImageRef) {
-		this.thumbnailImageRef = thumbnailImageRef;
 	}
 
 	@Override

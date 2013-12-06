@@ -14,16 +14,7 @@ import java.util.List;
  * @param <T>
  *            is any class which can be saved into the database.
  */
-public interface Dao<T> {
-	
-	interface Observer<T> {	
-		void onDataChanged(boolean selfChange, T dataObject);
-		void onDataChanged(boolean selfChange, List<T> dataObjects);
-	}
-	
-	void registerContentObserver(Observer<T> observer);
-	void unregisterContentObserver(Observer<T> observer);
-	
+public interface Dao<T> extends DaoObservable<T> {
 	/**
 	 * Create new object in the database (row in the table).
 	 * 
@@ -55,9 +46,7 @@ public interface Dao<T> {
 	 * Read some news object from the database specifying its id.
 	 * 
 	 * @param id
-	 *            id the id returned by
-	 *            {@link ContentResolver#create(android.database.sqlite.ContentResolver.CursorFactory)}
-	 *            method. Only one object can be identified by id.
+	 *            unique id of the object. Returned by create method.
 	 * @return News object created from the database. Null if object is not
 	 *         found.
 	 */
@@ -68,9 +57,7 @@ public interface Dao<T> {
 	 * ids.
 	 * 
 	 * @param ids
-	 *            collections of ids returned by
-	 *            {@link ContentResolver#create(android.database.sqlite.ContentResolver.CursorFactory)}
-	 *            method. Only one object can be identified by id.
+	 *            collections of ids returned by create method.
 	 * @return Collection of News objects created from the database. Not null.
 	 *         Could be empty.
 	 */
@@ -116,7 +103,7 @@ public interface Dao<T> {
 	/**
 	 * Check whether object exists in database.
 	 * 
-	 * @param id is the unique key of the object.
+	 * @param key is the unique key of the object.
 	 * 
 	 * @return true if exist, false otherwise.
 	 */
@@ -138,9 +125,7 @@ public interface Dao<T> {
 	 * Deletes object from the database.
 	 * 
 	 * @param id
-	 *            id the id returned by
-	 *            {@link ContentResolver#create(android.database.sqlite.ContentResolver.CursorFactory)}
-	 *            method. Only one object can be identified by id.
+	 *            unique id returned by create
 	 * @return number of rows deleted.
 	 */
 	int delete(long id);

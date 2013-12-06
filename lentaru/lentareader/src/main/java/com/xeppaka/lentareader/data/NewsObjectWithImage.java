@@ -1,6 +1,6 @@
 package com.xeppaka.lentareader.data;
 
-import com.xeppaka.lentareader.data.dao.objects.BitmapReference;
+import com.xeppaka.lentareader.data.dao.daoobjects.BitmapReference;
 
 /**
  * This interface represents contract for a news object (news, article, column,

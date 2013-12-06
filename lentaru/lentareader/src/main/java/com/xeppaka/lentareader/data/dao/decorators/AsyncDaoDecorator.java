@@ -7,7 +7,6 @@ import com.xeppaka.lentareader.data.dao.Dao;
 import com.xeppaka.lentareader.data.dao.async.AsyncDao;
 import com.xeppaka.lentareader.data.db.SQLiteType;
 
-import java.util.Collection;
 import java.util.List;
 
 public class AsyncDaoDecorator<T extends DatabaseObject> implements AsyncDao<T> {
@@ -177,17 +176,15 @@ public class AsyncDaoDecorator<T extends DatabaseObject> implements AsyncDao<T> 
 		return decoratedDao;
 	}
 
-	@Override
-	public void registerContentObserver(
-			com.xeppaka.lentareader.data.dao.Dao.Observer<T> observer) {
-		getDecoratedDao().registerContentObserver(observer);
-	}
+    @Override
+    public void registerContentObserver(Observer<T> observer) {
+        decoratedDao.registerContentObserver(observer);
+    }
 
-	@Override
-	public void unregisterContentObserver(
-			com.xeppaka.lentareader.data.dao.Dao.Observer<T> observer) {
-		getDecoratedDao().unregisterContentObserver(observer);
-	}
+    @Override
+    public void unregisterContentObserver(Observer<T> observer) {
+        decoratedDao.unregisterContentObserver(observer);
+    }
 
 	@Override
 	public long create(T dataObject) {

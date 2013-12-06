@@ -3,8 +3,6 @@ package com.xeppaka.lentareader.ui.fragments;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.text.Html;
-import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,9 +15,9 @@ import com.xeppaka.lentareader.data.News;
 import com.xeppaka.lentareader.data.body.Body;
 import com.xeppaka.lentareader.data.body.items.Item;
 import com.xeppaka.lentareader.data.dao.async.AsyncDao;
-import com.xeppaka.lentareader.data.dao.objects.BitmapReference;
-import com.xeppaka.lentareader.data.dao.objects.ImageDao;
-import com.xeppaka.lentareader.data.dao.objects.NewsDao;
+import com.xeppaka.lentareader.data.dao.daoobjects.BitmapReference;
+import com.xeppaka.lentareader.data.dao.daoobjects.ImageDaoOld;
+import com.xeppaka.lentareader.data.dao.daoobjects.NewsDao;
 
 public class NewsFullFragment extends Fragment {
 	private TextView titleView;
@@ -77,7 +75,7 @@ public class NewsFullFragment extends Fragment {
 	public void onDestroy() {
 		super.onDestroy();
 		
-		loadedNews.getImage().releaseBitmap();
+//		loadedNews.getImage().releaseBitmap();
 	}
 
 	private void showNews(News news) {
@@ -91,15 +89,15 @@ public class NewsFullFragment extends Fragment {
 		
 		titleView.setText(news.getTitle());
 		
-		news.getImage().getBitmapAsync(new BitmapReference.BitmapLoadListener() {
-			@Override
-			public void onBitmapLoaded(Bitmap bitmap) {
-            if (bitmap == null) {
-                bitmap = ImageDao.getNotAvailableImage().getBitmap();
-            }
-
-            imageView.setImageBitmap(bitmap);
-			}
-		});
+//		news.getImage().getBitmapAsync(new BitmapReference.BitmapLoadListener() {
+//			@Override
+//			public void onBitmapLoaded(Bitmap bitmap) {
+//            if (bitmap == null) {
+//                bitmap = ImageDaoOld.getNotAvailableImage().getBitmap();
+//            }
+//
+//            imageView.setImageBitmap(bitmap);
+//			}
+//		});
 	}
 }

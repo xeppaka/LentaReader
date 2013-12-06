@@ -20,17 +20,16 @@ object Rubrics extends Enumeration {
 
   implicit def valueToRubricsValue(x: Value) = x.asInstanceOf[RubricsValue]
 
-  val SCIENCE = RubricsValue("science", "/science", "Наука и техника")
   val ROOT = RubricsValue("root", "", "")
   val RUSSIA = RubricsValue("russia", "/russia", "Россия")
   val WORLD = RubricsValue("world", "/world", "Мир")
   val USSR = RubricsValue("ussr", "/ussr", "Бывший СССР")
   val ECONOMICS = RubricsValue("economics", "/economics", "Экономика")
-//  val SCIENCE = RubricsValue("science", "/science", "Наука и техника")
+  val SCIENCE = RubricsValue("science", "/science", "Наука и техника")
   val SPORT = RubricsValue("sport", "/sport", "Спорт")
   val CULTURE = RubricsValue("culture", "/culture", "Культура")
   val MEDIA = RubricsValue("media", "/media", "Интернет и СМИ")
-  val LIFE = RubricsValue("life", "/life", "Жизнь")
+  val LIFE = RubricsValue("life", "/life", "Из жизни")
 
   def getRubric(russianCategory: String): Rubrics = {
     values.find(item => valueToRubricsValue(item).russianText == russianCategory) match {

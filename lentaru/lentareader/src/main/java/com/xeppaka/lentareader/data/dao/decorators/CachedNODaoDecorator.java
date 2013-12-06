@@ -9,7 +9,6 @@ import com.xeppaka.lentareader.data.dao.NODao;
 import com.xeppaka.lentareader.utils.LentaConstants;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 

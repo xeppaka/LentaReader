@@ -1,15 +1,10 @@
 package com.xeppaka.lentareader.data.body.items;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
-import com.xeppaka.lentareader.data.dao.objects.ImageDao;
-import com.xeppaka.lentareader.utils.LentaConstants;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
+import com.xeppaka.lentareader.data.dao.daoobjects.ImageDaoOld;
 
 /**
  * Created by nnm on 11/18/13.
@@ -53,20 +48,16 @@ public class LentaBodyItemImage implements Item {
         }
 
         if (credits != null) {
-            try {
-                sb.append("credits=\"").append(URLEncoder.encode(credits, "UTF-8")).append("\" ");
-            } catch (UnsupportedEncodingException e) {
-                Log.d(LentaConstants.LoggerAnyTag, "Error occured while marshalling LentaBodyItemImage to xml.", e);
-            }
+            sb.append("credits=\"").append(credits).append("\" ");
         }
 
-        return sb.append("</image>").toString();
+        return sb.append("/>").toString();
     }
 
     @Override
     public View createView(Context context) {
         ImageView view = new ImageView(context);
-        view.setImageBitmap(ImageDao.getNotAvailableImage().getBitmap());
+        view.setImageBitmap(ImageDaoOld.getNotAvailableImage().getBitmap());
 
         return view;
     }

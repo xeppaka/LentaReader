@@ -1,4 +1,4 @@
-package com.xeppaka.lentareader.data.dao.objects;
+package com.xeppaka.lentareader.data.dao.daoobjects;
 
 import android.content.ContentResolver;
 import android.graphics.Bitmap;
@@ -22,7 +22,7 @@ import java.net.MalformedURLException;
 /**
  * This class is responsible for maintaining all images in the application that
  * are part of news, articles, etc. When image is downloaded it should be saved
- * in this class by using {@link ImageDao#create(String, Bitmap)}.
+ * in this class by using {@link ImageDaoOld#create(String, Bitmap)}.
  * <p>
  * Users of images do not use {@link Bitmap} class instances directly, instead
  * they use {@link BitmapReference} with getBitmap(), releaseBitmap() methods. 
@@ -32,7 +32,8 @@ import java.net.MalformedURLException;
  * @author kacpa01
  * 
  */
-public class ImageDao {
+@Deprecated
+public class ImageDaoOld {
 	// how many times thumbnail image is smaller than full image
 	private static final float SAMPLE_SIZE_COEFF = 4;
 	
@@ -75,13 +76,13 @@ public class ImageDao {
 		notAvailableImageRef = new StrongBitmapReference(createNotAvailableBitmap());
 	}
 	
-	private ImageDao(ContentResolver contentResolver) {
+	private ImageDaoOld(ContentResolver contentResolver) {
 		this.contentResolver = contentResolver;
 		bitmapThumbnailOptions.inSampleSize = (int) SAMPLE_SIZE_COEFF;
 	}
 	
-	public static ImageDao getInstance(ContentResolver contentResolver) {
-		return new ImageDao(contentResolver);
+	public static ImageDaoOld getInstance(ContentResolver contentResolver) {
+		return new ImageDaoOld(contentResolver);
 	}
 	
 	public BitmapReference read(String imageUrl) {
@@ -90,7 +91,7 @@ public class ImageDao {
 	
 	private BitmapReference read(String imageUrl, boolean cacheOnly) {
 		Log.d(LentaConstants.LoggerAnyTag,
-				"ImageDao read bitmap with URL: "
+				"ImageDaoOld read bitmap with URL: "
 						+ imageUrl);
 
 		String imageKey;
@@ -127,7 +128,7 @@ public class ImageDao {
 	
 	private BitmapReference readThumbnail(String imageUrl, boolean cacheOnly) {
 		Log.d(LentaConstants.LoggerAnyTag,
-				"ImageDao read thumbnail bitmap with URL: "
+				"ImageDaoOld read thumbnail bitmap with URL: "
 						+ imageUrl);
 
 		String imageKey;
@@ -172,13 +173,13 @@ public class ImageDao {
 	 * Creates bitmap in cache. It means it will store bitmap in the memory
 	 * cache and save it to the external drive cache if it's available.
 	 * <p>
-	 * Thumbnail image in the cache is created by default.
+	 * Thumbnail image in the cache is also created by default.
 	 * 
 	 * @param imageUrl
 	 *            is the URL where image was downloaded. Used as a key for the
 	 *            image.
 	 * @param bitmap
-	 *            is the to save.
+	 *            is the bitmap that should be saved.
 	 * @return reference to the BitmapReference instance. Should be used later
 	 *         on to retrieve image from the cache.
 	 */
@@ -194,7 +195,7 @@ public class ImageDao {
 	 *            is the URL where image was downloaded. Used as a key for the
 	 *            image.
 	 * @param bitmap
-	 *            is the to save.
+	 *            is the bitmap that should be saved.
 	 * @param withThumbnail
 	 *            indicates if thumbnail should be automatically created and
 	 *            pushed into the cache.
@@ -383,11 +384,11 @@ public class ImageDao {
 		private final String cacheKey;
 		private final boolean thumbnail;
 		
-		private class BitmapLoadTask extends AsyncTask<BitmapLoadListener, Void, Bitmap> {
-			private BitmapLoadListener[] listeners;
+		private class BitmapLoadTask extends AsyncTask<Callback, Void, Bitmap> {
+			private Callback[] listeners;
 			
 			@Override
-			protected Bitmap doInBackground(BitmapLoadListener... listeners) {
+			protected Bitmap doInBackground(Callback... listeners) {
 				this.listeners = listeners;
 				
 				return getBitmap();
@@ -395,8 +396,8 @@ public class ImageDao {
 
 			@Override
 			protected void onPostExecute(Bitmap result) {
-				for (BitmapLoadListener listener : listeners) {
-					listener.onBitmapLoaded(result);
+				for (Callback listener : listeners) {
+					listener.onSuccess(result);
 				}
 			}
 		}
@@ -514,12 +515,12 @@ public class ImageDao {
 		 * @see cz.fit.lentaruand.data.dao.BitmapReference#getBitmapAsync(cz.fit.lentaruand.data.dao.BitmapReference.BitmapLoadListener)
 		 */
 		@Override
-		public void getBitmapAsync(BitmapLoadListener listener) {
+		public void getBitmapAsync(Callback callback) {
 			Bitmap seizedBitmap = seizeBitmap();
 			if (seizedBitmap != null) {
-				listener.onBitmapLoaded(seizedBitmap);
+                callback.onSuccess(seizedBitmap);
 			} else {
-				new BitmapLoadTask().execute(listener);
+				new BitmapLoadTask().execute(callback);
 			}
 		}
 
