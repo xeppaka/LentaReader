@@ -25,7 +25,7 @@ object Main extends App {
 
         val newSnapshot = cursnapshot match {
           case Some(memsnapshot) => {
-            val newRssItems = rss.olderThan(memsnapshot.latestDate)
+            val newRssItems = rss.olderThan(memsnapshot.oldestWithoutPicture(5))
 
             if (newRssItems.isEmpty) {
               println("No new items found. Skipping...")

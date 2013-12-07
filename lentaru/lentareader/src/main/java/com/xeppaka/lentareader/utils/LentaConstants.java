@@ -15,8 +15,7 @@ public class LentaConstants {
     public static final String XML_PATH_ROOT = "";
 
     public static final int DAO_CACHE_MAX_OBJECTS = 200;
-	public static final int BITMAP_CACHE_MAX_SIZE_IN_BYTES = 4 * 1024 * 1024; // 4 MB
-	public static final int BITMAP_THUMBNAIL_CACHE_MAX_SIZE_IN_BYTES = 4 * 1024 * 1024; // 4 MB
-	
+	public static final int BITMAP_CACHE_MAX_SIZE_IN_BYTES = 16 * 1024 * 1024; // 4 MB
+
 	public static final boolean DEVELOPER_MODE = true;
 }

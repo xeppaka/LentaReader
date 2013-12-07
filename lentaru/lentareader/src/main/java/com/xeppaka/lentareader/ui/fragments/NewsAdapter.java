@@ -11,7 +11,6 @@ import com.xeppaka.lentareader.R;
 import com.xeppaka.lentareader.data.News;
 import com.xeppaka.lentareader.data.dao.daoobjects.BitmapReference;
 import com.xeppaka.lentareader.data.dao.daoobjects.ImageDao;
-import com.xeppaka.lentareader.data.dao.daoobjects.ImageDaoOld;
 
 public class NewsAdapter extends NewsObjectAdapter<News> {
 
@@ -48,7 +47,7 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
 	public NewsAdapter(Context context) {
 		super(context);
 
-        imageDao = ImageDao.newInstance(context);
+        imageDao = ImageDao.newInstance();
 	}
 
 	@Override
@@ -56,44 +55,42 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
 		View view;
 		ImageView newsImageView;
 		TextView newsTitleTextView;
-		BitmapReference imageRef;
 
 		News news = getItem(position);
-        BitmapReference reference = imageDao.read(news.getImageLink());
+        BitmapReference bitmapRef = imageDao.read(news.getImageLink());
 		
 		if (convertView == null) {
 			view = inflater.inflate(R.layout.brief_news_list_item, null);
 			newsTitleTextView = (TextView)view.findViewById(R.id.brief_news_title);
 			newsImageView = (ImageView)view.findViewById(R.id.brief_news_image);
-			
-			view.setTag(new ViewHolder(newsImageView, newsTitleTextView, reference));
+            newsImageView.setImageDrawable(null);
+
+			view.setTag(new ViewHolder(newsImageView, newsTitleTextView, bitmapRef));
 		} else {
 			view = convertView;
 			ViewHolder holder = (ViewHolder)view.getTag();
 			
 			newsTitleTextView = holder.getNewsTitle();
 			newsImageView = holder.getNewsImage();
-			newsImageView.setImageBitmap(null);
+			newsImageView.setImageDrawable(null);
 			
 			BitmapReference prevImageRef = holder.getImage();
 			if (prevImageRef != null) {
 				prevImageRef.releaseBitmap();
 			}
 			
-			holder.setImage(reference);
+			holder.setImage(bitmapRef);
 		}
 
 		newsTitleTextView.setText(news.getTitle());
 
 		final ImageView newsImageViewForAsync = newsImageView;
 
-        reference.getBitmapAsync(new BitmapReference.Callback() {
+        bitmapRef.getBitmapAsync(new BitmapReference.Callback() {
 			@Override
 			public void onSuccess(Bitmap bitmap) {
-                if (bitmap != null) {
+                if (bitmap != null && newsImageViewForAsync.getDrawable() == null) {
                     newsImageViewForAsync.setImageBitmap(bitmap);
-                } else {
-                    newsImageViewForAsync.setImageBitmap(ImageDao.getNotAvailableImage().getBitmap());
                 }
 			}
 

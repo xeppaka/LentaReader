@@ -18,7 +18,6 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -12,14 +12,22 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 
 import java.io.IOException;
 import java.io.InputStream;
 
 public class LentaHttpImageDownloader {
 	public static Bitmap downloadBitmap(String url) throws HttpStatusCodeException, IOException {
+        HttpParams httpParameters = new BasicHttpParams();
+        HttpConnectionParams.setConnectionTimeout(httpParameters, 5000);
+        HttpConnectionParams.setSoTimeout(httpParameters, 10000);
+
 		final AndroidHttpClient client = AndroidHttpClient.newInstance(LentaConstants.UserAgent);
 		final HttpGet getRequest = new HttpGet(url);
+        getRequest.setParams(httpParameters);
 		
 		try {
 			HttpResponse response = client.execute(getRequest);

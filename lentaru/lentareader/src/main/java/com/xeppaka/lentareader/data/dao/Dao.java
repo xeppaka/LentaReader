@@ -1,7 +1,5 @@
 package com.xeppaka.lentareader.data.dao;
 
-import android.content.ContentResolver;
-
 import com.xeppaka.lentareader.data.db.SQLiteType;
 
 import java.util.List;

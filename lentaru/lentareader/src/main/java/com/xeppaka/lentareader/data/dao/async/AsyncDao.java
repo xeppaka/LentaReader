@@ -1,7 +1,5 @@
 package com.xeppaka.lentareader.data.dao.async;
 
-import android.content.ContentResolver;
-
 import com.xeppaka.lentareader.data.dao.Dao;
 
 import java.util.Collection;

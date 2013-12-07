@@ -1,8 +1,6 @@
 package com.xeppaka.lentareader.data;
 
 import com.xeppaka.lentareader.data.body.Body;
-import com.xeppaka.lentareader.data.dao.daoobjects.BitmapReference;
-import com.xeppaka.lentareader.data.dao.daoobjects.ImageDaoOld;
 import com.xeppaka.lentareader.parser.rss.LentaRssItem;
 
 import java.util.Date;

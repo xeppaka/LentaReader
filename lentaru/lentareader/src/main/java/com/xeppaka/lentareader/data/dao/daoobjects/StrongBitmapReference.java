@@ -2,8 +2,6 @@ package com.xeppaka.lentareader.data.dao.daoobjects;
 
 import android.graphics.Bitmap;
 
-import com.xeppaka.lentareader.service.Callback;
-
 public class StrongBitmapReference implements BitmapReference {
 	private final Bitmap bitmap;
 	

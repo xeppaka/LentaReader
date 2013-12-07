@@ -1,14 +1,12 @@
 package com.xeppaka.lentareader.data.dao.daoobjects;
 
 import android.content.ContentResolver;
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.AsyncTask;
-import android.os.Handler;
 import android.os.ParcelFileDescriptor;
 import android.support.v4.util.LruCache;
 import android.text.TextUtils;
@@ -18,7 +16,6 @@ import com.xeppaka.lentareader.data.dao.DaoObservable;
 import com.xeppaka.lentareader.data.provider.LentaProvider;
 import com.xeppaka.lentareader.downloader.LentaHttpImageDownloader;
 import com.xeppaka.lentareader.downloader.exceptions.HttpStatusCodeException;
-import com.xeppaka.lentareader.service.ServiceHelper;
 import com.xeppaka.lentareader.utils.LentaConstants;
 import com.xeppaka.lentareader.utils.URLHelper;
 
@@ -27,6 +24,9 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by nnm on 11/22/13.
@@ -53,18 +53,17 @@ public class ImageDao implements DaoObservable<BitmapReference> {
     private static final List<Observer> observers = new ArrayList<Observer>();
     private static final Object observersSync = new Object();
 
-    private final ServiceHelper serviceHelper;
+    private static final ThreadPoolExecutor downloadExecutor = new ThreadPoolExecutor(1, 1, 0, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
 
     static {
         notAvailableImageRef = new StrongBitmapReference(createNotAvailableBitmap());
     }
 
-    private ImageDao(Context context) {
-        serviceHelper = new ServiceHelper(context, new Handler());
+    private ImageDao() {
     }
 
-    public static ImageDao newInstance(Context context) {
-        return new ImageDao(context);
+    public static ImageDao newInstance() {
+        return new ImageDao();
     }
 
     public BitmapReference read(String imageUrl) {
@@ -405,8 +404,11 @@ public class ImageDao implements DaoObservable<BitmapReference> {
             // TODO: try to find in disk cache
 
             try {
-                // download bitmap
-                return downloadBitmap();
+                // download and set bitmap
+                Bitmap bitm = downloadBitmap();
+                setBitmap(bitm);
+
+                return bitm;
             } catch (IOException e) {
                 Log.e(LentaConstants.LoggerAnyTag, "IO Error while downloading bitmap, url: " + url, e);
                 return null;
@@ -426,7 +428,7 @@ public class ImageDao implements DaoObservable<BitmapReference> {
             if (bitmap != null) {
                 callback.onSuccess(bitmap);
             } else {
-                new BitmapLoadTask().execute(callback);
+                new BitmapLoadTask().executeOnExecutor(downloadExecutor, callback);
             }
         }
 

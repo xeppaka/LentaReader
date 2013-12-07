@@ -1,7 +1,5 @@
 package com.xeppaka.lentareader.data.dao;
 
-import java.util.List;
-
 /**
  * Created by nnm on 11/30/13.
  */

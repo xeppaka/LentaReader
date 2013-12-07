@@ -67,6 +67,15 @@ class LentaSnapshot(val newsType: NewsType, val rubric: Rubrics, val items: List
     if (isEmpty) 0 else items.head.pubDate
   }
 
+  def oldestWithoutPicture(maxOffset: Int): Long = {
+    if (isEmpty) 0 else {
+      items.take(maxOffset).filter((item) => (item.image == null || item.image.isEmpty)) match {
+        case Nil => items.head.pubDate
+        case l: List[LentaItem] => l.last.pubDate
+      }
+    }
+  }
+
   def merge(other: LentaSnapshot): LentaSnapshot = {
     if (other.newsType != newsType || other.rubric != rubric)
       throw new IllegalArgumentException("Other snapshot has different news type and/or rubric")

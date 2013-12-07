@@ -4,7 +4,7 @@ import android.content.Context;
 import android.view.View;
 import android.widget.ImageView;
 
-import com.xeppaka.lentareader.data.dao.daoobjects.ImageDaoOld;
+import com.xeppaka.lentareader.data.dao.daoobjects.ImageDao;
 
 /**
  * Created by nnm on 11/18/13.
@@ -57,7 +57,7 @@ public class LentaBodyItemImage implements Item {
     @Override
     public View createView(Context context) {
         ImageView view = new ImageView(context);
-        view.setImageBitmap(ImageDaoOld.getNotAvailableImage().getBitmap());
+        view.setImageBitmap(ImageDao.getNotAvailableImage().getBitmap());
 
         return view;
     }

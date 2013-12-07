@@ -3,10 +3,8 @@ package com.xeppaka.lentareader.data.dao.daoobjects;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.v4.util.LruCache;
-import android.text.TextUtils;
 import android.util.Log;
 
 import com.xeppaka.lentareader.data.News;
@@ -60,11 +58,8 @@ public final class NewsDao {
 			NewsEntry.COLUMN_NAME_BODY
 		};
 		
-		private final ImageDaoOld imageDao;
-		
 		public ContentResolverNewsDao(ContentResolver cr) {
 			super(cr);
-			imageDao = ImageDaoOld.getInstance(cr);
 		}
 
 		@Override

@@ -34,7 +34,7 @@ public class DownloadImageServiceCommand extends RunnableServiceCommand {
 
         try {
             Bitmap newBitmap = LentaHttpImageDownloader.downloadBitmap(url);
-            ImageDao.newInstance(context).create(url, newBitmap);
+            ImageDao.newInstance().create(url, newBitmap);
 
             Log.d(LentaConstants.LoggerServiceTag, "Successfuly downloaded and saved image: " + url);
         } catch (HttpStatusCodeException e) {

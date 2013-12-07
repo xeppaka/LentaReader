@@ -1,6 +1,5 @@
 package com.xeppaka.lentareader.ui.fragments;
 
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -15,8 +14,6 @@ import com.xeppaka.lentareader.data.News;
 import com.xeppaka.lentareader.data.body.Body;
 import com.xeppaka.lentareader.data.body.items.Item;
 import com.xeppaka.lentareader.data.dao.async.AsyncDao;
-import com.xeppaka.lentareader.data.dao.daoobjects.BitmapReference;
-import com.xeppaka.lentareader.data.dao.daoobjects.ImageDaoOld;
 import com.xeppaka.lentareader.data.dao.daoobjects.NewsDao;
 
 public class NewsFullFragment extends Fragment {

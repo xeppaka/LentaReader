@@ -2,7 +2,6 @@ package com.xeppaka.lentareader.service.commands;
 
 import android.content.ContentResolver;
 import android.os.ResultReceiver;
-import android.text.TextUtils;
 import android.util.Log;
 
 import com.xeppaka.lentareader.data.News;
