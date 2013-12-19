@@ -15,4 +15,6 @@ import java.util.List;
  */
 public interface NODao<T extends NewsObject> extends Dao<T> {
     List<T> readForRubric(Rubrics rubric);
+    boolean hasImage(long id);
+    boolean hasImage(String key);
 }

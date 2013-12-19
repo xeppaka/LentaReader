@@ -1,5 +1,6 @@
 package com.xeppaka.lentareader.ui.fragments;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -14,6 +15,8 @@ import com.xeppaka.lentareader.data.News;
 import com.xeppaka.lentareader.data.body.Body;
 import com.xeppaka.lentareader.data.body.items.Item;
 import com.xeppaka.lentareader.data.dao.async.AsyncDao;
+import com.xeppaka.lentareader.data.dao.daoobjects.BitmapReference;
+import com.xeppaka.lentareader.data.dao.daoobjects.ImageDao;
 import com.xeppaka.lentareader.data.dao.daoobjects.NewsDao;
 
 public class NewsFullFragment extends Fragment {
@@ -71,8 +74,6 @@ public class NewsFullFragment extends Fragment {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		
-//		loadedNews.getImage().releaseBitmap();
 	}
 
 	private void showNews(News news) {
@@ -85,16 +86,22 @@ public class NewsFullFragment extends Fragment {
 		}
 		
 		titleView.setText(news.getTitle());
-		
-//		news.getImage().getBitmapAsync(new BitmapReference.BitmapLoadListener() {
-//			@Override
-//			public void onBitmapLoaded(Bitmap bitmap) {
-//            if (bitmap == null) {
-//                bitmap = ImageDaoOld.getNotAvailableImage().getBitmap();
-//            }
-//
-//            imageView.setImageBitmap(bitmap);
-//			}
-//		});
+
+        BitmapReference reference = ImageDao.newInstance().read(news.getImageLink());
+        reference.getBitmapAsync(new BitmapReference.Callback() {
+            @Override
+            public void onSuccess(Bitmap bitmap) {
+                if (bitmap == null) {
+                    imageView.setImageBitmap(ImageDao.getNotAvailableImage().getBitmap());
+                } else {
+                    imageView.setImageBitmap(bitmap);
+                }
+            }
+
+            @Override
+            public void onFailure() {
+                imageView.setImageBitmap(ImageDao.getNotAvailableImage().getBitmap());
+            }
+        });
 	}
 }

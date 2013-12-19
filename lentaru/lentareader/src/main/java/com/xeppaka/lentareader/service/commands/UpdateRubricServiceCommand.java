@@ -8,6 +8,7 @@ import com.xeppaka.lentareader.data.News;
 import com.xeppaka.lentareader.data.NewsType;
 import com.xeppaka.lentareader.data.Rubrics;
 import com.xeppaka.lentareader.data.dao.Dao;
+import com.xeppaka.lentareader.data.dao.NODao;
 import com.xeppaka.lentareader.data.dao.daoobjects.NewsDao;
 import com.xeppaka.lentareader.downloader.LentaNewsDownloader;
 import com.xeppaka.lentareader.downloader.exceptions.HttpStatusCodeException;
@@ -60,14 +61,17 @@ public final class UpdateRubricServiceCommand extends RunnableServiceCommand {
 			throw e;
 		}
 
-		Dao<News> newsDao = NewsDao.getInstance(contentResolver);
+        NODao<News> newsDao = NewsDao.getInstance(contentResolver);
 
 		List<News> nonExistingNews = new ArrayList<News>();
+        List<News> withNewImage = new ArrayList<News>();
 
 		for (News n : news) {
 			if (!newsDao.exist(n.getGuid())) {
 				nonExistingNews.add(n);
-			}
+			} else if (n.hasImage() && !newsDao.hasImage(n.getGuid())) {
+                withNewImage.add(n);
+            }
 		}
 
 		Log.d(LentaConstants.LoggerServiceTag, "Number of new news from downloaded: " + nonExistingNews.size());
@@ -75,23 +79,15 @@ public final class UpdateRubricServiceCommand extends RunnableServiceCommand {
 		Collection<Long> newsIds = newsDao.create(nonExistingNews);
 		Log.d(LentaConstants.LoggerServiceTag, "Newly created news ids: " + newsIds);
 
-//        for (News n : nonExistingNews) {
-//            if (n.getImageLink() != null && !TextUtils.isEmpty(n.getImageLink())) {
-//                executor.execute(new DownloadImageServiceCommand(getRequestId(),  n.getImageLink(), getResultReceiver()));
-//            }
-//        }
+        for (News n : withNewImage) {
+            News newWithImage = newsDao.read(n.getGuid());
 
-//		prepareResultCreated(newsIds);
+            newWithImage.setImageLink(n.getImageLink());
+            newWithImage.setImageCredits(n.getImageCredits());
+            newWithImage.setImageCaption(n.getImageCaption());
 
-//		Collections.sort(nonExistingNews, Collections.reverseOrder());
-
-//		for (News n : nonExistingNews) {
-//			executor.execute(new RetrieveNewsFullTextServiceCommand(getRequestId(), n, contentResolver, getResultReceiver(), false));
-//		}
-
-//		for (News n : nonExistingNews) {
-//			executor.execute(new RetrieveNewsImageServiceCommand(getRequestId(), n, contentResolver, getResultReceiver()));
-//		}
+            newsDao.update(newWithImage);
+        }
 	}
 	
 	private void prepareResultCreated(Collection<Long> ids) {

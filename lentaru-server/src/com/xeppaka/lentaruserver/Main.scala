@@ -4,6 +4,7 @@ import com.xeppaka.lentaruserver.fs.FileSystem
 import java.nio.file.{Files, FileSystems}
 import com.xeppaka.lentaruserver.items.RssSnapshot
 import com.xeppaka.lentaruserver.Rubrics.Rubrics
+import scala.None
 
 object Main extends App {
   if (args.length >= 1) {
@@ -19,50 +20,56 @@ object Main extends App {
         val curdir = FileSystem.createFullPath(rootPath.toString, NewsType.NEWS, rubric)
         val cursnapshot = snapshots.get(rubric)
 
-        print("Downloading rss snapshot for " + rubric.toString + "... ")
-        val rss = RssSnapshot.downloadRss(NewsType.NEWS, rubric)
-        println("Done")
+        //print("Downloading rss snapshot for " + rubric.toString + "... ")
+        val newrss = RssSnapshot.downloadRss(NewsType.NEWS, rubric)
+        //println("Done")
 
-        val newSnapshot = cursnapshot match {
-          case Some(memsnapshot) => {
-            val newRssItems = rss.olderThan(memsnapshot.oldestWithoutPicture(5))
+        newrss match {
+          case Some(rss) => {
+            val newSnapshot = cursnapshot match {
+              case Some(memsnapshot) => {
+                val newRssItems = rss.olderOrEqualThan(memsnapshot.oldestWithoutPicture(5))
 
-            if (newRssItems.isEmpty) {
-              println("No new items found. Skipping...")
-              None
+                if (newRssItems.isEmpty) {
+                  //println("No new items found. Skipping...")
+                  None
+                }
+                else {
+                  //print("Downloading new " + newRssItems.items.length + " items... " )
+                  val newSnapshot = LentaSnapshot.download(newRssItems).merge(memsnapshot)
+                  //println("Done")
+                  Some(newSnapshot)
+                }
+              }
+              case None => {
+                //print("Downloading and parsing " + rss.items.length + " items (complete rss)... " )
+                val newSnapshot = LentaSnapshot.download(rss)
+                //println("Done")
+                Some(newSnapshot)
+              }
             }
-            else {
-              print("Downloading new " + newRssItems.items.length + " items... " )
-              val newSnapshot = LentaSnapshot.download(newRssItems).merge(memsnapshot)
-              println("Done")
-              Some(newSnapshot)
+
+            newSnapshot match {
+              case Some(snap) => {
+                snapshots = snapshots.updated(rubric, snap)
+
+                //print("Deleting xmls in " + curdir.toString + "... ")
+                FileSystem.clean(curdir)
+                //println("Done")
+
+                //print("Writing xmls in " + curdir.toString + "... ")
+                snap.writeXmlSet(curdir)
+                //println("Done")
+              }
+              case None =>
             }
           }
-          case None => {
-            print("Downloading and parsing " + rss.items.length + " items (complete rss)... " )
-            val newSnapshot = LentaSnapshot.download(rss)
-            println("Done")
-            Some(newSnapshot)
-          }
-        }
 
-        newSnapshot match {
-          case Some(snap) => {
-            snapshots = snapshots.updated(rubric, snap)
-
-            print("Deleting xmls in " + curdir.toString + "... ")
-            FileSystem.clean(curdir)
-            println("Done")
-
-            print("Writing xmls in " + curdir.toString + "... ")
-            snap.writeXmlSet(curdir)
-            println("Done")
-          }
           case None =>
         }
       })
 
-      println("Sleep for 60 seconds...")
+      //println("Sleep for 60 seconds...")
       Thread.sleep(1000 * 60)
     }
   } else {

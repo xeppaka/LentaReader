@@ -22,7 +22,21 @@ public class SynchronizedNODaoDecorator<T extends NewsObject> extends Synchroniz
 		}
 	}
 
-	@Override
+    @Override
+    public boolean hasImage(long id) {
+        synchronized (getSync()) {
+            return decoratedDao.hasImage(id);
+        }
+    }
+
+    @Override
+    public boolean hasImage(String key) {
+        synchronized (getSync()) {
+            return decoratedDao.hasImage(key);
+        }
+    }
+
+    @Override
 	protected NODao<T> getDecoratedDao() {
 		return decoratedDao;
 	}

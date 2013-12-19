@@ -56,6 +56,16 @@ public class CachedNODaoDecorator<T extends NewsObject> extends CachedDaoDecorat
     }
 
     @Override
+    public boolean hasImage(long id) {
+        return getDecoratedDao().hasImage(id);
+    }
+
+    @Override
+    public boolean hasImage(String key) {
+        return getDecoratedDao().hasImage(key);
+    }
+
+    @Override
 	protected NODao<T> getDecoratedDao() {
 		return decoratedDao;
 	}

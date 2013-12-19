@@ -3,8 +3,14 @@ package com.xeppaka.lentareader.data.body.items;
 import android.content.Context;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageSwitcher;
 import android.widget.TextView;
+import android.widget.ViewSwitcher;
+
+import com.xeppaka.lentareader.R;
+import com.xeppaka.lentareader.ui.widgets.ImageGalleryFactory;
 
 import java.util.List;
 
@@ -39,18 +45,5 @@ public class LentaBodyItemImageGallery implements Item {
 
     @Override
     public View createView(Context context) {
-        TextView view = new TextView(context);
-
-        StringBuilder sb = new StringBuilder("IMAGE GALLERY CREDITS:\n");
-
-        for (LentaBodyItemImage image : images) {
-            if (image.getCredits() != null)
-                sb.append(image.getCredits()).append("\n");
-        }
-
-        view.setText(Html.fromHtml(sb.toString()));
-        view.setMovementMethod(LinkMovementMethod.getInstance());
-
-        return view;
     }
 }

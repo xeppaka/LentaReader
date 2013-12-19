@@ -5,6 +5,8 @@ import com.xeppaka.lentaruserver.Rubrics.Rubrics
 import scala.xml.XML
 import java.net.URL
 import com.xeppaka.lentaruserver.Lenta
+import scala.util.{Success, Failure, Try}
+import java.util.logging.{Level, Logger}
 
 /**
  * Created with IntelliJ IDEA.
@@ -16,6 +18,11 @@ import com.xeppaka.lentaruserver.Lenta
 class RssSnapshot(val newsType: NewsType, val rubric: Rubrics, val items: List[RssItem]) {
   def olderThan(date: Long): RssSnapshot = {
     val newItems = items.filter(_.pubDate > date)
+    RssSnapshot(newsType, rubric, newItems)
+  }
+
+  def olderOrEqualThan(date: Long): RssSnapshot = {
+    val newItems = items.filter(_.pubDate >= date)
     RssSnapshot(newsType, rubric, newItems)
   }
 
@@ -50,15 +57,23 @@ class RssSnapshot(val newsType: NewsType, val rubric: Rubrics, val items: List[R
 }
 
 object RssSnapshot {
+  val logger = Logger.getLogger(RssSnapshot.getClass.getName)
   val MAX_ITEMS = 40
 
-  def downloadRss(newsType: NewsType, rubric: Rubrics): RssSnapshot = {
-    val xml = XML.load(new URL(Lenta.url(newsType, rubric)))
-    val rawRssItems = xml \\ "item"
+  def downloadRss(newsType: NewsType, rubric: Rubrics): Option[RssSnapshot] = {
+    val url = Lenta.url(newsType, rubric)
 
-    val rssItems = rawRssItems.map(item => RssItem(item)).toList.take(MAX_ITEMS)
+    Try {
+      val xml = XML.load(new URL(url))
+      val rawRssItems = xml \\ "item"
 
-    RssSnapshot(newsType, rubric, rssItems)
+      val rssItems = rawRssItems.map(item => RssItem(item)).toList.take(MAX_ITEMS)
+
+      RssSnapshot(newsType, rubric, rssItems)
+    } match {
+      case Success(v) => Some(v)
+      case Failure(e) => { logger.log(Level.ALL, s"Error while loading page: $url", e); None }
+    }
   }
 
   def apply(newsType: NewsType, rubric: Rubrics, rssItems: List[RssItem]): RssSnapshot = new RssSnapshot(newsType, rubric, rssItems)

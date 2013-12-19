@@ -67,10 +67,14 @@ class LentaSnapshot(val newsType: NewsType, val rubric: Rubrics, val items: List
     if (isEmpty) 0 else items.head.pubDate
   }
 
+  def oldestDate(): Long = {
+    if (isEmpty) 0 else items.last.pubDate
+  }
+
   def oldestWithoutPicture(maxOffset: Int): Long = {
     if (isEmpty) 0 else {
       items.take(maxOffset).filter((item) => (item.image == null || item.image.isEmpty)) match {
-        case Nil => items.head.pubDate
+        case Nil => items.head.pubDate + 1
         case l: List[LentaItem] => l.last.pubDate
       }
     }
@@ -80,7 +84,8 @@ class LentaSnapshot(val newsType: NewsType, val rubric: Rubrics, val items: List
     if (other.newsType != newsType || other.rubric != rubric)
       throw new IllegalArgumentException("Other snapshot has different news type and/or rubric")
 
-    val newItems: List[LentaItem] = (other.items ::: items).sortWith(_.pubDate > _.pubDate).take(LentaSnapshot.MAX_ITEMS)
+    val newSnapshotDateFrom = oldestDate()
+    val newItems: List[LentaItem] = (other.items.filter(item => item.pubDate < newSnapshotDateFrom) ::: items).sortWith(_.pubDate > _.pubDate).take(LentaSnapshot.MAX_ITEMS)
 
     LentaSnapshot(newsType, rubric, newItems)
   }

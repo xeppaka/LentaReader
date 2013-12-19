@@ -8,28 +8,17 @@ import java.util.Date;
 public class News extends NewsObject {
 	private static final long serialVersionUID = 1L;
 	
-	private String imageLink;
-	private String imageCaption;
-	private String imageCredits;
 
 	public News(long id, String guid, String title, String link, Date pubDate, String imageLink,
 			String imageCaption, String imageCredits, Rubrics rubric, String description,
             Body body) {
-		super(id, guid, title, link, pubDate, rubric, description, body);
-		
-		setImageLink(imageLink);
-		setImageCaption(imageCaption);
-		setImageCredits(imageCredits);
+		super(id, guid, title, link, imageLink, imageCaption, imageCredits, pubDate, rubric, description, body);
 	}
 	
 	public News(String guid, String title, String link, Date pubDate, String imageLink,
 			String imageCaption, String imageCredits, Rubrics rubric, String description,
             Body body) {
-		super(guid, title, link, pubDate, rubric, description, body);
-		
-		setImageLink(imageLink);
-		setImageCaption(imageCaption);
-		setImageCredits(imageCredits);
+		super(guid, title, link, imageLink, imageCaption, imageCredits, pubDate, rubric, description, body);
 	}
 
 	public News(LentaRssItem rssItem) {
@@ -38,30 +27,6 @@ public class News extends NewsObject {
 		setImageLink(rssItem.getImageLink());
 		setImageCaption(null);
 		setImageCredits(null);
-	}
-
-	public String getImageLink() {
-		return imageLink;
-	}
-
-	public void setImageLink(String imageLink) {
-		this.imageLink = imageLink;
-	}
-
-	public String getImageCaption() {
-		return imageCaption;
-	}
-
-	public void setImageCaption(String imageCaption) {
-		this.imageCaption = imageCaption;
-	}
-
-	public String getImageCredits() {
-		return imageCredits;
-	}
-
-	public void setImageCredits(String imageCredits) {
-		this.imageCredits = imageCredits;
 	}
 
 	@Override

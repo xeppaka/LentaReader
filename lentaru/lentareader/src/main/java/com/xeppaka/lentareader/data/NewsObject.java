@@ -1,5 +1,7 @@
 package com.xeppaka.lentareader.data;
 
+import android.text.TextUtils;
+
 import com.xeppaka.lentareader.data.body.Body;
 import com.xeppaka.lentareader.parser.rss.LentaRssItem;
 
@@ -12,26 +14,32 @@ public abstract class NewsObject implements Comparable<NewsObject>, DatabaseObje
 	private String guid;
 	private String title;
 	private String link;
+    private String imageLink;
+    private String imageCaption;
+    private String imageCredits;
 	private Date pubDate;
 	private Rubrics rubric;
     private String description;
     private Body body;
 
-	public NewsObject(long id, String guid, String title, String link, Date pubDate,
-			Rubrics rubric, String description, Body body) {
+	public NewsObject(long id, String guid, String title, String link, String imageLink,
+                      String imageCaption, String imageCredits, Date pubDate, Rubrics rubric, String description, Body body) {
 		setId(id);
 		setGuid(guid);
 		setTitle(title);
 		setLink(link);
+        setImageLink(imageLink);
+        setImageCaption(imageCaption);
+        setImageCredits(imageCredits);
 		setPubDate(pubDate);
 		setRubric(rubric);
         setDescription(description);
         setBody(body);
 	}
 	
-	public NewsObject(String guid, String title, String link, Date pubDate, Rubrics rubric,
-                      String description, Body body) {
-		this(ID_NONE, guid, title, link, pubDate, rubric, description, body);
+	public NewsObject(String guid, String title, String link, String imageLink, String imageCaption,
+                      String imageCredits, Date pubDate, Rubrics rubric, String description, Body body) {
+		this(ID_NONE, guid, title, link, imageLink, imageCaption, imageCredits, pubDate, rubric, description, body);
 	}
 	
 	public NewsObject(LentaRssItem rssItem) {
@@ -79,7 +87,31 @@ public abstract class NewsObject implements Comparable<NewsObject>, DatabaseObje
 		return link;
 	}
 
-	public void setLink(String link) {
+    public String getImageLink() {
+        return imageLink;
+    }
+
+    public void setImageLink(String imageLink) {
+        this.imageLink = imageLink;
+    }
+
+    public String getImageCaption() {
+        return imageCaption;
+    }
+
+    public void setImageCaption(String imageCaption) {
+        this.imageCaption = imageCaption;
+    }
+
+    public String getImageCredits() {
+        return imageCredits;
+    }
+
+    public void setImageCredits(String imageCredits) {
+        this.imageCredits = imageCredits;
+    }
+
+    public void setLink(String link) {
 		if (link == null || (link.length() == 0))
 			throw new IllegalArgumentException("Argument link must not be null or empty.");
 		
@@ -186,4 +218,8 @@ public abstract class NewsObject implements Comparable<NewsObject>, DatabaseObje
 	public long getParentId() {
 		return ID_NONE;
 	}
+
+    public boolean hasImage() {
+        return imageLink != null && !TextUtils.isEmpty(imageLink);
+    }
 }

@@ -30,15 +30,25 @@ public class AsyncNODaoDecorator<T extends NewsObject> extends AsyncDaoDecorator
 			listener.finished(result);
 		}
 	}
-	
+
 	public AsyncNODaoDecorator(NODao<T> decoratedDao) {
 		super(decoratedDao);
 		
 		this.decoratedDao = decoratedDao;
 	}
 
-	@Override
-	public void readAsyncForRubric(Rubrics rubric,
+    @Override
+    public boolean hasImage(long id) {
+        return getDecoratedDao().hasImage(id);
+    }
+
+    @Override
+    public boolean hasImage(String key) {
+        return getDecoratedDao().hasImage(key);
+    }
+
+    @Override
+	public void readForRubricAsync(Rubrics rubric,
 			com.xeppaka.lentareader.data.dao.async.AsyncDao.DaoReadMultiListener<T> listener) {
 		new AsyncReadMultiForRubricTask(listener).execute();
 	}
