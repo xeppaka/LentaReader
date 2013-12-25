@@ -4,12 +4,18 @@ import android.text.TextUtils;
 
 import com.xeppaka.lentareader.data.body.Body;
 import com.xeppaka.lentareader.parser.rss.LentaRssItem;
+import com.xeppaka.lentareader.utils.LentaConstants;
 
+import java.text.DateFormatSymbols;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 public abstract class NewsObject implements Comparable<NewsObject>, DatabaseObject {
 	private static final long serialVersionUID = 1L;
-	
+
+    private static final SimpleDateFormat dateFormat;
+
 	private long id;
 	private String guid;
 	private String title;
@@ -18,11 +24,25 @@ public abstract class NewsObject implements Comparable<NewsObject>, DatabaseObje
     private String imageCaption;
     private String imageCredits;
 	private Date pubDate;
+    private String formattedPubDate;
 	private Rubrics rubric;
     private String description;
     private Body body;
 
-	public NewsObject(long id, String guid, String title, String link, String imageLink,
+    static {
+        Locale rusLocale = new Locale("ru-ru");
+        DateFormatSymbols dfs = new DateFormatSymbols(rusLocale);
+        dfs.setMonths(LentaConstants.MONTHS_RUS);
+        dfs.setShortMonths(LentaConstants.MONTHS_SHORT_RUS);
+        dfs.setWeekdays(LentaConstants.DAYS_RUS);
+        dfs.setShortWeekdays(LentaConstants.DAYS_SHORT_RUS);
+
+        dateFormat = new SimpleDateFormat("EE, d MMMM yyyy HH:mm:ss Z", rusLocale);
+        dateFormat.setDateFormatSymbols(dfs);
+    }
+
+
+    public NewsObject(long id, String guid, String title, String link, String imageLink,
                       String imageCaption, String imageCredits, Date pubDate, Rubrics rubric, String description, Body body) {
 		setId(id);
 		setGuid(guid);
@@ -35,6 +55,8 @@ public abstract class NewsObject implements Comparable<NewsObject>, DatabaseObje
 		setRubric(rubric);
         setDescription(description);
         setBody(body);
+
+        setFormattedPubDate(dateFormat.format(getPubDate()));
 	}
 	
 	public NewsObject(String guid, String title, String link, String imageLink, String imageCaption,
@@ -49,6 +71,8 @@ public abstract class NewsObject implements Comparable<NewsObject>, DatabaseObje
 		setPubDate(rssItem.getPubDate());
 		setRubric(rssItem.getRubric());
         setDescription(rssItem.getDescription());
+
+        setFormattedPubDate(dateFormat.format(getPubDate()));
 	}
 	
 	public abstract NewsType getType();
@@ -128,8 +152,16 @@ public abstract class NewsObject implements Comparable<NewsObject>, DatabaseObje
 		
 		this.pubDate = pubDate;
 	}
-	
-	public Rubrics getRubric() {
+
+    public String getFormattedPubDate() {
+        return formattedPubDate;
+    }
+
+    public void setFormattedPubDate(String formattedPubDate) {
+        this.formattedPubDate = formattedPubDate;
+    }
+
+    public Rubrics getRubric() {
 		return rubric;
 	}
 

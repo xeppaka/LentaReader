@@ -49,6 +49,7 @@ public class ImageDao implements DaoObservable<BitmapReference> {
 
     private ContentResolver contentResolver;
     private static final StrongBitmapReference notAvailableImageRef;
+    private static final StrongBitmapReference loadingBitmapRef;
 
     private static final List<Observer> observers = new ArrayList<Observer>();
     private static final Object observersSync = new Object();
@@ -57,6 +58,7 @@ public class ImageDao implements DaoObservable<BitmapReference> {
 
     static {
         notAvailableImageRef = new StrongBitmapReference(createNotAvailableBitmap());
+        loadingBitmapRef = new StrongBitmapReference(createLoadingBitmap());
     }
 
     private ImageDao() {
@@ -120,6 +122,15 @@ public class ImageDao implements DaoObservable<BitmapReference> {
     }
 
     /**
+     * Gets image with "Image loading" phrase written in it.
+     *
+     * @return reference to the bitmap. Never null.
+     */
+    public static BitmapReference getLoadingImage() {
+        return loadingBitmapRef;
+    }
+
+    /**
      * Creates bitmap in cache. It means it will store bitmap in the memory
      * cache and save it to the external drive cache if it's available.
      *
@@ -163,7 +174,7 @@ public class ImageDao implements DaoObservable<BitmapReference> {
                  * the one user of the bitmap. So we need to release bitmap before
                  * return lazy load reference to it.
                  */
-                imageRef.releaseBitmap();
+                //imageRef.releaseBitmap();
             }
 
             Log.d(LentaConstants.LoggerAnyTag, "Create bitmap: no old references in the cache found, created new reference. Cache size: " + bitmapCache.size());
@@ -239,6 +250,20 @@ public class ImageDao implements DaoObservable<BitmapReference> {
 
         canvas.drawText("Изображение", 20, 20, paint);
         canvas.drawText("не доступно.", 20, 100, paint);
+        return result;
+    }
+
+    private static Bitmap createLoadingBitmap() {
+        Bitmap result = Bitmap.createBitmap(300, 300, Bitmap.Config.ARGB_8888);
+
+        Canvas canvas = new Canvas(result);
+
+        Paint paint = new Paint();
+        paint.setColor(Color.BLACK);
+        paint.setTextSize(30);
+
+        canvas.drawText("Изображение", 20, 20, paint);
+        canvas.drawText("загружается.", 20, 100, paint);
         return result;
     }
 
@@ -424,11 +449,16 @@ public class ImageDao implements DaoObservable<BitmapReference> {
         }
 
         @Override
-        public void getBitmapAsync(Callback callback) {
+        public AsyncTask<Callback, Void, Bitmap> getBitmapAsync(Callback callback) {
             if (bitmap != null) {
                 callback.onSuccess(bitmap);
+
+                return null;
             } else {
-                new BitmapLoadTask().executeOnExecutor(downloadExecutor, callback);
+                AsyncTask<Callback, Void, Bitmap> task = new BitmapLoadTask();
+                task.executeOnExecutor(downloadExecutor, callback);
+
+                return task;
             }
         }
 
@@ -476,9 +506,9 @@ public class ImageDao implements DaoObservable<BitmapReference> {
         }
 
         private synchronized void onRemoveFromCache() {
-            if (bitmapReferences <= 0) {
+//            if (bitmapReferences <= 0) {
                 recycleBitmap();
-            }
+//            }
 
             cached = false;
         }

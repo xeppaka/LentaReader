@@ -1,23 +1,17 @@
 package com.xeppaka.lentareader.data.body.items;
 
 import android.content.Context;
-import android.text.Html;
-import android.text.method.LinkMovementMethod;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ImageSwitcher;
-import android.widget.TextView;
-import android.widget.ViewSwitcher;
 
-import com.xeppaka.lentareader.R;
-import com.xeppaka.lentareader.ui.widgets.ImageGalleryFactory;
+import com.xeppaka.lentareader.ui.widgets.ImageGallery;
 
+import java.util.Iterator;
 import java.util.List;
 
 /**
  * Created by nnm on 11/18/13.
  */
-public class LentaBodyItemImageGallery implements Item {
+public class LentaBodyItemImageGallery implements Item, Iterable<LentaBodyItemImage> {
     private List<LentaBodyItemImage> images;
 
     public LentaBodyItemImageGallery(List<LentaBodyItemImage> images) {
@@ -45,5 +39,23 @@ public class LentaBodyItemImageGallery implements Item {
 
     @Override
     public View createView(Context context) {
+        return new ImageGallery(context, this);
+    }
+
+    @Override
+    public Iterator<LentaBodyItemImage> iterator() {
+        return images.iterator();
+    }
+
+    public int size() {
+        return images.size();
+    }
+
+    public boolean isEmpty() {
+        return images.isEmpty();
+    }
+
+    public LentaBodyItemImage getImage(int index) {
+        return images.get(index);
     }
 }

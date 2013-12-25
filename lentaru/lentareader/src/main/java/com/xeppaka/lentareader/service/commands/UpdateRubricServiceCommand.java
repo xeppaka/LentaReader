@@ -7,7 +7,6 @@ import android.util.Log;
 import com.xeppaka.lentareader.data.News;
 import com.xeppaka.lentareader.data.NewsType;
 import com.xeppaka.lentareader.data.Rubrics;
-import com.xeppaka.lentareader.data.dao.Dao;
 import com.xeppaka.lentareader.data.dao.NODao;
 import com.xeppaka.lentareader.data.dao.daoobjects.NewsDao;
 import com.xeppaka.lentareader.downloader.LentaNewsDownloader;

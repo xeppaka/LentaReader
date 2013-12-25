@@ -2,14 +2,10 @@ package com.xeppaka.lentaruserver.items.body
 
 import com.xeppaka.lentaruserver.items.ItemBase
 import scala.io.Source
-import org.apache.commons.lang3.StringEscapeUtils
-import java.io.IOException
 import scala.util.{Success, Failure, Try}
 import java.util.logging.{Level, Logger}
-import scala.util.matching.Regex
 import scala.util.parsing.json.JSON
-import scala.xml.Utility
-import java.net.{URLDecoder, URLEncoder, URL}
+import java.net.URLDecoder
 
 abstract class LentaBody extends ItemBase {
   val items: List[ItemBase]

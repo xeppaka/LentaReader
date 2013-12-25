@@ -1,6 +1,7 @@
 package com.xeppaka.lentareader.data.dao.daoobjects;
 
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 
 /**
  * 
@@ -23,6 +24,6 @@ public interface BitmapReference {
 	
 	Bitmap getBitmap();
 	Bitmap getBitmapIfCached();
-	void getBitmapAsync(final Callback callback);
+	AsyncTask<Callback, Void, Bitmap> getBitmapAsync(final Callback callback);
 	void releaseBitmap();
 }

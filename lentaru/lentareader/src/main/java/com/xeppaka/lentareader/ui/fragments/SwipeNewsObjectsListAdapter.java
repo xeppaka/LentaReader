@@ -24,18 +24,18 @@ public class SwipeNewsObjectsListAdapter extends FragmentPagerAdapter {
 			R.string.pager_title_articles, R.string.pager_title_columns,
 			R.string.pager_title_photos, R.string.pager_title_videos };
 	
-	private final List<ListFragment> fragments;
+	private final List<NewsListFragment> fragments;
 	
 	public SwipeNewsObjectsListAdapter(FragmentManager fragmentManager, Context context) {
 		super(fragmentManager);
 		this.context = context;
 		
-		fragments = new ArrayList<ListFragment>();
+		fragments = new ArrayList<NewsListFragment>();
 		fragments.add(new NewsListFragment());
 	}
 
 	@Override
-	public Fragment getItem(int position) {
+	public NewsListFragment getItem(int position) {
 		return fragments.get(position);
 	}
 
@@ -48,4 +48,8 @@ public class SwipeNewsObjectsListAdapter extends FragmentPagerAdapter {
 	public CharSequence getPageTitle(int position) {
 		return context.getResources().getText(SwipeNewsObjectsListAdapter.TITLES[position]);
 	}
+
+    public void refresh(int position) {
+        getItem(position).refresh();
+    }
 }

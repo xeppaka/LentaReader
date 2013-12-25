@@ -1,9 +1,8 @@
 package com.xeppaka.lentaruserver.fs
 
-import java.io.{IOException, File}
+import java.io.IOException
 import java.nio.file._
 import java.nio.file.attribute.BasicFileAttributes
-import com.xeppaka.lentaruserver.{NewsType, Rubrics}
 import com.xeppaka.lentaruserver.NewsType.NewsType
 import com.xeppaka.lentaruserver.NewsType
 import com.xeppaka.lentaruserver.Rubrics.Rubrics

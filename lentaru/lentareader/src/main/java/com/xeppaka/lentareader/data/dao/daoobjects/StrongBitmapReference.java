@@ -1,6 +1,7 @@
 package com.xeppaka.lentareader.data.dao.daoobjects;
 
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 
 public class StrongBitmapReference implements BitmapReference {
 	private final Bitmap bitmap;
@@ -20,8 +21,10 @@ public class StrongBitmapReference implements BitmapReference {
 	}
 	
 	@Override
-	public void getBitmapAsync(BitmapReference.Callback callback) {
+	public AsyncTask<Callback, Void, Bitmap> getBitmapAsync(BitmapReference.Callback callback) {
 		callback.onSuccess(bitmap);
+
+        return null;
 	}
 
 	@Override

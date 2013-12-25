@@ -16,12 +16,12 @@ import java.util.logging.{Level, Logger}
  * To change this template use File | Settings | File Templates.
  */
 class RssSnapshot(val newsType: NewsType, val rubric: Rubrics, val items: List[RssItem]) {
-  def olderThan(date: Long): RssSnapshot = {
+  def newerThan(date: Long): RssSnapshot = {
     val newItems = items.filter(_.pubDate > date)
     RssSnapshot(newsType, rubric, newItems)
   }
 
-  def olderOrEqualThan(date: Long): RssSnapshot = {
+  def newerOrEqualThan(date: Long): RssSnapshot = {
     val newItems = items.filter(_.pubDate >= date)
     RssSnapshot(newsType, rubric, newItems)
   }

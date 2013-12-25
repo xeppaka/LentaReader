@@ -10,7 +10,6 @@ import android.text.TextUtils;
 import com.xeppaka.lentareader.data.NewsObject;
 import com.xeppaka.lentareader.data.Rubrics;
 import com.xeppaka.lentareader.data.dao.NODao;
-import com.xeppaka.lentareader.data.db.NewsEntry;
 import com.xeppaka.lentareader.data.db.NewsObjectEntry;
 import com.xeppaka.lentareader.data.db.SQLiteType;
 

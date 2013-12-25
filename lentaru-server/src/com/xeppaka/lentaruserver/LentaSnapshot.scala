@@ -2,10 +2,8 @@ package com.xeppaka.lentaruserver
 
 import _root_.com.xeppaka.lentaruserver.NewsType.NewsType
 import _root_.com.xeppaka.lentaruserver.Rubrics.Rubrics
-import scala.xml.{Node, XML}
-import java.net.URL
 import com.xeppaka.lentaruserver.items._
-import java.io.{File, PrintWriter}
+import java.io.PrintWriter
 import com.xeppaka.lentaruserver.fs.FileSystem
 import java.nio.file.Path
 import scala.Some
@@ -85,7 +83,7 @@ class LentaSnapshot(val newsType: NewsType, val rubric: Rubrics, val items: List
       throw new IllegalArgumentException("Other snapshot has different news type and/or rubric")
 
     val newSnapshotDateFrom = oldestDate()
-    val newItems: List[LentaItem] = (other.items.filter(item => item.pubDate < newSnapshotDateFrom) ::: items).sortWith(_.pubDate > _.pubDate).take(LentaSnapshot.MAX_ITEMS)
+    val newItems: List[LentaItem] = (items ::: other.items.filter(item => item.pubDate < newSnapshotDateFrom)).sortWith(_.pubDate > _.pubDate).take(LentaSnapshot.MAX_ITEMS)
 
     LentaSnapshot(newsType, rubric, newItems)
   }

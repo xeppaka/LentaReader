@@ -4,6 +4,10 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBarActivity;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
 import com.viewpagerindicator.TitlePageIndicator;
 import com.xeppaka.lentareader.R;
@@ -17,7 +21,7 @@ import com.xeppaka.lentareader.utils.LentaUtils;
  * @author 
  * 
  */
-public class NewsBriefActivity extends FragmentActivity {
+public class NewsBriefActivity extends ActionBarActivity {
 	private SwipeNewsObjectsListAdapter pagerAdapter;
 	private ViewPager pager;
 
@@ -54,9 +58,26 @@ public class NewsBriefActivity extends FragmentActivity {
 		indicator.setViewPager(pager);
 	}
 
-//	@Override
-//	public boolean onCreateOptionsMenu(Menu menu) {
-//		getSupportMenuInflater().inflate(R.menu.main, menu);
-//		return true;
-//	}
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.brief_activity_actions, menu);
+
+		return super.onCreateOptionsMenu(menu);
+	}
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_refresh:
+                onRefresh();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void onRefresh() {
+        pagerAdapter.refresh(pager.getCurrentItem());
+    }
 }

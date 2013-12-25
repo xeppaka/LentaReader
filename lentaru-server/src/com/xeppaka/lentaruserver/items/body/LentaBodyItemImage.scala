@@ -1,8 +1,6 @@
 package com.xeppaka.lentaruserver.items.body
 
 import com.xeppaka.lentaruserver.items.ItemBase
-import java.net.{URLDecoder, URLEncoder}
-import java.net
 import org.apache.commons.lang3.StringEscapeUtils
 
 /**

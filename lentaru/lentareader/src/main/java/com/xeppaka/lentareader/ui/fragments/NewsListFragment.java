@@ -34,7 +34,7 @@ public class NewsListFragment extends ListFragment {
 	private NewsAdapter newsAdapter;
 	private ServiceHelper serviceHelper;
 	private AsyncDao<News> dao;
-    private Rubrics currentRubric = Rubrics.SCIENCE;
+    private Rubrics currentRubric = Rubrics.ROOT;
 
 	private class ListFragmentServiceListener implements Callback {
         @Override

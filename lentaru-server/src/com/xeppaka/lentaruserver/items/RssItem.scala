@@ -1,7 +1,5 @@
 package com.xeppaka.lentaruserver.items
 
-import com.xeppaka.lentaruserver.NewsType.NewsType
-import com.xeppaka.lentaruserver.Rubrics.Rubrics
 import scala.xml.Node
 import java.text.SimpleDateFormat
 import java.util.Locale
