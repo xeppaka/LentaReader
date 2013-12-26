@@ -3,7 +3,7 @@ package com.xeppaka.lentaruserver.items.body
 import com.xeppaka.lentaruserver.items.ItemBase
 import scala.io.Source
 import scala.util.{Success, Failure, Try}
-import java.util.logging.{Level, Logger}
+import java.util.logging.{SimpleFormatter, StreamHandler, Level, Logger}
 import scala.util.parsing.json.JSON
 import java.net.URLDecoder
 
@@ -20,6 +20,7 @@ abstract class LentaBody extends ItemBase {
 
 object LentaBody {
   val logger = Logger.getLogger(LentaBody.getClass.getName)
+  logger.addHandler(new StreamHandler(System.out, new SimpleFormatter()))
 
   val SEPARATOR_PLACEHOLDER = "[[SEP]]"
   val ASIDE_PLACEHOLDER = "[[ASIDE]]"

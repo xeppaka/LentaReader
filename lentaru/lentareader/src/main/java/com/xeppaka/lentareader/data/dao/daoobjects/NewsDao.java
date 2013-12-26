@@ -54,6 +54,7 @@ public final class NewsDao {
 			NewsEntry.COLUMN_NAME_IMAGECREDITS,
 			NewsEntry.COLUMN_NAME_PUBDATE,
 			NewsEntry.COLUMN_NAME_RUBRIC,
+            NewsEntry.COLUMN_NAME_LATEST_NEWS,
 			NewsEntry.COLUMN_NAME_DESCRIPTION,
 			NewsEntry.COLUMN_NAME_BODY
 		};
@@ -87,6 +88,7 @@ public final class NewsDao {
 			
 			values.put(NewsEntry.COLUMN_NAME_PUBDATE, news.getPubDate().getTime());
 			values.put(NewsEntry.COLUMN_NAME_RUBRIC, news.getRubric().name());
+            values.put(NewsEntry.COLUMN_NAME_LATEST_NEWS, news.isLatest());
 			values.put(NewsEntry.COLUMN_NAME_DESCRIPTION, news.getDescription());
 
 			if (news.getBody() == null)
@@ -108,9 +110,10 @@ public final class NewsDao {
 			String imageCredits = cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_IMAGECREDITS));
 			Date pubDate = new Date(cur.getLong(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_PUBDATE)));
 			Rubrics rubric = Rubrics.valueOf(cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_RUBRIC)));
-
+            boolean latest = cur.getInt(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_LATEST_NEWS)) > 0;
 			String description = cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_DESCRIPTION));
             Body body;
+
             try {
 			    body = bodyParser.parse(cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_BODY)));
             } catch (XmlPullParserException e) {
@@ -121,7 +124,7 @@ public final class NewsDao {
                 body = EmptyBody.getInstance();
             }
 
-            return new News(id, guidDb, title, link, pubDate, imageLink, imageCaption, imageCredits, rubric, description, body);
+            return new News(id, guidDb, title, link, pubDate, imageLink, imageCaption, imageCredits, rubric, latest, description, body);
 		}
 	
 		@Override
@@ -150,22 +153,14 @@ public final class NewsDao {
 		}
 
 		@Override
-		protected String getRubricColumnName() {
-			return NewsEntry.COLUMN_NAME_RUBRIC;
-		}
-
-		@Override
 		public List<News> read() {
 			List<News> news;
-			
-			synchronized(sync) {
-				news = super.read();
-				
+            news = super.read();
+
 //				for (News n : news) {
 //					readOtherNewsParts(n);
 //				}
-			}
-				
+
 			Collections.sort(news);
 			
 			return news;
@@ -173,56 +168,48 @@ public final class NewsDao {
 
 		@Override
 		public News read(long id) {
-			synchronized(sync) {
-				News news = super.read(id);
-				
-				if (news == null)
-					return news;
-		
-				//readOtherNewsParts(news);
-				
-				return news;
-			}
+            News news = super.read(id);
+
+            if (news == null)
+                return news;
+
+            //readOtherNewsParts(news);
+
+            return news;
 		}
 	
 		@Override
 		public News read(String key) {
-			synchronized(sync) {
-				News news = super.read(key);
-				
-				if (news == null)
-					return news;
-				
-				//readOtherNewsParts(news);
-				
-				return news;
-			}
+            News news = super.read(key);
+
+            if (news == null)
+                return news;
+
+            //readOtherNewsParts(news);
+
+            return news;
 		}
 	
 		@Override
 		public News read(SQLiteType keyType,
 				String keyColumnName, String keyValue) {
-			synchronized(sync) {
-				News news = super.read(keyType, keyColumnName, keyValue);
-				
-				if (news == null)
-					return news;
-		
-				//readOtherNewsParts(news);
-				
-				return news;
-			}
+            News news = super.read(keyType, keyColumnName, keyValue);
+
+            if (news == null)
+                return news;
+
+            //readOtherNewsParts(news);
+
+            return news;
 		}
 	
 		@Override
 		public int update(News news) {
-			synchronized(sync) {
-				int result = super.update(news);
-				
-				//updateOtherNewsParts(news);
-				
-				return result;
-			}
+            int result = super.update(news);
+
+            //updateOtherNewsParts(news);
+
+            return result;
 		}
 		
 		@Override
@@ -231,8 +218,8 @@ public final class NewsDao {
 		}
 
 		@Override
-		public List<News> readForRubric(Rubrics rubric) {
-			List<News> news = super.readForRubric(rubric);
+		public List<News> read(Rubrics rubric) {
+			List<News> news = super.read(rubric);
 			
 //			for (News n : news) {
 //				readOtherNewsParts(n);

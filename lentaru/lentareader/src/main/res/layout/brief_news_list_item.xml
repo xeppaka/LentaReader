@@ -56,14 +56,33 @@
             android:id="@+id/brief_news_image_credits"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="6dip"
             android:textSize="8sp"/>
 
         <TextView
             android:id="@+id/brief_news_description"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dip"
+            android:layout_marginBottom="6dip"
             android:textSize="10sp"/>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/rubric_label"
+                android:textSize="8sp"/>
+
+            <TextView
+                android:id="@+id/brief_news_rubric"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="8sp"/>
+        </LinearLayout>
     </LinearLayout>
 
 </LinearLayout>

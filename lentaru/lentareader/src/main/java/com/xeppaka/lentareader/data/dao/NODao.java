@@ -14,7 +14,9 @@ import java.util.List;
  * @param <T>
  */
 public interface NODao<T extends NewsObject> extends Dao<T> {
-    List<T> readForRubric(Rubrics rubric);
+    List<T> read(Rubrics rubric);
+    T readLatestWOImage(Rubrics rubric, int limit);
+    int clearLatestFlag(Rubrics rubric);
     boolean hasImage(long id);
     boolean hasImage(String key);
 }

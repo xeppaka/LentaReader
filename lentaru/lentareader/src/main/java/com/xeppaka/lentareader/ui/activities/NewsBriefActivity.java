@@ -2,15 +2,16 @@ package com.xeppaka.lentareader.ui.activities;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.viewpagerindicator.TitlePageIndicator;
 import com.xeppaka.lentareader.R;
+import com.xeppaka.lentareader.data.Rubrics;
 import com.xeppaka.lentareader.ui.fragments.SwipeNewsObjectsListAdapter;
 import com.xeppaka.lentareader.utils.LentaUtils;
 
@@ -24,6 +25,7 @@ import com.xeppaka.lentareader.utils.LentaUtils;
 public class NewsBriefActivity extends ActionBarActivity {
 	private SwipeNewsObjectsListAdapter pagerAdapter;
 	private ViewPager pager;
+    private View selectRubric;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +40,7 @@ public class NewsBriefActivity extends ActionBarActivity {
 	}
 
 	private void initializeViewPager() {
+        selectRubric = findViewById(R.id.select_rubric_menu);
 		pager = (ViewPager) findViewById(R.id.brief_news_pager);
 		pagerAdapter = new SwipeNewsObjectsListAdapter(
 				getSupportFragmentManager(), this);
@@ -72,6 +75,9 @@ public class NewsBriefActivity extends ActionBarActivity {
             case R.id.action_refresh:
                 onRefresh();
                 return true;
+            case R.id.action_select_rubric:
+                onSelectRubric();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -79,5 +85,49 @@ public class NewsBriefActivity extends ActionBarActivity {
 
     private void onRefresh() {
         pagerAdapter.refresh(pager.getCurrentItem());
+    }
+
+    private void onSelectRubric() {
+        if (selectRubric.getVisibility() == View.INVISIBLE)
+            selectRubric.setVisibility(View.VISIBLE);
+        else
+            selectRubric.setVisibility(View.INVISIBLE);
+    }
+
+    public void onRubricSelected(View view) {
+        selectRubric.setVisibility(View.INVISIBLE);
+
+        switch (view.getId()) {
+            case R.id.button_rubric_all:
+                pagerAdapter.selectRubric(pager.getCurrentItem(), Rubrics.LATEST);
+                break;
+            case R.id.button_rubric_russia:
+                pagerAdapter.selectRubric(pager.getCurrentItem(), Rubrics.RUSSIA);
+                break;
+            case R.id.button_rubric_culture:
+                pagerAdapter.selectRubric(pager.getCurrentItem(), Rubrics.CULTURE);
+                break;
+            case R.id.button_rubric_economics:
+                pagerAdapter.selectRubric(pager.getCurrentItem(), Rubrics.ECONOMICS);
+                break;
+            case R.id.button_rubric_internet:
+                pagerAdapter.selectRubric(pager.getCurrentItem(), Rubrics.MEDIA);
+                break;
+            case R.id.button_rubric_life:
+                pagerAdapter.selectRubric(pager.getCurrentItem(), Rubrics.LIFE);
+                break;
+            case R.id.button_rubric_science:
+                pagerAdapter.selectRubric(pager.getCurrentItem(), Rubrics.SCIENCE);
+                break;
+            case R.id.button_rubric_sport:
+                pagerAdapter.selectRubric(pager.getCurrentItem(), Rubrics.SPORT);
+                break;
+            case R.id.button_rubric_ussr:
+                pagerAdapter.selectRubric(pager.getCurrentItem(), Rubrics.USSR);
+                break;
+            case R.id.button_rubric_world:
+                pagerAdapter.selectRubric(pager.getCurrentItem(), Rubrics.WORLD);
+                break;
+        }
     }
 }

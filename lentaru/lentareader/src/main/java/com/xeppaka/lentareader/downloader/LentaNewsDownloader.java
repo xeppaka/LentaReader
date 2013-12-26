@@ -39,7 +39,27 @@ public class LentaNewsDownloader extends LentaNewsObjectDownloader<News> {
         String url = URLHelper.getXmlForRubric(rubric, NewsType.NEWS);
         //Page xml = new Page(url, rubric, NewsType.NEWS, HttpPageDownloader.download(url));
 
-        return parser.parse(HttpPageDownloader.download(url));
+        List<News> result = parser.parse(HttpPageDownloader.download(url));
+
+        for (News n : result) {
+            n.setLatest(rubric == Rubrics.LATEST);
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<News> download(Rubrics rubric, long fromDate) throws HttpStatusCodeException, IOException, XmlPullParserException {
+        String url = URLHelper.getXmlForRubric(rubric, NewsType.NEWS, fromDate);
+        //Page xml = new Page(url, rubric, NewsType.NEWS, HttpPageDownloader.download(url));
+
+        List<News> result = parser.parse(HttpPageDownloader.download(url));
+
+        for (News n : result) {
+            n.setLatest(rubric == Rubrics.LATEST);
+        }
+
+        return result;
     }
 
     @Override

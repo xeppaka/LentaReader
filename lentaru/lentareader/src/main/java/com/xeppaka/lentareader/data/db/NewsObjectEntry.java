@@ -11,6 +11,7 @@ public abstract class NewsObjectEntry implements BaseColumns {
     public static final String COLUMN_NAME_IMAGECAPTION = "imagecaption";
     public static final String COLUMN_NAME_IMAGECREDITS = "imagecredits";
 	public static final String COLUMN_NAME_RUBRIC = "rubric";
+    public static final String COLUMN_NAME_LATEST_NEWS = "latest";
     public static final String COLUMN_NAME_DESCRIPTION = "description";
     public static final String COLUMN_NAME_BODY = "body";
 
@@ -23,6 +24,7 @@ public abstract class NewsObjectEntry implements BaseColumns {
             COLUMN_NAME_IMAGECREDITS + " TEXT, " +
 			COLUMN_NAME_PUBDATE + " INTEGER, " +
 			COLUMN_NAME_RUBRIC + " TEXT, " +
+            COLUMN_NAME_LATEST_NEWS + " INTEGER," +
             COLUMN_NAME_DESCRIPTION + " TEXT, " +
             COLUMN_NAME_BODY + " TEXT";
 }

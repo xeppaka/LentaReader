@@ -20,7 +20,7 @@ object Rubrics extends Enumeration {
 
   implicit def valueToRubricsValue(x: Value) = x.asInstanceOf[RubricsValue]
 
-  val ROOT = RubricsValue("root", "", "")
+  val LATEST = RubricsValue("latest", "", "")
   val RUSSIA = RubricsValue("russia", "/russia", "Россия")
   val WORLD = RubricsValue("world", "/world", "Мир")
   val USSR = RubricsValue("ussr", "/ussr", "Бывший СССР")
@@ -33,7 +33,7 @@ object Rubrics extends Enumeration {
 
   def getRubric(russianCategory: String): Rubrics = {
     values.find(item => valueToRubricsValue(item).russianText == russianCategory) match {
-      case None => ROOT
+      case None => LATEST
       case Some(category) => category
     }
   }

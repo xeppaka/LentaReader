@@ -3,7 +3,6 @@ package com.xeppaka.lentareader.ui.widgets;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageSwitcher;
 import android.widget.ImageView;

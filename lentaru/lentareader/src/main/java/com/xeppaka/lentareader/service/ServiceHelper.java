@@ -94,9 +94,11 @@ public class ServiceHelper {
 	}
 
 	private Context context;
-	
+    private final ServiceResultReceiver resultReceiver;
+
     public ServiceHelper(Context context, Handler handler) {
     	this.context = context;
+        this.resultReceiver = new ServiceResultReceiver(handler);
 	}
 
 	public void updateRubric(NewsType newsType, Rubrics rubric, Callback callback) {
@@ -104,6 +106,8 @@ public class ServiceHelper {
 
         Uri uri = LentaService.BASE_URI.buildUpon().appendPath(newsType.name()).appendPath(rubric.name()).build();
         Intent intent = new Intent(LentaService.Action.UPDATE_RUBRIC.name(), uri, context, LentaService.class);
+        intent.putExtra(LentaService.INTENT_RESULT_RECEIVER_NAME, resultReceiver);
+        intent.putExtra(LentaService.INTENT_REQUEST_ID_NAME, requestId);
 
         synchronized (sync) {
             for (ServiceRequest request : serviceRequests.values()) {

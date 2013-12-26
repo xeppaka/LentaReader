@@ -38,6 +38,11 @@ public class LentaArticleDownloader extends LentaNewsObjectDownloader<Article> {
     }
 
     @Override
+    public Collection<Article> download(Rubrics rubric, long fromDate) throws HttpStatusCodeException, IOException, XmlPullParserException {
+        return null;
+    }
+
+    @Override
 	protected NewsType getNewsType() {
 		return NewsType.ARTICLE;
 	}

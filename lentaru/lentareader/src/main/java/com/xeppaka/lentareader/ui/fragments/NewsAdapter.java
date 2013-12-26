@@ -1,6 +1,5 @@
 package com.xeppaka.lentareader.ui.fragments;
 
-import android.app.ActionBar;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
@@ -8,7 +7,6 @@ import android.text.Html;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -16,11 +14,6 @@ import com.xeppaka.lentareader.R;
 import com.xeppaka.lentareader.data.News;
 import com.xeppaka.lentareader.data.dao.daoobjects.BitmapReference;
 import com.xeppaka.lentareader.data.dao.daoobjects.ImageDao;
-import com.xeppaka.lentareader.utils.LentaConstants;
-
-import java.text.DateFormatSymbols;
-import java.text.SimpleDateFormat;
-import java.util.Locale;
 
 public class NewsAdapter extends NewsObjectAdapter<News> {
 
@@ -32,6 +25,7 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
         private final TextView newsDate;
         private final TextView newsImageCaption;
         private final TextView newsImageCredits;
+        private final TextView newsRubric;
         private final View newsDescriptionPanel;
         private final ImageView newsImage;
 		private BitmapReference imageRef;
@@ -39,13 +33,15 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
         private String imageUrl;
         private AsyncTask asyncTask;
 
-        public ViewHolder(ImageView newsImage, TextView newsTitle, TextView newsDescription, TextView newsDate, TextView newsImageCaption, TextView newsImageCredits, View newsDescriptionPanel, int position) {
+        public ViewHolder(ImageView newsImage, TextView newsTitle, TextView newsDescription, TextView newsDate,
+                          TextView newsImageCaption, TextView newsImageCredits, TextView newsRubric, View newsDescriptionPanel, int position) {
 			this.newsImage = newsImage;
 			this.newsTitle = newsTitle;
             this.newsDescription = newsDescription;
             this.newsDate = newsDate;
             this.newsImageCaption = newsImageCaption;
             this.newsImageCredits = newsImageCredits;
+            this.newsRubric = newsRubric;
             this.newsDescriptionPanel = newsDescriptionPanel;
             this.position = position;
 		}
@@ -68,6 +64,10 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
 
         public TextView getNewsImageCredits() {
             return newsImageCredits;
+        }
+
+        public TextView getNewsRubric() {
+            return newsRubric;
         }
 
         public ImageView getNewsImage() {
@@ -126,6 +126,7 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
         TextView newsDateTextView;
         TextView newsCaptionTextView;
         TextView newsCreditsTextView;
+        TextView newsRubric;
         View newsDescriptionPanel;
 
 		News news = getItem(position);
@@ -135,7 +136,7 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
         if (news.getImageLink() == null || TextUtils.isEmpty(news.getImageLink())) {
             bitmapRef = ImageDao.getNotAvailableImage();
         } else {
-            bitmapRef = imageDao.read(news.getImageLink());
+            bitmapRef = imageDao.readThumbnail(news.getImageLink());
         }
 
         ViewHolder holder;
@@ -146,6 +147,7 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
             newsDateTextView = (TextView)view.findViewById(R.id.brief_news_date);
             newsCaptionTextView = (TextView)view.findViewById(R.id.brief_news_image_caption);
             newsCreditsTextView = (TextView)view.findViewById(R.id.brief_news_image_credits);
+            newsRubric = (TextView)view.findViewById(R.id.brief_news_rubric);
             newsDescriptionTextView = (TextView)view.findViewById(R.id.brief_news_description);
             newsDescriptionPanel = view.findViewById(R.id.brief_news_description_panel);
 
@@ -153,7 +155,7 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
 
             final View newsDescriptionPanelAsync = newsDescriptionPanel;
             view.setTag(holder = new ViewHolder(newsImageView, newsTitleTextView, newsDescriptionTextView, newsDateTextView,
-                    newsCaptionTextView, newsCreditsTextView, newsDescriptionPanel, position));
+                    newsCaptionTextView, newsCreditsTextView, newsRubric, newsDescriptionPanel, position));
 
             newsImageView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -181,6 +183,7 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
             newsDateTextView = holder.getNewsDate();
             newsCaptionTextView = holder.getNewsImageCaption();
             newsCreditsTextView = holder.getNewsImageCredits();
+            newsRubric = holder.getNewsRubric();
 			newsImageView = holder.getNewsImage();
             newsDescriptionPanel = holder.getNewsDescriptionPanel();
 
@@ -211,6 +214,8 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
             newsCreditsTextView.setText(Html.fromHtml(news.getImageCredits()));
             newsCreditsTextView.setVisibility(View.VISIBLE);
         }
+
+        newsRubric.setText(" " + news.getRubric().getLabel());
 
         newsDateTextView.setText(news.getFormattedPubDate());
 

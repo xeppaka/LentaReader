@@ -11,9 +11,8 @@ import com.xeppaka.lentareader.data.News;
 import com.xeppaka.lentareader.data.NewsType;
 import com.xeppaka.lentareader.data.Rubrics;
 import com.xeppaka.lentareader.data.dao.Dao;
-import com.xeppaka.lentareader.data.dao.async.AsyncDao;
 import com.xeppaka.lentareader.data.dao.async.AsyncDao.DaoReadMultiListener;
-import com.xeppaka.lentareader.data.dao.daoobjects.BitmapReference;
+import com.xeppaka.lentareader.data.dao.async.AsyncNODao;
 import com.xeppaka.lentareader.data.dao.daoobjects.DaoObserver;
 import com.xeppaka.lentareader.data.dao.daoobjects.NewsDao;
 import com.xeppaka.lentareader.service.Callback;
@@ -33,8 +32,8 @@ import java.util.List;
 public class NewsListFragment extends ListFragment {
 	private NewsAdapter newsAdapter;
 	private ServiceHelper serviceHelper;
-	private AsyncDao<News> dao;
-    private Rubrics currentRubric = Rubrics.ROOT;
+	private AsyncNODao<News> dao;
+    private Rubrics currentRubric = Rubrics.LATEST;
 
 	private class ListFragmentServiceListener implements Callback {
         @Override
@@ -51,24 +50,17 @@ public class NewsListFragment extends ListFragment {
     private Dao.Observer<News> newsDaoObserver = new DaoObserver<News>(new Handler()) {
         @Override
         public void onDataChanged(boolean selfChange, News dataObject) {
-            showNewsObjects(Arrays.asList(dataObject));
+            newsAdapter.setNewsObjects(Arrays.asList(dataObject));
         }
 
         @Override
         public void onDataChanged(boolean selfChange) {
-            showNewsObjects(dao.read());
-        }
-    };
-
-    private Dao.Observer<BitmapReference> bitmapsDaoObserver = new DaoObserver<BitmapReference>(new Handler()) {
-        @Override
-        public void onDataChanged(boolean selfChange, BitmapReference dataObject) {
-            newsAdapter.notifyDataSetChanged();
-        }
-
-        @Override
-        public void onDataChanged(boolean selfChange) {
-            newsAdapter.notifyDataSetChanged();
+            dao.readAsync(currentRubric, new DaoReadMultiListener<News>() {
+                @Override
+                public void finished(List<News> result) {
+                    newsAdapter.setNewsObjects(result);
+                }
+            });
         }
     };
 
@@ -94,15 +86,7 @@ public class NewsListFragment extends ListFragment {
 		super.onResume();
 
         dao.registerContentObserver(newsDaoObserver);
-
-		dao.readAsync(new DaoReadMultiListener<News>() {
-            @Override
-            public void finished(List<News> result) {
-                showNewsObjects(result);
-                serviceHelper.updateRubric(NewsType.NEWS, currentRubric, serviceListener);
-            }
-        });
-
+        refreshLocal();
 	}
 
 	@Override
@@ -122,11 +106,20 @@ public class NewsListFragment extends ListFragment {
 		startActivity(intent);
 	}
 
-	private void showNewsObjects(List<News> newsObjects) {
-		newsAdapter.setNewsObjects(newsObjects);
-	}
-
     public void refresh() {
         serviceHelper.updateRubric(NewsType.NEWS, currentRubric, serviceListener);
+    }
+
+    public void refreshLocal() {
+        dao.readAsync(currentRubric, new DaoReadMultiListener<News>() {
+            @Override
+            public void finished(List<News> result) {
+                newsAdapter.setNewsObjects(result);
+            }
+        });
+    }
+
+    public void selectRubric(Rubrics rubric) {
+        currentRubric = rubric;
     }
 }

@@ -19,24 +19,31 @@ import java.util.Collections;
 import java.util.List;
 
 public abstract class ContentResolverDao<T extends DatabaseObject> implements Dao<T> {
-	private final static String textKeyWhere;
-	private final static String intKeyWhere;
+	private final static String[] textKeyWhere;
+	private final static String[] intKeyWhere;
 	private final static String[] projectionId = { BaseColumns._ID };
-	
-	protected static String getWhereFromSQLiteType(SQLiteType type) {
+
+    protected static String getWhereFromSQLiteType(SQLiteType type) {
+        return getWhereFromSQLiteType(type, 1);
+    }
+
+	protected static String getWhereFromSQLiteType(SQLiteType type, int argumentIndex) {
+        if (argumentIndex <= 0 || argumentIndex > 3)
+            throw new IllegalArgumentException("argumentIndex should be from 1 to 3 inclusive.");
+
 		switch (type) {
 		case TEXT:
-			return textKeyWhere;
+			return textKeyWhere[argumentIndex - 1];
 		case INTEGER:
-			return intKeyWhere;
+			return intKeyWhere[argumentIndex - 1];
 		default:
 			throw new IllegalArgumentException("Only TEXT and INTEGER are supported as key types in database.");
 		}
 	}
 	
 	static {
-		textKeyWhere = "%1s LIKE ?";
-		intKeyWhere = "%1s = ?";
+        textKeyWhere = new String[]{"%1s LIKE ?", "%2s LIKE ?", "%3s LIKE ?"};
+		intKeyWhere = new String[]{"%1s = ?", "%2s = ?", "%3s = ?"};
 	}
 	
 	private final ContentResolver cr;

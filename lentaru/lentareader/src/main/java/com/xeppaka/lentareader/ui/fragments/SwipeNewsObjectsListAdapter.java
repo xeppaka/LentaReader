@@ -1,12 +1,11 @@
 package com.xeppaka.lentareader.ui.fragments;
 
 import android.content.Context;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.ListFragment;
 
 import com.xeppaka.lentareader.R;
+import com.xeppaka.lentareader.data.Rubrics;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,5 +50,11 @@ public class SwipeNewsObjectsListAdapter extends FragmentPagerAdapter {
 
     public void refresh(int position) {
         getItem(position).refresh();
+    }
+
+    public void selectRubric(int position, Rubrics rubric) {
+        NewsListFragment currentFragment = getItem(position);
+        currentFragment.selectRubric(rubric);
+        currentFragment.refreshLocal();
     }
 }

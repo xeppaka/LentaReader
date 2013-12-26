@@ -10,6 +10,7 @@ import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 public abstract class NewsObject implements Comparable<NewsObject>, DatabaseObject {
 	private static final long serialVersionUID = 1L;
@@ -26,6 +27,7 @@ public abstract class NewsObject implements Comparable<NewsObject>, DatabaseObje
 	private Date pubDate;
     private String formattedPubDate;
 	private Rubrics rubric;
+    private boolean latest;
     private String description;
     private Body body;
 
@@ -37,13 +39,14 @@ public abstract class NewsObject implements Comparable<NewsObject>, DatabaseObje
         dfs.setWeekdays(LentaConstants.DAYS_RUS);
         dfs.setShortWeekdays(LentaConstants.DAYS_SHORT_RUS);
 
-        dateFormat = new SimpleDateFormat("EE, d MMMM yyyy HH:mm:ss Z", rusLocale);
+        dateFormat = new SimpleDateFormat("EE, d MMMM yyyy HH:mm:ss", rusLocale);
         dateFormat.setDateFormatSymbols(dfs);
+        dateFormat.setTimeZone(TimeZone.getDefault());
     }
 
 
     public NewsObject(long id, String guid, String title, String link, String imageLink,
-                      String imageCaption, String imageCredits, Date pubDate, Rubrics rubric, String description, Body body) {
+                      String imageCaption, String imageCredits, Date pubDate, Rubrics rubric, boolean latest, String description, Body body) {
 		setId(id);
 		setGuid(guid);
 		setTitle(title);
@@ -55,13 +58,14 @@ public abstract class NewsObject implements Comparable<NewsObject>, DatabaseObje
 		setRubric(rubric);
         setDescription(description);
         setBody(body);
+        setLatest(latest);
 
         setFormattedPubDate(dateFormat.format(getPubDate()));
 	}
 	
 	public NewsObject(String guid, String title, String link, String imageLink, String imageCaption,
-                      String imageCredits, Date pubDate, Rubrics rubric, String description, Body body) {
-		this(ID_NONE, guid, title, link, imageLink, imageCaption, imageCredits, pubDate, rubric, description, body);
+                      String imageCredits, Date pubDate, Rubrics rubric, boolean latest, String description, Body body) {
+		this(ID_NONE, guid, title, link, imageLink, imageCaption, imageCredits, pubDate, rubric, latest, description, body);
 	}
 	
 	public NewsObject(LentaRssItem rssItem) {
@@ -172,6 +176,14 @@ public abstract class NewsObject implements Comparable<NewsObject>, DatabaseObje
 		this.rubric = rubric;
 	}
 
+    public boolean isLatest() {
+        return latest;
+    }
+
+    public void setLatest(boolean latest) {
+        this.latest = latest;
+    }
+
     public Body getBody() {
         return body;
     }
@@ -188,6 +200,50 @@ public abstract class NewsObject implements Comparable<NewsObject>, DatabaseObje
         this.description = description;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        NewsObject that = (NewsObject) o;
+
+        if (id != that.id) return false;
+        if (latest != that.latest) return false;
+        if (!body.equals(that.body)) return false;
+        if (!description.equals(that.description)) return false;
+        if (!guid.equals(that.guid)) return false;
+        if (imageCaption != null ? !imageCaption.equals(that.imageCaption) : that.imageCaption != null)
+            return false;
+        if (imageCredits != null ? !imageCredits.equals(that.imageCredits) : that.imageCredits != null)
+            return false;
+        if (imageLink != null ? !imageLink.equals(that.imageLink) : that.imageLink != null)
+            return false;
+        if (!link.equals(that.link)) return false;
+        if (!pubDate.equals(that.pubDate)) return false;
+        if (rubric != that.rubric) return false;
+        if (!title.equals(that.title)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (int) (id ^ (id >>> 32));
+        result = 31 * result + guid.hashCode();
+        result = 31 * result + title.hashCode();
+        result = 31 * result + link.hashCode();
+        result = 31 * result + (imageLink != null ? imageLink.hashCode() : 0);
+        result = 31 * result + (imageCaption != null ? imageCaption.hashCode() : 0);
+        result = 31 * result + (imageCredits != null ? imageCredits.hashCode() : 0);
+        result = 31 * result + pubDate.hashCode();
+        result = 31 * result + rubric.hashCode();
+        result = 31 * result + (latest ? 1 : 0);
+        result = 31 * result + description.hashCode();
+        result = 31 * result + body.hashCode();
+
+        return result;
+    }
+
     /**
 	 * Standard comparator compares dates ==> we will have all news 
 	 * sorter by date.
@@ -196,52 +252,8 @@ public abstract class NewsObject implements Comparable<NewsObject>, DatabaseObje
 	public int compareTo(NewsObject another) {
 		return another.getPubDate().compareTo(getPubDate());
 	}
-	
-	@Override
-	public boolean equals(Object other) {
-		if (this == other)
-			return true;
-		
-		if (!(other instanceof NewsObject))
-			return false;
-		
-		NewsObject otherNewsObject = (NewsObject)other;
-		
-		if (getId() != otherNewsObject.getId())
-			return false;
-		
-		if (getGuid() != otherNewsObject.getGuid() && (getGuid() != null && !getGuid().equals(otherNewsObject.getGuid())))
-			return false;
-		
-		if (getTitle() != otherNewsObject.getTitle() && (getTitle() != null && !getTitle().equals(otherNewsObject.getTitle())))
-			return false;
-		
-		if (getLink() != otherNewsObject.getLink() && (getLink() != null && !getLink().equals(otherNewsObject.getLink())))
-			return false;
-		
-		if (getPubDate() != otherNewsObject.getPubDate() && (getPubDate() != null && !getPubDate().equals(otherNewsObject.getPubDate())))
-			return false;
-		
-		if (getRubric() != otherNewsObject.getRubric() && (getRubric() != null && !getRubric().equals(otherNewsObject.getRubric())))
-			return false;
-		
-		return true;
-	}
 
-	@Override
-	public int hashCode() {
-		int hash = 17;
-		hash = 37 * hash + (int)(getId() ^ (getId() >> 32));
-		hash = 37 * hash + (getGuid() == null ? 0 : getGuid().hashCode());
-		hash = 37 * hash + (getTitle() == null ? 0 : getTitle().hashCode());
-		hash = 37 * hash + (getLink() == null ? 0 : getLink().hashCode());
-		hash = 37 * hash + (getPubDate() == null ? 0 : getPubDate().hashCode());
-		hash = 37 * hash + (getRubric() == null ? 0 : getRubric().hashCode());
-
-		return hash;
-	}
-
-	@Override
+    @Override
 	public String getKeyValue() {
 		return getGuid();
 	}

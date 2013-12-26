@@ -22,7 +22,7 @@ public class AsyncNODaoDecorator<T extends NewsObject> extends AsyncDaoDecorator
 
 		@Override
 		protected List<T> doInBackground(Rubrics... rubric) {
-			return readForRubric(rubric[0]);
+			return read(rubric[0]);
 		}
 
 		@Override
@@ -30,6 +30,52 @@ public class AsyncNODaoDecorator<T extends NewsObject> extends AsyncDaoDecorator
 			listener.finished(result);
 		}
 	}
+
+    private static class ReadSingleWOImageForRubricParam {
+        private Rubrics rubric;
+        private int limit;
+
+        private ReadSingleWOImageForRubricParam(Rubrics rubric, int limit) {
+            this.rubric = rubric;
+            this.limit = limit;
+        }
+    }
+
+    protected class AsyncReadSingleWOImageForRubricTask extends AsyncTask<ReadSingleWOImageForRubricParam, Void, T> {
+        private AsyncDao.DaoReadSingleListener<T> listener;
+
+        public AsyncReadSingleWOImageForRubricTask(AsyncDao.DaoReadSingleListener<T> listener) {
+            this.listener = listener;
+        }
+
+        @Override
+        protected T doInBackground(ReadSingleWOImageForRubricParam... param) {
+            return readLatestWOImage(param[0].rubric, param[0].limit);
+        }
+
+        @Override
+        protected void onPostExecute(T result) {
+            listener.finished(result);
+        }
+    }
+
+    protected class AsyncClearLatestFlagTask extends AsyncTask<Rubrics, Void, Integer> {
+        private DaoUpdateListener listener;
+
+        public AsyncClearLatestFlagTask(DaoUpdateListener listener) {
+            this.listener = listener;
+        }
+
+        @Override
+        protected Integer doInBackground(Rubrics... rubric) {
+            return clearLatestFlag(rubric[0]);
+        }
+
+        @Override
+        protected void onPostExecute(Integer result) {
+            listener.finished(result);
+        }
+    }
 
 	public AsyncNODaoDecorator(NODao<T> decoratedDao) {
 		super(decoratedDao);
@@ -48,17 +94,36 @@ public class AsyncNODaoDecorator<T extends NewsObject> extends AsyncDaoDecorator
     }
 
     @Override
-	public void readForRubricAsync(Rubrics rubric,
-			com.xeppaka.lentareader.data.dao.async.AsyncDao.DaoReadMultiListener<T> listener) {
-		new AsyncReadMultiForRubricTask(listener).execute();
+	public void readAsync(Rubrics rubric, DaoReadMultiListener<T> listener) {
+		new AsyncReadMultiForRubricTask(listener).execute(rubric);
 	}
 
-	@Override
-	public List<T> readForRubric(Rubrics rubric) {
-		return getDecoratedDao().readForRubric(rubric);
+    @Override
+    public void readLatestWOImageAsync(Rubrics rubric, int limit, DaoReadSingleListener<T> listener) {
+        new AsyncReadSingleWOImageForRubricTask(listener).execute(new ReadSingleWOImageForRubricParam(rubric, limit));
+    }
+
+    @Override
+    public T readLatestWOImage(Rubrics rubric, int limit) {
+        return getDecoratedDao().readLatestWOImage(rubric, limit);
+    }
+
+    @Override
+	public List<T> read(Rubrics rubric) {
+		return getDecoratedDao().read(rubric);
 	}
 
-	@Override
+    @Override
+    public int clearLatestFlag(Rubrics rubric) {
+        return getDecoratedDao().clearLatestFlag(rubric);
+    }
+
+    @Override
+    public void clearLatestFlagAsync(Rubrics rubric, DaoUpdateListener listener) {
+        new AsyncClearLatestFlagTask(listener).execute(rubric);
+    }
+
+    @Override
 	protected NODao<T> getDecoratedDao() {
 		return decoratedDao;
 	}

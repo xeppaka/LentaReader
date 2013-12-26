@@ -32,6 +32,10 @@ public class URLHelper {
         return LentaConstants.OWNSERVER_URL_ROOT + rubric.getXmlPath(type);
     }
 
+    public static String getXmlForRubric(Rubrics rubric, NewsType type, long fromDate) {
+        return LentaConstants.OWNSERVER_URL_ROOT + rubric.getXmlPath(type) + String.valueOf(fromDate) + ".xml";
+    }
+
 	/**
 	 * Returns URL to mobile version of the site created from the link to the
 	 * full version.

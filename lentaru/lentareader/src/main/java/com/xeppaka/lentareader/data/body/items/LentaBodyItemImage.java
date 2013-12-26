@@ -6,6 +6,8 @@ import android.widget.ImageView;
 
 import com.xeppaka.lentareader.data.dao.daoobjects.ImageDao;
 
+import org.apache.commons.lang3.StringEscapeUtils;
+
 /**
  * Created by nnm on 11/18/13.
  */
@@ -44,11 +46,11 @@ public class LentaBodyItemImage implements Item {
         sb.append(preview_url).append("\" ").append("original_url=\"").append(original_url).append("\" ");
 
         if (caption != null) {
-            sb.append("caption=\"").append(caption).append("\" ");
+            sb.append("caption=\"").append(StringEscapeUtils.escapeXml(caption)).append("\" ");
         }
 
         if (credits != null) {
-            sb.append("credits=\"").append(credits).append("\" ");
+            sb.append("credits=\"").append(StringEscapeUtils.escapeXml(credits)).append("\" ");
         }
 
         return sb.append("/>").toString();

@@ -26,7 +26,7 @@ public abstract class AsyncBriefNewsObjectLoader<T extends NewsObject> extends A
 	private final LentaNewsObjectDownloader<T> downloader;
 
 	public AsyncBriefNewsObjectLoader(Context context) {
-		this(context, Rubrics.ROOT);
+		this(context, Rubrics.LATEST);
 	}
 	
 	public AsyncBriefNewsObjectLoader(Context context, Rubrics rubric) {

@@ -13,6 +13,7 @@ import java.util.Collection;
 
 public interface NewsObjectDownloader<T extends NewsObject> {
     Collection<T> download(Rubrics rubric) throws HttpStatusCodeException, IOException, XmlPullParserException;
+    Collection<T> download(Rubrics rubric, long fromDate) throws HttpStatusCodeException, IOException, XmlPullParserException;
 	Collection<T> downloadRubricBrief(Rubrics rubric) throws ParseWithXPathException, HttpStatusCodeException, IOException;
 	void downloadFull(T brief) throws HttpStatusCodeException, IOException, ParseWithRegexException;
 }

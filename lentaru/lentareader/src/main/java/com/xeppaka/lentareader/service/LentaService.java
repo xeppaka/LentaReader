@@ -10,10 +10,8 @@ import android.os.ResultReceiver;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.xeppaka.lentareader.data.DatabaseObject;
 import com.xeppaka.lentareader.data.NewsType;
 import com.xeppaka.lentareader.data.Rubrics;
-import com.xeppaka.lentareader.service.ServiceIntentBuilder.ServiceIntentKey;
 import com.xeppaka.lentareader.service.commands.DownloadImageServiceCommand;
 import com.xeppaka.lentareader.service.commands.ServiceCommand;
 import com.xeppaka.lentareader.service.commands.UpdateRubricServiceCommand;
@@ -42,6 +40,11 @@ public class LentaService extends Service {
         SUCCESS,
         FAILURE
     }
+
+    public static final String INTENT_RESULT_RECEIVER_NAME = "resultReceiver";
+    public static final String INTENT_REQUEST_ID_NAME = "requestId";
+
+    public static final int NO_REQUEST_ID = -1;
 
     private static final int POOL_SIZE = 2;
 	private static final int KEEP_ALIVE_TIME = 60;
@@ -121,8 +124,8 @@ public class LentaService extends Service {
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Log.d(LentaConstants.LoggerServiceTag, "Got the intent, checking the command");
 		
-		int requestId = intent.getIntExtra(ServiceIntentKey.REQUEST_ID.name(), ServiceIntentBuilder.NO_REQUEST_ID);
-        ResultReceiver receiver = intent.getParcelableExtra(ServiceIntentBuilder.ServiceIntentKey.RESULT_RECEIVER.name());
+		int requestId = intent.getIntExtra(INTENT_REQUEST_ID_NAME, NO_REQUEST_ID);
+        ResultReceiver receiver = intent.getParcelableExtra(INTENT_RESULT_RECEIVER_NAME);
 
 		Action action = Action.valueOf(intent.getAction());
 
@@ -192,10 +195,6 @@ public class LentaService extends Service {
 //	private Rubrics getRubric(Intent intent) {
 //		return Rubrics.valueOf(intent.getStringExtra(ServiceIntentKey.RUBRIC.name()));
 //	}
-	
-	private long getItemId(Intent intent) {
-		return intent.getLongExtra(ServiceIntentBuilder.ServiceIntentKey.ITEM_ID.name(), DatabaseObject.ID_NONE);
-	}
 	
 	@Override
 	public IBinder onBind(Intent intent) {

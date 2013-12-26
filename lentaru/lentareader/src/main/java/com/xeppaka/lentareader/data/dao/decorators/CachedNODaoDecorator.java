@@ -11,6 +11,7 @@ import com.xeppaka.lentareader.utils.LentaConstants;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public class CachedNODaoDecorator<T extends NewsObject> extends CachedDaoDecorator<T> implements NODao<T> {
 	protected NODao<T> decoratedDao;
@@ -22,8 +23,8 @@ public class CachedNODaoDecorator<T extends NewsObject> extends CachedDaoDecorat
 	}
 
 	@Override
-	public List<T> readForRubric(Rubrics rubric) {
-        List<T> dbResult = getDecoratedDao().readForRubric(rubric);
+	public List<T> read(Rubrics rubric) {
+        List<T> dbResult = getDecoratedDao().read(rubric);
 		
 		if (dbResult.isEmpty()) {
 			return dbResult;
@@ -35,10 +36,10 @@ public class CachedNODaoDecorator<T extends NewsObject> extends CachedDaoDecorat
 			T cachedObject = getLruCacheId().get(object.getId());			
 			
 			if (cachedObject != null) {
-				Log.d(LentaConstants.LoggerServiceTag, "readForRubric: found object in cache with id " + object.getId());
+				Log.d(LentaConstants.LoggerServiceTag, "read: found object in cache with id " + object.getId());
 				result.add(cachedObject);
 			} else {
-				Log.d(LentaConstants.LoggerServiceTag, "readForRubric: not found object in cache with id " + object.getId());
+				Log.d(LentaConstants.LoggerServiceTag, "read: not found object in cache with id " + object.getId());
 				getLruCacheId().put(object.getId(), object);
 				result.add(object);
 			}
@@ -63,6 +64,26 @@ public class CachedNODaoDecorator<T extends NewsObject> extends CachedDaoDecorat
     @Override
     public boolean hasImage(String key) {
         return getDecoratedDao().hasImage(key);
+    }
+
+    @Override
+    public T readLatestWOImage(Rubrics rubric, int limit) {
+        return getDecoratedDao().readLatestWOImage(rubric, limit);
+    }
+
+    @Override
+    public int clearLatestFlag(Rubrics rubric) {
+        int result = getDecoratedDao().clearLatestFlag(rubric);
+
+        Map<Long, T> cacheSnapshot = getLruCacheId().snapshot();
+        for (T newsObject : cacheSnapshot.values()) {
+            T n = getLruCacheId().get(newsObject.getId());
+            if (n != null && n.getRubric() == rubric) {
+                n.setLatest(false);
+            }
+        }
+
+        return result;
     }
 
     @Override

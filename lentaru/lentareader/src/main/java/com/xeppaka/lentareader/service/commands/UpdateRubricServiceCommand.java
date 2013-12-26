@@ -48,8 +48,16 @@ public final class UpdateRubricServiceCommand extends RunnableServiceCommand {
 	private void executeNews() throws Exception {
 		List<News> news;
 
-		try {
-			news = new LentaNewsDownloader().download(rubric);
+        NODao<News> newsDao = NewsDao.getInstance(contentResolver);
+
+        try {
+            News latest = newsDao.readLatestWOImage(rubric, LentaConstants.WITHOUT_PICTURE_LIMIT);
+
+            if (latest == null) {
+			    news = new LentaNewsDownloader().download(rubric);
+            } else {
+                news = new LentaNewsDownloader().download(rubric, latest.getPubDate().getTime());
+            }
 
 			Log.d(LentaConstants.LoggerServiceTag, "Downloaded " + news.size() + " news.");
 		} catch (IOException e) {
@@ -60,7 +68,6 @@ public final class UpdateRubricServiceCommand extends RunnableServiceCommand {
 			throw e;
 		}
 
-        NODao<News> newsDao = NewsDao.getInstance(contentResolver);
 
 		List<News> nonExistingNews = new ArrayList<News>();
         List<News> withNewImage = new ArrayList<News>();
@@ -81,11 +88,18 @@ public final class UpdateRubricServiceCommand extends RunnableServiceCommand {
         for (News n : withNewImage) {
             News newWithImage = newsDao.read(n.getGuid());
 
+            newWithImage.setTitle(n.getTitle());
+            newWithImage.setDescription(n.getDescription());
+            newWithImage.setBody(n.getBody());
             newWithImage.setImageLink(n.getImageLink());
             newWithImage.setImageCredits(n.getImageCredits());
             newWithImage.setImageCaption(n.getImageCaption());
 
             newsDao.update(newWithImage);
+        }
+
+        if (rubric != Rubrics.LATEST) {
+            newsDao.clearLatestFlag(rubric);
         }
 	}
 	

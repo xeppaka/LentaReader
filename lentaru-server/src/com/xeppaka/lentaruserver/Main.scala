@@ -33,13 +33,20 @@ object Main extends App {
           case Some(rss) => {
             val newSnapshot = cursnapshot match {
               case Some(memsnapshot) => {
-                val newRssItems = rss.newerOrEqualThan(memsnapshot.oldestWithoutPicture(5))
+                // zero last 5 digits (when lenta updates news with image -> it zeroing seconds)
+                val oldestWOImage = (memsnapshot.oldestWithoutPicture(10) / 100000) * 100000;
+                logger.info("Downloaded rss lentgh: " + rss.items.length + " items")
+                logger.info("Oldest without image: " + oldestWOImage)
+                val newRssItems = rss.newerOrEqualThan(oldestWOImage)
 
                 if (newRssItems.isEmpty) {
                   logger.info("No new items found. Skipping...")
                   None
-                }
-                else {
+                } else {
+                  logger.info("First 10 items dates: \n")
+                  rss.items.take(10).foreach(item => println(item.pubDate))
+                  println("")
+
                   logger.info("Downloading new " + newRssItems.items.length + " items... " )
                   val newSnapshot = LentaSnapshot.download(newRssItems).merge(memsnapshot)
                   logger.info("Done")

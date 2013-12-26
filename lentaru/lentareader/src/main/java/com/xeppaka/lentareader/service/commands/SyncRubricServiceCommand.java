@@ -30,7 +30,7 @@ public class SyncRubricServiceCommand /*extends RunnableServiceCommand*/ {
 //
 //	private void syncNews(Rubrics rubric) {
 //		AsyncNODao<News> newsDao = NewsDao.getInstance(contentResolver);
-//		Collection<News> news = newsDao.readForRubric(rubric);
+//		Collection<News> news = newsDao.read(rubric);
 //
 //		for (News newsObject : news) {
 //			executor.execute(new SyncNewsServiceCommand(getRequestId(), newsObject, contentResolver, executor, getResultReceiver(), false));

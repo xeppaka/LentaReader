@@ -16,9 +16,9 @@ public class SynchronizedNODaoDecorator<T extends NewsObject> extends Synchroniz
 	}
 
 	@Override
-	public List<T> readForRubric(Rubrics rubric) {
+	public List<T> read(Rubrics rubric) {
 		synchronized (getSync()) {
-			return decoratedDao.readForRubric(rubric);
+			return decoratedDao.read(rubric);
 		}
 	}
 
@@ -33,6 +33,20 @@ public class SynchronizedNODaoDecorator<T extends NewsObject> extends Synchroniz
     public boolean hasImage(String key) {
         synchronized (getSync()) {
             return decoratedDao.hasImage(key);
+        }
+    }
+
+    @Override
+    public T readLatestWOImage(Rubrics rubric, int limit) {
+        synchronized (getSync()) {
+            return decoratedDao.readLatestWOImage(rubric, limit);
+        }
+    }
+
+    @Override
+    public int clearLatestFlag(Rubrics rubric) {
+        synchronized (getSync()) {
+            return decoratedDao.clearLatestFlag(rubric);
         }
     }
 

@@ -47,7 +47,24 @@ public class ImageDao implements DaoObservable<BitmapReference> {
         }
     };
 
-    private ContentResolver contentResolver;
+    private static final LruCache<String, CachedLazyLoadBitmapReference> thumbnailsBitmapCache = new LruCache<String, CachedLazyLoadBitmapReference>(LentaConstants.THUMBNAILS_BITMAP_CACHE_MAX_SIZE_IN_BYTES) {
+        @Override
+        protected void entryRemoved(boolean evicted, String key,
+                                    CachedLazyLoadBitmapReference oldValue, CachedLazyLoadBitmapReference newValue) {
+            if (newValue != oldValue && evicted) {
+                oldValue.onRemoveFromCache();
+            }
+        }
+
+        @Override
+        protected int sizeOf(String key, CachedLazyLoadBitmapReference value) {
+            return value.bitmapSize();
+        }
+    };
+
+    private static final float THUMBNAIL_RATIO = 3.5f;
+
+    // private ContentResolver contentResolver;
     private static final StrongBitmapReference notAvailableImageRef;
     private static final StrongBitmapReference loadingBitmapRef;
 
@@ -70,6 +87,49 @@ public class ImageDao implements DaoObservable<BitmapReference> {
 
     public BitmapReference read(String imageUrl) {
         return read(imageUrl, false);
+    }
+
+    public BitmapReference readThumbnail(String imageUrl) {
+        return readThumbnail(imageUrl, false);
+    }
+
+    private BitmapReference readThumbnail(String imageUrl, boolean cacheOnly) {
+        if (imageUrl == null || TextUtils.isEmpty(imageUrl)) {
+            Log.d(LentaConstants.LoggerAnyTag,
+                    "ImageDao trying to read image with empty URL");
+
+            return getNotAvailableImage();
+        }
+
+        Log.d(LentaConstants.LoggerAnyTag,
+                "ImageDao read thumbnail bitmap with URL: " + imageUrl);
+
+        String imageKey;
+        try {
+            imageKey = URLHelper.getImageId(imageUrl);
+        } catch (MalformedURLException e) {
+            Log.e(LentaConstants.LoggerAnyTag, "Error getting key for image URL: " + imageUrl);
+            return getNotAvailableImage();
+        }
+
+        CachedLazyLoadBitmapReference imageRef;
+        synchronized(thumbnailsBitmapCache) {
+            imageRef = thumbnailsBitmapCache.get(imageKey);
+        }
+
+        if (cacheOnly || imageRef != null) {
+            Log.d(LentaConstants.LoggerAnyTag, "Found thumbnail in cache. Bitmap size: " + imageRef.bitmapSize());
+            return imageRef;
+        }
+
+        imageRef = new CachedLazyLoadBitmapReference(imageKey, imageUrl, true);
+        synchronized(thumbnailsBitmapCache) {
+            thumbnailsBitmapCache.put(imageKey, imageRef);
+        }
+
+        Log.d(LentaConstants.LoggerAnyTag, "Created empty lazy load reference.");
+
+        return imageRef;
     }
 
     private BitmapReference read(String imageUrl, boolean cacheOnly) {
@@ -267,53 +327,53 @@ public class ImageDao implements DaoObservable<BitmapReference> {
         return result;
     }
 
-    private boolean createBitmapOnDisk(String key, Bitmap bitmap) {
-        ParcelFileDescriptor.AutoCloseOutputStream output = null;
-        try {
-            ParcelFileDescriptor fileDescriptor = contentResolver
-                    .openFileDescriptor(
-                            LentaProvider.CONTENT_URI_CACHED_IMAGE.buildUpon().appendPath(key).build(), "wt");
-            output = new ParcelFileDescriptor.AutoCloseOutputStream(fileDescriptor);
-
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, output);
-
-            return true;
-        } catch (FileNotFoundException e) {
-            Log.d(LentaConstants.LoggerAnyTag, "Cannot find on the external drive bitmap with id: " + key, e);
-            return false;
-        } finally {
-            if (output != null) {
-                try {
-                    output.close();
-                } catch (IOException e) {
-                    Log.e(LentaConstants.LoggerAnyTag, "Error occured during flushing and closing output stream.", e);
-                }
-            }
-        }
-    }
-
-    private Bitmap readBitmapFromDisk(String key) {
-        ParcelFileDescriptor.AutoCloseInputStream input = null;
-        try {
-            ParcelFileDescriptor fileDescriptor = contentResolver
-                    .openFileDescriptor(
-                            LentaProvider.CONTENT_URI_CACHED_IMAGE.buildUpon().appendPath(key).build(), "r");
-            input = new ParcelFileDescriptor.AutoCloseInputStream(fileDescriptor);
-
-            return BitmapFactory.decodeStream(input);
-        } catch (FileNotFoundException e) {
-            Log.d(LentaConstants.LoggerAnyTag, "Cannot find on the external drive bitmap with id: " + key, e);
-            return null;
-        } finally {
-            if (input != null) {
-                try {
-                    input.close();
-                } catch (IOException e) {
-                    Log.e(LentaConstants.LoggerAnyTag, "Error occured during closing output stream.", e);
-                }
-            }
-        }
-    }
+//    private boolean createBitmapOnDisk(String key, Bitmap bitmap) {
+//        ParcelFileDescriptor.AutoCloseOutputStream output = null;
+//        try {
+//            ParcelFileDescriptor fileDescriptor = contentResolver
+//                    .openFileDescriptor(
+//                            LentaProvider.CONTENT_URI_CACHED_IMAGE.buildUpon().appendPath(key).build(), "wt");
+//            output = new ParcelFileDescriptor.AutoCloseOutputStream(fileDescriptor);
+//
+//            bitmap.compress(Bitmap.CompressFormat.PNG, 100, output);
+//
+//            return true;
+//        } catch (FileNotFoundException e) {
+//            Log.d(LentaConstants.LoggerAnyTag, "Cannot find on the external drive bitmap with id: " + key, e);
+//            return false;
+//        } finally {
+//            if (output != null) {
+//                try {
+//                    output.close();
+//                } catch (IOException e) {
+//                    Log.e(LentaConstants.LoggerAnyTag, "Error occured during flushing and closing output stream.", e);
+//                }
+//            }
+//        }
+//    }
+//
+//    private Bitmap readBitmapFromDisk(String key) {
+//        ParcelFileDescriptor.AutoCloseInputStream input = null;
+//        try {
+//            ParcelFileDescriptor fileDescriptor = contentResolver
+//                    .openFileDescriptor(
+//                            LentaProvider.CONTENT_URI_CACHED_IMAGE.buildUpon().appendPath(key).build(), "r");
+//            input = new ParcelFileDescriptor.AutoCloseInputStream(fileDescriptor);
+//
+//            return BitmapFactory.decodeStream(input);
+//        } catch (FileNotFoundException e) {
+//            Log.d(LentaConstants.LoggerAnyTag, "Cannot find on the external drive bitmap with id: " + key, e);
+//            return null;
+//        } finally {
+//            if (input != null) {
+//                try {
+//                    input.close();
+//                } catch (IOException e) {
+//                    Log.e(LentaConstants.LoggerAnyTag, "Error occured during closing output stream.", e);
+//                }
+//            }
+//        }
+//    }
 
     @Override
     public void registerContentObserver(Observer<BitmapReference> observer) {
@@ -362,6 +422,7 @@ public class ImageDao implements DaoObservable<BitmapReference> {
         private Bitmap bitmap;
         private final String cacheKey;
         private final String url;
+        private boolean thumbnail;
 
         private class BitmapLoadTask extends AsyncTask<Callback, Void, Bitmap> {
             private Callback[] listeners;
@@ -385,10 +446,19 @@ public class ImageDao implements DaoObservable<BitmapReference> {
             this(key, url, null);
         }
 
+        public CachedLazyLoadBitmapReference(String key, String url, boolean thumbnail) {
+            this(key, url, null, thumbnail);
+        }
+
         public CachedLazyLoadBitmapReference(String key, String url, Bitmap bitmap) {
+            this(key, url, bitmap, false);
+        }
+
+        public CachedLazyLoadBitmapReference(String key, String url, Bitmap bitmap, boolean thumbnail) {
             this.bitmap = bitmap;
             this.cacheKey = key;
             this.url = url;
+            this.thumbnail = thumbnail;
 
             if (bitmap != null) {
 
@@ -406,12 +476,19 @@ public class ImageDao implements DaoObservable<BitmapReference> {
 
         private synchronized void setBitmap(Bitmap bitmap) {
             // set bitmap with cache size recalculating
-            synchronized(bitmapCache) {
-                CachedLazyLoadBitmapReference imageRef = bitmapCache.remove(cacheKey);
+            LruCache<String, CachedLazyLoadBitmapReference> cacheWhereToPut;
+
+            if (thumbnail)
+                cacheWhereToPut = thumbnailsBitmapCache;
+            else
+                cacheWhereToPut = bitmapCache;
+
+            synchronized(cacheWhereToPut) {
+                CachedLazyLoadBitmapReference imageRef = cacheWhereToPut.remove(cacheKey);
                 this.bitmap = bitmap;
 
                 if (imageRef != null) {
-                    bitmapCache.put(cacheKey, imageRef);
+                    cacheWhereToPut.put(cacheKey, imageRef);
                 }
             }
         }
@@ -426,14 +503,45 @@ public class ImageDao implements DaoObservable<BitmapReference> {
                 return bitmap;
             }
 
-            // TODO: try to find in disk cache
-
             try {
-                // download and set bitmap
-                Bitmap bitm = downloadBitmap();
-                setBitmap(bitm);
+                if (thumbnail) {
+                    // may be full bitmap is in the cache
+                    BitmapReference fullBitmapRef;
+                    synchronized(bitmapCache) {
+                        fullBitmapRef = bitmapCache.get(cacheKey);
+                    }
 
-                return bitm;
+                    if (fullBitmapRef != null) {
+                        Bitmap fullBitmap = fullBitmapRef.getBitmapIfCached();
+
+                        if (fullBitmap != null) {
+                            // create scaled bitmap
+                            setBitmap(Bitmap.createScaledBitmap(fullBitmap, Math.round(fullBitmap.getWidth() / THUMBNAIL_RATIO), Math.round(fullBitmap.getHeight() / THUMBNAIL_RATIO), false));
+
+                            return seizeBitmap();
+                        }
+                    }
+                }
+
+                // download and set bitmap
+                Bitmap downloadedBitmap = downloadBitmap();
+
+                if (thumbnail) {
+                    setBitmap(Bitmap.createScaledBitmap(downloadedBitmap, Math.round(downloadedBitmap.getWidth() / 4.0f), Math.round(downloadedBitmap.getHeight() / 4.0f), false));
+
+                    // we have full image, let's put it in the full bitmaps cache
+                    synchronized (bitmapCache) {
+                        if (bitmapCache.get(url) == null) {
+                            CachedLazyLoadBitmapReference fullImageRef = new CachedLazyLoadBitmapReference(cacheKey, url, downloadedBitmap);
+                            bitmapCache.put(cacheKey, fullImageRef);
+                            fullImageRef.releaseBitmap();
+                        }
+                    }
+                } else {
+                    setBitmap(downloadedBitmap);
+                }
+
+                return seizeBitmap();
             } catch (IOException e) {
                 Log.e(LentaConstants.LoggerAnyTag, "IO Error while downloading bitmap, url: " + url, e);
                 return null;

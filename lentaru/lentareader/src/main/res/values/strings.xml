@@ -27,4 +27,18 @@
     
     <string name="full_news_image_desc">News image</string>
     <string name="action_refresh">Обновить</string>
+    <string name="action_select_rubric">Выбрать рубрику</string>
+
+    <string name="rubric_label">Рубрика:</string>
+
+    <string name="rubric_root">Все</string>
+    <string name="rubric_russia">Россия</string>
+    <string name="rubric_world">Мир</string>
+    <string name="rubric_ussr">Бывший СССР</string>
+    <string name="rubric_economics">Экономика</string>
+    <string name="rubric_science">Наука и техника</string>
+    <string name="rubric_sport">Спорт</string>
+    <string name="rubric_culture">Культура</string>
+    <string name="rubric_internet">Интернет и СМИ</string>
+    <string name="rubric_life">Из жизни</string>
 </resources>

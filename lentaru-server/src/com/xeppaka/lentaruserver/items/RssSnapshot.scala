@@ -6,7 +6,7 @@ import scala.xml.XML
 import java.net.URL
 import com.xeppaka.lentaruserver.Lenta
 import scala.util.{Success, Failure, Try}
-import java.util.logging.{Level, Logger}
+import java.util.logging.{SimpleFormatter, StreamHandler, Level, Logger}
 
 /**
  * Created with IntelliJ IDEA.
@@ -22,7 +22,7 @@ class RssSnapshot(val newsType: NewsType, val rubric: Rubrics, val items: List[R
   }
 
   def newerOrEqualThan(date: Long): RssSnapshot = {
-    val newItems = items.filter(_.pubDate >= date)
+    val newItems = items.filter(item => item.pubDate >= date)
     RssSnapshot(newsType, rubric, newItems)
   }
 
@@ -58,6 +58,8 @@ class RssSnapshot(val newsType: NewsType, val rubric: Rubrics, val items: List[R
 
 object RssSnapshot {
   val logger = Logger.getLogger(RssSnapshot.getClass.getName)
+  logger.addHandler(new StreamHandler(System.out, new SimpleFormatter()))
+
   val MAX_ITEMS = 40
 
   def downloadRss(newsType: NewsType, rubric: Rubrics): Option[RssSnapshot] = {
