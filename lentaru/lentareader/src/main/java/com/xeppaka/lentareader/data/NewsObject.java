@@ -131,12 +131,20 @@ public abstract class NewsObject implements Comparable<NewsObject>, DatabaseObje
         this.imageCaption = imageCaption;
     }
 
+    public boolean hasImageCaption() {
+        return getImageCaption() != null && !TextUtils.isEmpty(getImageCaption());
+    }
+
     public String getImageCredits() {
         return imageCredits;
     }
 
     public void setImageCredits(String imageCredits) {
         this.imageCredits = imageCredits;
+    }
+
+    public boolean hasImageCredits() {
+        return getImageCredits() != null && !TextUtils.isEmpty(getImageCredits());
     }
 
     public void setLink(String link) {

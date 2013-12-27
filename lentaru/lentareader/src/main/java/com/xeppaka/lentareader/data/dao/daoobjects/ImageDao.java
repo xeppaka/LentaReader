@@ -1,29 +1,22 @@
 package com.xeppaka.lentareader.data.dao.daoobjects;
 
-import android.content.ContentResolver;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.AsyncTask;
-import android.os.ParcelFileDescriptor;
 import android.support.v4.util.LruCache;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.xeppaka.lentareader.data.dao.DaoObservable;
-import com.xeppaka.lentareader.data.provider.LentaProvider;
 import com.xeppaka.lentareader.downloader.LentaHttpImageDownloader;
 import com.xeppaka.lentareader.downloader.exceptions.HttpStatusCodeException;
 import com.xeppaka.lentareader.utils.LentaConstants;
 import com.xeppaka.lentareader.utils.URLHelper;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -62,20 +55,32 @@ public class ImageDao implements DaoObservable<BitmapReference> {
         }
     };
 
+    private static final String imageNotAvailableText1 = "Изображение";
+    private static final String imageNotAvailableText2 = "не доступно";
+
+    private static final String imageLoadingText1 = "Изображение";
+    private static final String imageLoadingText2 = "загружается";
+
     private static final float THUMBNAIL_RATIO = 3.5f;
 
     // private ContentResolver contentResolver;
     private static final StrongBitmapReference notAvailableImageRef;
-    private static final StrongBitmapReference loadingBitmapRef;
+    private static final StrongBitmapReference loadingImageRef;
 
-    private static final List<Observer> observers = new ArrayList<Observer>();
-    private static final Object observersSync = new Object();
+    private static final StrongBitmapReference notAvailableThumbnailImageRef;
+    private static final StrongBitmapReference loadingThumbnailImageRef;
+
+//    private static final List<Observer> observers = new ArrayList<Observer>();
+//    private static final Object observersSync = new Object();
 
     private static final ThreadPoolExecutor downloadExecutor = new ThreadPoolExecutor(1, 1, 0, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
 
     static {
         notAvailableImageRef = new StrongBitmapReference(createNotAvailableBitmap());
-        loadingBitmapRef = new StrongBitmapReference(createLoadingBitmap());
+        loadingImageRef = new StrongBitmapReference(createLoadingBitmap());
+
+        notAvailableThumbnailImageRef = new StrongBitmapReference(createNotAvailableThumbnailBitmap());
+        loadingThumbnailImageRef = new StrongBitmapReference(createLoadingThumbnailBitmap());
     }
 
     private ImageDao() {
@@ -182,67 +187,85 @@ public class ImageDao implements DaoObservable<BitmapReference> {
     }
 
     /**
+     * Gets thumbnail image with "Image loading" phrase written in it.
+     *
+     * @return reference to the bitmap. Never null.
+     */
+    public static BitmapReference getLoadingThumbnailImage() {
+        return loadingThumbnailImageRef;
+    }
+    /**
+     * Gets thumbnail image with "Not available" phrase written in it. Can be when image for
+     * some reason is not available for news/article/etc.
+     *
+     * @return reference to the bitmap. Never null.
+     */
+    public static BitmapReference getNotAvailableThumbnailImage() {
+        return notAvailableThumbnailImageRef;
+    }
+
+    /**
      * Gets image with "Image loading" phrase written in it.
      *
      * @return reference to the bitmap. Never null.
      */
     public static BitmapReference getLoadingImage() {
-        return loadingBitmapRef;
+        return loadingImageRef;
     }
 
-    /**
-     * Creates bitmap in cache. It means it will store bitmap in the memory
-     * cache and save it to the external drive cache if it's available.
-     *
-     * @param url
-     *            is the URL where image can be downloaded.
-     * @param bitmap
-     *            is the bitmap that should be saved.
-     * @return reference to the BitmapReference instance. Should be used later
-     *         on to retrieve image from the cache.
-     */
-    public BitmapReference create(String url, Bitmap bitmap) {
-        Log.d(LentaConstants.LoggerAnyTag, "Create bitmap in disk and/or memory cache for image URL: " + url);
-
-        String imageKey;
-        try {
-            imageKey = URLHelper.getImageId(url);
-        } catch (MalformedURLException e) {
-            Log.e(LentaConstants.LoggerAnyTag, "Error getting key for image URL: " + url);
-            return getNotAvailableImage();
-        }
-
-        CachedLazyLoadBitmapReference imageRef = bitmapCache.get(imageKey);
-
-        if (imageRef != null) {
-            imageRef.setBitmap(bitmap);
-
-            Log.d(LentaConstants.LoggerAnyTag, "Create bitmap: found reference in the cache, set bitmap to this reference. Cache size: " + bitmapCache.size());
-        } else {
-            imageRef = new CachedLazyLoadBitmapReference(imageKey, url, bitmap);
-
-            try {
-                //createBitmapOnDisk(imageKey, bitmap);
-
-                synchronized(bitmapCache) {
-                    bitmapCache.put(imageKey, imageRef);
-                }
-                Log.d(LentaConstants.LoggerAnyTag, "Put bitmap to the cache. Cache size: " + bitmapCache.size());
-            } finally {
-                /**
-                 * When CachedLazyLoadBitmapReference is created it supposes that we are
-                 * the one user of the bitmap. So we need to release bitmap before
-                 * return lazy load reference to it.
-                 */
-                //imageRef.releaseBitmap();
-            }
-
-            Log.d(LentaConstants.LoggerAnyTag, "Create bitmap: no old references in the cache found, created new reference. Cache size: " + bitmapCache.size());
-        }
-
-        notifyDataChanged(imageRef);
-        return imageRef;
-    }
+//    /**
+//     * Creates bitmap in cache. It means it will store bitmap in the memory
+//     * cache and save it to the external drive cache if it's available.
+//     *
+//     * @param url
+//     *            is the URL where image can be downloaded.
+//     * @param bitmap
+//     *            is the bitmap that should be saved.
+//     * @return reference to the BitmapReference instance. Should be used later
+//     *         on to retrieve image from the cache.
+//     */
+//    public BitmapReference create(String url, Bitmap bitmap) {
+//        Log.d(LentaConstants.LoggerAnyTag, "Create bitmap in disk and/or memory cache for image URL: " + url);
+//
+//        String imageKey;
+//        try {
+//            imageKey = URLHelper.getImageId(url);
+//        } catch (MalformedURLException e) {
+//            Log.e(LentaConstants.LoggerAnyTag, "Error getting key for image URL: " + url);
+//            return getNotAvailableImage();
+//        }
+//
+//        CachedLazyLoadBitmapReference imageRef = bitmapCache.get(imageKey);
+//
+//        if (imageRef != null) {
+//            imageRef.setBitmap(bitmap);
+//
+//            Log.d(LentaConstants.LoggerAnyTag, "Create bitmap: found reference in the cache, set bitmap to this reference. Cache size: " + bitmapCache.size());
+//        } else {
+//            imageRef = new CachedLazyLoadBitmapReference(imageKey, url, bitmap);
+//
+//            try {
+//                //createBitmapOnDisk(imageKey, bitmap);
+//
+//                synchronized(bitmapCache) {
+//                    bitmapCache.put(imageKey, imageRef);
+//                }
+//                Log.d(LentaConstants.LoggerAnyTag, "Put bitmap to the cache. Cache size: " + bitmapCache.size());
+//            } finally {
+//                /**
+//                 * When CachedLazyLoadBitmapReference is created it supposes that we are
+//                 * the one user of the bitmap. So we need to release bitmap before
+//                 * return lazy load reference to it.
+//                 */
+//                //imageRef.releaseBitmap();
+//            }
+//
+//            Log.d(LentaConstants.LoggerAnyTag, "Create bitmap: no old references in the cache found, created new reference. Cache size: " + bitmapCache.size());
+//        }
+//
+//        notifyDataChanged(imageRef);
+//        return imageRef;
+//    }
 
 //    public boolean imageExist(String imageUrl) {
 //        String imageKey;
@@ -285,45 +308,78 @@ public class ImageDao implements DaoObservable<BitmapReference> {
 //        }
 //    }
 
-    private boolean isBitmapInMemory(String imageKey) {
-        Log.d(LentaConstants.LoggerAnyTag, "Check bitmap in memory cache for image key: " + imageKey);
-
-        CachedLazyLoadBitmapReference bitmap;
-        synchronized(bitmapCache) {
-            bitmap = bitmapCache.get(imageKey);
-        }
-
-        if (bitmap != null) {
-            return bitmap.isBitmapInMemory();
-        }
-
-        return false;
-    }
+//    private boolean isBitmapInMemory(String imageKey) {
+//        Log.d(LentaConstants.LoggerAnyTag, "Check bitmap in memory cache for image key: " + imageKey);
+//
+//        CachedLazyLoadBitmapReference bitmap;
+//        synchronized(bitmapCache) {
+//            bitmap = bitmapCache.get(imageKey);
+//        }
+//
+//        return bitmap != null && bitmap.isBitmapInMemory();
+//    }
 
     private static Bitmap createNotAvailableBitmap() {
-        Bitmap result = Bitmap.createBitmap(300, 300, Bitmap.Config.ARGB_8888);
+        Bitmap result = Bitmap.createBitmap(420, 280, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(result);
 
         Paint paint = new Paint();
         paint.setColor(Color.BLACK);
-        paint.setTextSize(30);
+        paint.setTextSize(35);
 
-        canvas.drawText("Изображение", 20, 20, paint);
-        canvas.drawText("не доступно.", 20, 100, paint);
+        float text1Width = paint.measureText(imageNotAvailableText1);
+        float text2Width = paint.measureText(imageNotAvailableText2);
+
+        canvas.drawText(imageNotAvailableText1, (420 - text1Width) / 2, 70, paint);
+        canvas.drawText(imageNotAvailableText2, (420 - text2Width) / 2, 105, paint);
+        return result;
+    }
+
+    private static Bitmap createNotAvailableThumbnailBitmap() {
+        Bitmap result = Bitmap.createBitmap(120, 80, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(result);
+
+        Paint paint = new Paint();
+        paint.setColor(Color.BLACK);
+        paint.setTextSize(15);
+
+        float text1Width = paint.measureText(imageNotAvailableText1);
+        float text2Width = paint.measureText(imageNotAvailableText2);
+
+        canvas.drawText(imageNotAvailableText1, (120 - text1Width) / 2, 25, paint);
+        canvas.drawText(imageNotAvailableText2, (120 - text2Width) / 2, 60, paint);
         return result;
     }
 
     private static Bitmap createLoadingBitmap() {
-        Bitmap result = Bitmap.createBitmap(300, 300, Bitmap.Config.ARGB_8888);
-
+        Bitmap result = Bitmap.createBitmap(420, 280, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(result);
 
         Paint paint = new Paint();
         paint.setColor(Color.BLACK);
-        paint.setTextSize(30);
+        paint.setTextSize(35);
 
-        canvas.drawText("Изображение", 20, 20, paint);
-        canvas.drawText("загружается.", 20, 100, paint);
+        float text1Width = paint.measureText(imageLoadingText1);
+        float text2Width = paint.measureText(imageLoadingText2);
+
+        canvas.drawText(imageLoadingText1, (420 - text1Width) / 2, 70, paint);
+        canvas.drawText(imageLoadingText2, (420 - text2Width) / 2, 105, paint);
+        return result;
+    }
+
+    private static Bitmap createLoadingThumbnailBitmap() {
+        Bitmap result = Bitmap.createBitmap(120, 80, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(result);
+
+        Paint paint = new Paint();
+        paint.setColor(Color.BLACK);
+        paint.setTextSize(15);
+
+        float text1Width = paint.measureText(imageLoadingText1);
+        float text2Width = paint.measureText(imageLoadingText2);
+
+        canvas.drawText(imageLoadingText1, (120 - text1Width) / 2, 25, paint);
+        canvas.drawText(imageLoadingText2, (120 - text2Width) / 2, 60, paint);
         return result;
     }
 
@@ -377,9 +433,9 @@ public class ImageDao implements DaoObservable<BitmapReference> {
 
     @Override
     public void registerContentObserver(Observer<BitmapReference> observer) {
-        synchronized (observersSync) {
-            observers.add(observer);
-        }
+//        synchronized (observersSync) {
+//            observers.add(observer);
+//        }
 //        DaoObserver<BitmapReference> daoObserver;
 //
 //        if (observer instanceof DaoObserver) {
@@ -393,10 +449,10 @@ public class ImageDao implements DaoObservable<BitmapReference> {
 
     @Override
     public void unregisterContentObserver(Observer<BitmapReference> observer) {
-        synchronized (observersSync) {
-            observers.remove(observer);
-        }
-
+//        synchronized (observersSync) {
+//            observers.remove(observer);
+//        }
+//
 //        DaoObserver<BitmapReference> daoObserver;
 //
 //        if (observer instanceof DaoObserver) {
@@ -408,13 +464,13 @@ public class ImageDao implements DaoObservable<BitmapReference> {
 //        contentResolver.unregisterContentObserver(daoObserver.getContentObserver());
     }
 
-    private void notifyDataChanged(BitmapReference bitmap) {
-        synchronized (observersSync) {
-            for (Observer<BitmapReference> observer : observers) {
-                observer.onDataChanged(false, bitmap);
-            }
-        }
-    }
+//    private void notifyDataChanged(BitmapReference bitmap) {
+//        synchronized (observersSync) {
+//            for (Observer<BitmapReference> observer : observers) {
+//                observer.onDataChanged(false, bitmap);
+//            }
+//        }
+//    }
 
     public class CachedLazyLoadBitmapReference implements BitmapReference {
         private volatile int bitmapReferences;
@@ -424,20 +480,51 @@ public class ImageDao implements DaoObservable<BitmapReference> {
         private final String url;
         private boolean thumbnail;
 
-        private class BitmapLoadTask extends AsyncTask<Callback, Void, Bitmap> {
+        private class BitmapGetResult {
+            private Bitmap bitmap;
+            private Exception exception;
+
+            private BitmapGetResult(Bitmap bitmap) {
+                this.bitmap = bitmap;
+            }
+
+            private BitmapGetResult(Exception exception) {
+                this.exception = exception;
+            }
+
+            public Bitmap getBitmap() {
+                return bitmap;
+            }
+
+            public Exception getException() {
+                return exception;
+            }
+        }
+
+        private class BitmapLoadTask extends AsyncTask<Callback, Void, BitmapGetResult> {
             private Callback[] listeners;
 
             @Override
-            protected Bitmap doInBackground(Callback... listeners) {
+            protected BitmapGetResult doInBackground(Callback... listeners) {
                 this.listeners = listeners;
-
-                return getBitmap();
+                try {
+                    return new BitmapGetResult(getBitmap());
+                } catch (IOException e) {
+                    Log.e(LentaConstants.LoggerAnyTag, "IO Error while downloading bitmap, url: " + url, e);
+                    return new BitmapGetResult(e);
+                } catch (HttpStatusCodeException e) {
+                    Log.e(LentaConstants.LoggerAnyTag, "IO Error while downloading bitmap, url: " + url, e);
+                    return new BitmapGetResult(e);
+                }
             }
 
             @Override
-            protected void onPostExecute(Bitmap result) {
+            protected void onPostExecute(BitmapGetResult result) {
                 for (Callback listener : listeners) {
-                    listener.onSuccess(result);
+                    if (result.getBitmap() != null)
+                        listener.onSuccess(result.getBitmap());
+                    else
+                        listener.onFailure(result.getException());
                 }
             }
         }
@@ -475,20 +562,23 @@ public class ImageDao implements DaoObservable<BitmapReference> {
         }
 
         private synchronized void setBitmap(Bitmap bitmap) {
-            // set bitmap with cache size recalculating
-            LruCache<String, CachedLazyLoadBitmapReference> cacheWhereToPut;
+            if (thumbnail) {
+                synchronized(thumbnailsBitmapCache) {
+                    CachedLazyLoadBitmapReference imageRef = thumbnailsBitmapCache.remove(cacheKey);
+                    this.bitmap = bitmap;
 
-            if (thumbnail)
-                cacheWhereToPut = thumbnailsBitmapCache;
-            else
-                cacheWhereToPut = bitmapCache;
+                    if (imageRef != null) {
+                        thumbnailsBitmapCache.put(cacheKey, imageRef);
+                    }
+                }
+            } else {
+                synchronized(thumbnailsBitmapCache) {
+                    CachedLazyLoadBitmapReference imageRef = thumbnailsBitmapCache.remove(cacheKey);
+                    this.bitmap = bitmap;
 
-            synchronized(cacheWhereToPut) {
-                CachedLazyLoadBitmapReference imageRef = cacheWhereToPut.remove(cacheKey);
-                this.bitmap = bitmap;
-
-                if (imageRef != null) {
-                    cacheWhereToPut.put(cacheKey, imageRef);
+                    if (imageRef != null) {
+                        thumbnailsBitmapCache.put(cacheKey, imageRef);
+                    }
                 }
             }
         }
@@ -498,57 +588,49 @@ public class ImageDao implements DaoObservable<BitmapReference> {
         }
 
         @Override
-        public synchronized Bitmap getBitmap() {
+        public synchronized Bitmap getBitmap() throws IOException, HttpStatusCodeException {
             if (bitmap != null) {
                 return bitmap;
             }
 
-            try {
-                if (thumbnail) {
-                    // may be full bitmap is in the cache
-                    BitmapReference fullBitmapRef;
-                    synchronized(bitmapCache) {
-                        fullBitmapRef = bitmapCache.get(cacheKey);
-                    }
-
-                    if (fullBitmapRef != null) {
-                        Bitmap fullBitmap = fullBitmapRef.getBitmapIfCached();
-
-                        if (fullBitmap != null) {
-                            // create scaled bitmap
-                            setBitmap(Bitmap.createScaledBitmap(fullBitmap, Math.round(fullBitmap.getWidth() / THUMBNAIL_RATIO), Math.round(fullBitmap.getHeight() / THUMBNAIL_RATIO), false));
-
-                            return seizeBitmap();
-                        }
-                    }
+            if (thumbnail) {
+                // may be full bitmap is in the cache
+                BitmapReference fullBitmapRef;
+                synchronized(bitmapCache) {
+                    fullBitmapRef = bitmapCache.get(cacheKey);
                 }
 
-                // download and set bitmap
-                Bitmap downloadedBitmap = downloadBitmap();
+                if (fullBitmapRef != null) {
+                    Bitmap fullBitmap = fullBitmapRef.getBitmapIfCached();
 
-                if (thumbnail) {
-                    setBitmap(Bitmap.createScaledBitmap(downloadedBitmap, Math.round(downloadedBitmap.getWidth() / 4.0f), Math.round(downloadedBitmap.getHeight() / 4.0f), false));
+                    if (fullBitmap != null) {
+                        // create scaled bitmap
+                        setBitmap(Bitmap.createScaledBitmap(fullBitmap, Math.round(fullBitmap.getWidth() / THUMBNAIL_RATIO), Math.round(fullBitmap.getHeight() / THUMBNAIL_RATIO), false));
 
-                    // we have full image, let's put it in the full bitmaps cache
-                    synchronized (bitmapCache) {
-                        if (bitmapCache.get(url) == null) {
-                            CachedLazyLoadBitmapReference fullImageRef = new CachedLazyLoadBitmapReference(cacheKey, url, downloadedBitmap);
-                            bitmapCache.put(cacheKey, fullImageRef);
-                            fullImageRef.releaseBitmap();
-                        }
+                        return seizeBitmap();
                     }
-                } else {
-                    setBitmap(downloadedBitmap);
                 }
-
-                return seizeBitmap();
-            } catch (IOException e) {
-                Log.e(LentaConstants.LoggerAnyTag, "IO Error while downloading bitmap, url: " + url, e);
-                return null;
-            } catch (HttpStatusCodeException e) {
-                Log.e(LentaConstants.LoggerAnyTag, "IO Error while downloading bitmap, url: " + url, e);
-                return null;
             }
+
+            // download and set bitmap
+            Bitmap downloadedBitmap = downloadBitmap();
+
+            if (thumbnail) {
+                setBitmap(Bitmap.createScaledBitmap(downloadedBitmap, Math.round(downloadedBitmap.getWidth() / 4.0f), Math.round(downloadedBitmap.getHeight() / 4.0f), false));
+
+                // we have full image, let's put it in the full bitmaps cache
+                synchronized (bitmapCache) {
+                    if (bitmapCache.get(url) == null) {
+                        CachedLazyLoadBitmapReference fullImageRef = new CachedLazyLoadBitmapReference(cacheKey, url, downloadedBitmap);
+                        bitmapCache.put(cacheKey, fullImageRef);
+                        fullImageRef.releaseBitmap();
+                    }
+                }
+            } else {
+                setBitmap(downloadedBitmap);
+            }
+
+            return seizeBitmap();
         }
 
         @Override
@@ -557,13 +639,13 @@ public class ImageDao implements DaoObservable<BitmapReference> {
         }
 
         @Override
-        public AsyncTask<Callback, Void, Bitmap> getBitmapAsync(Callback callback) {
+        public AsyncTask getBitmapAsync(Callback callback) {
             if (bitmap != null) {
                 callback.onSuccess(bitmap);
 
                 return null;
             } else {
-                AsyncTask<Callback, Void, Bitmap> task = new BitmapLoadTask();
+                AsyncTask<Callback, Void, BitmapGetResult> task = new BitmapLoadTask();
                 task.executeOnExecutor(downloadExecutor, callback);
 
                 return task;
@@ -609,9 +691,9 @@ public class ImageDao implements DaoObservable<BitmapReference> {
             return cached;
         }
 
-        public synchronized boolean isBitmapInMemory() {
-            return bitmap != null && !bitmap.isRecycled();
-        }
+//        public synchronized boolean isBitmapInMemory() {
+//            return bitmap != null && !bitmap.isRecycled();
+//        }
 
         private synchronized void onRemoveFromCache() {
 //            if (bitmapReferences <= 0) {

@@ -2,7 +2,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="2dip"
-    android:minHeight="75dip"
     android:orientation="vertical">
 
     <LinearLayout
@@ -12,12 +11,15 @@
 
         <ImageView
             android:id="@+id/brief_news_image"
-            android:scaleType="fitStart"
+            android:scaleType="fitXY"
+            android:adjustViewBounds="true"
             android:layout_width="90dip"
-            android:layout_height="60dip"
+            android:layout_height="wrap_content"
             android:layout_marginRight="5dip"
             android:layout_marginTop="2dip"
-            android:contentDescription="@string/brief_news_image_description"/>
+            android:layout_marginLeft="2dip"
+            android:layout_marginBottom="2dip"
+            android:contentDescription="@string/brief_news_image_desc"/>
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -44,6 +46,7 @@
         android:id="@+id/brief_news_description_panel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="2dip"
         android:orientation="vertical"
         android:visibility="gone">
         <TextView

@@ -134,7 +134,7 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
         BitmapReference bitmapRef;
 
         if (news.getImageLink() == null || TextUtils.isEmpty(news.getImageLink())) {
-            bitmapRef = ImageDao.getNotAvailableImage();
+            bitmapRef = ImageDao.getNotAvailableThumbnailImage();
         } else {
             bitmapRef = imageDao.readThumbnail(news.getImageLink());
         }
@@ -143,6 +143,11 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
 		
 		if (convertView == null) {
 			view = inflater.inflate(R.layout.brief_news_list_item, null);
+
+            if (view == null) {
+                throw new AssertionError();
+            }
+
 			newsTitleTextView = (TextView)view.findViewById(R.id.brief_news_title);
             newsDateTextView = (TextView)view.findViewById(R.id.brief_news_date);
             newsCaptionTextView = (TextView)view.findViewById(R.id.brief_news_image_caption);
@@ -201,14 +206,14 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
 		newsTitleTextView.setText(news.getTitle());
         newsDescriptionTextView.setText(Html.fromHtml(news.getDescription()));
 
-        if (news.getImageCaption() == null || TextUtils.isEmpty(news.getImageCaption())) {
+        if (!news.hasImageCaption()) {
             newsCaptionTextView.setVisibility(View.GONE);
         } else {
-            newsCaptionTextView.setText(news.getImageCaption());
+            newsCaptionTextView.setText(Html.fromHtml(news.getImageCaption()));
             newsCaptionTextView.setVisibility(View.VISIBLE);
         }
 
-        if (news.getImageCredits() == null || TextUtils.isEmpty(news.getImageCredits())) {
+        if (!news.hasImageCredits()) {
             newsCreditsTextView.setVisibility(View.GONE);
         } else {
             newsCreditsTextView.setText(Html.fromHtml(news.getImageCredits()));
@@ -225,14 +230,13 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
 
         // Set loading bitmap now, but only if we are really going to load news bitmap from internet
         if (bitmapRef != ImageDao.getNotAvailableImage()) {
-            newsImageView.setImageBitmap(ImageDao.getLoadingImage().getBitmap());
+            newsImageView.setImageBitmap(ImageDao.getLoadingThumbnailImage().getBitmapIfCached());
         }
 
-        final AsyncTask<BitmapReference.Callback, Void, Bitmap> asyncTask = bitmapRef.getBitmapAsync(new BitmapReference.Callback() {
+        final AsyncTask asyncTask = bitmapRef.getBitmapAsync(new BitmapReference.Callback() {
 			@Override
 			public void onSuccess(Bitmap bitmap) {
-                if (bitmap == null ||
-                        position != holderForAsync.getPosition() ||
+                if (position != holderForAsync.getPosition() ||
                         (imageUrl == null && holderForAsync.getImage() != ImageDao.getNotAvailableImage()) ||
                         (imageUrl != null && !imageUrl.equals(holderForAsync.getImageUrl()))) {
                     return;
@@ -242,8 +246,8 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
 			}
 
             @Override
-            public void onFailure() {
-                newsImageViewForAsync.setImageBitmap(ImageDao.getNotAvailableImage().getBitmap());
+            public void onFailure(Exception e) {
+                newsImageViewForAsync.setImageBitmap(ImageDao.getNotAvailableThumbnailImage().getBitmapIfCached());
             }
         });
 

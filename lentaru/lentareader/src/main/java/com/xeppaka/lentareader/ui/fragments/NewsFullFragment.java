@@ -3,6 +3,7 @@ package com.xeppaka.lentareader.ui.fragments;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,9 +21,12 @@ import com.xeppaka.lentareader.data.dao.daoobjects.ImageDao;
 import com.xeppaka.lentareader.data.dao.daoobjects.NewsDao;
 
 public class NewsFullFragment extends Fragment {
-	private TextView titleView;
 	private ImageView imageView;
+    private TextView imageCaption;
+    private TextView imageCredits;
+    private TextView titleView;
     private LinearLayout contentView;
+    private TextView rubricView;
 
 	private long newsId;
 	private News loadedNews;
@@ -31,39 +35,52 @@ public class NewsFullFragment extends Fragment {
 		this.newsId = newsId;
 	}
 
-	@Override
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putLong("newsId", newsId);
+    }
+
+    @Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		return inflater.inflate(R.layout.full_news_fragment, null);
-	}
+        if (savedInstanceState != null) {
+            newsId = savedInstanceState.getLong("newsId");
+        }
 
-	public NewsFullFragment() {
-		super();
+		return inflater.inflate(R.layout.full_news_fragment, null);
 	}
 
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 
+        imageView = (ImageView) getActivity().findViewById(R.id.full_news_image);
+        imageCaption = (TextView) getActivity().findViewById(R.id.full_news_image_caption);
+        imageCredits = (TextView) getActivity().findViewById(R.id.full_news_image_credits);
 		titleView = (TextView) getActivity().findViewById(R.id.full_news_title);
-		imageView = (ImageView) getActivity().findViewById(R.id.full_news_image);
-        contentView = (LinearLayout) getActivity().findViewById(R.id.full_news_content);
+        rubricView = (TextView) getActivity().findViewById(R.id.full_news_rubric);
 
-		imageView.setImageBitmap(null);
+        contentView = (LinearLayout) getActivity().findViewById(R.id.full_news_content);
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
-		
-		AsyncDao<News> nd = NewsDao.getInstance(getActivity().getContentResolver());
-		nd.readAsync(newsId, new AsyncDao.DaoReadSingleListener<News>() {
-			@Override
-			public void finished(News result) {
-				loadedNews = result;
-				showNews(loadedNews);
-			}
-		});
+
+        if (loadedNews != null) {
+            showNews(loadedNews);
+        } else {
+            AsyncDao<News> nd = NewsDao.getInstance(getActivity().getContentResolver());
+            nd.readAsync(newsId, new AsyncDao.DaoReadSingleListener<News>() {
+                @Override
+                public void finished(News result) {
+                    loadedNews = result;
+                    showNews(loadedNews);
+                }
+            });
+        }
 	}
 	
 	@Override
@@ -76,32 +93,40 @@ public class NewsFullFragment extends Fragment {
 		super.onDestroy();
 	}
 
-	private void showNews(News news) {
-		Body body = news.getBody();
-		
+	private void showNews(final News news) {
+        titleView.setText(news.getTitle());
+
+        Body body = news.getBody();
 		if (body != null) {
             for (Item item : body.getItems()) {
                 contentView.addView(item.createView(getActivity()));
             }
 		}
-		
-		titleView.setText(news.getTitle());
 
-        BitmapReference reference = ImageDao.newInstance().read(news.getImageLink());
-        reference.getBitmapAsync(new BitmapReference.Callback() {
-            @Override
-            public void onSuccess(Bitmap bitmap) {
-                if (bitmap == null) {
-                    imageView.setImageBitmap(ImageDao.getNotAvailableImage().getBitmap());
-                } else {
+        rubricView.setText(" " + news.getRubric().getLabel());
+
+        if (news.hasImage()) {
+            BitmapReference bitmapRef = ImageDao.newInstance().read(news.getImageLink());
+            bitmapRef.getBitmapAsync(new BitmapReference.Callback() {
+                @Override
+                public void onSuccess(Bitmap bitmap) {
                     imageView.setImageBitmap(bitmap);
-                }
-            }
+                    imageView.setVisibility(View.VISIBLE);
 
-            @Override
-            public void onFailure() {
-                imageView.setImageBitmap(ImageDao.getNotAvailableImage().getBitmap());
-            }
-        });
+                    if (news.hasImageCaption()) {
+                        imageCaption.setText(news.getImageCaption());
+                        imageCaption.setVisibility(View.VISIBLE);
+                    }
+
+                    if (news.hasImageCredits()) {
+                        imageCredits.setText(news.getImageCredits());
+                        imageCredits.setVisibility(View.VISIBLE);
+                    }
+                }
+
+                @Override
+                public void onFailure(Exception e) {}
+            });
+        }
 	}
 }
