@@ -6,6 +6,7 @@ import com.xeppaka.lentaruserver.items.RssSnapshot
 import com.xeppaka.lentaruserver.Rubrics.Rubrics
 import scala.None
 import java.util.logging.{SimpleFormatter, StreamHandler, Logger}
+import java.util.Calendar
 
 object Main extends App {
   private val logger = Logger.getLogger(Main.getClass.getName)
@@ -33,11 +34,12 @@ object Main extends App {
           case Some(rss) => {
             val newSnapshot = cursnapshot match {
               case Some(memsnapshot) => {
-                // zero last 5 digits (when lenta updates news with image -> it zeroing seconds)
-                val oldestWOImage = (memsnapshot.oldestWithoutPicture(10) / 100000) * 100000;
+                // with zeroed seconds
+                val oldestWOImage = (memsnapshot.oldestWithoutPicture(10) / 60000) * 60000
+
                 logger.info("Downloaded rss lentgh: " + rss.items.length + " items")
-                logger.info("Oldest without image: " + oldestWOImage)
-                val newRssItems = rss.newerOrEqualThan(oldestWOImage)
+                logger.info("Oldest without image: " + cal.getTimeInMillis)
+                val newRssItems = rss.newerOrEqualThan(cal.getTimeInMillis)
 
                 if (newRssItems.isEmpty) {
                   logger.info("No new items found. Skipping...")
