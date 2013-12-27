@@ -123,26 +123,6 @@ public class ServiceHelper {
         startService(intent);
 	}
 
-    public void downloadImage(String url, Callback callback) {
-        final int requestId = requestCounter.incrementAndGet();
-
-        Intent intent = new Intent(LentaService.Action.DOWNLOAD_IMAGE.name(), Uri.EMPTY, context, LentaService.class);
-        intent.putExtra("url", url);
-
-        synchronized (sync) {
-            for (ServiceRequest request : serviceRequests.values()) {
-                if (request.getIntent().filterEquals(intent) && url.equals(request.getIntent().getStringExtra("url"))) {
-                    request.getListeners().add(callback);
-                    return;
-                }
-            }
-
-            serviceRequests.put(requestId, new ServiceRequest(intent, callback));
-        }
-
-        startService(intent);
-    }
-
 	private void startService(Intent intent) {
 		context.startService(intent);
 	}

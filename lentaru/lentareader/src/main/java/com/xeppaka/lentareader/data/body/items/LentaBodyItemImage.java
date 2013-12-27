@@ -1,9 +1,11 @@
 package com.xeppaka.lentareader.data.body.items;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.xeppaka.lentareader.data.dao.daoobjects.BitmapReference;
 import com.xeppaka.lentareader.data.dao.daoobjects.ImageDao;
 
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -58,8 +60,8 @@ public class LentaBodyItemImage implements Item {
 
     @Override
     public View createView(Context context) {
-        ImageView view = new ImageView(context);
-        view.setImageBitmap(ImageDao.getNotAvailableImage().getBitmap());
+        final ImageView view = new ImageView(context);
+        view.setImageBitmap(ImageDao.getNotAvailableImage().getBitmapIfCached());
 
         return view;
     }

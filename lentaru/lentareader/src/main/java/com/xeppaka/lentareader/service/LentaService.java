@@ -7,12 +7,10 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.ResultReceiver;
-import android.text.TextUtils;
 import android.util.Log;
 
 import com.xeppaka.lentareader.data.NewsType;
 import com.xeppaka.lentareader.data.Rubrics;
-import com.xeppaka.lentareader.service.commands.DownloadImageServiceCommand;
 import com.xeppaka.lentareader.service.commands.ServiceCommand;
 import com.xeppaka.lentareader.service.commands.UpdateRubricServiceCommand;
 import com.xeppaka.lentareader.utils.LentaConstants;
@@ -33,7 +31,6 @@ public class LentaService extends Service {
 
     public enum Action {
         UPDATE_RUBRIC,
-        DOWNLOAD_IMAGE
     }
 
     public enum Result {
@@ -142,17 +139,6 @@ public class LentaService extends Service {
 
                 updateRubric(requestId, rubric, newsType, receiver);
                 break;
-            case DOWNLOAD_IMAGE:
-                String url = intent.getStringExtra("url");
-
-                if (url == null || TextUtils.isEmpty(url)) {
-                    failStart(requestId, receiver);
-                    stopSelf(startId);
-                    return START_NOT_STICKY;
-                }
-
-                downloadImage(requestId, url, receiver);
-                break;
         }
 
 		return START_NOT_STICKY;
@@ -181,11 +167,6 @@ public class LentaService extends Service {
 		UpdateRubricServiceCommand command = new UpdateRubricServiceCommand(requestId, newsType, rubric, executor, getContentResolver(), resultReceiver);
 		executor.execute(command);
 	}
-
-    private void downloadImage(int requestId, String url, ResultReceiver resultReceiver) {
-        DownloadImageServiceCommand command = new DownloadImageServiceCommand(requestId, this, url, resultReceiver);
-        executor.execute(command);
-    }
 
 //	private void updateNewsItem(int requestId, long newsId, ContentResolver contentResolver, ExecutorService executor, ResultReceiver resultReceiver) {
 //		SyncNewsServiceCommand command = new SyncNewsServiceCommand(requestId, newsId, contentResolver, executor, resultReceiver, false);

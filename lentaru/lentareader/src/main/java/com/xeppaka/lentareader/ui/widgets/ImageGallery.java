@@ -40,7 +40,7 @@ public class ImageGallery extends ImageSwitcher implements BitmapReference.Callb
         if (!gallery.isEmpty()) {
             imageDao.read(gallery.getImage(curImageIndex).getPreview_url()).getBitmapAsync(this);
         } else {
-            setBitmap(ImageDao.getNotAvailableImage().getBitmap());
+            setBitmap(ImageDao.getNotAvailableImage().getBitmapIfCached());
         }
     }
 
@@ -74,8 +74,8 @@ public class ImageGallery extends ImageSwitcher implements BitmapReference.Callb
     }
 
     @Override
-    public void onFailure() {
-        setBitmap(ImageDao.getNotAvailableImage().getBitmap());
+    public void onFailure(Exception e) {
+        setBitmap(ImageDao.getNotAvailableImage().getBitmapIfCached());
     }
 
     @Override

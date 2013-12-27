@@ -3,6 +3,10 @@ package com.xeppaka.lentareader.data.dao.daoobjects;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 
+import com.xeppaka.lentareader.downloader.exceptions.HttpStatusCodeException;
+
+import java.io.IOException;
+
 /**
  * 
  * 
@@ -19,11 +23,11 @@ public interface BitmapReference {
 	 */
 	public interface Callback {
 		void onSuccess(final Bitmap bitmap);
-        void onFailure();
+        void onFailure(Exception e);
 	}
 	
-	Bitmap getBitmap();
+	Bitmap getBitmap() throws Exception;
 	Bitmap getBitmapIfCached();
-	AsyncTask<Callback, Void, Bitmap> getBitmapAsync(final Callback callback);
+	AsyncTask getBitmapAsync(final Callback callback);
 	void releaseBitmap();
 }

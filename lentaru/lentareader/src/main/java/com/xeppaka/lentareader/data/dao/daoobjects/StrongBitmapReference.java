@@ -23,7 +23,6 @@ public class StrongBitmapReference implements BitmapReference {
 	@Override
 	public AsyncTask<Callback, Void, Bitmap> getBitmapAsync(BitmapReference.Callback callback) {
 		callback.onSuccess(bitmap);
-
         return null;
 	}
 
