@@ -3,6 +3,7 @@ package com.xeppaka.lentareader.ui.fragments;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Html;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -114,12 +115,12 @@ public class NewsFullFragment extends Fragment {
                     imageView.setVisibility(View.VISIBLE);
 
                     if (news.hasImageCaption()) {
-                        imageCaption.setText(news.getImageCaption());
+                        imageCaption.setText(Html.fromHtml(news.getImageCaption()));
                         imageCaption.setVisibility(View.VISIBLE);
                     }
 
                     if (news.hasImageCredits()) {
-                        imageCredits.setText(news.getImageCredits());
+                        imageCredits.setText(Html.fromHtml(news.getImageCredits()));
                         imageCredits.setVisibility(View.VISIBLE);
                     }
                 }
