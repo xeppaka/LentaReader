@@ -38,8 +38,8 @@ object Main extends App {
                 val oldestWOImage = (memsnapshot.oldestWithoutPicture(10) / 60000) * 60000
 
                 logger.info("Downloaded rss lentgh: " + rss.items.length + " items")
-                logger.info("Oldest without image: " + cal.getTimeInMillis)
-                val newRssItems = rss.newerOrEqualThan(cal.getTimeInMillis)
+                logger.info("Oldest without image: " + oldestWOImage)
+                val newRssItems = rss.newerOrEqualThan(oldestWOImage)
 
                 if (newRssItems.isEmpty) {
                   logger.info("No new items found. Skipping...")
