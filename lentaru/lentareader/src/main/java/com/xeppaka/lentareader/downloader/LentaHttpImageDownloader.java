@@ -22,8 +22,8 @@ import java.io.InputStream;
 public class LentaHttpImageDownloader {
 	public static Bitmap downloadBitmap(String url) throws HttpStatusCodeException, IOException {
         HttpParams httpParameters = new BasicHttpParams();
-        HttpConnectionParams.setConnectionTimeout(httpParameters, 5000);
-        HttpConnectionParams.setSoTimeout(httpParameters, 10000);
+        HttpConnectionParams.setConnectionTimeout(httpParameters, 500);
+        HttpConnectionParams.setSoTimeout(httpParameters, 1000);
 
 		final AndroidHttpClient client = AndroidHttpClient.newInstance(LentaConstants.UserAgent);
 		final HttpGet getRequest = new HttpGet(url);

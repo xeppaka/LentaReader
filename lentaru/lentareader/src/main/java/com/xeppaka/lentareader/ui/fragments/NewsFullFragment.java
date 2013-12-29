@@ -1,5 +1,6 @@
 package com.xeppaka.lentareader.ui.fragments;
 
+import android.app.Activity;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -27,6 +28,7 @@ public class NewsFullFragment extends Fragment {
     private TextView imageCredits;
     private TextView titleView;
     private LinearLayout contentView;
+    private TextView dateView;
     private TextView rubricView;
 
 	private long newsId;
@@ -57,18 +59,15 @@ public class NewsFullFragment extends Fragment {
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 
-        imageView = (ImageView) getActivity().findViewById(R.id.full_news_image);
-        imageCaption = (TextView) getActivity().findViewById(R.id.full_news_image_caption);
-        imageCredits = (TextView) getActivity().findViewById(R.id.full_news_image_credits);
-		titleView = (TextView) getActivity().findViewById(R.id.full_news_title);
-        rubricView = (TextView) getActivity().findViewById(R.id.full_news_rubric);
+        final Activity activity = getActivity();
 
-        contentView = (LinearLayout) getActivity().findViewById(R.id.full_news_content);
-	}
-
-	@Override
-	public void onResume() {
-		super.onResume();
+        imageView = (ImageView) activity.findViewById(R.id.full_news_image);
+        imageCaption = (TextView) activity.findViewById(R.id.full_news_image_caption);
+        imageCredits = (TextView) activity.findViewById(R.id.full_news_image_credits);
+		titleView = (TextView) activity.findViewById(R.id.full_news_title);
+        dateView = (TextView) activity.findViewById(R.id.full_news_date);
+        rubricView = (TextView) activity.findViewById(R.id.full_news_rubric);
+        contentView = (LinearLayout) activity.findViewById(R.id.full_news_content);
 
         if (loadedNews != null) {
             showNews(loadedNews);
@@ -82,16 +81,14 @@ public class NewsFullFragment extends Fragment {
                 }
             });
         }
-	}
-	
-	@Override
-	public void onPause() {
-		super.onPause();
-	}
+
+    }
 
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
+
+        loadedNews = null;
 	}
 
 	private void showNews(final News news) {
@@ -104,6 +101,7 @@ public class NewsFullFragment extends Fragment {
             }
 		}
 
+        dateView.setText(news.getFormattedPubDate());
         rubricView.setText(" " + news.getRubric().getLabel());
 
         if (news.hasImage()) {

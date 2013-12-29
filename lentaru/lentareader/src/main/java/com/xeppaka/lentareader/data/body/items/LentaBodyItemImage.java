@@ -61,10 +61,7 @@ public class LentaBodyItemImage implements Item {
 
     @Override
     public View createView(Context context) {
-        final ImageView view = new ImageView(context);
-        view.setImageBitmap(ImageDao.getNotAvailableImage().getBitmapIfCached());
-
-        return view;
+        throw new UnsupportedOperationException("Operation is not supported.");
     }
 
     public boolean hasCaption() {

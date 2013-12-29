@@ -8,7 +8,7 @@ public enum Rubrics {
 	WORLD("/world", "/WORLD", "Мир"),
 	USSR("/ussr", "/USSR", "Бывший СССР"),
 	ECONOMICS("/economics", "/ECONOMICS", "Экономика"),
-	SCIENCE("/science", "/SCIENCE", "Наука"),
+	SCIENCE("/science", "/SCIENCE", "Наука и техника"),
 	SPORT("/sport", "/SPORT", "Спорт"),
 	CULTURE("/culture", "/CULTURE", "Культура"),
 	MEDIA("/media", "/MEDIA", "Интернет и СМИ"),

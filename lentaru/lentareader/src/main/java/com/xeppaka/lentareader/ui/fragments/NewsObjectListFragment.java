@@ -57,7 +57,11 @@ public abstract class NewsObjectListFragment extends ListFragment {
     }
 
     public void restoreScrollPosition() {
-        getListView().setSelectionFromTop(scrollPositions[currentRubric.ordinal()].item, scrollPositions[currentRubric.ordinal()].top);
+        if (scrollPositions[currentRubric.ordinal()].item < getListAdapter().getCount()) {
+            getListView().setSelectionFromTop(scrollPositions[currentRubric.ordinal()].item, scrollPositions[currentRubric.ordinal()].top);
+        } else {
+            clearScrollPosition();
+        }
     }
 
     public void clearScrollPosition() {

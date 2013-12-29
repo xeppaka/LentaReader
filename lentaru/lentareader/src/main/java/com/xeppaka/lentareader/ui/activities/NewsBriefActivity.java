@@ -1,14 +1,20 @@
 package com.xeppaka.lentareader.ui.activities;
 
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 
 import com.viewpagerindicator.TitlePageIndicator;
 import com.xeppaka.lentareader.R;
@@ -18,7 +24,8 @@ import com.xeppaka.lentareader.service.Callback;
 import com.xeppaka.lentareader.service.ServiceHelper;
 import com.xeppaka.lentareader.ui.fragments.NewsObjectListFragment;
 import com.xeppaka.lentareader.ui.fragments.SwipeNewsObjectsListAdapter;
-import com.xeppaka.lentareader.utils.LentaUtils;
+import com.xeppaka.lentareader.ui.widgets.SelectRubricDialog;
+import com.xeppaka.lentareader.utils.LentaDebugUtils;
 
 /**
  * This is the main activity where everything starts right after application is 
@@ -27,10 +34,10 @@ import com.xeppaka.lentareader.utils.LentaUtils;
  * @author 
  * 
  */
-public class NewsBriefActivity extends ActionBarActivity {
+public class NewsBriefActivity extends ActionBarActivity implements DialogInterface.OnDismissListener {
 	private SwipeNewsObjectsListAdapter pagerAdapter;
 	private ViewPager pager;
-    private View selectRubric;
+    private SelectRubricDialog selectRubricDialog;
 
     private ServiceHelper serviceHelper;
     private TitlePageIndicator indicator;
@@ -39,21 +46,36 @@ public class NewsBriefActivity extends ActionBarActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		LentaUtils.strictMode();
+		LentaDebugUtils.strictMode();
 
 		setContentView(R.layout.brief_news_activity);
 
 		initializeViewPager();
 		initializeViewIndicator();
 
+        selectRubricDialog = new SelectRubricDialog(this);
+        selectRubricDialog.setOnDismissListener(this);
+
+        int actionBarHeight = 0;
+        TypedValue tv = new TypedValue();
+        if (getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true))
+            actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, getResources().getDisplayMetrics());
+
+
+        if (actionBarHeight != 0) {
+            WindowManager.LayoutParams params = selectRubricDialog.getWindow().getAttributes();
+
+            params.gravity = Gravity.TOP | Gravity.RIGHT;
+            params.y = actionBarHeight;
+        }
+
         serviceHelper = new ServiceHelper(this, new Handler());
 	}
 
-	private void initializeViewPager() {
-        selectRubric = findViewById(R.id.select_rubric_menu);
+    private void initializeViewPager() {
+        pagerAdapter = new SwipeNewsObjectsListAdapter(getSupportFragmentManager(), this);
+
 		pager = (ViewPager) findViewById(R.id.brief_news_pager);
-		pagerAdapter = new SwipeNewsObjectsListAdapter(
-				getSupportFragmentManager(), this);
 		pager.setAdapter(pagerAdapter);
 	}
 	
@@ -111,47 +133,15 @@ public class NewsBriefActivity extends ActionBarActivity {
     }
 
     private void onSelectRubric() {
-        if (selectRubric.getVisibility() == View.INVISIBLE)
-            selectRubric.setVisibility(View.VISIBLE);
-        else
-            selectRubric.setVisibility(View.INVISIBLE);
+        selectRubricDialog.show();
     }
 
-    public void onRubricSelected(View view) {
-        selectRubric.setVisibility(View.INVISIBLE);
+    @Override
+    public void onDismiss(DialogInterface dialogInterface) {
+        final Rubrics selectedRubric = selectRubricDialog.getSelectedRubric();
 
-        switch (view.getId()) {
-            case R.id.button_rubric_all:
-                selectRubric(Rubrics.LATEST);
-                break;
-            case R.id.button_rubric_russia:
-                selectRubric(Rubrics.RUSSIA);
-                break;
-            case R.id.button_rubric_culture:
-                selectRubric(Rubrics.CULTURE);
-                break;
-            case R.id.button_rubric_economics:
-                selectRubric(Rubrics.ECONOMICS);
-                break;
-            case R.id.button_rubric_internet:
-                selectRubric(Rubrics.MEDIA);
-                break;
-            case R.id.button_rubric_life:
-                selectRubric(Rubrics.LIFE);
-                break;
-            case R.id.button_rubric_science:
-                selectRubric(Rubrics.SCIENCE);
-                break;
-            case R.id.button_rubric_sport:
-                selectRubric(Rubrics.SPORT);
-                break;
-            case R.id.button_rubric_ussr:
-                selectRubric(Rubrics.USSR);
-                break;
-            case R.id.button_rubric_world:
-                selectRubric(Rubrics.WORLD);
-                break;
-        }
+        if (selectedRubric != null)
+            selectRubric(selectedRubric);
     }
 
     private void selectRubric(Rubrics rubric) {

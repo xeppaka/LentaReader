@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.text.Html;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -126,16 +127,6 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
         TextView newsRubric;
         View newsDescriptionPanel;
 
-		News news = getItem(position);
-
-        BitmapReference bitmapRef;
-
-        if (news.getImageLink() == null || TextUtils.isEmpty(news.getImageLink())) {
-            bitmapRef = ImageDao.getNotAvailableThumbnailImage();
-        } else {
-            bitmapRef = imageDao.readThumbnail(news.getImageLink());
-        }
-
         ViewHolder holder;
 		
 		if (convertView == null) {
@@ -208,6 +199,15 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
 //			}
 		}
 
+        News news = getItem(position);
+        BitmapReference bitmapRef;
+
+        if (news.hasImage()) {
+            bitmapRef = imageDao.readThumbnail(news.getImageLink());
+        } else {
+            bitmapRef = ImageDao.getNotAvailableThumbnailImage();
+        }
+
         holder.setImage(bitmapRef);
         holder.setImageUrl(news.getImageLink());
 
@@ -240,27 +240,26 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
         final ViewHolder holderForAsync = holder;
         final String imageUrl = news.getImageLink();
 
-        // Set loading bitmap now, but only if we are really going to load news bitmap from internet
-        if (bitmapRef != ImageDao.getNotAvailableImage()) {
+        if (news.hasImage()) {
             newsImageView.setImageBitmap(ImageDao.getLoadingThumbnailImage().getBitmapIfCached());
         }
 
         final AsyncTask asyncTask = bitmapRef.getBitmapAsync(new BitmapReference.Callback() {
-			@Override
-			public void onSuccess(Bitmap bitmap) {
+            @Override
+            public void onSuccess(Bitmap bitmap) {
                 if (position != holderForAsync.getPosition() ||
-                        (imageUrl == null && holderForAsync.getImage() != ImageDao.getNotAvailableImage()) ||
+                        (imageUrl == null && holderForAsync.getImage() != ImageDao.getNotAvailableThumbnailImage()) ||
                         (imageUrl != null && !imageUrl.equals(holderForAsync.getImageUrl()))) {
                     return;
                 }
 
                 holderForAsync.getNewsImage().setImageBitmap(bitmap);
-			}
+            }
 
             @Override
             public void onFailure(Exception e) {
                 if (position != holderForAsync.getPosition() ||
-                        (imageUrl == null && holderForAsync.getImage() != ImageDao.getNotAvailableImage()) ||
+                        (imageUrl == null && holderForAsync.getImage() != ImageDao.getNotAvailableThumbnailImage()) ||
                         (imageUrl != null && !imageUrl.equals(holderForAsync.getImageUrl()))) {
                     return;
                 }
@@ -270,7 +269,7 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
         });
 
         holder.setAsyncTask(asyncTask);
-		
+
 		return view;
 	}
 }

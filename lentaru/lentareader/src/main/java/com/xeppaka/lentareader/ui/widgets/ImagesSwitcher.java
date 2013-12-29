@@ -56,21 +56,34 @@ public class ImagesSwitcher extends ViewPager {
             final ImageView currentImageView = imageViews[position];
 
             container.addView(currentImageView);
+            BitmapReference bitmapRef = imageDao.read(images.get(position).getPreview_url());
 
-            imageDao.read(images.get(position).getPreview_url()).getBitmapAsync(new BitmapReference.Callback() {
-                @Override
-                public void onSuccess(Bitmap bitmap) {
-                    currentImageView.setImageDrawable(new BitmapDrawable(getContext().getResources(), bitmap));
-                    getLayoutParams().height = Math.round(getWidth() / (float)bitmap.getWidth() * bitmap.getHeight());
-                }
+            Bitmap bitmap = null;
+            if ((bitmap = bitmapRef.getBitmapIfCached()) != null) {
+                setBitmap(currentImageView, bitmap);
+            } else {
+                final Bitmap loadingBitmap = ImageDao.getLoadingImage().getBitmapIfCached();
+                setBitmap(currentImageView, loadingBitmap);
 
-                @Override
-                public void onFailure(Exception e) {
-                    // TODO: set image load error message to user
-                }
-            });
+                bitmapRef.getBitmapAsync(new BitmapReference.Callback() {
+                    @Override
+                    public void onSuccess(Bitmap bitmap) {
+                        setBitmap(currentImageView, bitmap);
+                    }
+
+                    @Override
+                    public void onFailure(Exception e) {
+                        setBitmap(currentImageView, ImageDao.getNotAvailableImage().getBitmapIfCached());
+                    }
+                });
+            }
 
             return currentImageView;
+        }
+
+        private void setBitmap(ImageView imageView, Bitmap bitmap) {
+            imageView.setImageDrawable(new BitmapDrawable(getContext().getResources(), bitmap));
+            getLayoutParams().height = Math.round(getWidth() / (float) bitmap.getWidth() * bitmap.getHeight());
         }
 
         @Override

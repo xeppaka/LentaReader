@@ -5,7 +5,7 @@ import android.support.v4.app.FragmentActivity;
 
 import com.xeppaka.lentareader.R;
 import com.xeppaka.lentareader.ui.fragments.NewsFullFragment;
-import com.xeppaka.lentareader.utils.LentaUtils;
+import com.xeppaka.lentareader.utils.LentaDebugUtils;
 
 public class NewsFullActivity extends FragmentActivity {
 	private NewsFullFragment fullNewsFragment;
@@ -14,7 +14,7 @@ public class NewsFullActivity extends FragmentActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		LentaUtils.strictMode();
+		LentaDebugUtils.strictMode();
 		
 		setContentView(R.layout.full_news_activity);
 		long newsId = getIntent().getLongExtra("newsId", -1);
