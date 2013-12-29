@@ -182,6 +182,9 @@ public abstract class ContentResolverDao<T extends DatabaseObject> implements Da
 	
 	@Override
 	public List<Long> create(List<T> dataObjects) {
+        if (dataObjects.isEmpty())
+            return Collections.emptyList();
+
         List<Long> result = null;
 		
 		for (T dataObject : dataObjects) {
@@ -197,20 +200,26 @@ public abstract class ContentResolverDao<T extends DatabaseObject> implements Da
 			result.add(id);
 		}
 		
-
-		cr.notifyChange(getContentProviderUri(), null);
-		
-		if (result == null) {
+		if (result == null || result.isEmpty()) {
 			return Collections.emptyList();
 		}
-		
+
+        cr.notifyChange(getContentProviderUri(), null);
+
 		return result;
 	}
 
 	@Override
 	public int delete(long id) {
 		Uri uri = ContentUris.withAppendedId(getContentProviderUri(), id);
-		return cr.delete(uri, null, null);
+
+		final int result = cr.delete(uri, null, null);
+
+        if (result > 0) {
+            cr.notifyChange(ContentUris.withAppendedId(getContentProviderUri(), id), null);
+        }
+
+        return result;
 	}
 
 	@Override
@@ -223,8 +232,14 @@ public abstract class ContentResolverDao<T extends DatabaseObject> implements Da
 			String keyColumnName, String keyValue) {
 		String[] whereArgs = { keyValue };
 		String where = String.format(getWhereFromSQLiteType(keyType), keyColumnName);
-		
-		return cr.delete(getContentProviderUri(), where, whereArgs);
+
+        final int result = cr.delete(getContentProviderUri(), where, whereArgs);
+
+        if (result > 0) {
+            cr.notifyChange(getContentProviderUri(), null);
+        }
+
+        return result;
 	}
 
 	public int update(T daoObject) {
@@ -232,15 +247,27 @@ public abstract class ContentResolverDao<T extends DatabaseObject> implements Da
 		
 		String[] whereArgs;
 		String where;
-		
+
+        int result;
+
 		if (id != DatabaseObject.ID_NONE) {
-			return cr.update(ContentUris.withAppendedId(getContentProviderUri(), id), prepareContentValues(daoObject), null, null);
+            result = cr.update(ContentUris.withAppendedId(getContentProviderUri(), id), prepareContentValues(daoObject), null, null);
+
+            if (result > 0) {
+                cr.notifyChange(ContentUris.withAppendedId(getContentProviderUri(), id), null);
+            }
 		} else {
 			whereArgs = new String[]{ daoObject.getKeyValue() };
 			where = String.format(getWhereFromSQLiteType(getKeyColumnType()), getKeyColumnName());
-			
-			return cr.update(getContentProviderUri(), prepareContentValues(daoObject), where, whereArgs);
+
+            result = cr.update(getContentProviderUri(), prepareContentValues(daoObject), where, whereArgs);
+
+            if (result > 0) {
+                cr.notifyChange(getContentProviderUri(), null);
+            }
 		}
+
+        return result;
 	}
 	
 	@Override

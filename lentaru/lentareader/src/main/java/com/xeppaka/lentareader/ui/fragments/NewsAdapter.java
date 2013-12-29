@@ -15,10 +15,9 @@ import com.xeppaka.lentareader.data.News;
 import com.xeppaka.lentareader.data.dao.daoobjects.BitmapReference;
 import com.xeppaka.lentareader.data.dao.daoobjects.ImageDao;
 
+import java.util.Set;
+
 public class NewsAdapter extends NewsObjectAdapter<News> {
-
-    private final ImageDao imageDao;
-
 	private static class ViewHolder {
 		private final TextView newsTitle;
         private final TextView newsDescription;
@@ -113,11 +112,9 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
 
 	public NewsAdapter(Context context) {
 		super(context);
-
-        imageDao = ImageDao.newInstance();
 	}
 
-	@Override
+    @Override
 	public View getView(final int position, View convertView, ViewGroup parent) {
 		View view;
 		ImageView newsImageView;
@@ -158,17 +155,30 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
 
             newsImageView = (ImageView)view.findViewById(R.id.brief_news_image);
 
-            final View newsDescriptionPanelAsync = newsDescriptionPanel;
             view.setTag(holder = new ViewHolder(newsImageView, newsTitleTextView, newsDescriptionTextView, newsDateTextView,
                     newsCaptionTextView, newsCreditsTextView, newsRubric, newsDescriptionPanel, position));
+
+            final ViewHolder holderForAsync = holder;
 
             newsImageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if (newsDescriptionPanelAsync.getVisibility() == View.GONE) {
-                        newsDescriptionPanelAsync.setVisibility(View.VISIBLE);
+                    final View currentNewsDescriptionTextView = holderForAsync.getNewsDescriptionPanel();
+                    final int currentPosition = holderForAsync.getPosition();
+                    final News n = getItem(currentPosition);
+
+                    if (currentNewsDescriptionTextView.getVisibility() == View.GONE) {
+                        currentNewsDescriptionTextView.setVisibility(View.VISIBLE);
+
+                        if (n != null && getExpandedItems() != null) {
+                            getExpandedItems().add(n.getId());
+                        }
                     } else {
-                        newsDescriptionPanelAsync.setVisibility(View.GONE);
+                        currentNewsDescriptionTextView.setVisibility(View.GONE);
+
+                        if (n != null && getExpandedItems() != null) {
+                            getExpandedItems().remove(n.getId());
+                        }
                     }
                 }
             });
@@ -192,8 +202,6 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
 			newsImageView = holder.getNewsImage();
             newsDescriptionPanel = holder.getNewsDescriptionPanel();
 
-            newsDescriptionPanel.setVisibility(View.GONE);
-
 //            BitmapReference prevImageRef = holder.getImage();
 //			if (prevImageRef != null) {
 //				prevImageRef.releaseBitmap();
@@ -205,6 +213,12 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
 
 		newsTitleTextView.setText(news.getTitle());
         newsDescriptionTextView.setText(Html.fromHtml(news.getDescription()));
+
+        if (getExpandedItems() != null && getExpandedItems().contains(news.getId())) {
+            newsDescriptionPanel.setVisibility(View.VISIBLE);
+        } else {
+            newsDescriptionPanel.setVisibility(View.GONE);
+        }
 
         if (!news.hasImageCaption()) {
             newsCaptionTextView.setVisibility(View.GONE);
@@ -221,10 +235,8 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
         }
 
         newsRubric.setText(" " + news.getRubric().getLabel());
-
         newsDateTextView.setText(news.getFormattedPubDate());
 
-		final ImageView newsImageViewForAsync = newsImageView;
         final ViewHolder holderForAsync = holder;
         final String imageUrl = news.getImageLink();
 
@@ -242,12 +254,18 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
                     return;
                 }
 
-                newsImageViewForAsync.setImageBitmap(bitmap);
+                holderForAsync.getNewsImage().setImageBitmap(bitmap);
 			}
 
             @Override
             public void onFailure(Exception e) {
-                newsImageViewForAsync.setImageBitmap(ImageDao.getNotAvailableThumbnailImage().getBitmapIfCached());
+                if (position != holderForAsync.getPosition() ||
+                        (imageUrl == null && holderForAsync.getImage() != ImageDao.getNotAvailableImage()) ||
+                        (imageUrl != null && !imageUrl.equals(holderForAsync.getImageUrl()))) {
+                    return;
+                }
+
+                holderForAsync.getNewsImage().setImageBitmap(ImageDao.getNotAvailableThumbnailImage().getBitmapIfCached());
             }
         });
 

@@ -2,6 +2,7 @@ package com.xeppaka.lentareader.data.body.items;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -64,5 +65,13 @@ public class LentaBodyItemImage implements Item {
         view.setImageBitmap(ImageDao.getNotAvailableImage().getBitmapIfCached());
 
         return view;
+    }
+
+    public boolean hasCaption() {
+        return caption != null && !TextUtils.isEmpty(caption);
+    }
+
+    public boolean hasCredits() {
+        return credits != null && !TextUtils.isEmpty(credits);
     }
 }

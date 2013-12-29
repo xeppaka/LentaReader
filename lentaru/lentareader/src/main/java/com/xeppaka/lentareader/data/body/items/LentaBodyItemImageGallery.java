@@ -3,7 +3,7 @@ package com.xeppaka.lentareader.data.body.items;
 import android.content.Context;
 import android.view.View;
 
-import com.xeppaka.lentareader.ui.widgets.ImageGallery;
+import com.xeppaka.lentareader.ui.widgets.ImagesGallery;
 
 import java.util.Iterator;
 import java.util.List;
@@ -39,7 +39,7 @@ public class LentaBodyItemImageGallery implements Item, Iterable<LentaBodyItemIm
 
     @Override
     public View createView(Context context) {
-        return new ImageGallery(context, this);
+        return new ImagesGallery(context, this);
     }
 
     @Override

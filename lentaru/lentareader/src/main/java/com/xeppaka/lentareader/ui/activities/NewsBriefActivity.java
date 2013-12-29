@@ -2,6 +2,7 @@ package com.xeppaka.lentareader.ui.activities;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
@@ -11,7 +12,11 @@ import android.view.View;
 
 import com.viewpagerindicator.TitlePageIndicator;
 import com.xeppaka.lentareader.R;
+import com.xeppaka.lentareader.data.NewsType;
 import com.xeppaka.lentareader.data.Rubrics;
+import com.xeppaka.lentareader.service.Callback;
+import com.xeppaka.lentareader.service.ServiceHelper;
+import com.xeppaka.lentareader.ui.fragments.NewsObjectListFragment;
 import com.xeppaka.lentareader.ui.fragments.SwipeNewsObjectsListAdapter;
 import com.xeppaka.lentareader.utils.LentaUtils;
 
@@ -27,6 +32,9 @@ public class NewsBriefActivity extends ActionBarActivity {
 	private ViewPager pager;
     private View selectRubric;
 
+    private ServiceHelper serviceHelper;
+    private TitlePageIndicator indicator;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -37,6 +45,8 @@ public class NewsBriefActivity extends ActionBarActivity {
 
 		initializeViewPager();
 		initializeViewIndicator();
+
+        serviceHelper = new ServiceHelper(this, new Handler());
 	}
 
 	private void initializeViewPager() {
@@ -48,8 +58,9 @@ public class NewsBriefActivity extends ActionBarActivity {
 	}
 	
 	private void initializeViewIndicator() {
-		TitlePageIndicator indicator = (TitlePageIndicator) findViewById(R.id.brief_news_title_indicator);
+		indicator = (TitlePageIndicator) findViewById(R.id.brief_news_title_indicator);
 		final float density = getResources().getDisplayMetrics().density;
+        indicator.setTextSize(12 * density);
 		indicator.setTextColor(Color.parseColor("#151515"));
 //		indicator.setBackgroundColor(Color.parseColor("#ffffff"));
 		indicator.setFooterColor(0xFFAA2222);
@@ -84,7 +95,19 @@ public class NewsBriefActivity extends ActionBarActivity {
     }
 
     private void onRefresh() {
-        pagerAdapter.refresh(pager.getCurrentItem());
+        NewsObjectListFragment currentListFragment = pagerAdapter.getItem(pager.getCurrentItem());
+        NewsType newsType = currentListFragment.getNewsType();
+        Rubrics rubric = currentListFragment.getCurrentRubric();
+
+        serviceHelper.updateRubric(newsType, rubric, new Callback() {
+            @Override
+            public void onSuccess() {
+            }
+
+            @Override
+            public void onFailure() {
+            }
+        });
     }
 
     private void onSelectRubric() {
@@ -99,35 +122,45 @@ public class NewsBriefActivity extends ActionBarActivity {
 
         switch (view.getId()) {
             case R.id.button_rubric_all:
-                pagerAdapter.selectRubric(pager.getCurrentItem(), Rubrics.LATEST);
+                selectRubric(Rubrics.LATEST);
                 break;
             case R.id.button_rubric_russia:
-                pagerAdapter.selectRubric(pager.getCurrentItem(), Rubrics.RUSSIA);
+                selectRubric(Rubrics.RUSSIA);
                 break;
             case R.id.button_rubric_culture:
-                pagerAdapter.selectRubric(pager.getCurrentItem(), Rubrics.CULTURE);
+                selectRubric(Rubrics.CULTURE);
                 break;
             case R.id.button_rubric_economics:
-                pagerAdapter.selectRubric(pager.getCurrentItem(), Rubrics.ECONOMICS);
+                selectRubric(Rubrics.ECONOMICS);
                 break;
             case R.id.button_rubric_internet:
-                pagerAdapter.selectRubric(pager.getCurrentItem(), Rubrics.MEDIA);
+                selectRubric(Rubrics.MEDIA);
                 break;
             case R.id.button_rubric_life:
-                pagerAdapter.selectRubric(pager.getCurrentItem(), Rubrics.LIFE);
+                selectRubric(Rubrics.LIFE);
                 break;
             case R.id.button_rubric_science:
-                pagerAdapter.selectRubric(pager.getCurrentItem(), Rubrics.SCIENCE);
+                selectRubric(Rubrics.SCIENCE);
                 break;
             case R.id.button_rubric_sport:
-                pagerAdapter.selectRubric(pager.getCurrentItem(), Rubrics.SPORT);
+                selectRubric(Rubrics.SPORT);
                 break;
             case R.id.button_rubric_ussr:
-                pagerAdapter.selectRubric(pager.getCurrentItem(), Rubrics.USSR);
+                selectRubric(Rubrics.USSR);
                 break;
             case R.id.button_rubric_world:
-                pagerAdapter.selectRubric(pager.getCurrentItem(), Rubrics.WORLD);
+                selectRubric(Rubrics.WORLD);
                 break;
         }
+    }
+
+    private void selectRubric(Rubrics rubric) {
+        final NewsObjectListFragment currentFragment = pagerAdapter.getItem(pager.getCurrentItem());
+
+        if (currentFragment.getCurrentRubric() != rubric) {
+            currentFragment.setCurrentRubric(rubric);
+        }
+
+        indicator.notifyDataSetChanged();
     }
 }

@@ -102,24 +102,4 @@ public final class UpdateRubricServiceCommand extends RunnableServiceCommand {
             newsDao.clearLatestFlag(rubric);
         }
 	}
-	
-	private void prepareResultCreated(Collection<Long> ids) {
-//		if (ids.isEmpty()) {
-//			result = null;
-//			return;
-//		}
-//
-//		result = new Bundle();
-//		result.putInt(BundleConstants.KEY_REQUEST_ID.name(), getRequestId());
-//		result.putString(BundleConstants.KEY_ACTION.name(), ServiceResultAction.DATABASE_OBJECT_CREATED.name());
-//		result.putString(BundleConstants.KEY_NEWS_TYPE.name(), newsType.name());
-//
-//		long[] createdIds = new long[ids.size()];
-//		int index = 0;
-//		for (Long id : ids) {
-//			createdIds[index++] = id;
-//		}
-//
-//		result.putLongArray(BundleConstants.KEY_IDS.name(), createdIds);
-	}
 }

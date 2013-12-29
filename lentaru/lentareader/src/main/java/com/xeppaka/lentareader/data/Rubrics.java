@@ -3,7 +3,7 @@ package com.xeppaka.lentareader.data;
 import com.xeppaka.lentareader.utils.LentaConstants;
 
 public enum Rubrics {
-	LATEST("", "/LATEST", ""),
+	LATEST("", "/LATEST", "Последние"),
 	RUSSIA("/russia", "/RUSSIA", "Россия"),
 	WORLD("/world", "/WORLD", "Мир"),
 	USSR("/ussr", "/USSR", "Бывший СССР"),

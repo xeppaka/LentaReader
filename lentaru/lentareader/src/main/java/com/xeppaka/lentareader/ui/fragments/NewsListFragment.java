@@ -29,38 +29,19 @@ import java.util.List;
  * 
  * @author nnm
  */
-public class NewsListFragment extends ListFragment {
+public class NewsListFragment extends NewsObjectListFragment {
 	private NewsAdapter newsAdapter;
-	private ServiceHelper serviceHelper;
 	private AsyncNODao<News> dao;
-    private Rubrics currentRubric = Rubrics.LATEST;
-
-	private class ListFragmentServiceListener implements Callback {
-        @Override
-        public void onSuccess() {
-        }
-
-        @Override
-        public void onFailure() {
-        }
-	}
-	
-	private ListFragmentServiceListener serviceListener = new ListFragmentServiceListener();
 
     private Dao.Observer<News> newsDaoObserver = new DaoObserver<News>(new Handler()) {
         @Override
         public void onDataChanged(boolean selfChange, News dataObject) {
-            newsAdapter.setNewsObjects(Arrays.asList(dataObject));
+            refresh();
         }
 
         @Override
         public void onDataChanged(boolean selfChange) {
-            dao.readAsync(currentRubric, new DaoReadMultiListener<News>() {
-                @Override
-                public void finished(List<News> result) {
-                    newsAdapter.setNewsObjects(result);
-                }
-            });
+            refresh();
         }
     };
 
@@ -69,9 +50,8 @@ public class NewsListFragment extends ListFragment {
 		super.onCreate(savedInstanceState);
 
         newsAdapter = new NewsAdapter(getActivity());
-        serviceHelper = new ServiceHelper(this.getActivity(), new Handler());
 
-        dao = NewsDao.getInstance(this.getActivity().getContentResolver());
+        dao = NewsDao.getInstance(getActivity().getContentResolver());
 
 		setListAdapter(newsAdapter);
 	}
@@ -86,8 +66,26 @@ public class NewsListFragment extends ListFragment {
 		super.onResume();
 
         dao.registerContentObserver(newsDaoObserver);
-        refreshLocal();
+        saveScrollPosition();
+        refresh();
 	}
+
+    @Override
+    public void refresh() {
+        dao.readAsync(getCurrentRubric(), new DaoReadMultiListener<News>() {
+            @Override
+            public void finished(List<News> result) {
+                if (result.size() != newsAdapter.size()) {
+                    clearScrollPosition();
+                }
+
+                newsAdapter.setNewsObjects(result, getExpandedItemIds());
+                newsAdapter.notifyDataSetChanged();
+
+                restoreScrollPosition();
+            }
+        });
+    }
 
 	@Override
 	public void onPause() {
@@ -106,20 +104,13 @@ public class NewsListFragment extends ListFragment {
 		startActivity(intent);
 	}
 
-    public void refresh() {
-        serviceHelper.updateRubric(NewsType.NEWS, currentRubric, serviceListener);
+    @Override
+    public NewsType getNewsType() {
+        return NewsType.NEWS;
     }
 
-    public void refreshLocal() {
-        dao.readAsync(currentRubric, new DaoReadMultiListener<News>() {
-            @Override
-            public void finished(List<News> result) {
-                newsAdapter.setNewsObjects(result);
-            }
-        });
-    }
-
-    public void selectRubric(Rubrics rubric) {
-        currentRubric = rubric;
+    @Override
+    public NewsObjectAdapter getDataObjectsAdapter() {
+        return newsAdapter;
     }
 }
