@@ -1,11 +1,10 @@
 package com.xeppaka.lentareader.ui.activities;
 
-import android.app.Dialog;
+import android.app.ActivityManager;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.util.TypedValue;
@@ -13,7 +12,6 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.WindowManager;
 
 import com.viewpagerindicator.TitlePageIndicator;
@@ -25,6 +23,7 @@ import com.xeppaka.lentareader.service.ServiceHelper;
 import com.xeppaka.lentareader.ui.fragments.NewsObjectListFragment;
 import com.xeppaka.lentareader.ui.fragments.SwipeNewsObjectsListAdapter;
 import com.xeppaka.lentareader.ui.widgets.SelectRubricDialog;
+import com.xeppaka.lentareader.utils.LentaConstants;
 import com.xeppaka.lentareader.utils.LentaDebugUtils;
 
 /**
@@ -49,6 +48,7 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
 		LentaDebugUtils.strictMode();
 
 		setContentView(R.layout.brief_news_activity);
+        setTitle(null);
 
 		initializeViewPager();
 		initializeViewIndicator();
@@ -68,6 +68,9 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
             params.gravity = Gravity.TOP | Gravity.RIGHT;
             params.y = actionBarHeight;
         }
+
+        //getActionBar().setIcon(R.drawable.lenta_icon);
+        getSupportActionBar().setLogo(R.drawable.lenta_icon);
 
         serviceHelper = new ServiceHelper(this, new Handler());
 	}
@@ -149,8 +152,7 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
 
         if (currentFragment.getCurrentRubric() != rubric) {
             currentFragment.setCurrentRubric(rubric);
+            indicator.notifyDataSetChanged();
         }
-
-        indicator.notifyDataSetChanged();
     }
 }

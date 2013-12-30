@@ -113,7 +113,7 @@ public class ImagesSwitcher extends ViewPager {
         super(context);
 
         this.images = images;
-        this.imageDao = ImageDao.newInstance();
+        this.imageDao = ImageDao.newInstance(context);
 
         setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0));
         setAdapter(adapter = new GalleryViewPagerAdapter(images));
@@ -123,7 +123,7 @@ public class ImagesSwitcher extends ViewPager {
         super(context, attrs);
 
         images = Collections.emptyList();
-        imageDao = ImageDao.newInstance();
+        imageDao = ImageDao.newInstance(context);
 
         setAdapter(adapter = new GalleryViewPagerAdapter(images));
     }

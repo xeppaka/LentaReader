@@ -19,7 +19,7 @@ public abstract class NewsObjectAdapter<T extends NewsObject> extends BaseAdapte
 
 	public NewsObjectAdapter(Context context) {
         inflater = LayoutInflater.from(context);
-        imageDao = ImageDao.newInstance();
+        imageDao = ImageDao.newInstance(context);
 	}
 
 	@Override

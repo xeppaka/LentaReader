@@ -105,7 +105,7 @@ public class NewsFullFragment extends Fragment {
         rubricView.setText(" " + news.getRubric().getLabel());
 
         if (news.hasImage()) {
-            BitmapReference bitmapRef = ImageDao.newInstance().read(news.getImageLink());
+            BitmapReference bitmapRef = ImageDao.newInstance(getActivity()).read(news.getImageLink());
             bitmapRef.getBitmapAsync(new BitmapReference.Callback() {
                 @Override
                 public void onSuccess(Bitmap bitmap) {

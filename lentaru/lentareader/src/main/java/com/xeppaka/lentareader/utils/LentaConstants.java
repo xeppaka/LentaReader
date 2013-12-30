@@ -17,8 +17,8 @@ public class LentaConstants {
     public static final String XML_PATH_ROOT = "";
 
     public static final int DAO_CACHE_MAX_OBJECTS = 200;
-	public static final int BITMAP_CACHE_MAX_SIZE_IN_BYTES = 10 * 1024 * 1024; // 10 MB
-    public static final int THUMBNAILS_BITMAP_CACHE_MAX_SIZE_IN_BYTES = 4 * 1024 * 1024; // 4 MB
+	public static int BITMAP_CACHE_MAX_SIZE_IN_BYTES = 10 * 1024 * 1024; // 10 MB
+    public static int THUMBNAILS_BITMAP_CACHE_MAX_SIZE_IN_BYTES = 4 * 1024 * 1024; // 4 MB
 
 	public static final boolean DEVELOPER_MODE = true;
 
@@ -71,5 +71,10 @@ public class LentaConstants {
         DAYS_SHORT_RUS[Calendar.FRIDAY] = "Пт";
         DAYS_SHORT_RUS[Calendar.SATURDAY] = "Сб";
         DAYS_SHORT_RUS[Calendar.SUNDAY] = "Вс";
+    }
+
+    public static void adjustCacheSizes(int memClass) {
+        BITMAP_CACHE_MAX_SIZE_IN_BYTES = Math.round(memClass / 3 * 0.7f) * 1024 * 1024;
+        THUMBNAILS_BITMAP_CACHE_MAX_SIZE_IN_BYTES = Math.round(memClass / 3 * 0.3f) * 1024 * 1024;
     }
 }

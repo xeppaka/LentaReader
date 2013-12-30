@@ -1,5 +1,7 @@
 package com.xeppaka.lentareader.data.dao.daoobjects;
 
+import android.app.ActivityManager;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -25,35 +27,8 @@ import java.util.concurrent.TimeUnit;
  * Created by nnm on 11/22/13.
  */
 public class ImageDao implements DaoObservable<BitmapReference> {
-    private static final LruCache<String, CachedLazyLoadBitmapReference> bitmapCache = new LruCache<String, CachedLazyLoadBitmapReference>(LentaConstants.BITMAP_CACHE_MAX_SIZE_IN_BYTES) {
-        @Override
-        protected void entryRemoved(boolean evicted, String key,
-                                    CachedLazyLoadBitmapReference oldValue, CachedLazyLoadBitmapReference newValue) {
-            if (newValue != oldValue && evicted) {
-                oldValue.onRemoveFromCache();
-            }
-        }
-
-        @Override
-        protected int sizeOf(String key, CachedLazyLoadBitmapReference value) {
-            return value.bitmapSize();
-        }
-    };
-
-    private static final LruCache<String, CachedLazyLoadBitmapReference> thumbnailsBitmapCache = new LruCache<String, CachedLazyLoadBitmapReference>(LentaConstants.THUMBNAILS_BITMAP_CACHE_MAX_SIZE_IN_BYTES) {
-        @Override
-        protected void entryRemoved(boolean evicted, String key,
-                                    CachedLazyLoadBitmapReference oldValue, CachedLazyLoadBitmapReference newValue) {
-            if (newValue != oldValue && evicted) {
-                oldValue.onRemoveFromCache();
-            }
-        }
-
-        @Override
-        protected int sizeOf(String key, CachedLazyLoadBitmapReference value) {
-            return value.bitmapSize();
-        }
-    };
+    private static LruCache<String, CachedLazyLoadBitmapReference> bitmapCache;
+    private static LruCache<String, CachedLazyLoadBitmapReference> thumbnailsBitmapCache;
 
     private static final String imageNotAvailableText1 = "Изображение";
     private static final String imageNotAvailableText2 = "не доступно";
@@ -83,11 +58,50 @@ public class ImageDao implements DaoObservable<BitmapReference> {
         loadingThumbnailImageRef = new StrongBitmapReference(createLoadingThumbnailBitmap());
     }
 
-    private ImageDao() {
-    }
+    private ImageDao() {}
+    private static ImageDao INSTANCE;
 
-    public static ImageDao newInstance() {
-        return new ImageDao();
+    public static ImageDao newInstance(Context context) {
+        if (bitmapCache == null || thumbnailsBitmapCache == null) {
+            ActivityManager activityManager = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
+            final int memClass = activityManager.getMemoryClass();
+            LentaConstants.adjustCacheSizes(memClass);
+
+            bitmapCache = new LruCache<String, CachedLazyLoadBitmapReference>(LentaConstants.BITMAP_CACHE_MAX_SIZE_IN_BYTES) {
+                @Override
+                protected void entryRemoved(boolean evicted, String key,
+                                            CachedLazyLoadBitmapReference oldValue, CachedLazyLoadBitmapReference newValue) {
+                    if (newValue != oldValue && evicted) {
+                        oldValue.onRemoveFromCache();
+                    }
+                }
+
+                @Override
+                protected int sizeOf(String key, CachedLazyLoadBitmapReference value) {
+                    return value.bitmapSize();
+                }
+            };
+
+            thumbnailsBitmapCache = new LruCache<String, CachedLazyLoadBitmapReference>(LentaConstants.THUMBNAILS_BITMAP_CACHE_MAX_SIZE_IN_BYTES) {
+                @Override
+                protected void entryRemoved(boolean evicted, String key,
+                                            CachedLazyLoadBitmapReference oldValue, CachedLazyLoadBitmapReference newValue) {
+                    if (newValue != oldValue && evicted) {
+                        oldValue.onRemoveFromCache();
+                    }
+                }
+
+                @Override
+                protected int sizeOf(String key, CachedLazyLoadBitmapReference value) {
+                    return value.bitmapSize();
+                }
+            };
+        }
+
+        if (INSTANCE == null)
+            INSTANCE = new ImageDao();
+
+        return INSTANCE;
     }
 
     public BitmapReference read(String imageUrl) {
@@ -108,6 +122,11 @@ public class ImageDao implements DaoObservable<BitmapReference> {
 
         Log.d(LentaConstants.LoggerAnyTag,
                 "ImageDao read thumbnail bitmap with URL: " + imageUrl);
+        Log.d(LentaConstants.LoggerAnyTag,
+                "Caches sizes: full bitmap cache is " + bitmapCache.size() + ", thumbnail bitmap cache is " + thumbnailsBitmapCache.size());
+
+        Log.d(LentaConstants.LoggerAnyTag, "Free memory: " + Runtime.getRuntime().freeMemory());
+
 
         String imageKey;
         try {
@@ -646,7 +665,10 @@ public class ImageDao implements DaoObservable<BitmapReference> {
                 return null;
             } else {
                 AsyncTask<Callback, Void, BitmapGetResult> task = new BitmapLoadTask();
-                task.executeOnExecutor(downloadImageExecutor, callback);
+                if (LentaConstants.SDK_VER >= 11)
+                    task.executeOnExecutor(downloadImageExecutor, callback);
+                else
+                    task.execute(callback);
 
                 return task;
             }
