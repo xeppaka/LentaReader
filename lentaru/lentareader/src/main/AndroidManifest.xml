@@ -5,7 +5,7 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="10"
+        android:minSdkVersion="11"
         android:targetSdkVersion="19" />
 
     <application
@@ -23,6 +23,11 @@
 
         <activity
             android:name=".ui.activities.NewsFullActivity"
+            android:theme="@style/Theme.AppCompat.Light.DarkActionBar">
+        </activity>
+
+        <activity
+            android:name=".ui.activities.PreferencesActivity"
             android:theme="@style/Theme.AppCompat.Light.DarkActionBar">
         </activity>
 

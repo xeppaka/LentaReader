@@ -109,6 +109,13 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
         public void setAsyncTask(AsyncTask asyncTask) {
             this.asyncTask = asyncTask;
         }
+
+        public void cancelAsyncTask() {
+            if (asyncTask != null) {
+                asyncTask.cancel(true);
+                asyncTask = null;
+            }
+        }
     }
 
 	public NewsAdapter(Context context) {
@@ -176,11 +183,7 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
 		} else {
 			view = convertView;
 			holder = (ViewHolder)view.getTag();
-
-            AsyncTask asyncTask = holder.getAsyncTask();
-            if (asyncTask != null) {
-                asyncTask.cancel(true);
-            }
+            holder.cancelAsyncTask();
 
             holder.setPosition(position);
 

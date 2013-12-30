@@ -16,9 +16,10 @@ public class LentaConstants {
     public static final String RSS_PATH_ROOT = "/rss";
     public static final String XML_PATH_ROOT = "";
 
-    public static final int DAO_CACHE_MAX_OBJECTS = 200;
-	public static int BITMAP_CACHE_MAX_SIZE_IN_BYTES = 10 * 1024 * 1024; // 10 MB
-    public static int THUMBNAILS_BITMAP_CACHE_MAX_SIZE_IN_BYTES = 4 * 1024 * 1024; // 4 MB
+    public static final int DAO_CACHE_MAX_OBJECTS = 100;
+    // Default values for bitmap caches
+	public static int BITMAP_CACHE_MAX_SIZE_IN_BYTES = 3 * 1024 * 1024; // 3 MB
+    public static int THUMBNAILS_BITMAP_CACHE_MAX_SIZE_IN_BYTES = 1 * 1024 * 1024; // 1 MB
 
 	public static final boolean DEVELOPER_MODE = true;
 
@@ -74,7 +75,10 @@ public class LentaConstants {
     }
 
     public static void adjustCacheSizes(int memClass) {
-        BITMAP_CACHE_MAX_SIZE_IN_BYTES = Math.round(memClass / 3 * 0.7f) * 1024 * 1024;
-        THUMBNAILS_BITMAP_CACHE_MAX_SIZE_IN_BYTES = Math.round(memClass / 3 * 0.3f) * 1024 * 1024;
+        // 12 MB should be enough(I hope) for everyone :D
+        final int cacheMem = memClass - 12;
+
+        BITMAP_CACHE_MAX_SIZE_IN_BYTES = cacheMem / 2 * 1024 * 1024;
+        THUMBNAILS_BITMAP_CACHE_MAX_SIZE_IN_BYTES = cacheMem / 2 * 1024 * 1024;
     }
 }

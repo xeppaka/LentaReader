@@ -6,9 +6,11 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.support.v4.util.LruCache;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.util.Log;
 
 import com.xeppaka.lentareader.data.dao.DaoObservable;
@@ -71,7 +73,7 @@ public class ImageDao implements DaoObservable<BitmapReference> {
                 @Override
                 protected void entryRemoved(boolean evicted, String key,
                                             CachedLazyLoadBitmapReference oldValue, CachedLazyLoadBitmapReference newValue) {
-                    if (newValue != oldValue && evicted) {
+                    if ((newValue != oldValue) && evicted) {
                         oldValue.onRemoveFromCache();
                     }
                 }
@@ -86,7 +88,7 @@ public class ImageDao implements DaoObservable<BitmapReference> {
                 @Override
                 protected void entryRemoved(boolean evicted, String key,
                                             CachedLazyLoadBitmapReference oldValue, CachedLazyLoadBitmapReference newValue) {
-                    if (newValue != oldValue && evicted) {
+                    if ((newValue != oldValue) && evicted) {
                         oldValue.onRemoveFromCache();
                     }
                 }
@@ -583,21 +585,15 @@ public class ImageDao implements DaoObservable<BitmapReference> {
         private void setBitmap(Bitmap bitmap) {
             if (thumbnail) {
                 synchronized(thumbnailsBitmapCache) {
-                    CachedLazyLoadBitmapReference imageRef = thumbnailsBitmapCache.remove(cacheKey);
+                    thumbnailsBitmapCache.remove(cacheKey);
                     this.bitmap = bitmap;
-
-                    if (imageRef != null) {
-                        thumbnailsBitmapCache.put(cacheKey, imageRef);
-                    }
+                    thumbnailsBitmapCache.put(cacheKey, this);
                 }
             } else {
-                synchronized(thumbnailsBitmapCache) {
-                    CachedLazyLoadBitmapReference imageRef = thumbnailsBitmapCache.remove(cacheKey);
+                synchronized(bitmapCache) {
+                    bitmapCache.remove(cacheKey);
                     this.bitmap = bitmap;
-
-                    if (imageRef != null) {
-                        thumbnailsBitmapCache.put(cacheKey, imageRef);
-                    }
+                    bitmapCache.put(cacheKey, this);
                 }
             }
         }
@@ -609,7 +605,7 @@ public class ImageDao implements DaoObservable<BitmapReference> {
         @Override
         public Bitmap getBitmap() throws IOException, HttpStatusCodeException {
             if (bitmap != null) {
-                return bitmap;
+                return seizeBitmap();
             }
 
             if (thumbnail) {
@@ -620,7 +616,7 @@ public class ImageDao implements DaoObservable<BitmapReference> {
                 }
 
                 if (fullBitmapRef != null) {
-                    Bitmap fullBitmap = fullBitmapRef.getBitmapIfCached();
+                    final Bitmap fullBitmap = fullBitmapRef.getBitmapIfCached();
 
                     if (fullBitmap != null) {
                         // create scaled bitmap
@@ -632,17 +628,21 @@ public class ImageDao implements DaoObservable<BitmapReference> {
             }
 
             // download and set bitmap
-            Bitmap downloadedBitmap = downloadBitmap();
+            final Bitmap downloadedBitmap = downloadBitmap();
 
             if (thumbnail) {
                 setBitmap(Bitmap.createScaledBitmap(downloadedBitmap, Math.round(downloadedBitmap.getWidth() / 4.0f), Math.round(downloadedBitmap.getHeight() / 4.0f), false));
 
                 // we have full image, let's put it in the full bitmaps cache
                 synchronized (bitmapCache) {
-                    if (bitmapCache.get(url) == null) {
-                        final CachedLazyLoadBitmapReference fullImageRef = new CachedLazyLoadBitmapReference(cacheKey, url, downloadedBitmap);
+                    CachedLazyLoadBitmapReference fullImageRef;
+
+                    if ((fullImageRef = bitmapCache.get(url)) == null) {
+                        fullImageRef = new CachedLazyLoadBitmapReference(cacheKey, url, downloadedBitmap);
                         bitmapCache.put(cacheKey, fullImageRef);
                         fullImageRef.releaseBitmap();
+                    } else if (!fullImageRef.isBitmapCached()) {
+                        fullImageRef.setBitmap(downloadedBitmap);
                     }
                 }
             } else {
@@ -700,9 +700,8 @@ public class ImageDao implements DaoObservable<BitmapReference> {
 //        }
 
         public void releaseBitmap() {
-            if (bitmap != null && --bitmapReferences <= 0 && !isCached()) {
+            if (--bitmapReferences <= 0 && !isCached()) {
                 Log.d(LentaConstants.LoggerAnyTag, "releaseBitmap(): key: " + cacheKey + ", number of references: " + bitmapReferences);
-
                 recycleBitmap();
             }
 
@@ -713,9 +712,9 @@ public class ImageDao implements DaoObservable<BitmapReference> {
             return cached;
         }
 
-//        public synchronized boolean isBitmapInMemory() {
-//            return bitmap != null && !bitmap.isRecycled();
-//        }
+        public synchronized boolean isBitmapCached() {
+            return bitmap != null;
+        }
 
         private void onRemoveFromCache() {
 //            if (bitmapReferences <= 0) {
@@ -741,7 +740,9 @@ public class ImageDao implements DaoObservable<BitmapReference> {
 
         private int bitmapSize() {
             if (bitmap != null) {
-                if (LentaConstants.SDK_VER > 11) {
+                if (LentaConstants.SDK_VER >= 19) {
+                    return bitmap.getAllocationByteCount();
+                } else if (LentaConstants.SDK_VER >= 12) {
                     return bitmap.getByteCount();
                 } else {
                     return bitmap.getWidth() * bitmap.getHeight() * getBytesPerPixel(bitmap.getConfig());

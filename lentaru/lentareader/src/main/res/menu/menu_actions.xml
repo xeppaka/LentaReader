@@ -10,4 +10,8 @@
         android:icon="@drawable/ic_action_select_all"
         android:title="@string/action_select_rubric"
         yourapp:showAsAction="ifRoom" />
+    <item android:id="@+id/action_preferences"
+        android:icon="@drawable/ic_action_select_all"
+        android:title="@string/action_preferences"
+        yourapp:showAsAction="ifRoom" />
 </menu>

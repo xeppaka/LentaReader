@@ -1,7 +1,7 @@
 package com.xeppaka.lentareader.ui.activities;
 
-import android.app.ActivityManager;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -23,7 +23,6 @@ import com.xeppaka.lentareader.service.ServiceHelper;
 import com.xeppaka.lentareader.ui.fragments.NewsObjectListFragment;
 import com.xeppaka.lentareader.ui.fragments.SwipeNewsObjectsListAdapter;
 import com.xeppaka.lentareader.ui.widgets.SelectRubricDialog;
-import com.xeppaka.lentareader.utils.LentaConstants;
 import com.xeppaka.lentareader.utils.LentaDebugUtils;
 
 /**
@@ -100,7 +99,7 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.brief_activity_actions, menu);
+        inflater.inflate(R.menu.menu_actions, menu);
 
 		return super.onCreateOptionsMenu(menu);
 	}
@@ -113,6 +112,9 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
                 return true;
             case R.id.action_select_rubric:
                 onSelectRubric();
+                return true;
+            case R.id.action_preferences:
+                onPreferences();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -137,6 +139,11 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
 
     private void onSelectRubric() {
         selectRubricDialog.show();
+    }
+
+    private void onPreferences() {
+        Intent preferences = new Intent(this, PreferencesActivity.class);
+        startActivity(preferences);
     }
 
     @Override

@@ -18,6 +18,7 @@
     
     <string name="action_refresh">Обновить</string>
     <string name="action_select_rubric">Выбрать рубрику</string>
+    <string name="action_preferences">Настройки</string>
 
     <string name="rubric_label">Рубрика:</string>
 
