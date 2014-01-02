@@ -32,4 +32,17 @@
     <string name="rubric_culture">Культура</string>
     <string name="rubric_internet">Интернет и СМИ</string>
     <string name="rubric_life">Из жизни</string>
+
+    <string name="pref_load_images">Изображения</string>
+    <string name="pref_load_images_news_list">В ленте новостей</string>
+    <string name="pref_load_images_news_full">В полной новости</string>
+    <string name="pref_load_images_news_list_summary">Загружать изображения при пролистывании ленты новостей</string>
+    <string name="pref_load_images_news_full_summary">Загружать изображения при открытии полной новости</string>
+
+    <string name="pref_old_news">Старые новости</string>
+    <string name="pref_news_deletion">Удалять</string>
+    <string name="pref_news_deletion_summary">Автоматически удалять старые новости</string>
+    <string name="pref_news_deletion_interval">Удалять новости старше</string>
+    <string name="pref_news_deletion_interval_summary">Автоматически удалять новости старше, чем x дней</string>
+
 </resources>

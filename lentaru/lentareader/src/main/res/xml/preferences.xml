@@ -1,9 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <CheckBoxPreference
-        android:key="pref_sync"
-        android:title="test123"
-        android:summary="this is my test"
-        android:defaultValue="true" />
+    <PreferenceCategory
+        android:title="@string/pref_load_images"
+        android:key="pref_key_load_images">
+        <CheckBoxPreference
+            android:key="pref_key_load_image_thumbnails"
+            android:summary="@string/pref_load_images_news_list_summary"
+            android:defaultValue="true" />
+        <CheckBoxPreference
+            android:key="pref_key_load_image_full"
+            android:title="@string/pref_load_images_news_full"
+            android:summary="@string/pref_load_images_news_full_summary"
+            android:defaultValue="true" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="@string/pref_old_news"
+        android:key="pref_key_old_news">
+        <CheckBoxPreference
+            android:key="pref_key_news_deletion"
+            android:title="@string/pref_news_deletion"
+            android:defaultValue="true" />
+        <ListPreference
+            android:dependency="pref_key_news_deletion"
+            android:key="pref_key_news_deletion_interval"
+            android:title="@string/pref_news_deletion_interval"
+            android:summary="@string/pref_news_deletion_interval_summary"
+            android:entries="@array/pref_news_deletion_interval_entries"
+            android:entryValues="@array/pref_news_deletion_interval_values"/>
+    </PreferenceCategory>
 </PreferenceScreen>
