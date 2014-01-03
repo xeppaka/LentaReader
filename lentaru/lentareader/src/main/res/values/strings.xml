@@ -42,7 +42,10 @@
     <string name="pref_old_news">Старые новости</string>
     <string name="pref_news_deletion">Удалять</string>
     <string name="pref_news_deletion_summary">Автоматически удалять старые новости</string>
-    <string name="pref_news_deletion_interval">Удалять новости старше</string>
-    <string name="pref_news_deletion_interval_summary">Автоматически удалять новости старше, чем x дней</string>
+    <string name="pref_news_deletion_interval_summary">Удалять новости старше %1s дней</string>
+    <string name="pref_news_deletion_interval_summary_day">Удалять новости старше %1s дня</string>
+    <string name="pref_news_deletion_interval_summary_days">Удалять новости старше %1s дней</string>
+
+    <string name="news_delete_interval_header">Количество дней, после которых новость будет автоматически удалена:</string>
 
 </resources>

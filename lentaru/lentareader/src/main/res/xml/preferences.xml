@@ -6,6 +6,7 @@
         android:key="pref_key_load_images">
         <CheckBoxPreference
             android:key="pref_key_load_image_thumbnails"
+            android:title="@string/pref_load_images_news_list"
             android:summary="@string/pref_load_images_news_list_summary"
             android:defaultValue="true" />
         <CheckBoxPreference
@@ -21,12 +22,9 @@
             android:key="pref_key_news_deletion"
             android:title="@string/pref_news_deletion"
             android:defaultValue="true" />
-        <ListPreference
+        <com.xeppaka.lentareader.ui.widgets.NewsDeleteIntervalPreference
             android:dependency="pref_key_news_deletion"
             android:key="pref_key_news_deletion_interval"
-            android:title="@string/pref_news_deletion_interval"
-            android:summary="@string/pref_news_deletion_interval_summary"
-            android:entries="@array/pref_news_deletion_interval_entries"
-            android:entryValues="@array/pref_news_deletion_interval_values"/>
+            android:defaultValue="5"/>
     </PreferenceCategory>
 </PreferenceScreen>
