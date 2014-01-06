@@ -58,7 +58,7 @@ public class ImagesSwitcher extends ViewPager {
             container.addView(currentImageView);
             BitmapReference bitmapRef = imageDao.read(images.get(position).getPreview_url());
 
-            Bitmap bitmap = null;
+            Bitmap bitmap;
             if ((bitmap = bitmapRef.getBitmapIfCached()) != null) {
                 setBitmap(currentImageView, bitmap);
             } else {

@@ -6,21 +6,27 @@
         android:key="pref_key_load_images">
         <CheckBoxPreference
             android:key="pref_key_load_image_thumbnails"
-            android:title="@string/pref_load_images_news_list"
             android:summary="@string/pref_load_images_news_list_summary"
             android:defaultValue="true" />
         <CheckBoxPreference
             android:key="pref_key_load_image_full"
-            android:title="@string/pref_load_images_news_full"
             android:summary="@string/pref_load_images_news_full_summary"
             android:defaultValue="true" />
     </PreferenceCategory>
     <PreferenceCategory
         android:title="@string/pref_old_news"
         android:key="pref_key_old_news">
+        <com.xeppaka.lentareader.ui.widgets.NewsTextSizePreference
+            android:key="pref_key_news_list_text_size"
+            android:summary="@string/news_list_text_size_summary_default"
+            android:defaultValue="12"/>
+        <com.xeppaka.lentareader.ui.widgets.NewsTextSizePreference
+            android:key="pref_key_news_full_text_size"
+            android:summary="@string/news_full_text_size_summary_default"
+            android:defaultValue="16"/>
         <CheckBoxPreference
             android:key="pref_key_news_deletion"
-            android:title="@string/pref_news_deletion"
+            android:summary="@string/pref_news_deletion_summary"
             android:defaultValue="true" />
         <com.xeppaka.lentareader.ui.widgets.NewsDeleteIntervalPreference
             android:dependency="pref_key_news_deletion"

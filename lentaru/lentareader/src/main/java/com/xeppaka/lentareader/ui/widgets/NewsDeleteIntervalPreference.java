@@ -1,6 +1,7 @@
 package com.xeppaka.lentareader.ui.widgets;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.preference.DialogPreference;
 import android.util.AttributeSet;
 import android.view.View;
@@ -24,19 +25,13 @@ public class NewsDeleteIntervalPreference extends DialogPreference {
         setNegativeButtonText(android.R.string.cancel);
 
         setDialogIcon(null);
-
-        if (currentValue == 1) {
-            setSummary(String.format(R.string.pref_news_deletion_interval_summary_day, currentValue));
-        } else {
-            setSummary(R.string.pref_news_deletion_interval_summary_days);
-        }
     }
 
     @Override
     protected View onCreateDialogView() {
         final View view = super.onCreateDialogView();
         daysPicker = (NumberPicker)view.findViewById(R.id.news_delete_number_picker);
-        daysPicker.setMaxValue(365);
+        daysPicker.setMaxValue(100);
         daysPicker.setMinValue(1);
         daysPicker.setValue(currentValue);
 
@@ -46,7 +41,9 @@ public class NewsDeleteIntervalPreference extends DialogPreference {
     @Override
     protected void onDialogClosed(boolean positiveResult) {
         if (positiveResult) {
-            persistInt(daysPicker.getValue());
+            persistInt(currentValue = daysPicker.getValue());
+
+            updateSummaryText();
         }
     }
 
@@ -59,6 +56,17 @@ public class NewsDeleteIntervalPreference extends DialogPreference {
             // Set default state from the XML attribute
             currentValue = (Integer) defaultValue;
             persistInt(currentValue);
+        }
+
+        updateSummaryText();
+    }
+
+    private void updateSummaryText() {
+        final Resources resources = getContext().getResources();
+        if (currentValue == 1) {
+            setSummary(String.format(resources.getString(R.string.pref_news_deletion_interval_summary_day), currentValue));
+        } else {
+            setSummary(String.format(resources.getString(R.string.pref_news_deletion_interval_summary_days), currentValue));
         }
     }
 }

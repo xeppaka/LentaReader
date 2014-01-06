@@ -71,6 +71,7 @@
             android:layout_marginRight="1dip">
 
             <TextView
+                android:id="@+id/full_news_rubric_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/rubric_label"

@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.xeppaka.lentareader.data.body.items.LentaBodyItemImage;
 import com.xeppaka.lentareader.data.body.items.LentaBodyItemImageGallery;
+import com.xeppaka.lentareader.utils.LentaTextUtils;
 
 /**
  * Created by nnm on 12/29/13.
@@ -23,7 +24,7 @@ public class ImagesGallery extends LinearLayout implements ViewPager.OnPageChang
 
     private final LentaBodyItemImageGallery gallery;
 
-    public ImagesGallery(Context context, LentaBodyItemImageGallery gallery) {
+    public ImagesGallery(Context context, LentaBodyItemImageGallery gallery, boolean downloadImages, int textSize) {
         super(context);
 
         this.gallery = gallery;
@@ -36,28 +37,29 @@ public class ImagesGallery extends LinearLayout implements ViewPager.OnPageChang
 
         setLayoutParams(params);
 
-        final ImagesSwitcher galleryView = new ImagesSwitcher(context, gallery.getImages());
-        galleryView.setOnPageChangeListener(this);
+        if (downloadImages) {
+            final ImagesSwitcher galleryView = new ImagesSwitcher(context, gallery.getImages());
+            galleryView.setOnPageChangeListener(this);
 
-        addView(galleryView);
-        addView(imageCaption = createDescriptionTextView(context));
-        addView(imageCredits = createDescriptionTextView(context));
+            addView(galleryView);
+        }
+
+        addView(imageCaption = createDescriptionTextView(context, LentaTextUtils.getNewsFullImageCaptionTextSize(textSize)));
+        addView(imageCredits = createDescriptionTextView(context, LentaTextUtils.getNewsFullImageCreditsTextSize(textSize)));
 
         if (!gallery.isEmpty())
             setImageDescription(gallery.getImage(0));
     }
 
-    private TextView createDescriptionTextView(Context context) {
+    private TextView createDescriptionTextView(Context context, int textSize) {
         final TextView textView = new TextView(context);
-        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 8f);
+        textView.setTextSize(textSize);
 
         return textView;
     }
 
     @Override
-    public void onPageScrolled(int i, float v, int i2) {
-
-    }
+    public void onPageScrolled(int i, float v, int i2) {}
 
     @Override
     public void onPageSelected(int i) {
@@ -81,7 +83,5 @@ public class ImagesGallery extends LinearLayout implements ViewPager.OnPageChang
     }
 
     @Override
-    public void onPageScrollStateChanged(int i) {
-
-    }
+    public void onPageScrollStateChanged(int i) {}
 }

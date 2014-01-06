@@ -87,7 +87,12 @@ public class ArticleLinksDao extends ContentResolverDao<Link> {
 		return null;
 	}
 
-//	public Collection<Link> readForArticle(SQLiteDatabase db, long articleId) {
+    @Override
+    protected String getSortOrder() {
+        return null;
+    }
+
+    //	public Collection<Link> readForArticle(SQLiteDatabase db, long articleId) {
 //		List<Link> result = new ArrayList<Link>();
 //		
 //		String[] keyWhereArgs = { String.valueOf(articleId) };

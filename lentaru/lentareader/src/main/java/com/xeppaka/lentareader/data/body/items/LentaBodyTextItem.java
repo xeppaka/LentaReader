@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.xeppaka.lentareader.data.CDataWrapper;
+import com.xeppaka.lentareader.utils.LentaTextUtils;
 
 /**
  * Created by kacpa01 on 11/4/13.
@@ -29,8 +30,10 @@ public class LentaBodyTextItem implements Item {
     }
 
     @Override
-    public View createView(Context context) {
+    public View createView(Context context, ItemPreferences preferences) {
         TextView view = new TextView(context);
+
+        view.setTextSize(LentaTextUtils.getNewsFullTextSize(preferences.getTextSize()));
         view.setText(Html.fromHtml(text));
         view.setMovementMethod(LinkMovementMethod.getInstance());
 

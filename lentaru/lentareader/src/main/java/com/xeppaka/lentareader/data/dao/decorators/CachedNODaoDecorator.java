@@ -49,9 +49,16 @@ public class CachedNODaoDecorator<T extends NewsObject> extends CachedDaoDecorat
 	}
 
     @Override
-    public List<T> read() {
-        List<T> result = super.read();
-        Collections.sort(result);
+    public T readLatest(Rubrics rubric) {
+        T result = getDecoratedDao().readLatest(rubric);
+
+        if (result != null) {
+            T cached = getLruCacheId().get(result.getId());
+
+            if (cached == null) {
+                getLruCacheId().put(result.getId(), result);
+            }
+        }
 
         return result;
     }

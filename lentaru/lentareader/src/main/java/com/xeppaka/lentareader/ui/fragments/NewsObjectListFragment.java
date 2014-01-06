@@ -19,6 +19,7 @@ public abstract class NewsObjectListFragment extends ListFragment {
     // expanded items for each rubric
     protected Set<Long>[] expandedItemIds = new Set[Rubrics.values().length];
     protected ScrollerPosition[] scrollPositions = new ScrollerPosition[Rubrics.values().length];
+    protected long[] latestNewsTime = new long[Rubrics.values().length];
 
     private static class ScrollerPosition {
         private int item;
@@ -66,6 +67,14 @@ public abstract class NewsObjectListFragment extends ListFragment {
 
     public void clearScrollPosition() {
         scrollPositions[currentRubric.ordinal()].item = scrollPositions[currentRubric.ordinal()].top = 0;
+    }
+
+    public Long getLatestPubDate() {
+        return latestNewsTime[currentRubric.ordinal()];
+    }
+
+    public void setLatestPubDate(long date) {
+        latestNewsTime[currentRubric.ordinal()] = date;
     }
 
     public abstract NewsType getNewsType();

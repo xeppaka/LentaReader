@@ -10,7 +10,7 @@ import com.xeppaka.lentareader.data.dao.async.AsyncNODao;
 
 import java.util.List;
 
-public class AsyncNODaoDecorator<T extends NewsObject> extends AsyncDaoDecorator<T> implements AsyncNODao<T>, NODao<T> {
+public class AsyncNODaoDecorator<T extends NewsObject> extends AsyncDaoDecorator<T> implements AsyncNODao<T> {
 	private NODao<T> decoratedDao;
 	
 	protected class AsyncReadMultiForRubricTask extends AsyncTask<Rubrics, Void, List<T>> {
@@ -59,6 +59,24 @@ public class AsyncNODaoDecorator<T extends NewsObject> extends AsyncDaoDecorator
         }
     }
 
+    protected class AsyncReadSingleLatestForRubricTask extends AsyncTask<Rubrics, Void, T> {
+        private AsyncDao.DaoReadSingleListener<T> listener;
+
+        public AsyncReadSingleLatestForRubricTask(AsyncDao.DaoReadSingleListener<T> listener) {
+            this.listener = listener;
+        }
+
+        @Override
+        protected T doInBackground(Rubrics... param) {
+            return readLatest(param[0]);
+        }
+
+        @Override
+        protected void onPostExecute(T result) {
+            listener.finished(result);
+        }
+    }
+
     protected class AsyncClearLatestFlagTask extends AsyncTask<Rubrics, Void, Integer> {
         private DaoUpdateListener listener;
 
@@ -94,9 +112,14 @@ public class AsyncNODaoDecorator<T extends NewsObject> extends AsyncDaoDecorator
     }
 
     @Override
-	public void readAsync(Rubrics rubric, DaoReadMultiListener<T> listener) {
-		new AsyncReadMultiForRubricTask(listener).execute(rubric);
+	public AsyncTask<Rubrics, Void, List<T>> readAsync(Rubrics rubric, DaoReadMultiListener<T> listener) {
+		return new AsyncReadMultiForRubricTask(listener).execute(rubric);
 	}
+
+    @Override
+    public AsyncTask<Rubrics, Void, T> readLatestAsync(Rubrics rubric, DaoReadSingleListener<T> listener) {
+        return new AsyncReadSingleLatestForRubricTask(listener).execute(rubric);
+    }
 
     @Override
     public void readLatestWOImageAsync(Rubrics rubric, int limit, DaoReadSingleListener<T> listener) {
@@ -112,6 +135,11 @@ public class AsyncNODaoDecorator<T extends NewsObject> extends AsyncDaoDecorator
 	public List<T> read(Rubrics rubric) {
 		return getDecoratedDao().read(rubric);
 	}
+
+    @Override
+    public T readLatest(Rubrics rubric) {
+        return getDecoratedDao().readLatest(rubric);
+    }
 
     @Override
     public int clearLatestFlag(Rubrics rubric) {

@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 public abstract class NewsObjectAdapter<T extends NewsObject> extends BaseAdapter {
-    protected List<T> currentObjects = Collections.emptyList();
+    protected List<T> newsObjects = Collections.emptyList();
     protected Set<Long> expandedItems;
     protected ImageDao imageDao;
 	protected LayoutInflater inflater;
@@ -24,12 +24,12 @@ public abstract class NewsObjectAdapter<T extends NewsObject> extends BaseAdapte
 
 	@Override
 	public int getCount() {
-        return currentObjects.size();
+        return newsObjects.size();
 	}
 
 	@Override
 	public T getItem(int position) {
-        return currentObjects.get(position);
+        return newsObjects.get(position);
 	}
 
 	@Override
@@ -44,16 +44,16 @@ public abstract class NewsObjectAdapter<T extends NewsObject> extends BaseAdapte
 
 	@Override
 	public boolean isEmpty() {
-		return currentObjects.isEmpty();
+		return newsObjects.isEmpty();
 	}
 
     public void setNewsObjects(List<T> newsObjects, Set<Long> expandedItems) {
-        this.currentObjects = newsObjects;
+        this.newsObjects = newsObjects;
         this.expandedItems = expandedItems;
     }
 
-    public List<T> getCurrentObjects() {
-        return currentObjects;
+    public List<T> getNewsObjects() {
+        return newsObjects;
     }
 
     public Set<Long> getExpandedItems() {
@@ -65,6 +65,6 @@ public abstract class NewsObjectAdapter<T extends NewsObject> extends BaseAdapte
     }
 
     public int size() {
-        return currentObjects.size();
+        return newsObjects.size();
     }
 }

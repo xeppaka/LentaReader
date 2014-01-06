@@ -50,7 +50,12 @@ public class NewsLinksDao {
 			super(cr);
 		}
 
-		@Override
+        @Override
+        protected String getSortOrder() {
+            return null;
+        }
+
+        @Override
 		protected ContentValues prepareContentValues(Link link) {
 			ContentValues values = new ContentValues();
 	

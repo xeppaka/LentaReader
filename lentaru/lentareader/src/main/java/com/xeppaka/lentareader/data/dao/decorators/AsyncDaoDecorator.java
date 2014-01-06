@@ -73,7 +73,29 @@ public class AsyncDaoDecorator<T extends DatabaseObject> implements AsyncDao<T> 
 			listener.finished(result);
 		}
 	}
-	
+
+    protected class AsyncReadMultiTask extends AsyncTask<List<Long>, Void, List<T>> {
+        private AsyncDao.DaoReadMultiListener<T> listener;
+
+        public AsyncReadMultiTask(AsyncDao.DaoReadMultiListener<T> listener) {
+            this.listener = listener;
+        }
+
+        @Override
+        protected List<T> doInBackground(List<Long>... ids) {
+            if (ids.length > 0) {
+                return read(ids[0]);
+            } else {
+                return read();
+            }
+        }
+
+        @Override
+        protected void onPostExecute(List<T> result) {
+            listener.finished(result);
+        }
+    }
+
 	protected class AsyncDeleteSingleTask extends AsyncTask<Long, Void, Integer> {
 		private AsyncDao.DaoDeleteListener listener;
 		
@@ -88,28 +110,6 @@ public class AsyncDaoDecorator<T extends DatabaseObject> implements AsyncDao<T> 
 
 		@Override
 		protected void onPostExecute(Integer result) {
-			listener.finished(result);
-		}
-	}
-	
-	protected class AsyncReadMultiTask extends AsyncTask<List<Long>, Void, List<T>> {
-		private AsyncDao.DaoReadMultiListener<T> listener;
-		
-		public AsyncReadMultiTask(AsyncDao.DaoReadMultiListener<T> listener) {
-			this.listener = listener;
-		}
-
-		@Override
-		protected List<T> doInBackground(List<Long>... ids) {
-			if (ids.length > 0) {
-				return read(ids[0]);
-			} else {
-				return read();
-			}
-		}
-
-		@Override
-		protected void onPostExecute(List<T> result) {
 			listener.finished(result);
 		}
 	}
@@ -134,42 +134,42 @@ public class AsyncDaoDecorator<T extends DatabaseObject> implements AsyncDao<T> 
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public synchronized void createAsync(T dataObject, AsyncDao.DaoCreateSingleListener<T> listener) {
-		new AsyncCreateSingleTask(listener).execute(dataObject);
+	public AsyncTask<T, Void, Long> createAsync(T dataObject, AsyncDao.DaoCreateSingleListener<T> listener) {
+		return new AsyncCreateSingleTask(listener).execute(dataObject);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public synchronized void createAsync(List<T> dataObjects, AsyncDao.DaoCreateMultiListener<T> listener) {
-		new AsyncCreateMultiTask(listener).execute(dataObjects);
+	public AsyncTask<List<T>, Void, List<Long>> createAsync(List<T> dataObjects, AsyncDao.DaoCreateMultiListener<T> listener) {
+		return new AsyncCreateMultiTask(listener).execute(dataObjects);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public synchronized void readAsync(AsyncDao.DaoReadMultiListener<T> listener) {
-		new AsyncReadMultiTask(listener).execute();
+	public AsyncTask<List<Long>, Void, List<T>> readAsync(AsyncDao.DaoReadMultiListener<T> listener) {
+		return new AsyncReadMultiTask(listener).execute();
 	}
 
 	@Override
-	public synchronized void readAsync(long id, AsyncDao.DaoReadSingleListener<T> listener) {
-		new AsyncReadSingleTask(listener).execute(id);
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public synchronized void readAsync(List<Long> ids, AsyncDao.DaoReadMultiListener<T> listener) {
-		new AsyncReadMultiTask(listener).execute(ids);
+	public AsyncTask<Long, Void, T> readAsync(long id, AsyncDao.DaoReadSingleListener<T> listener) {
+		return new AsyncReadSingleTask(listener).execute(id);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public synchronized void updateAsync(T dataObject, AsyncDao.DaoUpdateListener listener) {
-		new AsyncUpdateSingleTask(listener).execute(dataObject);
+	public AsyncTask<List<Long>, Void, List<T>> readAsync(List<Long> ids, AsyncDao.DaoReadMultiListener<T> listener) {
+		return new AsyncReadMultiTask(listener).execute(ids);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public AsyncTask<T, Void, Integer> updateAsync(T dataObject, AsyncDao.DaoUpdateListener listener) {
+		return new AsyncUpdateSingleTask(listener).execute(dataObject);
 	}
 
 	@Override
-	public synchronized void deleteAsync(long id, AsyncDao.DaoDeleteListener listener) {
-		new AsyncDeleteSingleTask(listener).execute(id);
+	public AsyncTask<Long, Void, Integer> deleteAsync(long id, AsyncDao.DaoDeleteListener listener) {
+		return new AsyncDeleteSingleTask(listener).execute(id);
 	}
 
 	protected Dao<T> getDecoratedDao() {

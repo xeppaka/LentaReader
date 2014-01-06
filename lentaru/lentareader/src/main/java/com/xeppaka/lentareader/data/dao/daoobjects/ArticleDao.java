@@ -123,4 +123,9 @@ public class ArticleDao extends ContentResolverDao<Article> {
 	public List<Article> readForParentObject(long parentId) {
 		return null;
 	}
+
+    @Override
+    protected String getSortOrder() {
+        return null;
+    }
 }

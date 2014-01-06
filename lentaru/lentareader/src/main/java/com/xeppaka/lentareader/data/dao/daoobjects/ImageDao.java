@@ -38,6 +38,9 @@ public class ImageDao implements DaoObservable<BitmapReference> {
     private static final String imageLoadingText1 = "Изображение";
     private static final String imageLoadingText2 = "загружается";
 
+    private static final String imageTurnedOffText1 = "Загрузка изображений";
+    private static final String imageTurnedOffText2 = "отключена";
+
     private static final float THUMBNAIL_RATIO = 3.5f;
 
     // private ContentResolver contentResolver;
@@ -46,6 +49,8 @@ public class ImageDao implements DaoObservable<BitmapReference> {
 
     private static final StrongBitmapReference notAvailableThumbnailImageRef;
     private static final StrongBitmapReference loadingThumbnailImageRef;
+
+    private static final StrongBitmapReference turnedOffImagesThumbnailImageRef;
 
 //    private static final List<Observer> observers = new ArrayList<Observer>();
 //    private static final Object observersSync = new Object();
@@ -58,6 +63,8 @@ public class ImageDao implements DaoObservable<BitmapReference> {
 
         notAvailableThumbnailImageRef = new StrongBitmapReference(createNotAvailableThumbnailBitmap());
         loadingThumbnailImageRef = new StrongBitmapReference(createLoadingThumbnailBitmap());
+
+        turnedOffImagesThumbnailImageRef = new StrongBitmapReference(createTurnedOffThumbnailBitmap());
     }
 
     private ImageDao() {}
@@ -234,7 +241,16 @@ public class ImageDao implements DaoObservable<BitmapReference> {
         return loadingImageRef;
     }
 
-//    /**
+    /**
+     * Gets image with "Turned off" phrase written in it.
+     *
+     * @return reference to the bitmap. Never null.
+     */
+    public static StrongBitmapReference getTurnedOffImagesThumbnailImageRef() {
+        return turnedOffImagesThumbnailImageRef;
+    }
+
+    //    /**
 //     * Creates bitmap in cache. It means it will store bitmap in the memory
 //     * cache and save it to the external drive cache if it's available.
 //     *
@@ -341,19 +357,23 @@ public class ImageDao implements DaoObservable<BitmapReference> {
 //    }
 
     private static Bitmap createNotAvailableBitmap() {
-        Bitmap result = Bitmap.createBitmap(420, 280, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(result);
+//        Bitmap result = Bitmap.createBitmap(420, 280, Bitmap.Config.ARGB_8888);
+//        Canvas canvas = new Canvas(result);
+//
+//        Paint paint = new Paint();
+//        paint.setColor(Color.BLACK);
+//        paint.setTextSize(30);
+//
+//        float text1Width = paint.measureText(imageNotAvailableText1);
+//        float text2Width = paint.measureText(imageNotAvailableText2);
+//
+//        canvas.drawText(imageNotAvailableText1, (420 - text1Width) / 2, 70, paint);
+//        canvas.drawText(imageNotAvailableText2, (420 - text2Width) / 2, 100, paint);
+//        return result;
 
-        Paint paint = new Paint();
-        paint.setColor(Color.BLACK);
-        paint.setTextSize(30);
+        // for now to save memory this image is not used
 
-        float text1Width = paint.measureText(imageNotAvailableText1);
-        float text2Width = paint.measureText(imageNotAvailableText2);
-
-        canvas.drawText(imageNotAvailableText1, (420 - text1Width) / 2, 70, paint);
-        canvas.drawText(imageNotAvailableText2, (420 - text2Width) / 2, 100, paint);
-        return result;
+        return null;
     }
 
     private static Bitmap createNotAvailableThumbnailBitmap() {
@@ -373,19 +393,23 @@ public class ImageDao implements DaoObservable<BitmapReference> {
     }
 
     private static Bitmap createLoadingBitmap() {
-        Bitmap result = Bitmap.createBitmap(420, 280, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(result);
+//        Bitmap result = Bitmap.createBitmap(420, 280, Bitmap.Config.ARGB_8888);
+//        Canvas canvas = new Canvas(result);
+//
+//        Paint paint = new Paint();
+//        paint.setColor(Color.BLACK);
+//        paint.setTextSize(30);
+//
+//        float text1Width = paint.measureText(imageLoadingText1);
+//        float text2Width = paint.measureText(imageLoadingText2);
+//
+//        canvas.drawText(imageLoadingText1, (420 - text1Width) / 2, 70, paint);
+//        canvas.drawText(imageLoadingText2, (420 - text2Width) / 2, 100, paint);
+//        return result;
 
-        Paint paint = new Paint();
-        paint.setColor(Color.BLACK);
-        paint.setTextSize(30);
+        // for now to save memory this image is not used
 
-        float text1Width = paint.measureText(imageLoadingText1);
-        float text2Width = paint.measureText(imageLoadingText2);
-
-        canvas.drawText(imageLoadingText1, (420 - text1Width) / 2, 70, paint);
-        canvas.drawText(imageLoadingText2, (420 - text2Width) / 2, 100, paint);
-        return result;
+        return null;
     }
 
     private static Bitmap createLoadingThumbnailBitmap() {
@@ -401,6 +425,22 @@ public class ImageDao implements DaoObservable<BitmapReference> {
 
         canvas.drawText(imageLoadingText1, (165 - text1Width) / 2, 25, paint);
         canvas.drawText(imageLoadingText2, (165 - text2Width) / 2, 45, paint);
+        return result;
+    }
+
+    private static Bitmap createTurnedOffThumbnailBitmap() {
+        Bitmap result = Bitmap.createBitmap(165, 110, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(result);
+
+        Paint paint = new Paint();
+        paint.setColor(Color.BLACK);
+        paint.setTextSize(15);
+
+        float text1Width = paint.measureText(imageTurnedOffText1);
+        float text2Width = paint.measureText(imageTurnedOffText2);
+
+        canvas.drawText(imageTurnedOffText1, (165 - text1Width) / 2, 25, paint);
+        canvas.drawText(imageTurnedOffText2, (165 - text2Width) / 2, 45, paint);
         return result;
     }
 

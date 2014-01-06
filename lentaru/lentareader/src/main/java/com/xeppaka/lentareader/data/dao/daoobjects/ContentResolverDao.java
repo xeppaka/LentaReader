@@ -59,7 +59,7 @@ public abstract class ContentResolverDao<T extends DatabaseObject> implements Da
 	@Override
 	public List<T> read() {
 		Cursor cur = cr.query(getContentProviderUri(),
-				getProjectionAll(), null, null, null);
+				getProjectionAll(), null, null, getSortOrder());
 
         if (cur == null) {
             return Collections.EMPTY_LIST;
@@ -423,5 +423,6 @@ public abstract class ContentResolverDao<T extends DatabaseObject> implements Da
 	protected abstract SQLiteType getKeyColumnType();
 	protected abstract String getIdColumnName();
 	protected abstract String[] getProjectionAll();
+    protected abstract String getSortOrder();
 	protected abstract Uri getContentProviderUri();
 }

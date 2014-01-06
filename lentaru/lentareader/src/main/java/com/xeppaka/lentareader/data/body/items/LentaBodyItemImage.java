@@ -60,7 +60,7 @@ public class LentaBodyItemImage implements Item {
     }
 
     @Override
-    public View createView(Context context) {
+    public View createView(Context context, ItemPreferences preferences) {
         throw new UnsupportedOperationException("Operation is not supported.");
     }
 

@@ -26,7 +26,12 @@ public class PhotoImageDao extends ContentResolverDao<PhotoImage> {
 		super(cr);
 	}
 
-	@Override
+    @Override
+    protected String getSortOrder() {
+        return null;
+    }
+
+    @Override
 	protected ContentValues prepareContentValues(PhotoImage photoImage) {
 		ContentValues values = new ContentValues();
 

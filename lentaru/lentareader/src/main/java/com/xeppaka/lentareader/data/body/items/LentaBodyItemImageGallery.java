@@ -38,8 +38,8 @@ public class LentaBodyItemImageGallery implements Item, Iterable<LentaBodyItemIm
     }
 
     @Override
-    public View createView(Context context) {
-        return new ImagesGallery(context, this);
+    public View createView(Context context, ItemPreferences preferences) {
+        return new ImagesGallery(context, this, preferences.isDownloadImages(), preferences.getTextSize());
     }
 
     @Override

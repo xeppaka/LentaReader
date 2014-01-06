@@ -1,5 +1,7 @@
 package com.xeppaka.lentareader.data.dao.async;
 
+import android.os.AsyncTask;
+
 import com.xeppaka.lentareader.data.dao.Dao;
 
 import java.util.Collection;
@@ -83,7 +85,7 @@ public interface AsyncDao<T> extends Dao<T> {
 	 *            is a listener for result.
 	 * @return database id for the newly created object.
 	 */
-	void createAsync(T dataObject, DaoCreateSingleListener<T> listener);
+	AsyncTask<T, Void, Long> createAsync(T dataObject, DaoCreateSingleListener<T> listener);
 
 	/**
 	 * Create new objects in the database (rows in the table).
@@ -95,7 +97,7 @@ public interface AsyncDao<T> extends Dao<T> {
 	 * @return database ids for the newly created object in the same order as
 	 *         objects were.
 	 */
-	void createAsync(List<T> dataObjects, DaoCreateMultiListener<T> listener);
+    AsyncTask<List<T>, Void, List<Long>> createAsync(List<T> dataObjects, DaoCreateMultiListener<T> listener);
 	
 	/**
 	 * Read all news objects from database.
@@ -105,7 +107,7 @@ public interface AsyncDao<T> extends Dao<T> {
 	 * @return Collection of the news objects. Null if error occurred while reading
 	 *         data from the database.
 	 */
-	void readAsync(DaoReadMultiListener<T> listener);
+    AsyncTask<List<Long>, Void, List<T>> readAsync(DaoReadMultiListener<T> listener);
 	
 	/**
 	 * Read some news object from the database specifying its id.
@@ -116,7 +118,7 @@ public interface AsyncDao<T> extends Dao<T> {
 	 * @return News object created from the database. Null if object is not
 	 *         found.
 	 */
-	void readAsync(long id, DaoReadSingleListener<T> listener);
+    AsyncTask<Long, Void, T> readAsync(long id, DaoReadSingleListener<T> listener);
 	
 	/**
 	 * Read some news objects from the database specifying its collection of
@@ -128,7 +130,7 @@ public interface AsyncDao<T> extends Dao<T> {
 	 * @return Collection of News objects created from the database. Not null.
 	 *         Could be empty.
 	 */
-	void readAsync(List<Long> ids, DaoReadMultiListener<T> listener);
+    AsyncTask<List<Long>, Void, List<T>> readAsync(List<Long> ids, DaoReadMultiListener<T> listener);
 	
 	/**
 	 * Update object's information in database.
@@ -141,7 +143,7 @@ public interface AsyncDao<T> extends Dao<T> {
 	 * @param listener
 	 *            is a listener for result.
 	 */
-	void updateAsync(T dataObject, DaoUpdateListener listener);
+    AsyncTask<T, Void, Integer> updateAsync(T dataObject, DaoUpdateListener listener);
 
 	/**
 	 * Deletes object from the database.
@@ -151,5 +153,5 @@ public interface AsyncDao<T> extends Dao<T> {
 	 *            is a listener for result.
 	 * @return number of rows deleted.
 	 */
-	void deleteAsync(long id, DaoDeleteListener listener);
+    AsyncTask<Long, Void, Integer> deleteAsync(long id, DaoDeleteListener listener);
 }

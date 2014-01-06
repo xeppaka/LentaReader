@@ -23,6 +23,13 @@ public class SynchronizedNODaoDecorator<T extends NewsObject> extends Synchroniz
 	}
 
     @Override
+    public T readLatest(Rubrics rubric) {
+        synchronized (getSync()) {
+            return decoratedDao.readLatest(rubric);
+        }
+    }
+
+    @Override
     public boolean hasImage(long id) {
         synchronized (getSync()) {
             return decoratedDao.hasImage(id);

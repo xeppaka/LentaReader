@@ -8,5 +8,5 @@ import android.view.View;
  */
 public interface Item {
     String toXml();
-    View createView(Context context);
+    View createView(Context context, ItemPreferences preferences);
 }

@@ -24,6 +24,8 @@ public abstract class ContentResolverNODao<T extends NewsObject> extends Content
     private final static String[] projectionImage = { BaseColumns._ID, NewsObjectEntry.COLUMN_NAME_IMAGELINK };
     private final static ContentValues clearLatestFlagValues;
 
+    private final static String sortOrder = NewsObjectEntry.COLUMN_NAME_PUBDATE + " DESC";
+
     static {
         clearLatestFlagValues = new ContentValues();
         clearLatestFlagValues.put(NewsEntry.COLUMN_NAME_LATEST_NEWS, 0);
@@ -68,6 +70,38 @@ public abstract class ContentResolverNODao<T extends NewsObject> extends Content
             }
 		}
 	}
+
+    @Override
+    public T readLatest(Rubrics rubric) {
+        Cursor cur;
+
+        if (rubric != Rubrics.LATEST) {
+            String where = getWhereFromSQLiteType(SQLiteType.TEXT, 1);
+            String[] whereArgs = { rubric.name() };
+
+            cur = getContentResolver().query(getContentProviderUri(),
+                    getProjectionAll(), String.format(where, getRubricColumnName()), whereArgs, getSortOrder() + " limit 1");
+        } else {
+            cur = getContentResolver().query(getContentProviderUri(),
+                    getProjectionAll(), null, null, getSortOrder() + " limit 1");
+        }
+
+        if (cur == null) {
+            return null;
+        }
+
+        try {
+            if (cur.moveToFirst()) {
+                return createDataObject(cur);
+            }
+
+            return null;
+        } finally {
+            if (cur != null) {
+                cur.close();
+            }
+        }
+    }
 
     @Override
     public T readLatestWOImage(Rubrics rubric, int limit) {
@@ -201,10 +235,14 @@ public abstract class ContentResolverNODao<T extends NewsObject> extends Content
 //	}
 //
 	protected String getRubricColumnName() {
-        return NewsEntry.COLUMN_NAME_RUBRIC;
+        return NewsObjectEntry.COLUMN_NAME_RUBRIC;
     }
 
     protected String getLatestColumnName() {
-        return NewsEntry.COLUMN_NAME_LATEST_NEWS;
+        return NewsObjectEntry.COLUMN_NAME_LATEST_NEWS;
+    }
+
+    protected String getSortOrder() {
+        return sortOrder;
     }
 }
