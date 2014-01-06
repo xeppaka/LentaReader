@@ -393,23 +393,19 @@ public class ImageDao implements DaoObservable<BitmapReference> {
     }
 
     private static Bitmap createLoadingBitmap() {
-//        Bitmap result = Bitmap.createBitmap(420, 280, Bitmap.Config.ARGB_8888);
-//        Canvas canvas = new Canvas(result);
-//
-//        Paint paint = new Paint();
-//        paint.setColor(Color.BLACK);
-//        paint.setTextSize(30);
-//
-//        float text1Width = paint.measureText(imageLoadingText1);
-//        float text2Width = paint.measureText(imageLoadingText2);
-//
-//        canvas.drawText(imageLoadingText1, (420 - text1Width) / 2, 70, paint);
-//        canvas.drawText(imageLoadingText2, (420 - text2Width) / 2, 100, paint);
-//        return result;
+        Bitmap result = Bitmap.createBitmap(420, 280, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(result);
 
-        // for now to save memory this image is not used
+        Paint paint = new Paint();
+        paint.setColor(Color.BLACK);
+        paint.setTextSize(30);
 
-        return null;
+        float text1Width = paint.measureText(imageLoadingText1);
+        float text2Width = paint.measureText(imageLoadingText2);
+
+        canvas.drawText(imageLoadingText1, (420 - text1Width) / 2, 70, paint);
+        canvas.drawText(imageLoadingText2, (420 - text2Width) / 2, 100, paint);
+        return result;
     }
 
     private static Bitmap createLoadingThumbnailBitmap() {

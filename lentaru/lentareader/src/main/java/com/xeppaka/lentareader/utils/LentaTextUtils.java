@@ -13,11 +13,11 @@ public class LentaTextUtils {
     }
 
     public static int getNewsFullImageCaptionTextSize(int baseTextSize) {
-        return baseTextSize - 6;
+        return baseTextSize - 5;
     }
 
     public static int getNewsFullImageCreditsTextSize(int baseTextSize) {
-        return baseTextSize - 6;
+        return baseTextSize - 5;
     }
 
     public static int getNewsFullRubricTextSize(int baseTextSize) {

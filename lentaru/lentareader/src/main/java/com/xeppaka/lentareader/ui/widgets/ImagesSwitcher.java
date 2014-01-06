@@ -6,6 +6,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageSwitcher;
@@ -35,6 +36,9 @@ public class ImagesSwitcher extends ViewPager {
         private GalleryViewPagerAdapter(List<LentaBodyItemImage> images) {
             this.images = images;
 
+            final int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 220, getResources().getDisplayMetrics());
+            setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height));
+
             createViews();
         }
 
@@ -43,7 +47,7 @@ public class ImagesSwitcher extends ViewPager {
 
             for (int i = 0; i < images.size(); ++i) {
                 final ImageView imageView = new ImageView(getContext());
-                imageView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                imageView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
                 imageView.setScaleType(ImageView.ScaleType.FIT_XY);
                 imageView.setAdjustViewBounds(true);
 
@@ -83,7 +87,9 @@ public class ImagesSwitcher extends ViewPager {
 
         private void setBitmap(ImageView imageView, Bitmap bitmap) {
             imageView.setImageDrawable(new BitmapDrawable(getContext().getResources(), bitmap));
-            getLayoutParams().height = Math.round(getWidth() / (float) bitmap.getWidth() * bitmap.getHeight());
+            // getLayoutParams().height = Math.round(getWidth() / (float) bitmap.getWidth() * bitmap.getHeight());
+
+            requestLayout();
         }
 
         @Override

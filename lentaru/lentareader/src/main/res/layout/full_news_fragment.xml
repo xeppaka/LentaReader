@@ -24,7 +24,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="1dip"
             android:layout_marginRight="1dip"
-            android:textSize="10sp"/>
+            android:textSize="11sp"/>
 
         <TextView
             android:id="@+id/full_news_image_credits"
@@ -33,7 +33,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="1dip"
             android:layout_marginRight="1dip"
-            android:textSize="10sp"/>
+            android:textSize="11sp"/>
 
         <TextView
             android:id="@+id/full_news_title"

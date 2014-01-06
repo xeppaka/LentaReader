@@ -3,6 +3,7 @@ package com.xeppaka.lentareader.ui.widgets;
 import android.content.Context;
 import android.support.v4.view.ViewPager;
 import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -54,6 +55,7 @@ public class ImagesGallery extends LinearLayout implements ViewPager.OnPageChang
     private TextView createDescriptionTextView(Context context, int textSize) {
         final TextView textView = new TextView(context);
         textView.setTextSize(textSize);
+        textView.setMovementMethod(LinkMovementMethod.getInstance());
 
         return textView;
     }
