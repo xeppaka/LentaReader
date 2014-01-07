@@ -42,6 +42,13 @@
                 android:textSize="11sp"
                 android:textStyle="bold"/>
         </LinearLayout>
+
+        <View
+            android:id="@+id/brief_news_read_indicator"
+            android:layout_width="1dip"
+            android:layout_height="match_parent"
+            android:background="@color/brief_list_item_notread"/>
+
     </LinearLayout>
 
     <LinearLayout

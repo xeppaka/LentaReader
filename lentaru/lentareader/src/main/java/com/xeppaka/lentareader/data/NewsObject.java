@@ -27,8 +27,9 @@ public abstract class NewsObject implements Comparable<NewsObject>, DatabaseObje
 	private Date pubDate;
     private String formattedPubDate;
 	private Rubrics rubric;
-    private boolean latest;
     private String description;
+    private boolean latest;
+    private boolean read;
     private Body body;
 
     static {
@@ -46,7 +47,7 @@ public abstract class NewsObject implements Comparable<NewsObject>, DatabaseObje
 
 
     public NewsObject(long id, String guid, String title, String link, String imageLink,
-                      String imageCaption, String imageCredits, Date pubDate, Rubrics rubric, boolean latest, String description, Body body) {
+                      String imageCaption, String imageCredits, Date pubDate, Rubrics rubric, String description, boolean latest, boolean read, Body body) {
 		setId(id);
 		setGuid(guid);
 		setTitle(title);
@@ -59,13 +60,14 @@ public abstract class NewsObject implements Comparable<NewsObject>, DatabaseObje
         setDescription(description);
         setBody(body);
         setLatest(latest);
+        setRead(read);
 
         setFormattedPubDate(dateFormat.format(getPubDate()));
 	}
 	
 	public NewsObject(String guid, String title, String link, String imageLink, String imageCaption,
-                      String imageCredits, Date pubDate, Rubrics rubric, boolean latest, String description, Body body) {
-		this(ID_NONE, guid, title, link, imageLink, imageCaption, imageCredits, pubDate, rubric, latest, description, body);
+                      String imageCredits, Date pubDate, Rubrics rubric, String description, boolean latest, boolean read, Body body) {
+		this(ID_NONE, guid, title, link, imageLink, imageCaption, imageCredits, pubDate, rubric, description, latest, read, body);
 	}
 	
 	public NewsObject(LentaRssItem rssItem) {
@@ -190,6 +192,14 @@ public abstract class NewsObject implements Comparable<NewsObject>, DatabaseObje
 
     public void setLatest(boolean latest) {
         this.latest = latest;
+    }
+
+    public boolean isRead() {
+        return read;
+    }
+
+    public void setRead(boolean read) {
+        this.read = read;
     }
 
     public Body getBody() {

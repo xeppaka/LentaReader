@@ -30,6 +30,7 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
         private final TextView newsRubric;
         private final TextView newsRubricTitle;
         private final View newsDescriptionPanel;
+        private final View newsReadIndicator;
         private final ImageView newsImage;
 		private BitmapReference imageRef;
         private int position;
@@ -37,7 +38,8 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
         private AsyncTask asyncTask;
 
         public ViewHolder(ImageView newsImage, TextView newsTitle, TextView newsDescription, TextView newsDate,
-                          TextView newsImageCaption, TextView newsImageCredits, TextView newsRubricTitle, TextView newsRubric, View newsDescriptionPanel, int position) {
+                          TextView newsImageCaption, TextView newsImageCredits, TextView newsRubricTitle, TextView newsRubric, View newsDescriptionPanel,
+                          View newsReadIndicator, int position) {
 			this.newsImage = newsImage;
 			this.newsTitle = newsTitle;
             this.newsDescription = newsDescription;
@@ -47,6 +49,7 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
             this.newsRubricTitle = newsRubricTitle;
             this.newsRubric = newsRubric;
             this.newsDescriptionPanel = newsDescriptionPanel;
+            this.newsReadIndicator = newsReadIndicator;
             this.position = position;
 		}
 		
@@ -86,6 +89,10 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
             return newsDescriptionPanel;
         }
 
+        public View getNewsReadIndicator() {
+            return newsReadIndicator;
+        }
+
         public BitmapReference getImage() {
 			return imageRef;
 		}
@@ -108,10 +115,6 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
 
         public void setImageUrl(String imageUrl) {
             this.imageUrl = imageUrl;
-        }
-
-        public AsyncTask getAsyncTask() {
-            return asyncTask;
         }
 
         public void setAsyncTask(AsyncTask asyncTask) {
@@ -145,6 +148,7 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
         TextView newsRubricTitle;
         TextView newsRubric;
         View newsDescriptionPanel;
+        View newsReadIndicator;
 
         ViewHolder holder;
 		
@@ -163,6 +167,7 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
             newsRubric = (TextView)view.findViewById(R.id.brief_news_rubric);
             newsDescriptionTextView = (TextView)view.findViewById(R.id.brief_news_description);
             newsDescriptionPanel = view.findViewById(R.id.brief_news_description_panel);
+            newsReadIndicator = view.findViewById(R.id.brief_news_read_indicator);
 
             newsCaptionTextView.setMovementMethod(LinkMovementMethod.getInstance());
             newsCreditsTextView.setMovementMethod(LinkMovementMethod.getInstance());
@@ -173,7 +178,7 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
             newsImageView = (ImageView)view.findViewById(R.id.brief_news_image);
 
             view.setTag(holder = new ViewHolder(newsImageView, newsTitleTextView, newsDescriptionTextView, newsDateTextView,
-                    newsCaptionTextView, newsCreditsTextView, newsRubricTitle, newsRubric, newsDescriptionPanel, position));
+                    newsCaptionTextView, newsCreditsTextView, newsRubricTitle, newsRubric, newsDescriptionPanel, newsReadIndicator, position));
 
             final ViewHolder holderForAsync = holder;
 
@@ -215,6 +220,7 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
             newsRubric = holder.getNewsRubric();
 			newsImageView = holder.getNewsImage();
             newsDescriptionPanel = holder.getNewsDescriptionPanel();
+            newsReadIndicator = holder.getNewsReadIndicator();
 
 //            BitmapReference prevImageRef = holder.getImage();
 //			if (prevImageRef != null) {
@@ -252,6 +258,12 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
         }
 
         News news = getItem(position);
+
+        if (news.isRead()) {
+            newsReadIndicator.setVisibility(View.GONE);
+        } else {
+            newsReadIndicator.setVisibility(View.VISIBLE);
+        }
 
 		newsTitleTextView.setText(news.getTitle());
         newsDescriptionTextView.setText(Html.fromHtml(news.getDescription()));

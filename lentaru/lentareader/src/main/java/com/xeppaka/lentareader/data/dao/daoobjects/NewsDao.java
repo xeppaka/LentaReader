@@ -16,6 +16,7 @@ import com.xeppaka.lentareader.data.dao.decorators.AsyncNODaoDecorator;
 import com.xeppaka.lentareader.data.dao.decorators.CachedNODaoDecorator;
 import com.xeppaka.lentareader.data.dao.decorators.SynchronizedNODaoDecorator;
 import com.xeppaka.lentareader.data.db.NewsEntry;
+import com.xeppaka.lentareader.data.db.NewsObjectEntry;
 import com.xeppaka.lentareader.data.db.SQLiteType;
 import com.xeppaka.lentareader.data.provider.LentaProvider;
 import com.xeppaka.lentareader.parser.convertednews.ConvertedBodyParser;
@@ -54,8 +55,9 @@ public final class NewsDao {
 			NewsEntry.COLUMN_NAME_IMAGECREDITS,
 			NewsEntry.COLUMN_NAME_PUBDATE,
 			NewsEntry.COLUMN_NAME_RUBRIC,
-            NewsEntry.COLUMN_NAME_LATEST_NEWS,
 			NewsEntry.COLUMN_NAME_DESCRIPTION,
+            NewsEntry.COLUMN_NAME_LATEST_NEWS,
+            NewsEntry.COLUMN_NAME_READ,
 			NewsEntry.COLUMN_NAME_BODY
 		};
 		
@@ -88,8 +90,9 @@ public final class NewsDao {
 			
 			values.put(NewsEntry.COLUMN_NAME_PUBDATE, news.getPubDate().getTime());
 			values.put(NewsEntry.COLUMN_NAME_RUBRIC, news.getRubric().name());
-            values.put(NewsEntry.COLUMN_NAME_LATEST_NEWS, news.isLatest());
 			values.put(NewsEntry.COLUMN_NAME_DESCRIPTION, news.getDescription());
+            values.put(NewsEntry.COLUMN_NAME_LATEST_NEWS, news.isLatest());
+            values.put(NewsEntry.COLUMN_NAME_READ, news.isRead());
 
 			if (news.getBody() == null)
 				values.putNull(NewsEntry.COLUMN_NAME_BODY);
@@ -111,6 +114,7 @@ public final class NewsDao {
 			Date pubDate = new Date(cur.getLong(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_PUBDATE)));
 			Rubrics rubric = Rubrics.valueOf(cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_RUBRIC)));
             boolean latest = cur.getInt(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_LATEST_NEWS)) > 0;
+            boolean read = cur.getInt(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_READ)) > 0;
 			String description = cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_DESCRIPTION));
             Body body;
 
@@ -124,7 +128,7 @@ public final class NewsDao {
                 body = EmptyBody.getInstance();
             }
 
-            return new News(id, guidDb, title, link, pubDate, imageLink, imageCaption, imageCredits, rubric, latest, description, body);
+            return new News(id, guidDb, title, link, pubDate, imageLink, imageCaption, imageCredits, rubric, description, latest, read, body);
 		}
 	
 		@Override

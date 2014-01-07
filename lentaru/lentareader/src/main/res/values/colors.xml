@@ -3,5 +3,6 @@
     <color name="select_rubric">#f5d7d7d7</color>
     <color name="select_rubric_pressed">#f5b3b3b3</color>
     <color name="select_rubric_focused">#f5efefef</color>
-    <color name="select_rubric_text">#000000</color>
+    <color name="select_rubric_text">#ff000000</color>
+    <color name="brief_list_item_notread">#ffff7f00</color>
 </resources>

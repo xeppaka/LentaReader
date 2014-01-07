@@ -9,15 +9,15 @@ public class News extends NewsObject {
 	private static final long serialVersionUID = 1L;
 
 	public News(long id, String guid, String title, String link, Date pubDate, String imageLink,
-			String imageCaption, String imageCredits, Rubrics rubric, boolean latest, String description,
+			String imageCaption, String imageCredits, Rubrics rubric, String description, boolean latest, boolean read,
             Body body) {
-		super(id, guid, title, link, imageLink, imageCaption, imageCredits, pubDate, rubric, latest, description, body);
+		super(id, guid, title, link, imageLink, imageCaption, imageCredits, pubDate, rubric, description, latest, read, body);
 	}
 	
 	public News(String guid, String title, String link, Date pubDate, String imageLink,
-			String imageCaption, String imageCredits, Rubrics rubric, boolean latest, String description,
+			String imageCaption, String imageCredits, Rubrics rubric, String description, boolean latest, boolean read,
             Body body) {
-		super(guid, title, link, imageLink, imageCaption, imageCredits, pubDate, rubric, latest, description, body);
+		super(guid, title, link, imageLink, imageCaption, imageCredits, pubDate, rubric, description, latest, read, body);
 	}
 
 	public News(LentaRssItem rssItem) {

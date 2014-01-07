@@ -90,13 +90,23 @@ public class NewsFullFragment extends Fragment {
         textSize = preferences.getInt(PreferencesConstants.PREF_KEY_NEWS_FULL_TEXT_SIZE, PreferencesConstants.NEWS_FULL_TEXT_SIZE_DEFAULT);
 
         if (loadedNews == null) {
-            AsyncDao<News> nd = NewsDao.getInstance(getActivity().getContentResolver());
+            final AsyncDao<News> nd = NewsDao.getInstance(getActivity().getContentResolver());
+
             nd.readAsync(newsId, new AsyncDao.DaoReadSingleListener<News>() {
                 @Override
                 public void finished(News result) {
                     if (isResumed()) {
                         loadedNews = result;
                         showNews(loadedNews);
+
+                        if (!loadedNews.isRead()) {
+                            loadedNews.setRead(true);
+
+                            nd.updateAsync(loadedNews, new AsyncDao.DaoUpdateListener() {
+                                @Override
+                                public void finished(int rowsUpdated) {}
+                            });
+                        }
                     }
                 }
             });

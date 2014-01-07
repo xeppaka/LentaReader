@@ -16,7 +16,7 @@ public class Article extends News {
 			String author, String link, Date pubDate, String imageLink, String imageCaption,
 			String imageCredits, Rubrics rubric, String description, Body body) {
 		super(id, guid, title, link, pubDate, imageLink, imageCaption, imageCredits,
-                rubric, false, description, body);
+                rubric, description, false, false, body);
 
 		setSecondTitle(secondTitle);
 		setAuthor(author);
@@ -25,8 +25,8 @@ public class Article extends News {
 	public Article(String guid, String title, String secondTitle,
 			String author, String link, Date pubDate, String imageLink, String imageCaption,
 			String imageCredits, Collection<Link> links, Rubrics rubric, String description, Body body) {
-		super(guid, title, link, pubDate, imageLink, imageCaption, imageCredits, rubric, false,
-                description, body);
+		super(guid, title, link, pubDate, imageLink, imageCaption, imageCredits, rubric, description,
+                false, false, body);
 
 		setSecondTitle(secondTitle);
 		setAuthor(author);
