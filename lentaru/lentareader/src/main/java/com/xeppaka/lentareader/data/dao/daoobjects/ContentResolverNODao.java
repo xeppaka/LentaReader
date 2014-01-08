@@ -23,12 +23,16 @@ public abstract class ContentResolverNODao<T extends NewsObject> extends Content
 
     private final static String[] projectionImage = { BaseColumns._ID, NewsObjectEntry.COLUMN_NAME_IMAGELINK };
     private final static ContentValues clearLatestFlagValues;
+    private final static ContentValues setLatestFlagValues;
 
     private final static String sortOrder = NewsObjectEntry.COLUMN_NAME_PUBDATE + " DESC";
 
     static {
         clearLatestFlagValues = new ContentValues();
         clearLatestFlagValues.put(NewsEntry.COLUMN_NAME_LATEST_NEWS, 0);
+
+        setLatestFlagValues = new ContentValues();
+        setLatestFlagValues.put(NewsEntry.COLUMN_NAME_LATEST_NEWS, 1);
     }
 
 	public ContentResolverNODao(ContentResolver cr) {
@@ -101,6 +105,28 @@ public abstract class ContentResolverNODao<T extends NewsObject> extends Content
                 cur.close();
             }
         }
+    }
+
+    @Override
+    public int deleteOlderOrEqual(Rubrics rubric, long date) {
+        String[] whereArgs;
+        String where;
+
+        if (rubric == Rubrics.LATEST) {
+            whereArgs = new String[] { String.valueOf(date) };
+            where = NewsEntry.COLUMN_NAME_PUBDATE + " <= ?";
+        } else {
+            whereArgs = new String[] { rubric.name(), String.valueOf(date) };
+            where = String.format(getWhereFromSQLiteType(SQLiteType.TEXT, 1) + " and " + NewsEntry.COLUMN_NAME_PUBDATE + " <= ?", NewsEntry.COLUMN_NAME_RUBRIC);
+        }
+
+        final int result = getContentResolver().delete(getContentProviderUri(), where, whereArgs);
+
+        if (result > 0) {
+            getContentResolver().notifyChange(getContentProviderUri(), null);
+        }
+
+        return result;
     }
 
     @Override
@@ -204,10 +230,26 @@ public abstract class ContentResolverNODao<T extends NewsObject> extends Content
 
     @Override
     public int clearLatestFlag(Rubrics rubric) {
-        String where = getWhereFromSQLiteType(SQLiteType.TEXT);
-        String[] whereArgs = { rubric.name() };
+        if (rubric != Rubrics.LATEST) {
+            String where = getWhereFromSQLiteType(SQLiteType.TEXT);
+            String[] whereArgs = new String[] { rubric.name() };
 
-        return getContentResolver().update(getContentProviderUri(), clearLatestFlagValues, String.format(where, getRubricColumnName()), whereArgs);
+            return getContentResolver().update(getContentProviderUri(), clearLatestFlagValues, String.format(where, getRubricColumnName()), whereArgs);
+        } else {
+            return getContentResolver().update(getContentProviderUri(), clearLatestFlagValues, null, null);
+        }
+    }
+
+    @Override
+    public int setLatestFlag(Rubrics rubric) {
+        if (rubric != Rubrics.LATEST) {
+            String where = getWhereFromSQLiteType(SQLiteType.TEXT);
+            String[] whereArgs = new String[] { rubric.name() };
+
+            return getContentResolver().update(getContentProviderUri(), setLatestFlagValues, String.format(where, getRubricColumnName()), whereArgs);
+        } else {
+            return getContentResolver().update(getContentProviderUri(), setLatestFlagValues, null, null);
+        }
     }
 
     //	@Override

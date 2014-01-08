@@ -9,7 +9,6 @@ import com.xeppaka.lentareader.data.dao.NODao;
 import com.xeppaka.lentareader.utils.LentaConstants;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -80,13 +79,44 @@ public class CachedNODaoDecorator<T extends NewsObject> extends CachedDaoDecorat
 
     @Override
     public int clearLatestFlag(Rubrics rubric) {
-        int result = getDecoratedDao().clearLatestFlag(rubric);
+        final int result = getDecoratedDao().clearLatestFlag(rubric);
 
         Map<Long, T> cacheSnapshot = getLruCacheId().snapshot();
         for (T newsObject : cacheSnapshot.values()) {
             T n = getLruCacheId().get(newsObject.getId());
-            if (n != null && n.getRubric() == rubric) {
+            if (n != null && ((rubric == Rubrics.LATEST) || (rubric != Rubrics.LATEST && n.getRubric() == rubric))) {
                 n.setLatest(false);
+            }
+        }
+
+        return result;
+    }
+
+    @Override
+    public int setLatestFlag(Rubrics rubric) {
+        final int result = getDecoratedDao().setLatestFlag(rubric);
+
+        Map<Long, T> cacheSnapshot = getLruCacheId().snapshot();
+        for (T newsObject : cacheSnapshot.values()) {
+            T n = getLruCacheId().get(newsObject.getId());
+            if (n != null && ((rubric == Rubrics.LATEST) || (rubric != Rubrics.LATEST && n.getRubric() == rubric))) {
+                n.setLatest(true);
+            }
+        }
+
+        return result;
+    }
+
+    @Override
+    public int deleteOlderOrEqual(Rubrics rubric, long date) {
+        final int result = getDecoratedDao().deleteOlderOrEqual(rubric, date);
+
+        final LruCache<Long, T> cache = getLruCacheId();
+        final Map<Long, T> cacheSnapshot = cache.snapshot();
+        for (T newsObject : cacheSnapshot.values()) {
+            T n = cache.get(newsObject.getId());
+            if (n != null && ((rubric == Rubrics.LATEST && n.getPubDate().getTime() <= date) || (rubric != Rubrics.LATEST && n.getRubric() == rubric && n.getPubDate().getTime() <= date))) {
+                cache.remove(newsObject.getId());
             }
         }
 

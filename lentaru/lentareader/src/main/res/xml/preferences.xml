@@ -16,6 +16,10 @@
     <PreferenceCategory
         android:title="@string/pref_old_news"
         android:key="pref_key_old_news">
+        <CheckBoxPreference
+            android:key="pref_key_news_auto_refresh"
+            android:summary="@string/news_auto_refresh_summary"
+            android:defaultValue="true" />
         <com.xeppaka.lentareader.ui.widgets.NewsTextSizePreference
             android:key="pref_key_news_list_text_size"
             android:summary="@string/news_list_text_size_summary_default"
@@ -25,12 +29,13 @@
             android:summary="@string/news_full_text_size_summary_default"
             android:defaultValue="16"/>
         <CheckBoxPreference
-            android:key="pref_key_news_deletion"
+            android:key="pref_key_news_delete"
             android:summary="@string/pref_news_deletion_summary"
             android:defaultValue="true" />
         <com.xeppaka.lentareader.ui.widgets.NewsDeleteIntervalPreference
-            android:dependency="pref_key_news_deletion"
-            android:key="pref_key_news_deletion_interval"
+            android:dependency="pref_key_news_delete"
+            android:key="pref_key_news_delete_days"
+            android:summary="@string/pref_news_deletion_interval_summary_days_default"
             android:defaultValue="5"/>
     </PreferenceCategory>
 </PreferenceScreen>

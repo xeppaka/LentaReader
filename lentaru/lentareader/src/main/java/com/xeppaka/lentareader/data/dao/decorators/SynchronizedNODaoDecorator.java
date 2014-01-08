@@ -58,6 +58,20 @@ public class SynchronizedNODaoDecorator<T extends NewsObject> extends Synchroniz
     }
 
     @Override
+    public int setLatestFlag(Rubrics rubric) {
+        synchronized (getSync()) {
+            return decoratedDao.setLatestFlag(rubric);
+        }
+    }
+
+    @Override
+    public int deleteOlderOrEqual(Rubrics rubric, long date) {
+        synchronized (getSync()) {
+            return decoratedDao.deleteOlderOrEqual(rubric, date);
+        }
+    }
+
+    @Override
 	protected NODao<T> getDecoratedDao() {
 		return decoratedDao;
 	}

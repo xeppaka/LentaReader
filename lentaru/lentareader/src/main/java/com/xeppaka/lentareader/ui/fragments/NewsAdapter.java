@@ -259,10 +259,10 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
 
         News news = getItem(position);
 
-        if (news.isRead()) {
-            newsReadIndicator.setVisibility(View.GONE);
-        } else {
+        if (!news.isRead()) {
             newsReadIndicator.setVisibility(View.VISIBLE);
+        } else {
+            newsReadIndicator.setVisibility(View.GONE);
         }
 
 		newsTitleTextView.setText(news.getTitle());

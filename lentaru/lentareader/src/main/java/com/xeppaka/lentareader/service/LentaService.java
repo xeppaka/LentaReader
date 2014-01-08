@@ -164,7 +164,7 @@ public class LentaService extends Service {
     }
 
 	private void updateRubric(int requestId, Rubrics rubric, NewsType newsType, ResultReceiver resultReceiver) {
-		UpdateRubricServiceCommand command = new UpdateRubricServiceCommand(requestId, newsType, rubric, executor, getContentResolver(), resultReceiver);
+		UpdateRubricServiceCommand command = new UpdateRubricServiceCommand(requestId, newsType, rubric, getApplicationContext(), resultReceiver);
 		executor.execute(command);
 	}
 

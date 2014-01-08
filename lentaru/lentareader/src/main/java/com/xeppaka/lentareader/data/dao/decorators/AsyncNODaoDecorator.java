@@ -41,6 +41,16 @@ public class AsyncNODaoDecorator<T extends NewsObject> extends AsyncDaoDecorator
         }
     }
 
+    private static class DeleteOlderOrEqualParam {
+        private Rubrics rubric;
+        private long date;
+
+        private DeleteOlderOrEqualParam(Rubrics rubric, long date) {
+            this.rubric = rubric;
+            this.date = date;
+        }
+    }
+
     protected class AsyncReadSingleWOImageForRubricTask extends AsyncTask<ReadSingleWOImageForRubricParam, Void, T> {
         private AsyncDao.DaoReadSingleListener<T> listener;
 
@@ -95,7 +105,43 @@ public class AsyncNODaoDecorator<T extends NewsObject> extends AsyncDaoDecorator
         }
     }
 
-	public AsyncNODaoDecorator(NODao<T> decoratedDao) {
+    protected class AsyncSetLatestFlagTask extends AsyncTask<Rubrics, Void, Integer> {
+        private DaoUpdateListener listener;
+
+        public AsyncSetLatestFlagTask(DaoUpdateListener listener) {
+            this.listener = listener;
+        }
+
+        @Override
+        protected Integer doInBackground(Rubrics... rubric) {
+            return setLatestFlag(rubric[0]);
+        }
+
+        @Override
+        protected void onPostExecute(Integer result) {
+            listener.finished(result);
+        }
+    }
+
+    protected class AsyncDeleteOlderOrEqualTask extends AsyncTask<DeleteOlderOrEqualParam, Void, Integer> {
+        private AsyncDao.DaoDeleteListener listener;
+
+        public AsyncDeleteOlderOrEqualTask(AsyncDao.DaoDeleteListener listener) {
+            this.listener = listener;
+        }
+
+        @Override
+        protected Integer doInBackground(DeleteOlderOrEqualParam... params) {
+            return deleteOlderOrEqual(params[0].rubric, params[0].date);
+        }
+
+        @Override
+        protected void onPostExecute(Integer result) {
+            listener.finished(result);
+        }
+    }
+
+    public AsyncNODaoDecorator(NODao<T> decoratedDao) {
 		super(decoratedDao);
 		
 		this.decoratedDao = decoratedDao;
@@ -122,8 +168,23 @@ public class AsyncNODaoDecorator<T extends NewsObject> extends AsyncDaoDecorator
     }
 
     @Override
-    public void readLatestWOImageAsync(Rubrics rubric, int limit, DaoReadSingleListener<T> listener) {
-        new AsyncReadSingleWOImageForRubricTask(listener).execute(new ReadSingleWOImageForRubricParam(rubric, limit));
+    public AsyncTask readLatestWOImageAsync(Rubrics rubric, int limit, DaoReadSingleListener<T> listener) {
+        return new AsyncReadSingleWOImageForRubricTask(listener).execute(new ReadSingleWOImageForRubricParam(rubric, limit));
+    }
+
+    @Override
+    public AsyncTask<DeleteOlderOrEqualParam, Void, Integer> deleteOlderOrEqualAsync(Rubrics rubric, long date, AsyncDao.DaoDeleteListener listener) {
+        return new AsyncDeleteOlderOrEqualTask(listener).execute(new DeleteOlderOrEqualParam(rubric, date));
+    }
+
+    @Override
+    public AsyncTask<Rubrics, Void, Integer> clearLatestFlagAsync(Rubrics rubric, DaoUpdateListener listener) {
+        return new AsyncClearLatestFlagTask(listener).execute(rubric);
+    }
+
+    @Override
+    public AsyncTask<Rubrics, Void, Integer> setLatestFlagAsync(Rubrics rubric, DaoUpdateListener listener) {
+        return new AsyncSetLatestFlagTask(listener).execute(rubric);
     }
 
     @Override
@@ -142,13 +203,18 @@ public class AsyncNODaoDecorator<T extends NewsObject> extends AsyncDaoDecorator
     }
 
     @Override
+    public int deleteOlderOrEqual(Rubrics rubric, long date) {
+        return getDecoratedDao().deleteOlderOrEqual(rubric, date);
+    }
+
+    @Override
     public int clearLatestFlag(Rubrics rubric) {
         return getDecoratedDao().clearLatestFlag(rubric);
     }
 
     @Override
-    public void clearLatestFlagAsync(Rubrics rubric, DaoUpdateListener listener) {
-        new AsyncClearLatestFlagTask(listener).execute(rubric);
+    public int setLatestFlag(Rubrics rubric) {
+        return getDecoratedDao().setLatestFlag(rubric);
     }
 
     @Override

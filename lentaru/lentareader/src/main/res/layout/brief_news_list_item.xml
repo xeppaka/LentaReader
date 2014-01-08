@@ -7,6 +7,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:weightSum="1"
         android:orientation="horizontal">
 
         <ImageView
@@ -24,7 +25,8 @@
             android:contentDescription="@string/brief_news_image_desc"/>
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="0dip"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
@@ -47,8 +49,9 @@
             android:id="@+id/brief_news_read_indicator"
             android:layout_width="1dip"
             android:layout_height="match_parent"
+            android:layout_marginTop="5dip"
+            android:layout_marginBottom="5dip"
             android:background="@color/brief_list_item_notread"/>
-
     </LinearLayout>
 
     <LinearLayout
@@ -97,5 +100,4 @@
                 android:textSize="8sp"/>
         </LinearLayout>
     </LinearLayout>
-
 </LinearLayout>

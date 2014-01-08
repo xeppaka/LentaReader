@@ -2,9 +2,11 @@ package com.xeppaka.lentareader.ui.activities;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.util.TypedValue;
@@ -24,6 +26,7 @@ import com.xeppaka.lentareader.ui.fragments.NewsObjectListFragment;
 import com.xeppaka.lentareader.ui.fragments.SwipeNewsObjectsListAdapter;
 import com.xeppaka.lentareader.ui.widgets.SelectRubricDialog;
 import com.xeppaka.lentareader.utils.LentaDebugUtils;
+import com.xeppaka.lentareader.utils.PreferencesConstants;
 
 /**
  * This is the main activity where everything starts right after application is 
@@ -39,6 +42,8 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
 
     private ServiceHelper serviceHelper;
     private TitlePageIndicator indicator;
+
+    private boolean autoRefresh;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +78,18 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
 
         serviceHelper = new ServiceHelper(this, new Handler());
 	}
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        autoRefresh = preferences.getBoolean(PreferencesConstants.PREF_KEY_NEWS_AUTO_REFRESH, PreferencesConstants.NEWS_AUTO_REFRESH_DEFAULT);
+
+        if (autoRefresh) {
+            onRefresh();
+        }
+    }
 
     private void initializeViewPager() {
         pagerAdapter = new SwipeNewsObjectsListAdapter(getSupportFragmentManager(), this);
@@ -150,8 +167,9 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
     public void onDismiss(DialogInterface dialogInterface) {
         final Rubrics selectedRubric = selectRubricDialog.getSelectedRubric();
 
-        if (selectedRubric != null)
+        if (selectedRubric != null) {
             selectRubric(selectedRubric);
+        }
     }
 
     private void selectRubric(Rubrics rubric) {
@@ -160,6 +178,10 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
         if (currentFragment.getCurrentRubric() != rubric) {
             currentFragment.setCurrentRubric(rubric);
             indicator.notifyDataSetChanged();
+
+            if (autoRefresh) {
+                onRefresh();
+            }
         }
     }
 }

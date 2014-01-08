@@ -2,20 +2,26 @@ package com.xeppaka.lentareader.ui.widgets;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.os.AsyncTask;
 import android.preference.DialogPreference;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.NumberPicker;
 
 import com.xeppaka.lentareader.R;
+import com.xeppaka.lentareader.data.News;
+import com.xeppaka.lentareader.data.Rubrics;
+import com.xeppaka.lentareader.data.dao.async.AsyncDao;
+import com.xeppaka.lentareader.data.dao.async.AsyncNODao;
+import com.xeppaka.lentareader.data.dao.daoobjects.NewsDao;
+import com.xeppaka.lentareader.utils.PreferencesConstants;
 
 /**
  * Created by kacpa01 on 1/3/14.
  */
 public class NewsDeleteIntervalPreference extends DialogPreference {
-    private static final int DEFAULT_DAYS_VALUE = 5;
     private NumberPicker daysPicker;
-    private int currentValue;
+    private int deleteAfterDays = PreferencesConstants.NEWS_DELETE_NEWS_DAYS_DEFAULT;
 
     public NewsDeleteIntervalPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -30,10 +36,11 @@ public class NewsDeleteIntervalPreference extends DialogPreference {
     @Override
     protected View onCreateDialogView() {
         final View view = super.onCreateDialogView();
+
         daysPicker = (NumberPicker)view.findViewById(R.id.news_delete_number_picker);
-        daysPicker.setMaxValue(100);
+        daysPicker.setMaxValue(30);
         daysPicker.setMinValue(1);
-        daysPicker.setValue(currentValue);
+        daysPicker.setValue(deleteAfterDays);
 
         return view;
     }
@@ -41,7 +48,16 @@ public class NewsDeleteIntervalPreference extends DialogPreference {
     @Override
     protected void onDialogClosed(boolean positiveResult) {
         if (positiveResult) {
-            persistInt(currentValue = daysPicker.getValue());
+            final int oldValue = deleteAfterDays;
+            persistInt(deleteAfterDays = daysPicker.getValue());
+
+            if (deleteAfterDays > oldValue) {
+                final AsyncNODao<News> nd = NewsDao.getInstance(getContext().getContentResolver());
+                nd.setLatestFlagAsync(Rubrics.LATEST, new AsyncDao.DaoUpdateListener() {
+                    @Override
+                    public void finished(int rowsUpdated) {}
+                });
+            }
 
             updateSummaryText();
         }
@@ -51,11 +67,11 @@ public class NewsDeleteIntervalPreference extends DialogPreference {
     protected void onSetInitialValue(boolean restorePersistedValue, Object defaultValue) {
         if (restorePersistedValue) {
             // Restore existing state
-            currentValue = this.getPersistedInt(DEFAULT_DAYS_VALUE);
+            deleteAfterDays = this.getPersistedInt(PreferencesConstants.NEWS_DELETE_NEWS_DAYS_DEFAULT);
         } else {
             // Set default state from the XML attribute
-            currentValue = (Integer) defaultValue;
-            persistInt(currentValue);
+            deleteAfterDays = (Integer) defaultValue;
+            persistInt(deleteAfterDays);
         }
 
         updateSummaryText();
@@ -63,10 +79,10 @@ public class NewsDeleteIntervalPreference extends DialogPreference {
 
     private void updateSummaryText() {
         final Resources resources = getContext().getResources();
-        if (currentValue == 1) {
-            setSummary(String.format(resources.getString(R.string.pref_news_deletion_interval_summary_day), currentValue));
+        if (deleteAfterDays == 1) {
+            setSummary(String.format(resources.getString(R.string.pref_news_deletion_interval_summary_day), deleteAfterDays));
         } else {
-            setSummary(String.format(resources.getString(R.string.pref_news_deletion_interval_summary_days), currentValue));
+            setSummary(String.format(resources.getString(R.string.pref_news_deletion_interval_summary_days), deleteAfterDays));
         }
     }
 }
