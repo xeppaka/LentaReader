@@ -43,7 +43,6 @@ public class NewsListFragment extends NewsObjectListFragment implements AbsListV
 	private AsyncNODao<News> dao;
 
     private boolean scrolled;
-    private boolean autoRefresh;
 
     private Dao.Observer<News> newsDaoObserver = new DaoObserver<News>(new Handler()) {
         @Override
@@ -57,7 +56,15 @@ public class NewsListFragment extends NewsObjectListFragment implements AbsListV
         }
     };
 
-	@Override
+    public NewsListFragment() {
+        super(null);
+    }
+
+    public NewsListFragment(ItemSelectionListener listener) {
+        super(listener);
+    }
+
+    @Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
@@ -81,7 +88,6 @@ public class NewsListFragment extends NewsObjectListFragment implements AbsListV
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         newsAdapter.setDownloadImages(preferences.getBoolean(PreferencesConstants.PREF_KEY_DOWNLOAD_IMAGE_THUMBNAILS, PreferencesConstants.DOWNLOAD_IMAGE_THUMBNAILS_DEFAULT));
         newsAdapter.setTextSize(preferences.getInt(PreferencesConstants.PREF_KEY_NEWS_LIST_TEXT_SIZE, PreferencesConstants.NEWS_LIST_TEXT_SIZE_DEFAULT));
-        autoRefresh = preferences.getBoolean(PreferencesConstants.PREF_KEY_NEWS_AUTO_REFRESH, PreferencesConstants.NEWS_AUTO_REFRESH_DEFAULT);
 
         scrolled = false;
 
@@ -123,16 +129,6 @@ public class NewsListFragment extends NewsObjectListFragment implements AbsListV
 
         dao.unregisterContentObserver(newsDaoObserver);
         saveScrollPosition();
-	}
-
-	@Override
-	public void onListItemClick(ListView l, View v, int position, long id) {
-		super.onListItemClick(l, v, position, id);
-		
-		Intent intent = new Intent(this.getActivity(), NewsFullActivity.class);
-		intent.putExtra("newsId", newsAdapter.getItem(position).getId());
-		
-		startActivity(intent);
 	}
 
     @Override

@@ -9,8 +9,8 @@ import com.xeppaka.lentareader.utils.LentaDebugUtils;
 
 public class NewsFullActivity extends FragmentActivity {
 	private NewsFullFragment fullNewsFragment;
-	
-	@Override
+
+    @Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 

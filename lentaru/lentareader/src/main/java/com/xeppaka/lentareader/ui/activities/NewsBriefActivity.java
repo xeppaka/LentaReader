@@ -35,7 +35,7 @@ import com.xeppaka.lentareader.utils.PreferencesConstants;
  * @author 
  * 
  */
-public class NewsBriefActivity extends ActionBarActivity implements DialogInterface.OnDismissListener {
+public class NewsBriefActivity extends ActionBarActivity implements DialogInterface.OnDismissListener, NewsObjectListFragment.ItemSelectionListener {
 	private SwipeNewsObjectsListAdapter pagerAdapter;
 	private ViewPager pager;
     private SelectRubricDialog selectRubricDialog;
@@ -92,10 +92,10 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
     }
 
     private void initializeViewPager() {
-        pagerAdapter = new SwipeNewsObjectsListAdapter(getSupportFragmentManager(), this);
+        pagerAdapter = new SwipeNewsObjectsListAdapter(getSupportFragmentManager(), this, this);
 
-		pager = (ViewPager) findViewById(R.id.brief_news_pager);
-		pager.setAdapter(pagerAdapter);
+        pager = (ViewPager) findViewById(R.id.brief_news_pager);
+        pager.setAdapter(pagerAdapter);
 	}
 	
 	private void initializeViewIndicator() {
@@ -173,15 +173,33 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
     }
 
     private void selectRubric(Rubrics rubric) {
-        final NewsObjectListFragment currentFragment = pagerAdapter.getItem(pager.getCurrentItem());
+//        final NewsObjectListFragment currentFragment = pagerAdapter.get
+//
+//        if (currentFragment.getCurrentRubric() != rubric) {
+//            currentFragment.setCurrentRubric(rubric);
+//            indicator.notifyDataSetChanged();
+//
+//            if (autoRefresh) {
+//                onRefresh();
+//            }
+//        }
+    }
 
-        if (currentFragment.getCurrentRubric() != rubric) {
-            currentFragment.setCurrentRubric(rubric);
-            indicator.notifyDataSetChanged();
-
-            if (autoRefresh) {
-                onRefresh();
-            }
+    @Override
+    public void onItemSelected(long id) {
+        switch (pagerAdapter.getItem(pager.getCurrentItem()).getNewsType()) {
+            case NEWS:
+                openNews(id);
+                break;
+            default:
+                throw new AssertionError();
         }
+    }
+
+    private void openNews(long id) {
+		Intent intent = new Intent(this, NewsFullActivity.class);
+		intent.putExtra("newsId", id);
+
+		startActivity(intent);
     }
 }

@@ -2,6 +2,7 @@ package com.xeppaka.lentareader.ui.fragments;
 
 import android.support.v4.app.ListFragment;
 import android.view.View;
+import android.widget.ListView;
 
 import com.xeppaka.lentareader.data.NewsObject;
 import com.xeppaka.lentareader.data.NewsType;
@@ -20,13 +21,20 @@ public abstract class NewsObjectListFragment extends ListFragment {
     protected Set<Long>[] expandedItemIds = new Set[Rubrics.values().length];
     protected ScrollerPosition[] scrollPositions = new ScrollerPosition[Rubrics.values().length];
     protected long[] latestNewsTime = new long[Rubrics.values().length];
+    private ItemSelectionListener itemSelectionListener;
+
+    public interface ItemSelectionListener {
+        void onItemSelected(long id);
+    }
 
     private static class ScrollerPosition {
         private int item;
         private int top;
     }
 
-    protected NewsObjectListFragment() {
+    protected NewsObjectListFragment(ItemSelectionListener listener) {
+        this.itemSelectionListener = listener;
+
         for (Rubrics rubric : Rubrics.values()) {
             expandedItemIds[rubric.ordinal()] = new HashSet<Long>();
             scrollPositions[rubric.ordinal()] = new ScrollerPosition();
@@ -75,6 +83,19 @@ public abstract class NewsObjectListFragment extends ListFragment {
 
     public void setLatestPubDate(long date) {
         latestNewsTime[currentRubric.ordinal()] = date;
+    }
+
+    public void setItemSelectionListener(ItemSelectionListener itemSelectionListener) {
+        this.itemSelectionListener = itemSelectionListener;
+    }
+
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
+        super.onListItemClick(l, v, position, id);
+
+        if (itemSelectionListener != null) {
+            itemSelectionListener.onItemSelected(id);
+        }
     }
 
     public abstract NewsType getNewsType();

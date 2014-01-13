@@ -1,0 +1,30 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:orientation="horizontal"
+    android:weightSum="4">
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="0dip"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+        <com.viewpagerindicator.TitlePageIndicator
+            android:id="@+id/brief_news_title_indicator"
+            android:padding="10dip"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            />
+        <android.support.v4.view.ViewPager
+            android:id="@+id/brief_news_pager"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+    </LinearLayout>
+    <FrameLayout
+        android:id="@+id/full_news_fragment_container_large"
+        android:layout_width="0dip"
+        android:layout_height="match_parent"
+        android:layout_weight="3">
+    </FrameLayout>
+</LinearLayout>
