@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import com.xeppaka.lentareader.R;
 import com.xeppaka.lentareader.data.News;
+import com.xeppaka.lentareader.data.NewsType;
 import com.xeppaka.lentareader.data.body.Body;
 import com.xeppaka.lentareader.data.body.items.Item;
 import com.xeppaka.lentareader.data.body.items.ItemPreferences;
@@ -29,6 +30,8 @@ import com.xeppaka.lentareader.utils.LentaTextUtils;
 import com.xeppaka.lentareader.utils.PreferencesConstants;
 
 public class NewsFullFragment extends Fragment {
+    public static final long NO_NEWS_ID = -1;
+
 	private ImageView imageView;
     private TextView imageCaption;
     private TextView imageCredits;
@@ -38,15 +41,19 @@ public class NewsFullFragment extends Fragment {
     private TextView rubricViewTitle;
     private TextView rubricView;
 
-	private long newsId;
+	private long newsId = NO_NEWS_ID;
 	private News loadedNews;
+
+    private AsyncDao<News> newsDao;
 
     private boolean downloadImages;
     private int textSize;
 
-	public NewsFullFragment(long newsId) {
-		this.newsId = newsId;
-	}
+    public NewsFullFragment() {}
+
+    public NewsFullFragment(long newsId) {
+        this.newsId = newsId;
+    }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -62,7 +69,9 @@ public class NewsFullFragment extends Fragment {
             newsId = savedInstanceState.getLong("newsId");
         }
 
-		return inflater.inflate(R.layout.full_news_fragment, null);
+        newsDao = NewsDao.getInstance(getActivity().getContentResolver());
+
+        return inflater.inflate(R.layout.full_news_fragment, null);
 	}
 
 	@Override
@@ -89,27 +98,8 @@ public class NewsFullFragment extends Fragment {
         downloadImages = preferences.getBoolean(PreferencesConstants.PREF_KEY_DOWNLOAD_IMAGE_FULL, PreferencesConstants.DOWNLOAD_IMAGE_FULL_DEFAULT);
         textSize = preferences.getInt(PreferencesConstants.PREF_KEY_NEWS_FULL_TEXT_SIZE, PreferencesConstants.NEWS_FULL_TEXT_SIZE_DEFAULT);
 
-        if (loadedNews == null) {
-            final AsyncDao<News> nd = NewsDao.getInstance(getActivity().getContentResolver());
-
-            nd.readAsync(newsId, new AsyncDao.DaoReadSingleListener<News>() {
-                @Override
-                public void finished(News result) {
-                    if (isResumed()) {
-                        loadedNews = result;
-                        showNews(loadedNews);
-
-                        if (!loadedNews.isRead()) {
-                            loadedNews.setRead(true);
-
-                            nd.updateAsync(loadedNews, new AsyncDao.DaoUpdateListener() {
-                                @Override
-                                public void finished(int rowsUpdated) {}
-                            });
-                        }
-                    }
-                }
-            });
+        if (newsId >= 0) {
+            showNews(newsId);
         }
     }
 
@@ -120,7 +110,7 @@ public class NewsFullFragment extends Fragment {
         loadedNews = null;
 	}
 
-	private void showNews(final News news) {
+	private void renderNews(final News news) {
         titleView.setText(news.getTitle());
 
         if (titleView.getTextSize() != LentaTextUtils.getNewsFullTitleTextSize(textSize)) {
@@ -200,6 +190,30 @@ public class NewsFullFragment extends Fragment {
             if (imageCredits.getTextSize() != LentaTextUtils.getNewsFullImageCreditsTextSize(textSize)) {
                 imageCredits.setTextSize(LentaTextUtils.getNewsFullImageCreditsTextSize(textSize));
             }
+        }
+    }
+
+    public void showNews(long newsId) {
+        if (loadedNews == null || loadedNews.getId() != newsId) {
+            newsDao.readAsync(newsId, new AsyncDao.DaoReadSingleListener<News>() {
+                @Override
+                public void finished(News result) {
+                    if (isResumed()) {
+                        loadedNews = result;
+                        renderNews(loadedNews);
+
+                        if (!loadedNews.isRead()) {
+                            loadedNews.setRead(true);
+
+                            newsDao.updateAsync(loadedNews, new AsyncDao.DaoUpdateListener() {
+                                @Override
+                                public void finished(int rowsUpdated) {
+                                }
+                            });
+                        }
+                    }
+                }
+            });
         }
     }
 }

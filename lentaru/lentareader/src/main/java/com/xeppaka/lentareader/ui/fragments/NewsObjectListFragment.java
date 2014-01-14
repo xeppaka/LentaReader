@@ -5,7 +5,6 @@ import android.support.v4.app.ListFragment;
 import android.view.View;
 import android.widget.ListView;
 
-import com.xeppaka.lentareader.data.NewsObject;
 import com.xeppaka.lentareader.data.NewsType;
 import com.xeppaka.lentareader.data.Rubrics;
 
@@ -15,7 +14,7 @@ import java.util.Set;
 /**
  * Created by nnm on 12/27/13.
  */
-public abstract class NewsObjectListFragment extends ListFragment implements RubricsSelector {
+public abstract class NewsObjectListFragment extends ListFragment implements BriefNewsListPresenter {
     protected Rubrics currentRubric = Rubrics.LATEST;
 
     // expanded items for each rubric
@@ -25,7 +24,7 @@ public abstract class NewsObjectListFragment extends ListFragment implements Rub
     private ItemSelectionListener itemSelectionListener;
 
     public interface ItemSelectionListener {
-        void onItemSelected(long id);
+        void onItemSelected(int position, long id);
     }
 
     private static class ScrollerPosition {
@@ -56,8 +55,8 @@ public abstract class NewsObjectListFragment extends ListFragment implements Rub
             setItemSelectionListener((ItemSelectionListener)activity);
         }
 
-        if (activity instanceof RubricsSelectorContainer) {
-            ((RubricsSelectorContainer)activity).setRubricsSelector(getNewsType(), this);
+        if (activity instanceof BriefNewsListPresenterContainer) {
+            ((BriefNewsListPresenterContainer)activity).setNewsListPresenter(getNewsType(), this);
         }
     }
 
@@ -114,8 +113,13 @@ public abstract class NewsObjectListFragment extends ListFragment implements Rub
         super.onListItemClick(l, v, position, id);
 
         if (itemSelectionListener != null) {
-            itemSelectionListener.onItemSelected(id);
+            itemSelectionListener.onItemSelected(position, id);
         }
+    }
+
+    @Override
+    public void selectItem(int position) {
+        setSelection(position);
     }
 
     public abstract NewsType getNewsType();

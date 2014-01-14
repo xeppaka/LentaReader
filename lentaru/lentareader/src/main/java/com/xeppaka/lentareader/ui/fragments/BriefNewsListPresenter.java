@@ -3,9 +3,10 @@ package com.xeppaka.lentareader.ui.fragments;
 import com.xeppaka.lentareader.data.Rubrics;
 
 /**
- * Created by nnm on 1/14/14.
+ * Created by kacpa01 on 1/14/14.
  */
-public interface RubricsSelector {
+public interface BriefNewsListPresenter {
     Rubrics getCurrentRubric();
     void setCurrentRubric(Rubrics currentRubric);
+    void selectItem(int position);
 }
