@@ -1,5 +1,6 @@
 package com.xeppaka.lentareader.ui.fragments;
 
+import android.app.Activity;
 import android.support.v4.app.ListFragment;
 import android.view.View;
 import android.widget.ListView;
@@ -14,7 +15,7 @@ import java.util.Set;
 /**
  * Created by nnm on 12/27/13.
  */
-public abstract class NewsObjectListFragment extends ListFragment {
+public abstract class NewsObjectListFragment extends ListFragment implements RubricsSelector {
     protected Rubrics currentRubric = Rubrics.LATEST;
 
     // expanded items for each rubric
@@ -32,12 +33,31 @@ public abstract class NewsObjectListFragment extends ListFragment {
         private int top;
     }
 
-    protected NewsObjectListFragment(ItemSelectionListener listener) {
-        this.itemSelectionListener = listener;
-
+    protected NewsObjectListFragment() {
         for (Rubrics rubric : Rubrics.values()) {
             expandedItemIds[rubric.ordinal()] = new HashSet<Long>();
             scrollPositions[rubric.ordinal()] = new ScrollerPosition();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        setItemSelectionListener(null);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        final Activity activity = getActivity();
+        if (activity instanceof ItemSelectionListener) {
+            setItemSelectionListener((ItemSelectionListener)activity);
+        }
+
+        if (activity instanceof RubricsSelectorContainer) {
+            ((RubricsSelectorContainer)activity).setRubricsSelector(getNewsType(), this);
         }
     }
 

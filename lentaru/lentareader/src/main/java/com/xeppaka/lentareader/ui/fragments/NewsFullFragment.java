@@ -44,8 +44,6 @@ public class NewsFullFragment extends Fragment {
     private boolean downloadImages;
     private int textSize;
 
-    public NewsFullFragment() {}
-
 	public NewsFullFragment(long newsId) {
 		this.newsId = newsId;
 	}

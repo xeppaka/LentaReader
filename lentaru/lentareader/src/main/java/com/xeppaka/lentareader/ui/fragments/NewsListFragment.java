@@ -1,5 +1,6 @@
 package com.xeppaka.lentareader.ui.fragments;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -55,14 +56,6 @@ public class NewsListFragment extends NewsObjectListFragment implements AbsListV
             refresh();
         }
     };
-
-    public NewsListFragment() {
-        super(null);
-    }
-
-    public NewsListFragment(ItemSelectionListener listener) {
-        super(listener);
-    }
 
     @Override
 	public void onCreate(Bundle savedInstanceState) {
