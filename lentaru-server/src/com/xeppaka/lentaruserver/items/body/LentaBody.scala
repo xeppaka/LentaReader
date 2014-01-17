@@ -1,11 +1,10 @@
 package com.xeppaka.lentaruserver.items.body
 
 import com.xeppaka.lentaruserver.items.ItemBase
-import scala.io.Source
-import scala.util.{Success, Failure, Try}
-import java.util.logging.{SimpleFormatter, StreamHandler, Level, Logger}
+import java.util.logging.{SimpleFormatter, StreamHandler, Logger}
 import scala.util.parsing.json.JSON
 import java.net.URLDecoder
+import com.xeppaka.lentaruserver.Downloader
 
 abstract class LentaBody extends ItemBase {
   val items: List[ItemBase]
@@ -40,10 +39,7 @@ object LentaBody {
   val iframeUrlPattern = "src=[\'\"](.+?)[\'\"]".r
 
   def downloadNews(url: String): Option[LentaNewsBody] = {
-    Try(Source.fromURL(url, "UTF-8").mkString) match {
-      case Success(page) => Some(parseNews(page))
-      case Failure(e) => {logger.log(Level.ALL, s"Error while loading page: $url", e); None}
-    }
+    Downloader.download(url).flatMap(f => Some(parseNews(f)))
   }
 
   private def parseNews(page: String): LentaNewsBody = {

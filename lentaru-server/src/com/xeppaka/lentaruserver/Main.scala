@@ -6,7 +6,6 @@ import com.xeppaka.lentaruserver.items.RssSnapshot
 import com.xeppaka.lentaruserver.Rubrics.Rubrics
 import scala.None
 import java.util.logging.{SimpleFormatter, StreamHandler, Logger}
-import java.util.Calendar
 
 object Main extends App {
   private val logger = Logger.getLogger(Main.getClass.getName)

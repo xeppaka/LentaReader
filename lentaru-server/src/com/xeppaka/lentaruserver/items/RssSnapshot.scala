@@ -3,10 +3,8 @@ package com.xeppaka.lentaruserver.items
 import com.xeppaka.lentaruserver.NewsType.NewsType
 import com.xeppaka.lentaruserver.Rubrics.Rubrics
 import scala.xml.XML
-import java.net.URL
-import com.xeppaka.lentaruserver.Lenta
-import scala.util.{Success, Failure, Try}
-import java.util.logging.{SimpleFormatter, StreamHandler, Level, Logger}
+import com.xeppaka.lentaruserver.{Downloader, Lenta}
+import java.util.logging.{SimpleFormatter, StreamHandler, Logger}
 
 /**
  * Created with IntelliJ IDEA.
@@ -65,17 +63,13 @@ object RssSnapshot {
   def downloadRss(newsType: NewsType, rubric: Rubrics): Option[RssSnapshot] = {
     val url = Lenta.url(newsType, rubric)
 
-    Try {
-      val xml = XML.load(new URL(url))
+    Downloader.download(url).flatMap(v => {
+      val xml = XML.loadString(v)
       val rawRssItems = xml \\ "item"
-
       val rssItems = rawRssItems.map(item => RssItem(item)).toList.take(MAX_ITEMS)
 
-      RssSnapshot(newsType, rubric, rssItems)
-    } match {
-      case Success(v) => Some(v)
-      case Failure(e) => { logger.log(Level.ALL, s"Error while loading page: $url", e); None }
-    }
+      Some(RssSnapshot(newsType, rubric, rssItems))
+    })
   }
 
   def apply(newsType: NewsType, rubric: Rubrics, rssItems: List[RssItem]): RssSnapshot = new RssSnapshot(newsType, rubric, rssItems)
