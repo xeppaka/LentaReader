@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
@@ -24,8 +25,6 @@ import com.xeppaka.lentareader.data.NewsType;
 import com.xeppaka.lentareader.data.Rubrics;
 import com.xeppaka.lentareader.service.Callback;
 import com.xeppaka.lentareader.service.ServiceHelper;
-import com.xeppaka.lentareader.ui.fragments.BriefNewsListPresenter;
-import com.xeppaka.lentareader.ui.fragments.BriefNewsListPresenterContainer;
 import com.xeppaka.lentareader.ui.fragments.NewsFullFragment;
 import com.xeppaka.lentareader.ui.fragments.NewsObjectListFragment;
 import com.xeppaka.lentareader.ui.fragments.SwipeNewsObjectsListAdapter;
@@ -40,7 +39,7 @@ import com.xeppaka.lentareader.utils.PreferencesConstants;
  * @author 
  * 
  */
-public class NewsBriefActivity extends ActionBarActivity implements DialogInterface.OnDismissListener, NewsObjectListFragment.ItemSelectionListener, BriefNewsListPresenterContainer {
+public class NewsBriefActivity extends ActionBarActivity implements DialogInterface.OnDismissListener, NewsObjectListFragment.ItemSelectionListener {
 	private SwipeNewsObjectsListAdapter pagerAdapter;
 	private ViewPager pager;
     private SelectRubricDialog selectRubricDialog;
@@ -48,11 +47,10 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
     private ServiceHelper serviceHelper;
     private TitlePageIndicator indicator;
 
-    private BriefNewsListPresenter[] newsListPresenters = new BriefNewsListPresenter[NewsType.values().length];
-
     private NewsFullFragment newsFullFragment;
 
     private boolean autoRefresh;
+    private int listFragments;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +60,8 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
 
 		setContentView(R.layout.brief_news_activity);
         setTitle(null);
+        //getActionBar().setIcon(R.drawable.lenta_icon);
+        getSupportActionBar().setLogo(R.drawable.ab_lenta_icon);
 
 		initializeViewPager();
 		initializeViewIndicator();
@@ -88,9 +88,6 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
             fragmentManager.beginTransaction().replace(R.id.full_news_fragment_container_large, newsFullFragment = new NewsFullFragment()).commit();
         }
 
-        //getActionBar().setIcon(R.drawable.lenta_icon);
-        getSupportActionBar().setLogo(R.drawable.lenta_icon);
-
         serviceHelper = new ServiceHelper(this, new Handler());
 	}
 
@@ -100,10 +97,6 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
 
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         autoRefresh = preferences.getBoolean(PreferencesConstants.PREF_KEY_NEWS_AUTO_REFRESH, PreferencesConstants.NEWS_AUTO_REFRESH_DEFAULT);
-
-        if (autoRefresh) {
-            onRefresh();
-        }
     }
 
     private void initializeViewPager() {
@@ -154,20 +147,18 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
     }
 
     private void onRefresh() {
-        final NewsType currentNewsType = getCurrentNewsType();
-        final BriefNewsListPresenter currentRubricsSelector = getNewsListPresenter(currentNewsType);
+        final NewsType currentNewsType = NewsType.values()[pager.getCurrentItem()];
+        final Rubrics rubric = pagerAdapter.getFragment(pager.getCurrentItem()).getCurrentRubric();
 
-        if (currentRubricsSelector != null) {
-            serviceHelper.updateRubric(currentNewsType, currentRubricsSelector.getCurrentRubric(), new Callback() {
-                @Override
-                public void onSuccess() {
-                }
+        serviceHelper.updateRubric(currentNewsType, rubric, new Callback() {
+            @Override
+            public void onSuccess() {
+            }
 
-                @Override
-                public void onFailure() {
-                }
-            });
-        }
+            @Override
+            public void onFailure() {
+            }
+        });
     }
 
     private void onSelectRubric() {
@@ -189,11 +180,10 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
     }
 
     private void selectRubric(Rubrics rubric) {
-        final NewsType currentNewsType = getCurrentNewsType();
-        final BriefNewsListPresenter currentRubricsSelector = getNewsListPresenter(currentNewsType);
+        final NewsObjectListFragment fragment = pagerAdapter.getFragment(pager.getCurrentItem());
 
-        if (currentRubricsSelector != null && currentRubricsSelector.getCurrentRubric() != rubric) {
-            currentRubricsSelector.setCurrentRubric(rubric);
+        if (fragment != null && fragment.getCurrentRubric() != rubric) {
+            fragment.setCurrentRubric(rubric);
             indicator.notifyDataSetChanged();
 
             if (autoRefresh) {
@@ -204,7 +194,7 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
 
     @Override
     public void onItemSelected(int position, long id) {
-        final NewsType currentNewsType = pagerAdapter.getNewsType(pager.getCurrentItem());
+        final NewsType currentNewsType = NewsType.values()[pager.getCurrentItem()];
 
         switch (currentNewsType) {
             case NEWS:
@@ -215,6 +205,17 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
         }
     }
 
+    @Override
+    public void onAttachFragment(Fragment fragment) {
+        super.onAttachFragment(fragment);
+
+        if (fragment instanceof NewsObjectListFragment) {
+            if (++listFragments == NewsType.values().length && autoRefresh) {
+                onRefresh();
+            }
+        }
+    }
+
     private void openNews(int position, long id) {
         if (newsFullFragment == null) {
             final Intent intent = new Intent(this, NewsFullActivity.class);
@@ -222,24 +223,10 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
 
             startActivity(intent);
         } else {
-            final BriefNewsListPresenter currentListPresenter = getNewsListPresenter(getCurrentNewsType());
-            currentListPresenter.selectItem(position);
+            final NewsObjectListFragment fragment = pagerAdapter.getFragment(pager.getCurrentItem());
+            fragment.setSelection(position);
 
             newsFullFragment.showNews(id);
         }
-    }
-
-    @Override
-    public BriefNewsListPresenter getNewsListPresenter(NewsType newsType) {
-        return newsListPresenters[newsType.ordinal()];
-    }
-
-    @Override
-    public void setNewsListPresenter(NewsType newsType, BriefNewsListPresenter newsListPresenter) {
-        newsListPresenters[newsType.ordinal()] = newsListPresenter;
-    }
-
-    public NewsType getCurrentNewsType() {
-        return pagerAdapter.getNewsType(pager.getCurrentItem());
     }
 }

@@ -57,7 +57,7 @@ public class Article extends News {
 
 	@Override
 	public NewsType getType() {
-		return NewsType.ARTICLE;
+		return /*NewsType.ARTICLE*/ null;
 	}
 
 	@Override

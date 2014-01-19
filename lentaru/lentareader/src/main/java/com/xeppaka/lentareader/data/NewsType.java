@@ -1,11 +1,11 @@
 package com.xeppaka.lentareader.data;
 
 public enum NewsType {
-	NEWS("/news", "/NEWS"),
-	ARTICLE("/articles", "/ARTICLE"),
-	COLUMN("/columns", "/COLUMN"),
-	PHOTO("/photo", "/PHOTO"),
-	VIDEO("/video", "/VIDEO");
+	NEWS("/news", "/NEWS");
+//	ARTICLE("/articles", "/ARTICLE"),
+//	COLUMN("/columns", "/COLUMN"),
+//	PHOTO("/photo", "/PHOTO"),
+//	VIDEO("/video", "/VIDEO");
 	
 	private String rssSubpath;
     private String xmlSubpath;

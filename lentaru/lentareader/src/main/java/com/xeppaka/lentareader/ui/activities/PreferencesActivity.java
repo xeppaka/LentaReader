@@ -21,6 +21,11 @@ public class PreferencesActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        setTitle(null);
+        //getActionBar().setIcon(R.drawable.lenta_icon);
+        getSupportActionBar().setLogo(R.drawable.ab_lenta_icon);
+
         setContentView(R.layout.preferences_activity);
 
         getFragmentManager().beginTransaction().replace(R.id.preferences_fragment_container, new LentaPreferencesFragment()).commit();

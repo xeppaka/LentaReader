@@ -1,6 +1,7 @@
 package com.xeppaka.lentareader.ui.fragments;
 
 import android.app.Activity;
+import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.view.View;
 import android.widget.ListView;
@@ -14,7 +15,7 @@ import java.util.Set;
 /**
  * Created by nnm on 12/27/13.
  */
-public abstract class NewsObjectListFragment extends ListFragment implements BriefNewsListPresenter {
+public abstract class NewsObjectListFragment extends ListFragment {
     protected Rubrics currentRubric = Rubrics.LATEST;
 
     // expanded items for each rubric
@@ -40,23 +41,12 @@ public abstract class NewsObjectListFragment extends ListFragment implements Bri
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-
-        setItemSelectionListener(null);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
 
         final Activity activity = getActivity();
         if (activity instanceof ItemSelectionListener) {
             setItemSelectionListener((ItemSelectionListener)activity);
-        }
-
-        if (activity instanceof BriefNewsListPresenterContainer) {
-            ((BriefNewsListPresenterContainer)activity).setNewsListPresenter(getNewsType(), this);
         }
     }
 
@@ -115,11 +105,6 @@ public abstract class NewsObjectListFragment extends ListFragment implements Bri
         if (itemSelectionListener != null) {
             itemSelectionListener.onItemSelected(position, id);
         }
-    }
-
-    @Override
-    public void selectItem(int position) {
-        setSelection(position);
     }
 
     public abstract NewsType getNewsType();

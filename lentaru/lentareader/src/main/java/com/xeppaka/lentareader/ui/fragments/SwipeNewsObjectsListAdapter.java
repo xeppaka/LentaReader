@@ -29,10 +29,12 @@ public class SwipeNewsObjectsListAdapter extends FragmentPagerAdapter {
             R.string.pager_title_photos, R.string.pager_title_videos };
 
 	private final String[] titles;
+    private final NewsObjectListFragment[] fragments;
 
 	public SwipeNewsObjectsListAdapter(FragmentManager fragmentManager, Context context) {
 		super(fragmentManager);
 
+        fragments = new NewsObjectListFragment[NewsType.values().length];
         titles = new String[TITLES_RESOURCES.length];
         final Resources resources = context.getResources();
 
@@ -47,7 +49,7 @@ public class SwipeNewsObjectsListAdapter extends FragmentPagerAdapter {
 
         switch (newsType) {
             case NEWS:
-                return new NewsListFragment();
+                return fragments[position] = new NewsListFragment();
             default:
                 throw new AssertionError();
         }
@@ -60,12 +62,20 @@ public class SwipeNewsObjectsListAdapter extends FragmentPagerAdapter {
 
 	@Override
 	public CharSequence getPageTitle(int position) {
-        final NewsObjectListFragment currentFragment = getItem(position);
+        final NewsObjectListFragment currentFragment = getFragment(position);
 
 		return titles[position] + ": " + currentFragment.getCurrentRubric().getLabel();
 	}
 
-    public NewsType getNewsType(int position) {
-        return NewsType.values()[position];
+    @Override
+    public Object instantiateItem(ViewGroup container, int position) {
+        final NewsObjectListFragment instFragment = (NewsObjectListFragment)super.instantiateItem(container, position);
+        fragments[position] = instFragment;
+
+        return instFragment;
+    }
+
+    public NewsObjectListFragment getFragment(int position) {
+        return fragments[position];
     }
 }
