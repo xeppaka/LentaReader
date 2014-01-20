@@ -5,13 +5,16 @@
     <item android:id="@+id/action_preferences"
         android:icon="@drawable/ic_action_settings"
         android:title="@string/action_preferences"
+        android:actionProviderClass="com.xeppaka.lentareader.ui.menu.LentaActionProvider"
         yourapp:showAsAction="always" />
     <item android:id="@+id/action_select_rubric"
         android:icon="@drawable/ic_action_select_all"
         android:title="@string/action_select_rubric"
+        android:actionProviderClass="com.xeppaka.lentareader.ui.menu.LentaActionProvider"
         yourapp:showAsAction="always" />
     <item android:id="@+id/action_refresh"
         android:icon="@drawable/ic_action_refresh"
         android:title="@string/action_refresh"
+        android:actionProviderClass="com.xeppaka.lentareader.ui.menu.LentaActionProvider"
         yourapp:showAsAction="always" />
 </menu>

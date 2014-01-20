@@ -1,5 +1,6 @@
 package com.xeppaka.lentareader.ui.activities;
 
+import android.animation.ValueAnimator;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,6 +10,7 @@ import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.util.TypedValue;
@@ -18,6 +20,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.viewpagerindicator.TitlePageIndicator;
@@ -30,6 +34,7 @@ import com.xeppaka.lentareader.service.commands.exceptions.NoInternetConnectionE
 import com.xeppaka.lentareader.ui.fragments.NewsFullFragment;
 import com.xeppaka.lentareader.ui.fragments.NewsObjectListFragment;
 import com.xeppaka.lentareader.ui.fragments.SwipeNewsObjectsListAdapter;
+import com.xeppaka.lentareader.ui.menu.LentaActionProvider;
 import com.xeppaka.lentareader.ui.widgets.SelectRubricDialog;
 import com.xeppaka.lentareader.utils.LentaDebugUtils;
 import com.xeppaka.lentareader.utils.PreferencesConstants;
@@ -53,6 +58,8 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
 
     private boolean autoRefresh;
     private int listFragments;
+    private MenuItem refreshMenu;
+    private ValueAnimator rotationAnimator;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -128,7 +135,12 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_actions, menu);
 
-		return super.onCreateOptionsMenu(menu);
+//        MenuItem mitem = menu.findItem(R.id.action_refresh);
+//        mitem.setActionProvider(new LentaActionProvider(this));
+
+//        LentaActionProvider.getMenuItemRefresh().animate().rotation(10f).setDuration(5000).start();
+
+        return super.onCreateOptionsMenu(menu);
 	}
 
     @Override
