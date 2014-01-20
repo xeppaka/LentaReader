@@ -16,7 +16,6 @@ import com.xeppaka.lentareader.data.dao.decorators.AsyncNODaoDecorator;
 import com.xeppaka.lentareader.data.dao.decorators.CachedNODaoDecorator;
 import com.xeppaka.lentareader.data.dao.decorators.SynchronizedNODaoDecorator;
 import com.xeppaka.lentareader.data.db.NewsEntry;
-import com.xeppaka.lentareader.data.db.NewsObjectEntry;
 import com.xeppaka.lentareader.data.db.SQLiteType;
 import com.xeppaka.lentareader.data.provider.LentaProvider;
 import com.xeppaka.lentareader.parser.convertednews.ConvertedBodyParser;

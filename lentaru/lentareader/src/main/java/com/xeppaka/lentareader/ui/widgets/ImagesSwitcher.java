@@ -9,14 +9,11 @@ import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageSwitcher;
 import android.widget.ImageView;
 
 import com.xeppaka.lentareader.data.body.items.LentaBodyItemImage;
-import com.xeppaka.lentareader.data.body.items.LentaBodyItemImageGallery;
 import com.xeppaka.lentareader.data.dao.daoobjects.BitmapReference;
 import com.xeppaka.lentareader.data.dao.daoobjects.ImageDao;
-import com.xeppaka.lentareader.downloader.Page;
 
 import java.util.Collections;
 import java.util.List;

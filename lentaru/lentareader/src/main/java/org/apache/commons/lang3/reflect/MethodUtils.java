@@ -16,12 +16,12 @@
  */
 package org.apache.commons.lang3.reflect;
 
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.ClassUtils;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.ClassUtils;
 
 /**
  * <p>Utility reflection methods focused on methods, originally from Commons BeanUtils.

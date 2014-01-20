@@ -16,6 +16,8 @@
  */
 package org.apache.commons.lang3.reflect;
 
+import org.apache.commons.lang3.ClassUtils;
+
 import java.lang.reflect.Array;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
@@ -28,8 +30,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.commons.lang3.ClassUtils;
 
 /**
  * <p> Utility methods focusing on type inspection, particularly with regard to

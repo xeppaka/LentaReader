@@ -85,8 +85,10 @@ public class ServiceHelper {
                     }
                     break;
                 case FAILURE:
+                    Exception ex = (Exception)resultData.getSerializable(BundleConstants.EXCEPTION.name());
+
                     for (Callback listener : requestListeners) {
-                        listener.onFailure();
+                        listener.onFailure(ex);
                     }
                     break;
             }

@@ -1,7 +1,6 @@
 package com.xeppaka.lentareader.ui.activities;
 
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.ActionBarActivity;
 
 import com.xeppaka.lentareader.R;

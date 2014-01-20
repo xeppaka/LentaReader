@@ -1,20 +1,13 @@
 package com.xeppaka.lentareader.ui.fragments;
 
-import android.app.ListFragment;
 import android.content.Context;
 import android.content.res.Resources;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.view.ViewGroup;
 
 import com.xeppaka.lentareader.R;
-import com.xeppaka.lentareader.data.NewsObject;
 import com.xeppaka.lentareader.data.NewsType;
-import com.xeppaka.lentareader.data.Rubrics;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * This class represents pager adapter -> it contains all page definitions

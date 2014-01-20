@@ -18,6 +18,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import com.viewpagerindicator.TitlePageIndicator;
 import com.xeppaka.lentareader.R;
@@ -25,6 +26,7 @@ import com.xeppaka.lentareader.data.NewsType;
 import com.xeppaka.lentareader.data.Rubrics;
 import com.xeppaka.lentareader.service.Callback;
 import com.xeppaka.lentareader.service.ServiceHelper;
+import com.xeppaka.lentareader.service.commands.exceptions.NoInternetConnectionException;
 import com.xeppaka.lentareader.ui.fragments.NewsFullFragment;
 import com.xeppaka.lentareader.ui.fragments.NewsObjectListFragment;
 import com.xeppaka.lentareader.ui.fragments.SwipeNewsObjectsListAdapter;
@@ -152,11 +154,11 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
 
         serviceHelper.updateRubric(currentNewsType, rubric, new Callback() {
             @Override
-            public void onSuccess() {
-            }
+            public void onSuccess() {}
 
             @Override
-            public void onFailure() {
+            public void onFailure(Exception ex) {
+                showServiceErrorToast(ex);
             }
         });
     }
@@ -227,6 +229,18 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
             fragment.setSelection(position);
 
             newsFullFragment.showNews(id);
+        }
+    }
+
+    private void showServiceErrorToast(Exception ex) {
+        final int duration = 60000;
+
+        try {
+            throw ex;
+        } catch (NoInternetConnectionException e) {
+            Toast.makeText(this, R.string.no_internet_connection_toast, duration).show();
+        } catch (Exception e) {
+            Toast.makeText(this, R.string.general_error_toast, duration).show();
         }
     }
 }

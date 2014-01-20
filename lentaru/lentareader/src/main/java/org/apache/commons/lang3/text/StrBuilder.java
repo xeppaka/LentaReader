@@ -16,14 +16,14 @@
  */
 package org.apache.commons.lang3.text;
 
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.SystemUtils;
+
 import java.io.Reader;
 import java.io.Writer;
 import java.util.Iterator;
 import java.util.List;
-
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.SystemUtils;
 
 /**
  * Builds a string from constituent parts providing a more flexible and powerful API

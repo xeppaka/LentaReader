@@ -75,7 +75,6 @@ public class LentaService extends Service {
 		}
 	}
 
-    public static final Bundle resultFail;
     public static final Bundle resultSuccess;
 
     private static final String URI_BASE_STRING = "com.xeppaka.lentareader.service";
@@ -90,8 +89,6 @@ public class LentaService extends Service {
         uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
         uriMatcher.addURI(URI_BASE_STRING, NewsType.NEWS.name() + "/*", NEWS);
 
-        resultFail = new Bundle();
-        resultFail.putString(BundleConstants.RESULT.name(), Result.FAILURE.name());
         resultSuccess = new Bundle();
         resultSuccess.putString(BundleConstants.RESULT.name(), Result.SUCCESS.name());
     }
@@ -146,7 +143,7 @@ public class LentaService extends Service {
 
     private void failStart(int requestId, ResultReceiver receiver) {
         if (receiver != null) {
-            receiver.send(requestId, resultFail);
+            receiver.send(requestId, createFailResult(null));
         }
     }
 
@@ -167,6 +164,20 @@ public class LentaService extends Service {
 		UpdateRubricServiceCommand command = new UpdateRubricServiceCommand(requestId, newsType, rubric, getApplicationContext(), resultReceiver);
 		executor.execute(command);
 	}
+
+    public static Bundle createFailResult(Exception ex) {
+        final Bundle resultFail = new Bundle();
+        resultFail.putString(BundleConstants.RESULT.name(), Result.FAILURE.name());
+
+        if (ex != null)
+            resultFail.putSerializable(BundleConstants.EXCEPTION.name(), ex);
+
+        return resultFail;
+    }
+
+    public static Bundle createFailResult() {
+        return createFailResult(null);
+    }
 
 //	private void updateNewsItem(int requestId, long newsId, ContentResolver contentResolver, ExecutorService executor, ResultReceiver resultReceiver) {
 //		SyncNewsServiceCommand command = new SyncNewsServiceCommand(requestId, newsId, contentResolver, executor, resultReceiver, false);

@@ -1,13 +1,8 @@
 package com.xeppaka.lentareader.data.body.items;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.ImageView;
-
-import com.xeppaka.lentareader.data.dao.daoobjects.BitmapReference;
-import com.xeppaka.lentareader.data.dao.daoobjects.ImageDao;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 

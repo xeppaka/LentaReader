@@ -16,10 +16,10 @@
  */
 package org.apache.commons.lang3.math;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
-
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * <p>Provides extra functionality for Java Number classes.</p>

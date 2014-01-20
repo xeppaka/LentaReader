@@ -16,10 +16,10 @@
  */
 package org.apache.commons.lang3.reflect;
 
+import org.apache.commons.lang3.ClassUtils;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-
-import org.apache.commons.lang3.ClassUtils;
 
 /**
  * Utilities for working with fields by reflection. Adapted and refactored

@@ -16,6 +16,9 @@
  */
 package org.apache.commons.lang3;
 
+import org.apache.commons.lang3.exception.CloneFailedException;
+import org.apache.commons.lang3.mutable.MutableInt;
+
 import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
@@ -25,9 +28,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeSet;
-
-import org.apache.commons.lang3.exception.CloneFailedException;
-import org.apache.commons.lang3.mutable.MutableInt;
 
 /**
  * <p>Operations on {@code Object}.</p>

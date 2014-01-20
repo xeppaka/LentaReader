@@ -7,5 +7,5 @@ public interface Callback {
 //
 //    void onFailed(int requestId, Exception e);
     void onSuccess();
-    void onFailure();
+    void onFailure(Exception ex);
 }

@@ -54,4 +54,7 @@
     <string name="news_full_text_size_summary">Размер текста в открытой новости — %1d</string>
     <string name="news_auto_refresh_summary">Автоматически загружать свежие новости, при открытии приложения и смене рубрики</string>
 
+    <string name="no_internet_connection_toast">Отсутствует подключение к интернету</string>
+    <string name="general_error_toast">Произошла ошибка при скачивании новостей</string>
+
 </resources>

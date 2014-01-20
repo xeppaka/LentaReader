@@ -2,7 +2,6 @@ package com.xeppaka.lentareader.ui.widgets;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.os.AsyncTask;
 import android.preference.DialogPreference;
 import android.util.AttributeSet;
 import android.view.View;

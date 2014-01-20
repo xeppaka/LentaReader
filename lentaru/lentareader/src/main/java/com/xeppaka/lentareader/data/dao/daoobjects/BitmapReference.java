@@ -3,10 +3,6 @@ package com.xeppaka.lentareader.data.dao.daoobjects;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 
-import com.xeppaka.lentareader.downloader.exceptions.HttpStatusCodeException;
-
-import java.io.IOException;
-
 /**
  * 
  * 

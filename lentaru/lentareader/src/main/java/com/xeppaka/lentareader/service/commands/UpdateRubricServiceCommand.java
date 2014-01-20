@@ -27,7 +27,7 @@ public final class UpdateRubricServiceCommand extends RunnableServiceCommand {
     private Context context;
 
     public UpdateRubricServiceCommand(int requestId, NewsType newsType, Rubrics rubric, Context context, ResultReceiver resultReceiver) {
-		super(requestId, resultReceiver);
+		super(context, requestId, resultReceiver, true);
 		
 		this.context = context;
 		this.newsType = newsType;

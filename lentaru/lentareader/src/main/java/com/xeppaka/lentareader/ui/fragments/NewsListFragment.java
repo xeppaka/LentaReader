@@ -1,35 +1,21 @@
 package com.xeppaka.lentareader.ui.fragments;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.support.v4.app.ListFragment;
 import android.view.View;
 import android.widget.AbsListView;
-import android.widget.ListView;
 
 import com.xeppaka.lentareader.data.News;
 import com.xeppaka.lentareader.data.NewsType;
-import com.xeppaka.lentareader.data.Rubrics;
 import com.xeppaka.lentareader.data.dao.Dao;
-import com.xeppaka.lentareader.data.dao.async.AsyncDao;
 import com.xeppaka.lentareader.data.dao.async.AsyncDao.DaoReadMultiListener;
-import com.xeppaka.lentareader.data.dao.async.AsyncDao.DaoReadSingleListener;
 import com.xeppaka.lentareader.data.dao.async.AsyncNODao;
 import com.xeppaka.lentareader.data.dao.daoobjects.DaoObserver;
 import com.xeppaka.lentareader.data.dao.daoobjects.NewsDao;
-import com.xeppaka.lentareader.service.Callback;
-import com.xeppaka.lentareader.service.ServiceHelper;
-import com.xeppaka.lentareader.ui.activities.NewsFullActivity;
 import com.xeppaka.lentareader.utils.PreferencesConstants;
 
-import org.apache.commons.lang3.ObjectUtils;
-
-import java.util.Arrays;
 import java.util.List;
 
 /**
