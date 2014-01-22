@@ -5,10 +5,15 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.os.AsyncTask;
 import android.support.v4.util.LruCache;
 import android.text.TextUtils;
+import android.util.Config;
+import android.util.DisplayMetrics;
 import android.util.Log;
 
 import com.xeppaka.lentareader.data.dao.DaoObservable;
@@ -65,8 +70,13 @@ public class ImageDao implements DaoObservable<BitmapReference> {
         turnedOffImagesThumbnailImageRef = new StrongBitmapReference(createTurnedOffThumbnailBitmap());
     }
 
-    private ImageDao() {}
     private static ImageDao INSTANCE;
+
+    private float displayDensity;
+
+    private ImageDao(Context context) {
+        displayDensity = context.getResources().getDisplayMetrics().density;
+    }
 
     public static ImageDao newInstance(Context context) {
         if (bitmapCache == null || thumbnailsBitmapCache == null) {
@@ -106,7 +116,7 @@ public class ImageDao implements DaoObservable<BitmapReference> {
         }
 
         if (INSTANCE == null)
-            INSTANCE = new ImageDao();
+            INSTANCE = new ImageDao(context);
 
         return INSTANCE;
     }
@@ -562,6 +572,7 @@ public class ImageDao implements DaoObservable<BitmapReference> {
             @Override
             protected BitmapGetResult doInBackground(Callback... listeners) {
                 this.listeners = listeners;
+
                 try {
                     return new BitmapGetResult(getBitmap());
                 } catch (IOException e) {
@@ -663,9 +674,12 @@ public class ImageDao implements DaoObservable<BitmapReference> {
 
             // download and set bitmap
             final Bitmap downloadedBitmap = downloadBitmap();
+            downloadedBitmap.setDensity((int)displayDensity);
 
             if (thumbnail) {
-                setBitmap(Bitmap.createScaledBitmap(downloadedBitmap, Math.round(downloadedBitmap.getWidth() / 4.0f), Math.round(downloadedBitmap.getHeight() / 4.0f), false));
+                final Bitmap scaledBitmap = Bitmap.createScaledBitmap(downloadedBitmap, Math.round(downloadedBitmap.getWidth() / THUMBNAIL_RATIO), Math.round(downloadedBitmap.getHeight() / THUMBNAIL_RATIO), false);
+                scaledBitmap.setDensity(downloadedBitmap.getDensity());
+                setBitmap(scaledBitmap);
 
                 // we have full image, let's put it in the full bitmaps cache
                 synchronized (bitmapCache) {

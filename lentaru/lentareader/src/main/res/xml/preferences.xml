@@ -23,7 +23,7 @@
         <com.xeppaka.lentareader.ui.widgets.NewsTextSizePreference
             android:key="pref_key_news_list_text_size"
             android:summary="@string/news_list_text_size_summary_default"
-            android:defaultValue="12"/>
+            android:defaultValue="13"/>
         <com.xeppaka.lentareader.ui.widgets.NewsTextSizePreference
             android:key="pref_key_news_full_text_size"
             android:summary="@string/news_full_text_size_summary_default"

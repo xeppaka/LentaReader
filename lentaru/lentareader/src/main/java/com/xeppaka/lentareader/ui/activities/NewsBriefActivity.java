@@ -4,13 +4,14 @@ import android.animation.ValueAnimator;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.util.TypedValue;
@@ -20,7 +21,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -34,8 +34,8 @@ import com.xeppaka.lentareader.service.commands.exceptions.NoInternetConnectionE
 import com.xeppaka.lentareader.ui.fragments.NewsFullFragment;
 import com.xeppaka.lentareader.ui.fragments.NewsObjectListFragment;
 import com.xeppaka.lentareader.ui.fragments.SwipeNewsObjectsListAdapter;
-import com.xeppaka.lentareader.ui.menu.LentaActionProvider;
 import com.xeppaka.lentareader.ui.widgets.SelectRubricDialog;
+import com.xeppaka.lentareader.utils.LentaConstants;
 import com.xeppaka.lentareader.utils.LentaDebugUtils;
 import com.xeppaka.lentareader.utils.PreferencesConstants;
 
@@ -58,8 +58,6 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
 
     private boolean autoRefresh;
     private int listFragments;
-    private MenuItem refreshMenu;
-    private ValueAnimator rotationAnimator;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -69,8 +67,9 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
 
 		setContentView(R.layout.brief_news_activity);
         setTitle(null);
-        //getActionBar().setIcon(R.drawable.lenta_icon);
         getSupportActionBar().setLogo(R.drawable.ab_lenta_icon);
+
+        // getSupportActionBar().setTitle(String.valueOf(LentaConstants.SDK_VER));
 
 		initializeViewPager();
 		initializeViewIndicator();
@@ -87,7 +86,7 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
         if (actionBarHeight != 0) {
             WindowManager.LayoutParams params = selectRubricDialog.getWindow().getAttributes();
 
-            params.gravity = Gravity.TOP | Gravity.RIGHT;
+            params.gravity = Gravity.TOP/* | Gravity.RIGHT */;
             params.y = actionBarHeight;
         }
 
@@ -134,11 +133,6 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
 	public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_actions, menu);
-
-//        MenuItem mitem = menu.findItem(R.id.action_refresh);
-//        mitem.setActionProvider(new LentaActionProvider(this));
-
-//        LentaActionProvider.getMenuItemRefresh().animate().rotation(10f).setDuration(5000).start();
 
         return super.onCreateOptionsMenu(menu);
 	}
@@ -245,7 +239,7 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
     }
 
     private void showServiceErrorToast(Exception ex) {
-        final int duration = 60000;
+        final int duration = 90000;
 
         try {
             throw ex;

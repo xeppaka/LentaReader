@@ -3,5 +3,6 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
     <solid android:color="@color/select_rubric_pressed"/>
-    <stroke android:color="@color/select_rubric_pressed" android:width="1px"/>
+    <stroke android:color="@color/select_rubric" android:width="1px"/>
+    <corners android:radius="1px"/>
 </shape>

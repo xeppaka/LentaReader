@@ -2,6 +2,7 @@ package com.xeppaka.lentareader.ui.fragments;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
