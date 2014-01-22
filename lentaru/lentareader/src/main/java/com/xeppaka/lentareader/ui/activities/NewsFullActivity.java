@@ -19,6 +19,7 @@ public class NewsFullActivity extends ActionBarActivity {
         setTitle(null);
         //getActionBar().setIcon(R.drawable.lenta_icon);
         getSupportActionBar().setLogo(R.drawable.ab_lenta_icon);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 		setContentView(R.layout.full_news_activity);
 		long newsId = getIntent().getLongExtra("newsId", -1);

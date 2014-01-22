@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Lenta.ru Reader</string>
-    <string name="action_bar_title">L3NTA.RU</string>
+    <string name="app_name">Lenta.RU</string>
     <string name="brief_news_image_desc">Картинка к новости</string>
     <string name="full_news_image_desc">Картинка к новости</string>
     <string name="title_activity_full_news">L3NTA.RU</string>
@@ -54,7 +53,6 @@
     <string name="news_full_text_size_summary">Размер текста в открытой новости — %1d</string>
     <string name="news_auto_refresh_summary">Автоматически загружать свежие новости, при открытии приложения и смене рубрики</string>
 
-    <string name="no_internet_connection_toast">Отсутствует подключение к интернету</string>
-    <string name="general_error_toast">Произошла ошибка при скачивании новостей</string>
-
+    <string name="no_internet_connection_toast">Ошибка соединения с сервером.\nПроверьте ваше соединение с интернетом.</string>
+    <string name="general_error_toast">Ошибка соединения с сервером.</string>
 </resources>

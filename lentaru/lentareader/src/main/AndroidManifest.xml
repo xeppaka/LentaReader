@@ -24,6 +24,9 @@
         <activity
             android:name=".ui.activities.NewsFullActivity"
             android:theme="@style/Theme.AppCompat.Light.DarkActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ui.activities.NewsBriefActivity" />
         </activity>
 
         <activity
