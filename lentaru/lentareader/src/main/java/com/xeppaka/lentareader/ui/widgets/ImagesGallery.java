@@ -19,6 +19,7 @@ import com.xeppaka.lentareader.utils.LentaTextUtils;
 public class ImagesGallery extends LinearLayout implements ViewPager.OnPageChangeListener {
     private final TextView imageCaption;
     private final TextView imageCredits;
+    private final TextView imageNumber;
 
     private final LentaBodyItemImageGallery gallery;
 
@@ -35,6 +36,8 @@ public class ImagesGallery extends LinearLayout implements ViewPager.OnPageChang
 
         setLayoutParams(params);
 
+        addView(imageNumber = createDescriptionTextView(context, LentaTextUtils.getNewsFullImageCaptionTextSize(textSize)));
+
         if (downloadImages) {
             final ImagesSwitcher galleryView = new ImagesSwitcher(context, gallery.getImages());
             galleryView.setOnPageChangeListener(this);
@@ -45,8 +48,10 @@ public class ImagesGallery extends LinearLayout implements ViewPager.OnPageChang
         addView(imageCaption = createDescriptionTextView(context, LentaTextUtils.getNewsFullImageCaptionTextSize(textSize)));
         addView(imageCredits = createDescriptionTextView(context, LentaTextUtils.getNewsFullImageCreditsTextSize(textSize)));
 
-        if (!gallery.isEmpty())
+        if (!gallery.isEmpty()) {
             setImageDescription(gallery.getImage(0));
+            setImageNumber(1, gallery.size());
+        }
     }
 
     private TextView createDescriptionTextView(Context context, int textSize) {
@@ -63,6 +68,7 @@ public class ImagesGallery extends LinearLayout implements ViewPager.OnPageChang
     @Override
     public void onPageSelected(int i) {
         setImageDescription(gallery.getImage(i));
+        setImageNumber(i + 1, gallery.size());
     }
 
     private void setImageDescription(LentaBodyItemImage image) {
@@ -79,6 +85,10 @@ public class ImagesGallery extends LinearLayout implements ViewPager.OnPageChang
         } else {
             imageCredits.setVisibility(GONE);
         }
+    }
+
+    private void setImageNumber(int current, int all) {
+        imageNumber.setText(String.format("%d/%d  ← →", current, all));
     }
 
     @Override
