@@ -2,6 +2,17 @@
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory
+        android:title="@string/pref_about_application">
+        <CheckBoxPreference
+            android:key="pref_key_load_image_thumbnails"
+            android:summary="@string/pref_load_images_news_list_summary"
+            android:defaultValue="true" />
+        <CheckBoxPreference
+            android:key="pref_key_load_image_full"
+            android:summary="@string/pref_load_images_news_full_summary"
+            android:defaultValue="true" />
+    </PreferenceCategory>
+    <PreferenceCategory
         android:title="@string/pref_load_images"
         android:key="pref_key_load_images">
         <CheckBoxPreference
@@ -37,5 +48,8 @@
             android:key="pref_key_news_delete_days"
             android:summary="@string/pref_news_deletion_interval_summary_days_default"
             android:defaultValue="5"/>
+        <com.xeppaka.lentareader.ui.widgets.NewsDeleteCache
+            android:key="pref_key_news_delete_cache"
+            android:summary="123"/>
     </PreferenceCategory>
 </PreferenceScreen>

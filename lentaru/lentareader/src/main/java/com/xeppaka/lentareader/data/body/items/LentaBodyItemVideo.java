@@ -35,11 +35,6 @@ public class LentaBodyItemVideo implements Item {
 
     @Override
     public View createView(Context context, ItemPreferences preferences) {
-        TextView view = new TextView(context);
-        view.setText(Html.fromHtml("VIDEO HERE from " + url));
-        view.setMovementMethod(LinkMovementMethod.getInstance());
-
-        return view;
-
+        return null;
     }
 }

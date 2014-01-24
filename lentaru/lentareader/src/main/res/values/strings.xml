@@ -33,6 +33,8 @@
     <string name="rubric_internet">Интернет и СМИ</string>
     <string name="rubric_life">Из жизни</string>
 
+    <string name="pref_about_application">О программе</string>
+
     <string name="pref_load_images">Изображения</string>
     <string name="pref_load_images_news_list">В ленте новостей</string>
     <string name="pref_load_images_news_full">В полной новости</string>
@@ -53,6 +55,8 @@
     <string name="news_list_text_size_summary">Размер текста в списке новостей — %1d</string>
     <string name="news_full_text_size_summary">Размер текста в открытой новости — %1d</string>
     <string name="news_auto_refresh_summary">Автоматически загружать свежие новости, при открытии приложения и смене рубрики</string>
+
+    <string name="news_clear_cache_confirmation">Вы уверены?</string>
 
     <string name="no_internet_connection_toast">Отсутствует подключение к интернету</string>
     <string name="general_error_toast">Произошла ошибка при скачивании новостей</string>

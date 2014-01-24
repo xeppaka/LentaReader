@@ -1,7 +1,9 @@
 package com.xeppaka.lentareader.ui.activities;
 
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBarActivity;
+import android.view.MenuItem;
 
 import com.xeppaka.lentareader.R;
 import com.xeppaka.lentareader.ui.fragments.NewsFullFragment;
@@ -27,5 +29,16 @@ public class NewsFullActivity extends ActionBarActivity {
 			fullNewsFragment = new NewsFullFragment(newsId);
 			getSupportFragmentManager().beginTransaction().replace(R.id.full_news_fragment_container, fullNewsFragment).commit();
 		}
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                NavUtils.navigateUpFromSameTask(this);
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }

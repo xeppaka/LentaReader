@@ -134,7 +134,11 @@ public class NewsFullFragment extends Fragment {
             final ItemPreferences itemPreferences = new ItemPreferences(downloadImages, textSize);
 
             for (Item item : body.getItems()) {
-                contentView.addView(item.createView(getActivity(), itemPreferences));
+                final View itemView = item.createView(getActivity(), itemPreferences);
+
+                if (itemView != null) {
+                    contentView.addView(itemView);
+                }
             }
 		}
 
