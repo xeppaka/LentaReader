@@ -2,6 +2,7 @@ package com.xeppaka.lentareader.data.dao.daoobjects;
 
 import android.app.ActivityManager;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -15,6 +16,7 @@ import android.text.TextUtils;
 import android.util.Config;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 
 import com.xeppaka.lentareader.data.dao.DaoObservable;
 import com.xeppaka.lentareader.downloader.LentaHttpImageDownloader;
@@ -47,35 +49,30 @@ public class ImageDao implements DaoObservable<BitmapReference> {
     private static final float THUMBNAIL_RATIO = 3.5f;
 
     // private ContentResolver contentResolver;
-    private static final StrongBitmapReference notAvailableImageRef;
-    private static final StrongBitmapReference loadingImageRef;
+    private static StrongBitmapReference notAvailableImageRef;
+    private static StrongBitmapReference loadingImageRef;
 
-    private static final StrongBitmapReference notAvailableThumbnailImageRef;
-    private static final StrongBitmapReference loadingThumbnailImageRef;
+    private static StrongBitmapReference notAvailableThumbnailImageRef;
+    private static StrongBitmapReference loadingThumbnailImageRef;
 
-    private static final StrongBitmapReference turnedOffImagesThumbnailImageRef;
+    private static StrongBitmapReference turnedOffImagesThumbnailImageRef;
 
 //    private static final List<Observer> observers = new ArrayList<Observer>();
 //    private static final Object observersSync = new Object();
 
     private static final ThreadPoolExecutor downloadImageExecutor = new ThreadPoolExecutor(3, 3, 0, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
 
-    static {
-        notAvailableImageRef = new StrongBitmapReference(createNotAvailableBitmap());
-        loadingImageRef = new StrongBitmapReference(createLoadingBitmap());
-
-        notAvailableThumbnailImageRef = new StrongBitmapReference(createNotAvailableThumbnailBitmap());
-        loadingThumbnailImageRef = new StrongBitmapReference(createLoadingThumbnailBitmap());
-
-        turnedOffImagesThumbnailImageRef = new StrongBitmapReference(createTurnedOffThumbnailBitmap());
-    }
-
     private static ImageDao INSTANCE;
 
     private float displayDensity;
 
-    private ImageDao(Context context) {
-        displayDensity = context.getResources().getDisplayMetrics().density;
+    private static int full_image_width = 330;
+    private static int full_image_height = 220;
+    private static int thumbnail_image_width = 90;
+    private static int thumbnail_image_height = 60;
+
+    private ImageDao(Resources resources) {
+        displayDensity = resources.getDisplayMetrics().density;
     }
 
     public static ImageDao newInstance(Context context) {
@@ -113,10 +110,25 @@ public class ImageDao implements DaoObservable<BitmapReference> {
                     return value.bitmapSize();
                 }
             };
+
+            final Resources resources = context.getResources();
+
+            full_image_width = Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, full_image_width, resources.getDisplayMetrics()));
+            full_image_height = Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, full_image_height, resources.getDisplayMetrics()));
+            thumbnail_image_width = Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, thumbnail_image_width, resources.getDisplayMetrics()));
+            thumbnail_image_height = Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, thumbnail_image_height, resources.getDisplayMetrics()));
+
+            notAvailableImageRef = new StrongBitmapReference(createNotAvailableBitmap());
+            loadingImageRef = new StrongBitmapReference(createLoadingBitmap());
+
+            notAvailableThumbnailImageRef = new StrongBitmapReference(createNotAvailableThumbnailBitmap());
+            loadingThumbnailImageRef = new StrongBitmapReference(createLoadingThumbnailBitmap());
+
+            turnedOffImagesThumbnailImageRef = new StrongBitmapReference(createTurnedOffThumbnailBitmap());
         }
 
         if (INSTANCE == null)
-            INSTANCE = new ImageDao(context);
+            INSTANCE = new ImageDao(context.getResources());
 
         return INSTANCE;
     }
@@ -141,9 +153,6 @@ public class ImageDao implements DaoObservable<BitmapReference> {
                 "ImageDao read thumbnail bitmap with URL: " + imageUrl);
         Log.d(LentaConstants.LoggerAnyTag,
                 "Caches sizes: full bitmap cache is " + bitmapCache.size() + ", thumbnail bitmap cache is " + thumbnailsBitmapCache.size());
-
-        Log.d(LentaConstants.LoggerAnyTag, "Free memory: " + Runtime.getRuntime().freeMemory());
-
 
         String imageKey;
         try {
@@ -385,66 +394,80 @@ public class ImageDao implements DaoObservable<BitmapReference> {
     }
 
     private static Bitmap createNotAvailableThumbnailBitmap() {
-        Bitmap result = Bitmap.createBitmap(165, 110, Bitmap.Config.ARGB_8888);
+        Bitmap result = Bitmap.createBitmap(thumbnail_image_width, thumbnail_image_height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(result);
 
         Paint paint = new Paint();
         paint.setColor(Color.BLACK);
-        paint.setTextSize(15);
+        paint.setAntiAlias(true);
+        paint.setTextSize(13);
 
         float text1Width = paint.measureText(imageNotAvailableText1);
         float text2Width = paint.measureText(imageNotAvailableText2);
 
-        canvas.drawText(imageNotAvailableText1, (165 - text1Width) / 2, 25, paint);
-        canvas.drawText(imageNotAvailableText2, (165 - text2Width) / 2, 45, paint);
+        canvas.drawText(imageNotAvailableText1, (thumbnail_image_width - text1Width) / 2, 25, paint);
+        canvas.drawText(imageNotAvailableText2, (thumbnail_image_width - text2Width) / 2, 45, paint);
+
+        paint.setStrokeWidth(1.0f);
+        paint.setStyle(Paint.Style.STROKE);
+
+        canvas.drawRect(0, 0, thumbnail_image_width - 1, thumbnail_image_height - 1, paint);
         return result;
     }
 
     private static Bitmap createLoadingBitmap() {
-        Bitmap result = Bitmap.createBitmap(420, 280, Bitmap.Config.ARGB_8888);
+        Bitmap result = Bitmap.createBitmap(full_image_width, full_image_height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(result);
 
         Paint paint = new Paint();
         paint.setColor(Color.BLACK);
+        paint.setAntiAlias(true);
         paint.setTextSize(30);
 
         float text1Width = paint.measureText(imageLoadingText1);
         float text2Width = paint.measureText(imageLoadingText2);
 
-        canvas.drawText(imageLoadingText1, (420 - text1Width) / 2, 70, paint);
-        canvas.drawText(imageLoadingText2, (420 - text2Width) / 2, 100, paint);
+        canvas.drawText(imageLoadingText1, (full_image_width - text1Width) / 2, 70, paint);
+        canvas.drawText(imageLoadingText2, (full_image_width - text2Width) / 2, 100, paint);
         return result;
     }
 
     private static Bitmap createLoadingThumbnailBitmap() {
-        Bitmap result = Bitmap.createBitmap(165, 110, Bitmap.Config.ARGB_8888);
+        Bitmap result = Bitmap.createBitmap(thumbnail_image_width, thumbnail_image_height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(result);
 
         Paint paint = new Paint();
         paint.setColor(Color.BLACK);
-        paint.setTextSize(15);
+        paint.setAntiAlias(true);
+        paint.setTextSize(13);
 
         float text1Width = paint.measureText(imageLoadingText1);
         float text2Width = paint.measureText(imageLoadingText2);
 
-        canvas.drawText(imageLoadingText1, (165 - text1Width) / 2, 25, paint);
-        canvas.drawText(imageLoadingText2, (165 - text2Width) / 2, 45, paint);
+        canvas.drawText(imageLoadingText1, (thumbnail_image_width - text1Width) / 2, 25, paint);
+        canvas.drawText(imageLoadingText2, (thumbnail_image_width - text2Width) / 2, 45, paint);
         return result;
     }
 
     private static Bitmap createTurnedOffThumbnailBitmap() {
-        Bitmap result = Bitmap.createBitmap(165, 110, Bitmap.Config.ARGB_8888);
+        Bitmap result = Bitmap.createBitmap(thumbnail_image_width, thumbnail_image_height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(result);
 
         Paint paint = new Paint();
         paint.setColor(Color.BLACK);
-        paint.setTextSize(15);
+        paint.setAntiAlias(true);
+        paint.setTextSize(11);
 
         float text1Width = paint.measureText(imageTurnedOffText1);
         float text2Width = paint.measureText(imageTurnedOffText2);
 
-        canvas.drawText(imageTurnedOffText1, (165 - text1Width) / 2, 25, paint);
-        canvas.drawText(imageTurnedOffText2, (165 - text2Width) / 2, 45, paint);
+        canvas.drawText(imageTurnedOffText1, (thumbnail_image_width - text1Width) / 2, 25, paint);
+        canvas.drawText(imageTurnedOffText2, (thumbnail_image_width - text2Width) / 2, 45, paint);
+
+        paint.setStrokeWidth(1.0f);
+        paint.setStyle(Paint.Style.STROKE);
+
+        canvas.drawRect(0, 0, thumbnail_image_width - 1, thumbnail_image_height - 1, paint);
         return result;
     }
 

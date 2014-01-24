@@ -43,7 +43,7 @@ import com.xeppaka.lentareader.utils.PreferencesConstants;
  * This is the main activity where everything starts right after application is 
  * loaded. 
  * 
- * @author 
+ * @author nnm
  * 
  */
 public class NewsBriefActivity extends ActionBarActivity implements DialogInterface.OnDismissListener, NewsObjectListFragment.ItemSelectionListener {
@@ -58,6 +58,8 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
 
     private boolean autoRefresh;
     private int listFragments;
+
+    private boolean showNoInternetToast = true;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -141,6 +143,7 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_refresh:
+                showNoInternetToast = true;
                 onRefresh();
                 return true;
             case R.id.action_select_rubric:
@@ -164,7 +167,10 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
 
             @Override
             public void onFailure(Exception ex) {
-                showServiceErrorToast(ex);
+                if (showNoInternetToast) {
+                    showServiceErrorToast(ex);
+                    showNoInternetToast = false;
+                }
             }
         });
     }
