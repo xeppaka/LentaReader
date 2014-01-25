@@ -3,11 +3,7 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory
         android:title="@string/pref_about_application">
-        <CheckBoxPreference
-            android:key="pref_key_load_image_thumbnails"
-            android:summary="@string/pref_load_images_news_list_summary"
-            android:defaultValue="true" />
-        <CheckBoxPreference
+        <
             android:key="pref_key_load_image_full"
             android:summary="@string/pref_load_images_news_full_summary"
             android:defaultValue="true" />
