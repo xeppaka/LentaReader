@@ -238,20 +238,22 @@ public class NewsFullFragment extends Fragment {
             public void finished(News result) {
                 loadedNews = result;
 
-                if (isResumed()) {
-                    if (resumed) {
-                        renderNewsAsync(loadedNews);
-                    }
-                }
-
-                if (!result.isRead()) {
-                    result.setRead(true);
-
-                    newsDao.updateAsync(result, new AsyncDao.DaoUpdateListener() {
-                        @Override
-                        public void finished(int rowsUpdated) {
+                if (result != null) {
+                    if (isResumed()) {
+                        if (resumed) {
+                            renderNewsAsync(loadedNews);
                         }
-                    });
+                    }
+
+                    if (!result.isRead()) {
+                        result.setRead(true);
+
+                        newsDao.updateAsync(result, new AsyncDao.DaoUpdateListener() {
+                            @Override
+                            public void finished(int rowsUpdated) {
+                            }
+                        });
+                    }
                 }
             }
         });

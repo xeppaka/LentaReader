@@ -18,6 +18,8 @@ import com.xeppaka.lentareader.data.dao.daoobjects.DaoObserver;
 import com.xeppaka.lentareader.data.dao.daoobjects.NewsDao;
 import com.xeppaka.lentareader.utils.PreferencesConstants;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -32,7 +34,6 @@ public class NewsListFragment extends NewsObjectListFragment implements AbsListV
 	private AsyncNODao<News> dao;
 
     private boolean scrolled;
-    private List<News> data;
 
     private Dao.Observer<News> newsDaoObserver = new DaoObserver<News>(new Handler()) {
         @Override
@@ -73,30 +74,63 @@ public class NewsListFragment extends NewsObjectListFragment implements AbsListV
 
         scrolled = false;
 
-        if (data == null) {
-            refresh();
-        } else {
-            newsAdapter.notifyDataSetChanged();
-        }
+        refresh();
 	}
 
     @Override
     public void refresh() {
         scrolled = false;
 
-        dao.readBriefAsync(getCurrentRubric(), new DaoReadMultiListener<News>() {
+        dao.readAllIdsAsync(getCurrentRubric(), new AsyncNODao.DaoReadIdsListener() {
             @Override
-            public void finished(List<News> result) {
-                data = result;
+            public void finished(List<Long> result) {
+                final List<News> news = newsAdapter.getNewsObjects();
 
-                if (isResumed()) {
-                    showData(data);
+                for (int i = 0; i < news.size(); ++i) {
+                    final News n = news.get(i);
+
+                    final int resultIndex = result.indexOf(n.getId());
+
+                    if (resultIndex < 0) {
+                        news.set(i, null);
+                    } else {
+                        result.remove(resultIndex);
+                    }
                 }
 
-                if (data.isEmpty()) {
-                    setLatestPubDate(0);
+                Iterator<News> iter = news.iterator();
+                while (iter.hasNext()) {
+                    News next = iter.next();
+
+                    if (next == null) {
+                        iter.remove();
+                    }
+                }
+
+                if (result.isEmpty()) {
+                    // result is empty means we don't have new news
+                    if (news.isEmpty()) {
+                        setLatestPubDate(0);
+                    } else {
+                        setLatestPubDate(news.get(0).getPubDate().getTime());
+                    }
+
+                    showData(news);
                 } else {
-                    setLatestPubDate(data.get(0).getPubDate().getTime());
+                    dao.readBriefAsync(getCurrentRubric(), new DaoReadMultiListener<News>() {
+                        @Override
+                        public void finished(List<News> result) {
+                            if (isResumed()) {
+                                showData(result);
+                            }
+
+                            if (result.isEmpty()) {
+                                setLatestPubDate(0);
+                            } else {
+                                setLatestPubDate(result.get(0).getPubDate().getTime());
+                            }
+                        }
+                    });
                 }
             }
         });

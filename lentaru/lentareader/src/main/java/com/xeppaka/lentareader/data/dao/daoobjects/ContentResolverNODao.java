@@ -238,6 +238,42 @@ public abstract class ContentResolverNODao<T extends NewsObject> extends Content
     }
 
     @Override
+    public List<Long> readAllIds(Rubrics rubric) {
+        final String[] projectionIdOnly = { BaseColumns._ID };
+
+        Cursor cur;
+
+        if (rubric != Rubrics.LATEST) {
+            final String where = getWhereFromSQLiteType(SQLiteType.TEXT, 1);
+            final String[] whereArgs = { rubric.name() };
+
+            cur = getContentResolver().query(getContentProviderUri(),
+                    projectionIdOnly, String.format(where, getRubricColumnName()), whereArgs, NewsObjectEntry.COLUMN_NAME_PUBDATE + " desc");
+        } else {
+            cur = getContentResolver().query(getContentProviderUri(),
+                    projectionIdOnly, null, null, NewsObjectEntry.COLUMN_NAME_PUBDATE + " desc");
+        }
+
+        if (cur == null) {
+            return Collections.EMPTY_LIST;
+        }
+
+        try {
+            List<Long> result = new ArrayList<Long>();
+
+            while (cur.moveToNext()) {
+                result.add(cur.getLong(cur.getColumnIndexOrThrow(BaseColumns._ID)));
+            }
+
+            return result;
+        } finally {
+            if (cur != null) {
+                cur.close();
+            }
+        }
+    }
+
+    @Override
     public int clearLatestFlag(Rubrics rubric) {
         if (rubric != Rubrics.LATEST) {
             String where = getWhereFromSQLiteType(SQLiteType.TEXT);

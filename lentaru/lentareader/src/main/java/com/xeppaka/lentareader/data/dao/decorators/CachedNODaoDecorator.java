@@ -129,6 +129,11 @@ public class CachedNODaoDecorator<T extends NewsObject> extends CachedDaoDecorat
     }
 
     @Override
+    public List<Long> readAllIds(Rubrics rubric) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Override
 	protected NODao<T> getDecoratedDao() {
 		return decoratedDao;
 	}

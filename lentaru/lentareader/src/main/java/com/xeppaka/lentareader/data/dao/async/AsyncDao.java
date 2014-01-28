@@ -57,16 +57,16 @@ public interface AsyncDao<T> extends Dao<T> {
 	public interface DaoReadMultiListener<T> {	
 		void finished(List<T> result);
 	}
-	
+
 	/**
 	 * Listener of deleting from database.
-	 * 
+	 *
 	 * @author nnm
 	 */
-	public interface DaoDeleteListener {	
+	public interface DaoDeleteListener {
 		void finished(int rowsDeleted);
 	}
-	
+
 	/**
 	 * Listener of updating objects in database.
 	 * 

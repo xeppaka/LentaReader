@@ -79,6 +79,13 @@ public class SynchronizedNODaoDecorator<T extends NewsObject> extends Synchroniz
     }
 
     @Override
+    public List<Long> readAllIds(Rubrics rubric) {
+        synchronized (getSync()) {
+            return decoratedDao.readAllIds(rubric);
+        }
+    }
+
+    @Override
 	protected NODao<T> getDecoratedDao() {
 		return decoratedDao;
 	}
