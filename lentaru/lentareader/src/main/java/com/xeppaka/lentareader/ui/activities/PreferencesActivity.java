@@ -4,6 +4,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
+import android.view.MenuItem;
 
 import com.xeppaka.lentareader.R;
 import com.xeppaka.lentareader.data.News;
@@ -25,6 +26,7 @@ public class PreferencesActivity extends ActionBarActivity {
         setTitle(null);
         //getActionBar().setIcon(R.drawable.lenta_icon);
         getSupportActionBar().setLogo(R.drawable.ab_lenta_icon);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         setContentView(R.layout.preferences_activity);
 
@@ -47,5 +49,17 @@ public class PreferencesActivity extends ActionBarActivity {
                 }
             }
         });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                //NavUtils.navigateUpFromSameTask(this);
+                finish();
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }

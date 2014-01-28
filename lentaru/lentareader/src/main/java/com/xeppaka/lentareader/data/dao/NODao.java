@@ -15,6 +15,7 @@ import java.util.List;
  */
 public interface NODao<T extends NewsObject> extends Dao<T> {
     List<T> read(Rubrics rubric);
+    List<T> readBrief(Rubrics rubric);
     T readLatest(Rubrics rubric);
     T readLatestWOImage(Rubrics rubric, int limit);
     int deleteOlderOrEqual(Rubrics rubric, long date);

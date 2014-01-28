@@ -1,7 +1,6 @@
 package com.xeppaka.lentareader.ui.activities;
 
 import android.os.Bundle;
-import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBarActivity;
 import android.view.MenuItem;
 
@@ -36,7 +35,8 @@ public class NewsFullActivity extends ActionBarActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                NavUtils.navigateUpFromSameTask(this);
+                //NavUtils.navigateUpFromSameTask(this);
+                finish();
                 return true;
         }
 

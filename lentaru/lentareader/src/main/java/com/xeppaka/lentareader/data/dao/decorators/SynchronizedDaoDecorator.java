@@ -114,7 +114,14 @@ public class SynchronizedDaoDecorator<T extends DatabaseObject> implements Dao<T
 		}
 	}
 
-	@Override
+    @Override
+    public int delete() {
+        synchronized (sync) {
+            return getDecoratedDao().delete();
+        }
+    }
+
+    @Override
 	public List<Long> readAllIds() {
 		synchronized (sync) {
 			return getDecoratedDao().readAllIds();

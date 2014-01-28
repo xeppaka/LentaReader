@@ -6,10 +6,12 @@ import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.AbsListView;
+import android.widget.ListView;
 
 import com.xeppaka.lentareader.data.News;
 import com.xeppaka.lentareader.data.NewsType;
 import com.xeppaka.lentareader.data.dao.Dao;
+import com.xeppaka.lentareader.data.dao.async.AsyncDao;
 import com.xeppaka.lentareader.data.dao.async.AsyncDao.DaoReadMultiListener;
 import com.xeppaka.lentareader.data.dao.async.AsyncNODao;
 import com.xeppaka.lentareader.data.dao.daoobjects.DaoObserver;
@@ -30,6 +32,7 @@ public class NewsListFragment extends NewsObjectListFragment implements AbsListV
 	private AsyncNODao<News> dao;
 
     private boolean scrolled;
+    private List<News> data;
 
     private Dao.Observer<News> newsDaoObserver = new DaoObserver<News>(new Handler()) {
         @Override
@@ -70,36 +73,56 @@ public class NewsListFragment extends NewsObjectListFragment implements AbsListV
 
         scrolled = false;
 
-        refresh();
+        if (data == null) {
+            refresh();
+        } else {
+            newsAdapter.notifyDataSetChanged();
+        }
 	}
 
     @Override
     public void refresh() {
         scrolled = false;
 
-        dao.readAsync(getCurrentRubric(), new DaoReadMultiListener<News>() {
+        dao.readBriefAsync(getCurrentRubric(), new DaoReadMultiListener<News>() {
             @Override
             public void finished(List<News> result) {
+                data = result;
+
                 if (isResumed()) {
-                    if (!result.isEmpty() && getLatestPubDate() != result.get(0).getPubDate().getTime()) {
-                        clearScrollPosition();
-                    }
-
-                    newsAdapter.setNewsObjects(result, getExpandedItemIds());
-                    newsAdapter.notifyDataSetChanged();
-
-                    if (!scrolled) {
-                        restoreScrollPosition();
-                    }
+                    showData(data);
                 }
 
-                if (result.isEmpty()) {
+                if (data.isEmpty()) {
                     setLatestPubDate(0);
                 } else {
-                    setLatestPubDate(result.get(0).getPubDate().getTime());
+                    setLatestPubDate(data.get(0).getPubDate().getTime());
                 }
             }
         });
+    }
+
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
+        super.onListItemClick(l, v, position, id);
+
+        final News news = newsAdapter.getItem(position);
+        if (!news.isRead()) {
+            news.setRead(true);
+        }
+    }
+
+    private void showData(List<News> data) {
+        if (!data.isEmpty() && getLatestPubDate() != data.get(0).getPubDate().getTime()) {
+            clearScrollPosition();
+        }
+
+        newsAdapter.setNewsObjects(data, getExpandedItemIds());
+        newsAdapter.notifyDataSetChanged();
+
+        if (!scrolled) {
+            restoreScrollPosition();
+        }
     }
 
 	@Override

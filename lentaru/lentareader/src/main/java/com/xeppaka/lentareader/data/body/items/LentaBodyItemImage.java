@@ -6,10 +6,12 @@ import android.view.View;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 
+import java.io.Serializable;
+
 /**
  * Created by nnm on 11/18/13.
  */
-public class LentaBodyItemImage implements Item {
+public class LentaBodyItemImage implements Item, Serializable {
     private String preview_url;
     private String original_url;
     private String caption;

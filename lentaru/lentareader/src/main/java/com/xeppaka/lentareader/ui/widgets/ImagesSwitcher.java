@@ -5,7 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.AttributeSet;
+import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +15,6 @@ import com.xeppaka.lentareader.data.body.items.LentaBodyItemImage;
 import com.xeppaka.lentareader.data.dao.daoobjects.BitmapReference;
 import com.xeppaka.lentareader.data.dao.daoobjects.ImageDao;
 
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -23,23 +22,22 @@ import java.util.List;
  */
 public class ImagesSwitcher extends ViewPager {
     private final ImageDao imageDao;
-    private List<LentaBodyItemImage> images;
-    private final GalleryViewPagerAdapter adapter;
+    private final boolean preview;
 
     private class GalleryViewPagerAdapter extends PagerAdapter {
         private List<LentaBodyItemImage> images;
         private ImageView[] imageViews;
 
-        private GalleryViewPagerAdapter(List<LentaBodyItemImage> images) {
+        private GalleryViewPagerAdapter(List<LentaBodyItemImage> images, OnClickListener onClickListener) {
             this.images = images;
 
             final int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 220, getResources().getDisplayMetrics());
             setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height));
 
-            createViews();
+            createViews(onClickListener);
         }
 
-        private void createViews() {
+        private void createViews(View.OnClickListener onClickListener) {
             this.imageViews = new ImageView[images.size()];
 
             for (int i = 0; i < images.size(); ++i) {
@@ -47,6 +45,8 @@ public class ImagesSwitcher extends ViewPager {
                 imageView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
                 imageView.setScaleType(ImageView.ScaleType.FIT_XY);
                 imageView.setAdjustViewBounds(true);
+
+                imageView.setOnClickListener(onClickListener);
 
                 imageViews[i] = imageView;
             }
@@ -57,7 +57,21 @@ public class ImagesSwitcher extends ViewPager {
             final ImageView currentImageView = imageViews[position];
 
             container.addView(currentImageView);
-            BitmapReference bitmapRef = imageDao.read(images.get(position).getPreview_url());
+
+            final LentaBodyItemImage curImage = images.get(position);
+            String url;
+
+            if (preview) {
+                url = curImage.getPreview_url();
+            } else {
+                url = curImage.getOriginal_url();
+
+                if (url == null || TextUtils.isEmpty(url)) {
+                    url = curImage.getPreview_url();
+                }
+            }
+
+            final BitmapReference bitmapRef = imageDao.read(url);
 
             Bitmap bitmap;
             if ((bitmap = bitmapRef.getBitmapIfCached()) != null) {
@@ -103,35 +117,19 @@ public class ImagesSwitcher extends ViewPager {
         public int getCount() {
             return images.size();
         }
-
-        public void setImages(List<LentaBodyItemImage> images) {
-            this.images = images;
-
-            createViews();
-            notifyDataSetChanged();
-        }
     }
 
-    public ImagesSwitcher(Context context, List<LentaBodyItemImage> images) {
+    public ImagesSwitcher(Context context, List<LentaBodyItemImage> images, boolean preview) {
+        this(context, images, null, preview);
+    }
+
+    public ImagesSwitcher(Context context, List<LentaBodyItemImage> images, OnClickListener onClickListener, boolean preview) {
         super(context);
 
-        this.images = images;
         this.imageDao = ImageDao.newInstance(context);
+        this.preview = preview;
 
         setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0));
-        setAdapter(adapter = new GalleryViewPagerAdapter(images));
-    }
-
-    public ImagesSwitcher(Context context, AttributeSet attrs) {
-        super(context, attrs);
-
-        images = Collections.emptyList();
-        imageDao = ImageDao.newInstance(context);
-
-        setAdapter(adapter = new GalleryViewPagerAdapter(images));
-    }
-
-    public void setImages(List<LentaBodyItemImage> images) {
-        adapter.setImages(images);
+        setAdapter(new GalleryViewPagerAdapter(images, onClickListener));
     }
 }

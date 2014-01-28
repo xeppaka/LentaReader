@@ -113,7 +113,25 @@ public class AsyncDaoDecorator<T extends DatabaseObject> implements AsyncDao<T> 
 			listener.finished(result);
 		}
 	}
-	
+
+    protected class AsyncDeleteAllTask extends AsyncTask<Void, Void, Integer> {
+        private AsyncDao.DaoDeleteListener listener;
+
+        public AsyncDeleteAllTask(AsyncDao.DaoDeleteListener listener) {
+            this.listener = listener;
+        }
+
+        @Override
+        protected Integer doInBackground(Void... params) {
+            return delete();
+        }
+
+        @Override
+        protected void onPostExecute(Integer result) {
+            listener.finished(result);
+        }
+    }
+
 	protected class AsyncUpdateSingleTask extends AsyncTask<T, Void, Integer> {
 		private AsyncDao.DaoUpdateListener listener;
 		
@@ -172,7 +190,12 @@ public class AsyncDaoDecorator<T extends DatabaseObject> implements AsyncDao<T> 
 		return new AsyncDeleteSingleTask(listener).execute(id);
 	}
 
-	protected Dao<T> getDecoratedDao() {
+    @Override
+    public AsyncTask<Void, Void, Integer> deleteAsync(DaoDeleteListener listener) {
+        return new AsyncDeleteAllTask(listener).execute();
+    }
+
+    protected Dao<T> getDecoratedDao() {
 		return decoratedDao;
 	}
 
@@ -251,7 +274,12 @@ public class AsyncDaoDecorator<T extends DatabaseObject> implements AsyncDao<T> 
 		return getDecoratedDao().delete(keyType, keyColumnName, keyValue);
 	}
 
-	@Override
+    @Override
+    public int delete() {
+        return getDecoratedDao().delete();
+    }
+
+    @Override
 	public List<Long> readAllIds() {
 		return getDecoratedDao().readAllIds();
 	}

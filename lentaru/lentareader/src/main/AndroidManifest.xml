@@ -38,6 +38,12 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".ui.activities.ImagesFullActivity"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+            android:screenOrientation="landscape">
+        </activity>
+
         <service android:name=".service.LentaService"
             android:label="LentaService">
         </service>

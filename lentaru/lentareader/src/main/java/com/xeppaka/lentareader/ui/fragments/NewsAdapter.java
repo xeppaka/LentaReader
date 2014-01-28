@@ -2,7 +2,6 @@ package com.xeppaka.lentareader.ui.fragments;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
@@ -219,10 +218,10 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
             newsDescriptionPanel = holder.getNewsDescriptionPanel();
             newsReadIndicator = holder.getNewsReadIndicator();
 
-//            BitmapReference prevImageRef = holder.getImage();
-//			if (prevImageRef != null) {
-//				prevImageRef.releaseBitmap();
-//			}
+            BitmapReference prevImageRef = holder.getImage();
+			if (prevImageRef != null) {
+				prevImageRef.releaseBitmap();
+			}
 		}
 
         if (newsTitleTextView.getTextSize() != LentaTextUtils.getNewsListTitleTextSize(textSize)) {

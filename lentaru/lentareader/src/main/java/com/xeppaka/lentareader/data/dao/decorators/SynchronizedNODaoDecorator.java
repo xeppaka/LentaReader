@@ -23,6 +23,13 @@ public class SynchronizedNODaoDecorator<T extends NewsObject> extends Synchroniz
 	}
 
     @Override
+    public List<T> readBrief(Rubrics rubric) {
+        synchronized (getSync()) {
+            return decoratedDao.readBrief(rubric);
+        }
+    }
+
+    @Override
     public T readLatest(Rubrics rubric) {
         synchronized (getSync()) {
             return decoratedDao.readLatest(rubric);

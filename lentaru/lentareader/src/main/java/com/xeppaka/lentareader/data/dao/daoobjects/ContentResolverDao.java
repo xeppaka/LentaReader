@@ -242,7 +242,18 @@ public abstract class ContentResolverDao<T extends DatabaseObject> implements Da
         return result;
 	}
 
-	public int update(T daoObject) {
+    @Override
+    public int delete() {
+        final int result = cr.delete(getContentProviderUri(), null, null);
+
+        if (result > 0) {
+            cr.notifyChange(getContentProviderUri(), null);
+        }
+
+        return result;
+    }
+
+    public int update(T daoObject) {
 		long id = daoObject.getId();
 		
 		String[] whereArgs;

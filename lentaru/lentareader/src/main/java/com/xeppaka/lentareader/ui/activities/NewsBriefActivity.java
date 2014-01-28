@@ -1,11 +1,8 @@
 package com.xeppaka.lentareader.ui.activities;
 
-import android.animation.ValueAnimator;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -20,8 +17,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
-import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.viewpagerindicator.TitlePageIndicator;
@@ -35,7 +32,6 @@ import com.xeppaka.lentareader.ui.fragments.NewsFullFragment;
 import com.xeppaka.lentareader.ui.fragments.NewsObjectListFragment;
 import com.xeppaka.lentareader.ui.fragments.SwipeNewsObjectsListAdapter;
 import com.xeppaka.lentareader.ui.widgets.SelectRubricDialog;
-import com.xeppaka.lentareader.utils.LentaConstants;
 import com.xeppaka.lentareader.utils.LentaDebugUtils;
 import com.xeppaka.lentareader.utils.PreferencesConstants;
 
@@ -56,16 +52,24 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
 
     private NewsFullFragment newsFullFragment;
 
+    private boolean refreshing;
     private boolean autoRefresh;
     private int listFragments;
 
-    private boolean showNoInternetToast = true;
+    private boolean showServiceErrorToast = true;
+
+    private MenuItem actionSelectRubric;
+    private MenuItem actionPreferences;
+    private MenuItem actionRefresh;
+    private MenuItem actionRefreshRun;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		LentaDebugUtils.strictMode();
+
+        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 
 		setContentView(R.layout.brief_news_activity);
         setTitle(null);
@@ -81,9 +85,9 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
 
         int actionBarHeight = 0;
         TypedValue tv = new TypedValue();
-        if (getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true))
+        if (getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
             actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, getResources().getDisplayMetrics());
-
+        }
 
         if (actionBarHeight != 0) {
             WindowManager.LayoutParams params = selectRubricDialog.getWindow().getAttributes();
@@ -104,6 +108,8 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
     @Override
     protected void onResume() {
         super.onResume();
+
+        showActionBarRefresh(false);
 
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         autoRefresh = preferences.getBoolean(PreferencesConstants.PREF_KEY_NEWS_AUTO_REFRESH, PreferencesConstants.NEWS_AUTO_REFRESH_DEFAULT);
@@ -136,6 +142,15 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_actions, menu);
 
+        actionPreferences = menu.findItem(R.id.action_preferences);
+        actionSelectRubric = menu.findItem(R.id.action_select_rubric);
+        actionRefresh = menu.findItem(R.id.action_refresh);
+        actionRefreshRun = menu.findItem(R.id.action_refresh_run);
+
+        if (refreshing) {
+            showActionBarRefresh(true);
+        }
+
         return super.onCreateOptionsMenu(menu);
 	}
 
@@ -143,7 +158,7 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_refresh:
-                showNoInternetToast = true;
+                showServiceErrorToast = true;
                 onRefresh();
                 return true;
             case R.id.action_select_rubric:
@@ -158,21 +173,40 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
     }
 
     private void onRefresh() {
+        refreshing = true;
+
         final NewsType currentNewsType = NewsType.values()[pager.getCurrentItem()];
         final Rubrics rubric = pagerAdapter.getFragment(pager.getCurrentItem()).getCurrentRubric();
 
+        showActionBarRefresh(true);
+
         serviceHelper.updateRubric(currentNewsType, rubric, new Callback() {
             @Override
-            public void onSuccess() {}
+            public void onSuccess() {
+                refreshing = false;
+                showActionBarRefresh(false);
+            }
 
             @Override
             public void onFailure(Exception ex) {
-                if (showNoInternetToast) {
+                refreshing = false;
+                showActionBarRefresh(false);
+
+                if (showServiceErrorToast) {
                     showServiceErrorToast(ex);
-                    showNoInternetToast = false;
+                    showServiceErrorToast = false;
                 }
             }
         });
+    }
+
+    private void showActionBarRefresh(boolean refreshing) {
+        if (actionRefresh != null) {
+            actionPreferences.setVisible(!refreshing);
+            actionSelectRubric.setVisible(!refreshing);
+            actionRefresh.setVisible(!refreshing);
+            actionRefreshRun.setVisible(refreshing);
+        }
     }
 
     private void onSelectRubric() {
@@ -240,19 +274,17 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
             final NewsObjectListFragment fragment = pagerAdapter.getFragment(pager.getCurrentItem());
             fragment.setSelection(position);
 
-            newsFullFragment.showNews(id);
+            newsFullFragment.loadNews(id);
         }
     }
 
     private void showServiceErrorToast(Exception ex) {
-        final int duration = 90000;
-
         try {
             throw ex;
         } catch (NoInternetConnectionException e) {
-            Toast.makeText(this, R.string.no_internet_connection_toast, duration).show();
+            Toast.makeText(this, R.string.error_no_internet_connection_toast, Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
-            Toast.makeText(this, R.string.general_error_toast, duration).show();
+            Toast.makeText(this, R.string.error_general_toast, Toast.LENGTH_SHORT).show();
         }
     }
 }

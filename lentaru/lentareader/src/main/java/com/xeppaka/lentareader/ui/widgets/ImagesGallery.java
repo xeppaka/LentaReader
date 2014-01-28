@@ -1,25 +1,32 @@
 package com.xeppaka.lentareader.ui.widgets;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v4.view.ViewPager;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.util.TypedValue;
+import android.view.Gravity;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.xeppaka.lentareader.data.body.items.LentaBodyItemImage;
 import com.xeppaka.lentareader.data.body.items.LentaBodyItemImageGallery;
+import com.xeppaka.lentareader.ui.activities.ImagesFullActivity;
 import com.xeppaka.lentareader.utils.LentaTextUtils;
+
+import java.util.ArrayList;
 
 /**
  * Created by nnm on 12/29/13.
  */
-public class ImagesGallery extends LinearLayout implements ViewPager.OnPageChangeListener {
+public class ImagesGallery extends LinearLayout implements ViewPager.OnPageChangeListener, View.OnClickListener {
     private final TextView imageCaption;
     private final TextView imageCredits;
     private final TextView imageNumber;
+    private ImagesSwitcher galleryView;
 
     private final LentaBodyItemImageGallery gallery;
 
@@ -36,11 +43,14 @@ public class ImagesGallery extends LinearLayout implements ViewPager.OnPageChang
 
         setLayoutParams(params);
 
-        addView(imageNumber = createDescriptionTextView(context, LentaTextUtils.getNewsFullImageCaptionTextSize(textSize)));
+        imageNumber = createDescriptionTextView(context, LentaTextUtils.getNewsFullImageCaptionTextSize(textSize));
+        imageNumber.setGravity(Gravity.RIGHT);
+        addView(imageNumber);
 
         if (downloadImages) {
-            final ImagesSwitcher galleryView = new ImagesSwitcher(context, gallery.getImages());
+            galleryView = new ImagesSwitcher(context, gallery.getImages(), this, true);
             galleryView.setOnPageChangeListener(this);
+            galleryView.setOnClickListener(this);
 
             addView(galleryView);
         }
@@ -93,4 +103,13 @@ public class ImagesGallery extends LinearLayout implements ViewPager.OnPageChang
 
     @Override
     public void onPageScrollStateChanged(int i) {}
+
+    @Override
+    public void onClick(View v) {
+        final Intent intent = new Intent(getContext(), ImagesFullActivity.class);
+        intent.putExtra(ImagesFullActivity.IMAGES_KEY, new ArrayList<LentaBodyItemImage>(gallery.getImages()));
+        intent.putExtra(ImagesFullActivity.INDEX_KEY, galleryView.getCurrentItem());
+
+        getContext().startActivity(intent);
+    }
 }

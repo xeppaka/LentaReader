@@ -151,7 +151,16 @@ public interface AsyncDao<T> extends Dao<T> {
 	 * @param id
 	 * @param listener
 	 *            is a listener for result.
-	 * @return number of rows deleted.
+	 * @return async task which makes deletion.
 	 */
     AsyncTask<Long, Void, Integer> deleteAsync(long id, DaoDeleteListener listener);
+
+    /**
+     * Deletes all objects from the database.
+     *
+     * @param listener
+     *            is a listener for result.
+     * @return async task which makes deletion.
+     */
+    AsyncTask<Void, Void, Integer> deleteAsync(DaoDeleteListener listener);
 }

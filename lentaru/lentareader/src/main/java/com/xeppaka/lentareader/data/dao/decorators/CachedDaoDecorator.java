@@ -24,7 +24,7 @@ public class CachedDaoDecorator<T extends DatabaseObject> implements Dao<T> {
 		return decoratedDao;
 	}
 	
-	protected LruCache<Long, T> getLruCacheId() {
+	protected LruCache<Long, T> getLruCache() {
 		return cacheId;
 	}
 	
@@ -55,7 +55,7 @@ public class CachedDaoDecorator<T extends DatabaseObject> implements Dao<T> {
 	public synchronized long create(T dataObject) {
 		long newId = getDecoratedDao().create(dataObject);
 		
-		getLruCacheId().put(newId, dataObject);
+		getLruCache().put(newId, dataObject);
 		
 		return newId;
 	}
@@ -91,7 +91,7 @@ public class CachedDaoDecorator<T extends DatabaseObject> implements Dao<T> {
 		result.addAll(dbResult);
 		
 		for (T object : dbResult) {
-			getLruCacheId().put(object.getId(), object);
+			getLruCache().put(object.getId(), object);
 		}
 
 		return result;
@@ -99,7 +99,7 @@ public class CachedDaoDecorator<T extends DatabaseObject> implements Dao<T> {
 
 	@Override
 	public T read(long id) {
-		T dataObject = getLruCacheId().get(id);
+		T dataObject = getLruCache().get(id);
 		
 		if (dataObject != null) {
 			return dataObject;
@@ -114,7 +114,7 @@ public class CachedDaoDecorator<T extends DatabaseObject> implements Dao<T> {
         List<T> result = new ArrayList<T>(ids.size());
 		
 		for (Long id : ids) {
-			T dataObject = getLruCacheId().get(id);
+			T dataObject = getLruCache().get(id);
 			
 			if (dataObject == null) {
 				missed.add(id);
@@ -129,7 +129,7 @@ public class CachedDaoDecorator<T extends DatabaseObject> implements Dao<T> {
 			result.addAll(dbResult);
 			
 			for (T object : dbResult) {
-				getLruCacheId().put(object.getId(), object);
+				getLruCache().put(object.getId(), object);
 			}
 		}
 		
@@ -148,7 +148,7 @@ public class CachedDaoDecorator<T extends DatabaseObject> implements Dao<T> {
 
 	@Override
 	public boolean exist(long id) {
-		if (getLruCacheId().get(id) != null) {
+		if (getLruCache().get(id) != null) {
 			return true;
 		}
 		
@@ -171,13 +171,13 @@ public class CachedDaoDecorator<T extends DatabaseObject> implements Dao<T> {
         List<T> result = new ArrayList<T>(dbResult.size());
 		
 		for (T object : dbResult) {
-			T cachedObject = getLruCacheId().get(object.getId());
+			T cachedObject = getLruCache().get(object.getId());
 			
 			if (cachedObject != null) {
 				result.add(cachedObject);
 			} else {
 				result.add(object);
-				getLruCacheId().put(object.getId(), object);
+				getLruCache().put(object.getId(), object);
 			}
 		}
 		
@@ -186,14 +186,14 @@ public class CachedDaoDecorator<T extends DatabaseObject> implements Dao<T> {
 
 	@Override
 	public int update(T dataObject) {
-		getLruCacheId().put(dataObject.getId(), dataObject);
+		getLruCache().put(dataObject.getId(), dataObject);
 		
 		return getDecoratedDao().update(dataObject);
 	}
 
 	@Override
 	public int delete(long id) {
-		getLruCacheId().remove(id);
+		getLruCache().remove(id);
 		
 		return getDecoratedDao().delete(id);
 	}
@@ -208,7 +208,15 @@ public class CachedDaoDecorator<T extends DatabaseObject> implements Dao<T> {
 		return getDecoratedDao().delete(keyType, keyColumnName, keyValue);
 	}
 
-	@Override
+    @Override
+    public int delete() {
+        final int result = getDecoratedDao().delete();
+        getLruCache().evictAll();
+
+        return result;
+    }
+
+    @Override
 	public List<Long> readAllIds() {
 		return getDecoratedDao().readAllIds();
 	}

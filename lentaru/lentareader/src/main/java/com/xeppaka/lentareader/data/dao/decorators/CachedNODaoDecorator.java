@@ -32,14 +32,14 @@ public class CachedNODaoDecorator<T extends NewsObject> extends CachedDaoDecorat
         List<T> result = new ArrayList<T>(dbResult.size());
 		
 		for (T object : dbResult) {
-			T cachedObject = getLruCacheId().get(object.getId());			
+			T cachedObject = getLruCache().get(object.getId());
 			
 			if (cachedObject != null) {
 				Log.d(LentaConstants.LoggerServiceTag, "read: found object in cache with id " + object.getId());
 				result.add(cachedObject);
 			} else {
 				Log.d(LentaConstants.LoggerServiceTag, "read: not found object in cache with id " + object.getId());
-				getLruCacheId().put(object.getId(), object);
+				getLruCache().put(object.getId(), object);
 				result.add(object);
 			}
 		}
@@ -48,14 +48,19 @@ public class CachedNODaoDecorator<T extends NewsObject> extends CachedDaoDecorat
 	}
 
     @Override
+    public List<T> readBrief(Rubrics rubric) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Override
     public T readLatest(Rubrics rubric) {
         T result = getDecoratedDao().readLatest(rubric);
 
         if (result != null) {
-            T cached = getLruCacheId().get(result.getId());
+            T cached = getLruCache().get(result.getId());
 
             if (cached == null) {
-                getLruCacheId().put(result.getId(), result);
+                getLruCache().put(result.getId(), result);
             }
         }
 
@@ -81,9 +86,9 @@ public class CachedNODaoDecorator<T extends NewsObject> extends CachedDaoDecorat
     public int clearLatestFlag(Rubrics rubric) {
         final int result = getDecoratedDao().clearLatestFlag(rubric);
 
-        Map<Long, T> cacheSnapshot = getLruCacheId().snapshot();
+        Map<Long, T> cacheSnapshot = getLruCache().snapshot();
         for (T newsObject : cacheSnapshot.values()) {
-            T n = getLruCacheId().get(newsObject.getId());
+            T n = getLruCache().get(newsObject.getId());
             if (n != null && ((rubric == Rubrics.LATEST) || (rubric != Rubrics.LATEST && n.getRubric() == rubric))) {
                 n.setLatest(false);
             }
@@ -96,9 +101,9 @@ public class CachedNODaoDecorator<T extends NewsObject> extends CachedDaoDecorat
     public int setLatestFlag(Rubrics rubric) {
         final int result = getDecoratedDao().setLatestFlag(rubric);
 
-        Map<Long, T> cacheSnapshot = getLruCacheId().snapshot();
+        Map<Long, T> cacheSnapshot = getLruCache().snapshot();
         for (T newsObject : cacheSnapshot.values()) {
-            T n = getLruCacheId().get(newsObject.getId());
+            T n = getLruCache().get(newsObject.getId());
             if (n != null && ((rubric == Rubrics.LATEST) || (rubric != Rubrics.LATEST && n.getRubric() == rubric))) {
                 n.setLatest(true);
             }
@@ -111,7 +116,7 @@ public class CachedNODaoDecorator<T extends NewsObject> extends CachedDaoDecorat
     public int deleteOlderOrEqual(Rubrics rubric, long date) {
         final int result = getDecoratedDao().deleteOlderOrEqual(rubric, date);
 
-        final LruCache<Long, T> cache = getLruCacheId();
+        final LruCache<Long, T> cache = getLruCache();
         final Map<Long, T> cacheSnapshot = cache.snapshot();
         for (T newsObject : cacheSnapshot.values()) {
             T n = cache.get(newsObject.getId());

@@ -31,13 +31,14 @@ import java.util.List;
 public final class NewsDao {
 	private static final int CACHE_MAX_OBJECTS = LentaConstants.DAO_CACHE_MAX_OBJECTS;
 	
-	private static final LruCache<Long, News> cacheId = new LruCache<Long, News>(CACHE_MAX_OBJECTS);
-	private static final Object sync = new Object();
+//	private static final LruCache<Long, News> cacheId = new LruCache<Long, News>(CACHE_MAX_OBJECTS);
+//	private static final Object sync = new Object();
 
     private static final ConvertedBodyParser bodyParser = new ConvertedBodyParser();
 
     public final static AsyncNODao<News> getInstance(ContentResolver contentResolver) {
-		return new AsyncNODaoDecorator<News>(new SynchronizedNODaoDecorator<News>(new CachedNODaoDecorator<News>(new ContentResolverNewsDao(contentResolver), cacheId), sync));
+		// return new AsyncNODaoDecorator<News>(new SynchronizedNODaoDecorator<News>(new CachedNODaoDecorator<News>(new ContentResolverNewsDao(contentResolver), cacheId), sync));
+        return new AsyncNODaoDecorator<News>(new ContentResolverNewsDao(contentResolver));
 	}
 
 	private NewsDao() {
@@ -59,6 +60,21 @@ public final class NewsDao {
             NewsEntry.COLUMN_NAME_READ,
 			NewsEntry.COLUMN_NAME_BODY
 		};
+
+        private static final String[] projectionBrief = {
+                NewsEntry._ID,
+                NewsEntry.COLUMN_NAME_GUID,
+                NewsEntry.COLUMN_NAME_TITLE,
+                NewsEntry.COLUMN_NAME_LINK,
+                NewsEntry.COLUMN_NAME_IMAGELINK,
+                NewsEntry.COLUMN_NAME_IMAGECAPTION,
+                NewsEntry.COLUMN_NAME_IMAGECREDITS,
+                NewsEntry.COLUMN_NAME_PUBDATE,
+                NewsEntry.COLUMN_NAME_RUBRIC,
+                NewsEntry.COLUMN_NAME_DESCRIPTION,
+                NewsEntry.COLUMN_NAME_LATEST_NEWS,
+                NewsEntry.COLUMN_NAME_READ
+        };
 		
 		public ContentResolverNewsDao(ContentResolver cr) {
 			super(cr);
@@ -118,7 +134,13 @@ public final class NewsDao {
             Body body;
 
             try {
-			    body = bodyParser.parse(cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_BODY)));
+                final int colIndex = cur.getColumnIndex(NewsEntry.COLUMN_NAME_BODY);
+
+                if (colIndex >= 0) {
+    			    body = bodyParser.parse(cur.getString(colIndex));
+                } else {
+                    body = EmptyBody.getInstance();
+                }
             } catch (XmlPullParserException e) {
                 Log.e(LentaConstants.LoggerAnyTag, "Error occured while parsing body of news with id = " + id, e);
                 body = EmptyBody.getInstance();
@@ -155,114 +177,88 @@ public final class NewsDao {
 			return projectionAll;
 		}
 
-		@Override
-		public List<News> read() {
-			List<News> news;
-            news = super.read();
+        @Override
+        protected String[] getProjectionBrief() {
+            return projectionBrief;
+        }
 
-//				for (News n : news) {
-//					readOtherNewsParts(n);
-//				}
-
-			Collections.sort(news);
-			
-			return news;
-		}
-
-		@Override
-		public News read(long id) {
-            News news = super.read(id);
-
-            if (news == null)
-                return news;
-
-            //readOtherNewsParts(news);
-
-            return news;
-		}
-	
-		@Override
-		public News read(String key) {
-            News news = super.read(key);
-
-            if (news == null)
-                return news;
-
-            //readOtherNewsParts(news);
-
-            return news;
-		}
-	
-		@Override
-		public News read(SQLiteType keyType,
-				String keyColumnName, String keyValue) {
-            News news = super.read(keyType, keyColumnName, keyValue);
-
-            if (news == null)
-                return news;
-
-            //readOtherNewsParts(news);
-
-            return news;
-		}
-	
-		@Override
-		public int update(News news) {
-            int result = super.update(news);
-
-            //updateOtherNewsParts(news);
-
-            return result;
-		}
-		
+//        @Override
+//		public List<News> read() {
+//			List<News> news;
+//            news = super.read();
+//
+////				for (News n : news) {
+////					readOtherNewsParts(n);
+////				}
+//
+//			Collections.sort(news);
+//
+//			return news;
+//		}
+//
+//		@Override
+//		public News read(long id) {
+//            News news = super.read(id);
+//
+//            if (news == null)
+//                return news;
+//
+//            //readOtherNewsParts(news);
+//
+//            return news;
+//		}
+//
+//		@Override
+//		public News read(String key) {
+//            News news = super.read(key);
+//
+//            if (news == null)
+//                return news;
+//
+//            //readOtherNewsParts(news);
+//
+//            return news;
+//		}
+//
+//		@Override
+//		public News read(SQLiteType keyType,
+//				String keyColumnName, String keyValue) {
+//            News news = super.read(keyType, keyColumnName, keyValue);
+//
+//            if (news == null)
+//                return news;
+//
+//            //readOtherNewsParts(news);
+//
+//            return news;
+//		}
+//
+//		@Override
+//		public int update(News news) {
+//            int result = super.update(news);
+//
+//            //updateOtherNewsParts(news);
+//
+//            return result;
+//		}
+//
 		@Override
 		public List<News> readForParentObject(long parentId) {
 			return null;
 		}
-
-		@Override
-		public List<News> read(Rubrics rubric) {
-			List<News> news = super.read(rubric);
-			
-//			for (News n : news) {
-//				readOtherNewsParts(n);
-//			}
-			
-			Collections.sort(news);
-			
-			return news;
-		}
-
-//		private void updateOtherNewsParts(News news) {
-//			BitmapReference imageRef = news.getImage();
-//			Bitmap image = imageRef.getBitmap();
 //
-//			if (image != null && image != ImageDaoOld.getNotAvailableImage().getBitmap()) {
-//				try {
-//					String imageLink = news.getImageLink();
+//		@Override
+//		public List<News> read(Rubrics rubric) {
+//			List<News> news = super.read(rubric);
 //
-//					if (imageLink != null) {
-//						BitmapReference newImageRef = imageDao.create(imageLink, image);
-//						BitmapReference newThumbnailImageRef = imageDao.readThumbnail(imageLink);
+////			for (News n : news) {
+////				readOtherNewsParts(n);
+////			}
 //
-//						news.setImage(newImageRef);
-//						news.setThumbnailImage(newThumbnailImageRef);
-//					}
-//				} finally {
-//					imageRef.releaseBitmap();
-//				}
-//			}
+//			Collections.sort(news);
+//
+//			return news;
 //		}
-//
-//		private void readOtherNewsParts(News news) {
-//			String imageLink = news.getImageLink();
-//			if (imageLink != null && !TextUtils.isEmpty(imageLink)) {
-//				news.setImage(imageDao.read(imageLink));
-//				news.setThumbnailImage(imageDao.readThumbnail(imageLink));
-//			} else {
-//				news.setImage(ImageDaoOld.getNotAvailableImage());
-//				news.setThumbnailImage(ImageDaoOld.getNotAvailableImage());
-//			}
-//		}
+
 	}
 }

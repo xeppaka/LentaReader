@@ -3,42 +3,41 @@ package com.xeppaka.lentareader.ui.widgets;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.preference.DialogPreference;
+import android.preference.Preference;
 import android.util.AttributeSet;
-import android.util.TypedValue;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import com.xeppaka.lentareader.R;
+import com.xeppaka.lentareader.data.dao.async.AsyncDao;
+import com.xeppaka.lentareader.data.dao.daoobjects.NewsDao;
 
 /**
  * Created by nnm on 1/23/14.
  */
-public class NewsDeleteCache extends DialogPreference {
+public class NewsDeleteCache extends Preference {
     public NewsDeleteCache(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
     @Override
-    protected View onCreateDialogView() {
-        final FrameLayout layout = new FrameLayout(getContext());
-        layout.setLayoutParams(new ViewGroup.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+    protected void onClick() {
+        final DialogInterface.OnClickListener positiveListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(final DialogInterface dialog, int which) {
+                dialog.dismiss();
 
-        final TextView textView = new TextView(getContext());
-        textView.setText(R.string.news_clear_cache_confirmation);
-        textView.setGravity(Gravity.CENTER);
+                NewsDao.getInstance(getContext().getContentResolver()).deleteAsync(new AsyncDao.DaoDeleteListener() {
+                    @Override
+                    public void finished(int rowsDeleted) {
+                        final String result = getContext().getResources().getString(R.string.news_clear_cache_result);
+                        Toast.makeText(getContext(), String.format(result, rowsDeleted), Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        };
 
-        final ViewGroup.MarginLayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        params.topMargin = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 18f, getContext().getResources().getDisplayMetrics());
-        textView.setLayoutParams(params);
-
-        layout.addView(textView);
-
-        return layout;
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setMessage(R.string.news_clear_cache_confirmation).setNegativeButton(android.R.string.no, null).
+            setPositiveButton(android.R.string.yes, positiveListener).show();
     }
 }

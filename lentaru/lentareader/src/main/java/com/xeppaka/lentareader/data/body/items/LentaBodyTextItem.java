@@ -2,7 +2,6 @@ package com.xeppaka.lentareader.data.body.items;
 
 import android.content.Context;
 import android.text.Html;
-import android.text.method.LinkMovementMethod;
 import android.view.View;
 import android.widget.TextView;
 
@@ -30,12 +29,13 @@ public class LentaBodyTextItem implements Item {
     }
 
     @Override
-    public View createView(Context context, ItemPreferences preferences) {
+    public View createView(final Context context, ItemPreferences preferences) {
         TextView view = new TextView(context);
 
         view.setTextSize(LentaTextUtils.getNewsFullTextSize(preferences.getTextSize()));
         view.setText(Html.fromHtml(text));
-        view.setMovementMethod(LinkMovementMethod.getInstance());
+        view.setTextIsSelectable(true);
+        view.setMovementMethod(SafeLinkMovementMethodDecorator.getInstance(context));
 
         return view;
     }

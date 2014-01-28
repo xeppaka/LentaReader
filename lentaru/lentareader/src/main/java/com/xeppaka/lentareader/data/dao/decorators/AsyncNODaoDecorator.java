@@ -31,6 +31,24 @@ public class AsyncNODaoDecorator<T extends NewsObject> extends AsyncDaoDecorator
 		}
 	}
 
+    protected class AsyncReadMultiBriefForRubricTask extends AsyncTask<Rubrics, Void, List<T>> {
+        private AsyncDao.DaoReadMultiListener<T> listener;
+
+        public AsyncReadMultiBriefForRubricTask(AsyncDao.DaoReadMultiListener<T> listener) {
+            this.listener = listener;
+        }
+
+        @Override
+        protected List<T> doInBackground(Rubrics... rubric) {
+            return readBrief(rubric[0]);
+        }
+
+        @Override
+        protected void onPostExecute(List<T> result) {
+            listener.finished(result);
+        }
+    }
+
     private static class ReadSingleWOImageForRubricParam {
         private Rubrics rubric;
         private int limit;
@@ -163,6 +181,11 @@ public class AsyncNODaoDecorator<T extends NewsObject> extends AsyncDaoDecorator
 	}
 
     @Override
+    public AsyncTask<Rubrics, Void, List<T>> readBriefAsync(Rubrics rubric, DaoReadMultiListener<T> listener) {
+        return new AsyncReadMultiBriefForRubricTask(listener).execute(rubric);
+    }
+
+    @Override
     public AsyncTask<Rubrics, Void, T> readLatestAsync(Rubrics rubric, DaoReadSingleListener<T> listener) {
         return new AsyncReadSingleLatestForRubricTask(listener).execute(rubric);
     }
@@ -196,6 +219,11 @@ public class AsyncNODaoDecorator<T extends NewsObject> extends AsyncDaoDecorator
 	public List<T> read(Rubrics rubric) {
 		return getDecoratedDao().read(rubric);
 	}
+
+    @Override
+    public List<T> readBrief(Rubrics rubric) {
+        return getDecoratedDao().readBrief(rubric);
+    }
 
     @Override
     public T readLatest(Rubrics rubric) {

@@ -152,7 +152,14 @@ public interface Dao<T> extends DaoObservable<T> {
 	 * @return number of rows deleted.
 	 */
 	int delete(SQLiteType keyType, String keyColumnName, String keyValue);
-	
+
+    /**
+     * Deletes all rows from the table.
+     *
+     * @return number of rows deleted.
+     */
+    int delete();
+
 	/**
 	 * Reads all object keys from database.
 	 * 

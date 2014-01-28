@@ -1,10 +1,7 @@
 package com.xeppaka.lentareader.data.body.items;
 
 import android.content.Context;
-import android.text.Html;
-import android.text.method.LinkMovementMethod;
 import android.view.View;
-import android.widget.TextView;
 
 import com.xeppaka.lentareader.data.body.VideoType;
 

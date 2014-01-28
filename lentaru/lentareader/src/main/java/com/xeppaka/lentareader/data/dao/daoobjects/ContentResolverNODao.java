@@ -41,39 +41,48 @@ public abstract class ContentResolverNODao<T extends NewsObject> extends Content
 
 	@Override
 	public List<T> read(Rubrics rubric) {
-		Cursor cur;
+        return readWithProjection(rubric, getProjectionAll());
+	}
+
+    @Override
+    public List<T> readBrief(Rubrics rubric) {
+        return readWithProjection(rubric, getProjectionBrief());
+    }
+
+    private List<T> readWithProjection(Rubrics rubric, String[] projection) {
+        Cursor cur;
 
         if (rubric != Rubrics.LATEST) {
             String where = getWhereFromSQLiteType(SQLiteType.TEXT);
             String[] whereArgs = { rubric.name() };
 
             cur = getContentResolver().query(getContentProviderUri(),
-                    getProjectionAll(), String.format(where, getRubricColumnName()), whereArgs, null);
+                    projection, String.format(where, getRubricColumnName()), whereArgs, null);
         } else {
             cur = getContentResolver().query(getContentProviderUri(),
-                    getProjectionAll(), null, null, null);
+                    projection, null, null, null);
         }
 
         if (cur == null) {
             return Collections.EMPTY_LIST;
         }
 
-		try {
-			List<T> result = new ArrayList<T>();
+        try {
+            List<T> result = new ArrayList<T>();
 
-			if (cur.moveToFirst()) {
-				do {
-					result.add(createDataObject(cur));
-				} while (cur.moveToNext());
-			}
+            if (cur.moveToFirst()) {
+                do {
+                    result.add(createDataObject(cur));
+                } while (cur.moveToNext());
+            }
 
-			return result;
-		} finally {
+            return result;
+        } finally {
             if (cur != null) {
                 cur.close();
             }
-		}
-	}
+        }
+    }
 
     @Override
     public T readLatest(Rubrics rubric) {
@@ -276,7 +285,9 @@ public abstract class ContentResolverNODao<T extends NewsObject> extends Content
 //		}
 //	}
 //
-	protected String getRubricColumnName() {
+    protected abstract String[] getProjectionBrief();
+
+    protected String getRubricColumnName() {
         return NewsObjectEntry.COLUMN_NAME_RUBRIC;
     }
 

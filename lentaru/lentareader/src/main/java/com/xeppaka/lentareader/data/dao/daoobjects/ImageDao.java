@@ -6,15 +6,10 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.Rect;
-import android.graphics.RectF;
 import android.os.AsyncTask;
 import android.support.v4.util.LruCache;
 import android.text.TextUtils;
-import android.util.Config;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 
@@ -73,6 +68,14 @@ public class ImageDao implements DaoObservable<BitmapReference> {
 
     private ImageDao(Resources resources) {
         displayDensity = resources.getDisplayMetrics().density;
+    }
+
+    public static ImageDao newInstance() {
+        if (INSTANCE == null) {
+            throw new IllegalStateException("ImageDao is not initialized previously.");
+        }
+
+        return INSTANCE;
     }
 
     public static ImageDao newInstance(Context context) {
@@ -219,6 +222,11 @@ public class ImageDao implements DaoObservable<BitmapReference> {
         Log.d(LentaConstants.LoggerAnyTag, "Created empty lazy load reference.");
 
         return imageRef;
+    }
+
+    public void makeSpace() {
+        bitmapCache.trimToSize(LentaConstants.BITMAP_CACHE_TRIM_MAX_SIZE_IN_BYTES);
+        thumbnailsBitmapCache.trimToSize(LentaConstants.THUMBNAILS_BITMAP_CACHE_TRIM_MAX_SIZE_IN_BYTES);
     }
 
     /**
@@ -408,6 +416,7 @@ public class ImageDao implements DaoObservable<BitmapReference> {
         canvas.drawText(imageNotAvailableText1, (thumbnail_image_width - text1Width) / 2, 25, paint);
         canvas.drawText(imageNotAvailableText2, (thumbnail_image_width - text2Width) / 2, 45, paint);
 
+        paint.setAntiAlias(false);
         paint.setStrokeWidth(1.0f);
         paint.setStyle(Paint.Style.STROKE);
 
@@ -464,6 +473,7 @@ public class ImageDao implements DaoObservable<BitmapReference> {
         canvas.drawText(imageTurnedOffText1, (thumbnail_image_width - text1Width) / 2, 25, paint);
         canvas.drawText(imageTurnedOffText2, (thumbnail_image_width - text2Width) / 2, 45, paint);
 
+        paint.setAntiAlias(false);
         paint.setStrokeWidth(1.0f);
         paint.setStyle(Paint.Style.STROKE);
 
@@ -667,7 +677,20 @@ public class ImageDao implements DaoObservable<BitmapReference> {
         }
 
         private Bitmap downloadBitmap() throws IOException, HttpStatusCodeException {
-            return LentaHttpImageDownloader.downloadBitmap(url);
+            return downloadBitmap(false);
+        }
+
+        private Bitmap downloadBitmap(boolean retry) throws IOException, HttpStatusCodeException {
+            try {
+                return LentaHttpImageDownloader.downloadBitmap(url);
+            } catch (OutOfMemoryError oome) {
+                if (!retry) {
+                    makeSpace();
+                    return downloadBitmap(true);
+                }
+
+                throw oome;
+            }
         }
 
         @Override
@@ -688,7 +711,9 @@ public class ImageDao implements DaoObservable<BitmapReference> {
 
                     if (fullBitmap != null) {
                         // create scaled bitmap
-                        setBitmap(Bitmap.createScaledBitmap(fullBitmap, Math.round(fullBitmap.getWidth() / THUMBNAIL_RATIO), Math.round(fullBitmap.getHeight() / THUMBNAIL_RATIO), false));
+                        final Bitmap scaledBitmap = Bitmap.createScaledBitmap(fullBitmap, Math.round(fullBitmap.getWidth() / THUMBNAIL_RATIO), Math.round(fullBitmap.getHeight() / THUMBNAIL_RATIO), false);
+                        scaledBitmap.setDensity((int)displayDensity);
+                        setBitmap(scaledBitmap);
 
                         return seizeBitmap();
                     }
@@ -701,7 +726,7 @@ public class ImageDao implements DaoObservable<BitmapReference> {
 
             if (thumbnail) {
                 final Bitmap scaledBitmap = Bitmap.createScaledBitmap(downloadedBitmap, Math.round(downloadedBitmap.getWidth() / THUMBNAIL_RATIO), Math.round(downloadedBitmap.getHeight() / THUMBNAIL_RATIO), false);
-                scaledBitmap.setDensity(downloadedBitmap.getDensity());
+                scaledBitmap.setDensity((int)displayDensity);
                 setBitmap(scaledBitmap);
 
                 // we have full image, let's put it in the full bitmaps cache
@@ -718,6 +743,28 @@ public class ImageDao implements DaoObservable<BitmapReference> {
                 }
             } else {
                 setBitmap(downloadedBitmap);
+//
+//                // if we downloaded full bitmap, but we don't have thumbnail,
+//                // let's create it and put into thumbnail bitmaps cache.
+//                synchronized (thumbnailsBitmapCache) {
+//                    // TODO: too much work in synchronized
+//
+//                    CachedLazyLoadBitmapReference thumbnailImageRef;
+//
+//                    if ((thumbnailImageRef = bitmapCache.get(url)) == null) {
+//                        final Bitmap scaledBitmap = Bitmap.createScaledBitmap(downloadedBitmap, Math.round(downloadedBitmap.getWidth() / THUMBNAIL_RATIO), Math.round(downloadedBitmap.getHeight() / THUMBNAIL_RATIO), false);
+//                        scaledBitmap.setDensity((int)displayDensity);
+//
+//                        thumbnailImageRef = new CachedLazyLoadBitmapReference(cacheKey, url, downloadedBitmap);
+//                        thumbnailsBitmapCache.put(cacheKey, thumbnailImageRef);
+//                        thumbnailImageRef.releaseBitmap();
+//                    } else if (!thumbnailImageRef.isBitmapCached()) {
+//                        final Bitmap scaledBitmap = Bitmap.createScaledBitmap(downloadedBitmap, Math.round(downloadedBitmap.getWidth() / THUMBNAIL_RATIO), Math.round(downloadedBitmap.getHeight() / THUMBNAIL_RATIO), false);
+//                        scaledBitmap.setDensity((int)displayDensity);
+//
+//                        thumbnailImageRef.setBitmap(downloadedBitmap);
+//                    }
+//                }
             }
 
             return seizeBitmap();
@@ -731,7 +778,7 @@ public class ImageDao implements DaoObservable<BitmapReference> {
         @Override
         public AsyncTask getBitmapAsync(Callback callback) {
             if (bitmap != null) {
-                callback.onSuccess(bitmap);
+                callback.onSuccess(seizeBitmap());
 
                 return null;
             } else {
@@ -745,38 +792,19 @@ public class ImageDao implements DaoObservable<BitmapReference> {
             }
         }
 
-        //        /*
-//         * Note: <b>MUST be called from UI thread.</b>
-//         * (non-Javadoc)
-//         * @see cz.fit.lentaruand.data.dao.BitmapReference#getBitmapAsync(cz.fit.lentaruand.data.dao.BitmapReference.BitmapLoadListener)
-//         */
-//        @Override
-//        public void getBitmapAsync(final Callback callback) {
-//            Bitmap seizedBitmap = seizeBitmap();
-//            if (seizedBitmap != null) {
-//                callback.onSuccess(seizedBitmap);
-//            } else {
-//                serviceHelper.downloadImage(url, new com.xeppaka.lentareader.service.Callback() {
-//                    @Override
-//                    public void onSuccess() {
-//                        callback.onSuccess(bitmap);
-//                    }
-//
-//                    @Override
-//                    public void onFailure() {
-//                        callback.onFailure();
-//                    }
-//                });
-//            }
-//        }
-
         public void releaseBitmap() {
-            if (--bitmapReferences <= 0 && !isCached()) {
-                Log.d(LentaConstants.LoggerAnyTag, "releaseBitmap(): key: " + cacheKey + ", number of references: " + bitmapReferences);
-                recycleBitmap();
-            }
+            if (bitmap != null) {
+                --bitmapReferences;
 
-            Log.d(LentaConstants.LoggerAnyTag, "releaseBitmap(): key: " + cacheKey + ", number of references: " + bitmapReferences);
+                if (bitmapReferences == 0 && !isCached()) {
+                    Log.d(LentaConstants.LoggerAnyTag, "releaseBitmap(): key: " + cacheKey + ", number of references: " + bitmapReferences);
+                    // recycleBitmap();
+                }
+
+                Log.d(LentaConstants.LoggerAnyTag, "releaseBitmap(): key: " + cacheKey + ", number of references: " + bitmapReferences);
+            } else {
+                Log.d(LentaConstants.LoggerAnyTag, "releaseBitmap(): key: " + cacheKey + ", bitmap is null, number of references: " + bitmapReferences);
+            }
         }
 
         public boolean isCached() {
