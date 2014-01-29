@@ -300,7 +300,7 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
                 holder.setImage(bitmapRef);
                 holder.setImageUrl(news.getImageLink());
 
-                final AsyncTask asyncTask = bitmapRef.getBitmapAsync(new BitmapReference.Callback() {
+                final AsyncTask asyncTask = bitmapRef.getBitmapAsync(newsImageView, new BitmapReference.LoadListener() {
                     @Override
                     public void onSuccess(Bitmap bitmap) {
                         if (position != holderForAsync.getPosition() ||
@@ -309,7 +309,8 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
                             return;
                         }
 
-                        holderForAsync.getNewsImage().setImageBitmap(bitmap);
+                        final ImageView iv = holderForAsync.getNewsImage();
+                        iv.setImageBitmap(bitmap);
                     }
 
                     @Override
@@ -338,7 +339,7 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
                 final BitmapReference bitmapRef = imageDao.readThumbnail(news.getImageLink());
                 final Bitmap bitmap;
 
-                if ((bitmap = bitmapRef.getBitmapIfCached()) != null) {
+                if ((bitmap = bitmapRef.getBitmapIfCached(newsImageView)) != null) {
                     newsImageView.setImageBitmap(bitmap);
                 } else {
                     newsImageView.setImageBitmap(ImageDao.getTurnedOffImagesThumbnailImageRef().getBitmapIfCached());

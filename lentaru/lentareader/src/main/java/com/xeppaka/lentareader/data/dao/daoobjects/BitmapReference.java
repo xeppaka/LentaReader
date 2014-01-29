@@ -2,6 +2,7 @@ package com.xeppaka.lentareader.data.dao.daoobjects;
 
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
+import android.widget.ImageView;
 
 /**
  * 
@@ -10,20 +11,17 @@ import android.os.AsyncTask;
  *
  */
 public interface BitmapReference {
-	
-	/**
-	 * 
-	 * 
-	 * @author kacpa01
-	 *
-	 */
-	public interface Callback {
-		void onSuccess(final Bitmap bitmap);
+
+	public interface LoadListener {
+		void onSuccess(Bitmap bitmap);
         void onFailure(Exception e);
 	}
-	
-	Bitmap getBitmap() throws Exception;
+
+    Bitmap getBitmap() throws Exception;
+	Bitmap getBitmap(ImageView view) throws Exception;
 	Bitmap getBitmapIfCached();
-	AsyncTask getBitmapAsync(final Callback callback);
+    Bitmap getBitmapIfCached(ImageView view);
+	AsyncTask getBitmapAsync(LoadListener loadListener);
+    AsyncTask getBitmapAsync(ImageView view, LoadListener loadListener);
 	void releaseBitmap();
 }

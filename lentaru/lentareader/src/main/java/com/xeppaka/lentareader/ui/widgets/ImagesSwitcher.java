@@ -74,13 +74,13 @@ public class ImagesSwitcher extends ViewPager {
             final BitmapReference bitmapRef = imageDao.read(url);
 
             Bitmap bitmap;
-            if ((bitmap = bitmapRef.getBitmapIfCached()) != null) {
+            if ((bitmap = bitmapRef.getBitmapIfCached(currentImageView)) != null) {
                 setBitmap(currentImageView, bitmap);
             } else {
                 final Bitmap loadingBitmap = ImageDao.getLoadingImage().getBitmapIfCached();
                 setBitmap(currentImageView, loadingBitmap);
 
-                bitmapRef.getBitmapAsync(new BitmapReference.Callback() {
+                bitmapRef.getBitmapAsync(currentImageView, new BitmapReference.LoadListener() {
                     @Override
                     public void onSuccess(Bitmap bitmap) {
                         setBitmap(currentImageView, bitmap);

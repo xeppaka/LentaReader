@@ -12,6 +12,7 @@ import android.support.v4.util.LruCache;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.TypedValue;
+import android.widget.ImageView;
 
 import com.xeppaka.lentareader.data.dao.DaoObservable;
 import com.xeppaka.lentareader.downloader.LentaHttpImageDownloader;
@@ -20,7 +21,10 @@ import com.xeppaka.lentareader.utils.LentaConstants;
 import com.xeppaka.lentareader.utils.URLHelper;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -578,6 +582,8 @@ public class ImageDao implements DaoObservable<BitmapReference> {
         private final String url;
         private boolean thumbnail;
 
+        private List<WeakReference<ImageView>> views = new ArrayList<WeakReference<ImageView>>();
+
         private class BitmapGetResult {
             private Bitmap bitmap;
             private Exception exception;
@@ -599,15 +605,35 @@ public class ImageDao implements DaoObservable<BitmapReference> {
             }
         }
 
-        private class BitmapLoadTask extends AsyncTask<Callback, Void, BitmapGetResult> {
-            private Callback[] listeners;
+        private class BitmapGetParameter {
+            private ImageView view;
+            private LoadListener loadListener;
+
+            private BitmapGetParameter(ImageView view, LoadListener loadListener) {
+                this.view = view;
+                this.loadListener = loadListener;
+            }
+
+            public ImageView getView() {
+                return view;
+            }
+
+            public LoadListener getLoadListener() {
+                return loadListener;
+            }
+        }
+
+        private class BitmapLoadTask extends AsyncTask<BitmapGetParameter, Void, BitmapGetResult> {
+            private LoadListener listener;
+            private ImageView view;
 
             @Override
-            protected BitmapGetResult doInBackground(Callback... listeners) {
-                this.listeners = listeners;
+            protected BitmapGetResult doInBackground(BitmapGetParameter... params) {
+                listener = params[0].getLoadListener();
+                view = params[0].getView();
 
                 try {
-                    return new BitmapGetResult(getBitmap());
+                    return new BitmapGetResult(getBitmap(view));
                 } catch (IOException e) {
                     Log.e(LentaConstants.LoggerAnyTag, "IO Error while downloading bitmap, url: " + url, e);
                     return new BitmapGetResult(e);
@@ -619,12 +645,10 @@ public class ImageDao implements DaoObservable<BitmapReference> {
 
             @Override
             protected void onPostExecute(BitmapGetResult result) {
-                for (Callback listener : listeners) {
                     if (result.getBitmap() != null)
                         listener.onSuccess(result.getBitmap());
                     else
                         listener.onFailure(result.getException());
-                }
             }
         }
 
@@ -694,9 +718,14 @@ public class ImageDao implements DaoObservable<BitmapReference> {
         }
 
         @Override
-        public Bitmap getBitmap() throws IOException, HttpStatusCodeException {
+        public Bitmap getBitmap() throws Exception {
+            return getBitmap(null);
+        }
+
+        @Override
+        public Bitmap getBitmap(ImageView view) throws IOException, HttpStatusCodeException {
             if (bitmap != null) {
-                return seizeBitmap();
+                return seizeBitmap(view);
             }
 
             if (thumbnail) {
@@ -707,7 +736,7 @@ public class ImageDao implements DaoObservable<BitmapReference> {
                 }
 
                 if (fullBitmapRef != null) {
-                    final Bitmap fullBitmap = fullBitmapRef.getBitmapIfCached();
+                    final Bitmap fullBitmap = fullBitmapRef.getBitmapIfCached(view);
 
                     if (fullBitmap != null) {
                         // create scaled bitmap
@@ -715,7 +744,7 @@ public class ImageDao implements DaoObservable<BitmapReference> {
                         scaledBitmap.setDensity((int)displayDensity);
                         setBitmap(scaledBitmap);
 
-                        return seizeBitmap();
+                        return seizeBitmap(view);
                     }
                 }
             }
@@ -767,26 +796,36 @@ public class ImageDao implements DaoObservable<BitmapReference> {
 //                }
             }
 
-            return seizeBitmap();
+            return seizeBitmap(view);
+        }
+
+        @Override
+        public Bitmap getBitmapIfCached(ImageView view) {
+            return seizeBitmap(view);
         }
 
         @Override
         public Bitmap getBitmapIfCached() {
-            return seizeBitmap();
+            return getBitmapIfCached(null);
         }
 
         @Override
-        public AsyncTask getBitmapAsync(Callback callback) {
+        public AsyncTask getBitmapAsync(LoadListener loadListener) {
+            return getBitmapAsync(null, loadListener);
+        }
+
+        @Override
+        public AsyncTask getBitmapAsync(ImageView view, LoadListener loadListener) {
             if (bitmap != null) {
-                callback.onSuccess(seizeBitmap());
+                loadListener.onSuccess(seizeBitmap());
 
                 return null;
             } else {
-                AsyncTask<Callback, Void, BitmapGetResult> task = new BitmapLoadTask();
+                AsyncTask<BitmapGetParameter, Void, BitmapGetResult> task = new BitmapLoadTask();
                 if (LentaConstants.SDK_VER >= 11)
-                    task.executeOnExecutor(downloadImageExecutor, callback);
+                    task.executeOnExecutor(downloadImageExecutor, new BitmapGetParameter(view, loadListener));
                 else
-                    task.execute(callback);
+                    task.execute(new BitmapGetParameter(view, loadListener));
 
                 return task;
             }
@@ -816,11 +855,27 @@ public class ImageDao implements DaoObservable<BitmapReference> {
         }
 
         private void onRemoveFromCache() {
+            if (!thumbnail) {
+                cleanViews();
+            }
+
 //            if (bitmapReferences <= 0) {
                 recycleBitmap();
 //            }
 
             cached = false;
+        }
+
+        private void cleanViews() {
+            for (WeakReference<ImageView> reference : views) {
+                final ImageView v = reference.get();
+
+                if (v != null) {
+                    v.setImageBitmap(null);
+                }
+            }
+
+            views.clear();
         }
 
         private int getBytesPerPixel(Bitmap.Config config) {
@@ -852,8 +907,17 @@ public class ImageDao implements DaoObservable<BitmapReference> {
         }
 
         private Bitmap seizeBitmap() {
+            return seizeBitmap(null);
+        }
+
+        private Bitmap seizeBitmap(ImageView view) {
             if (bitmap != null) {
                 ++bitmapReferences;
+
+                if (view != null) {
+                    views.add(new WeakReference<ImageView>(view));
+                }
+
                 Log.d(LentaConstants.LoggerAnyTag, "seizeBitmap(): key: " + cacheKey + ", number of references: " + bitmapReferences);
             }
 

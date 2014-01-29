@@ -22,17 +22,12 @@ import com.xeppaka.lentareader.data.News;
 import com.xeppaka.lentareader.data.body.Body;
 import com.xeppaka.lentareader.data.body.items.Item;
 import com.xeppaka.lentareader.data.body.items.ItemPreferences;
-import com.xeppaka.lentareader.data.body.items.LentaBodyItemImage;
-import com.xeppaka.lentareader.data.body.items.LentaBodyItemImageGallery;
 import com.xeppaka.lentareader.data.dao.async.AsyncDao;
 import com.xeppaka.lentareader.data.dao.daoobjects.BitmapReference;
 import com.xeppaka.lentareader.data.dao.daoobjects.ImageDao;
 import com.xeppaka.lentareader.data.dao.daoobjects.NewsDao;
 import com.xeppaka.lentareader.utils.LentaTextUtils;
 import com.xeppaka.lentareader.utils.PreferencesConstants;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class NewsFullFragment extends Fragment {
     public static final long NO_NEWS_ID = -1;
@@ -185,10 +180,9 @@ public class NewsFullFragment extends Fragment {
             mainImageRef = bitmapRef;
 
             if (downloadImages) {
-                bitmapRef.getBitmapAsync(new BitmapReference.Callback() {
+                bitmapRef.getBitmapAsync(imageView, new BitmapReference.LoadListener() {
                     @Override
                     public void onSuccess(final Bitmap bitmap) {
-
                         if (isResumed()) {
                             setNewsImage(news, bitmap);
                         }
@@ -198,7 +192,7 @@ public class NewsFullFragment extends Fragment {
                     public void onFailure(Exception e) {}
                 });
             } else {
-                final Bitmap bitmap = bitmapRef.getBitmapIfCached();
+                final Bitmap bitmap = bitmapRef.getBitmapIfCached(imageView);
 
                 if (bitmap != null) {
                     setNewsImage(news, bitmap);
