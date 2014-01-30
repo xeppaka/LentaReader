@@ -59,7 +59,7 @@
 
     <string name="news_clear_cache_confirmation">Вы уверены?</string>
     <string name="news_clear_cache_result">Удалено новостей из кэша: %d</string>
-    <string name="rate_program_summary">Оценить программу в Google Play</string>
+    <string name="rate_program_summary">Оценить программу в магазине приложений</string>
 
     <string name="error_no_internet_connection_toast">Ошибка соединения с сервером.\nПроверьте ваше соединение с интернетом.</string>
     <string name="error_general_toast">Ошибка соединения с сервером.</string>

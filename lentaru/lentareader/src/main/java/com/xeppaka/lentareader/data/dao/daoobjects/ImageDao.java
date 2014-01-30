@@ -231,6 +231,8 @@ public class ImageDao implements DaoObservable<BitmapReference> {
     public void makeSpace() {
         bitmapCache.trimToSize(LentaConstants.BITMAP_CACHE_TRIM_MAX_SIZE_IN_BYTES);
         thumbnailsBitmapCache.trimToSize(LentaConstants.THUMBNAILS_BITMAP_CACHE_TRIM_MAX_SIZE_IN_BYTES);
+
+        System.gc();
     }
 
     /**
@@ -730,22 +732,11 @@ public class ImageDao implements DaoObservable<BitmapReference> {
 
             if (thumbnail) {
                 // may be full bitmap is in the cache
-                BitmapReference fullBitmapRef;
-                synchronized(bitmapCache) {
-                    fullBitmapRef = bitmapCache.get(cacheKey);
-                }
+                final Bitmap scaledBitmap = createThumbnailFromFullBitmap();
 
-                if (fullBitmapRef != null) {
-                    final Bitmap fullBitmap = fullBitmapRef.getBitmapIfCached(view);
-
-                    if (fullBitmap != null) {
-                        // create scaled bitmap
-                        final Bitmap scaledBitmap = Bitmap.createScaledBitmap(fullBitmap, Math.round(fullBitmap.getWidth() / THUMBNAIL_RATIO), Math.round(fullBitmap.getHeight() / THUMBNAIL_RATIO), false);
-                        scaledBitmap.setDensity((int)displayDensity);
-                        setBitmap(scaledBitmap);
-
-                        return seizeBitmap(view);
-                    }
+                if (scaledBitmap != null) {
+                    setBitmap(scaledBitmap);
+                    return seizeBitmap(view);
                 }
             }
 
@@ -801,7 +792,39 @@ public class ImageDao implements DaoObservable<BitmapReference> {
 
         @Override
         public Bitmap getBitmapIfCached(ImageView view) {
+            if (thumbnail && bitmap == null) {
+                // may be full bitmap is in the cache
+                final Bitmap scaledBitmap = createThumbnailFromFullBitmap();
+
+                if (scaledBitmap != null) {
+                    setBitmap(scaledBitmap);
+                    return seizeBitmap(view);
+                }
+            }
+
             return seizeBitmap(view);
+        }
+
+        private Bitmap createThumbnailFromFullBitmap() {
+            BitmapReference fullBitmapRef;
+
+            synchronized(bitmapCache) {
+                fullBitmapRef = bitmapCache.get(cacheKey);
+            }
+
+            if (fullBitmapRef != null) {
+                final Bitmap fullBitmap = fullBitmapRef.getBitmapIfCached();
+
+                if (fullBitmap != null) {
+                    // create scaled bitmap
+                    final Bitmap scaledBitmap = Bitmap.createScaledBitmap(fullBitmap, Math.round(fullBitmap.getWidth() / THUMBNAIL_RATIO), Math.round(fullBitmap.getHeight() / THUMBNAIL_RATIO), false);
+                    scaledBitmap.setDensity((int)displayDensity);
+
+                    return scaledBitmap;
+                }
+            }
+
+            return null;
         }
 
         @Override
@@ -856,24 +879,32 @@ public class ImageDao implements DaoObservable<BitmapReference> {
 
         private void onRemoveFromCache() {
             if (!thumbnail) {
-                cleanViews();
-            }
-
+                cleanViewsOnRemoveFromCache();
+            } else {
 //            if (bitmapReferences <= 0) {
                 recycleBitmap();
 //            }
 
-            cached = false;
+                cached = false;
+            }
         }
 
-        private void cleanViews() {
+        private void cleanViewsOnRemoveFromCache() {
             for (WeakReference<ImageView> reference : views) {
                 final ImageView v = reference.get();
 
                 if (v != null) {
-                    v.setImageBitmap(null);
+                    v.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            v.setImageBitmap(null);
+                        }
+                    });
                 }
             }
+
+            recycleBitmap();
+            cached = false;
 
             views.clear();
         }

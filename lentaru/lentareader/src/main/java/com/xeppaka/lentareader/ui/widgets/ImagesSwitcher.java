@@ -75,20 +75,19 @@ public class ImagesSwitcher extends ViewPager {
 
             Bitmap bitmap;
             if ((bitmap = bitmapRef.getBitmapIfCached(currentImageView)) != null) {
-                setBitmap(currentImageView, bitmap);
+                currentImageView.setImageBitmap(bitmap);
             } else {
-                final Bitmap loadingBitmap = ImageDao.getLoadingImage().getBitmapIfCached();
-                setBitmap(currentImageView, loadingBitmap);
+                currentImageView.setImageBitmap(ImageDao.getLoadingImage().getBitmapIfCached());
 
                 bitmapRef.getBitmapAsync(currentImageView, new BitmapReference.LoadListener() {
                     @Override
                     public void onSuccess(Bitmap bitmap) {
-                        setBitmap(currentImageView, bitmap);
+                        currentImageView.setImageBitmap(bitmap);
                     }
 
                     @Override
                     public void onFailure(Exception e) {
-                        setBitmap(currentImageView, ImageDao.getNotAvailableImage().getBitmapIfCached());
+                        currentImageView.setImageBitmap(ImageDao.getNotAvailableImage().getBitmapIfCached());
                     }
                 });
             }
@@ -96,16 +95,12 @@ public class ImagesSwitcher extends ViewPager {
             return currentImageView;
         }
 
-        private void setBitmap(ImageView imageView, Bitmap bitmap) {
-            imageView.setImageDrawable(new BitmapDrawable(getContext().getResources(), bitmap));
-            // getLayoutParams().height = Math.round(getWidth() / (float) bitmap.getWidth() * bitmap.getHeight());
-
-            requestLayout();
-        }
-
         @Override
         public void destroyItem(ViewGroup container, int position, Object object) {
-            container.removeView((View)object);
+            final ImageView view = (ImageView)object;
+            view.setImageBitmap(null);
+
+            container.removeView(view);
         }
 
         @Override

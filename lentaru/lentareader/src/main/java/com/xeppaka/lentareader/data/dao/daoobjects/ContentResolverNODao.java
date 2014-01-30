@@ -57,10 +57,10 @@ public abstract class ContentResolverNODao<T extends NewsObject> extends Content
             String[] whereArgs = { rubric.name() };
 
             cur = getContentResolver().query(getContentProviderUri(),
-                    projection, String.format(where, getRubricColumnName()), whereArgs, null);
+                    projection, String.format(where, getRubricColumnName()), whereArgs, NewsObjectEntry.COLUMN_NAME_PUBDATE + " desc");
         } else {
             cur = getContentResolver().query(getContentProviderUri(),
-                    projection, null, null, null);
+                    projection, null, null, NewsObjectEntry.COLUMN_NAME_PUBDATE + " desc");
         }
 
         if (cur == null) {

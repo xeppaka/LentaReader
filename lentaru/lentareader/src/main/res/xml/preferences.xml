@@ -33,12 +33,12 @@
             android:key="pref_key_news_full_text_size"
             android:summary="@string/news_full_text_size_summary_default"
             android:defaultValue="16"/>
-        <CheckBoxPreference
+        <!-- <CheckBoxPreference
             android:key="pref_key_news_delete"
             android:summary="@string/pref_news_deletion_summary"
-            android:defaultValue="true" />
+            android:defaultValue="true" /> -->
+        <!-- android:dependency="pref_key_news_delete" -->
         <com.xeppaka.lentareader.ui.widgets.NewsDeleteIntervalPreference
-            android:dependency="pref_key_news_delete"
             android:key="pref_key_news_delete_days"
             android:summary="@string/pref_news_deletion_interval_summary_days_default"
             android:defaultValue="5"/>

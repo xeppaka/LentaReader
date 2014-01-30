@@ -182,83 +182,37 @@ public final class NewsDao {
             return projectionBrief;
         }
 
-//        @Override
-//		public List<News> read() {
-//			List<News> news;
-//            news = super.read();
-//
-////				for (News n : news) {
-////					readOtherNewsParts(n);
-////				}
+        @Override
+		public List<News> read() {
+//			List<News> news = super.read();
 //
 //			Collections.sort(news);
 //
 //			return news;
-//		}
+            throw new UnsupportedOperationException("Should not be used from NewsDao.");
+		}
+
+//        @Override
+//        public List<News> readBrief(Rubrics rubric) {
+//            List<News> news = super.readBrief(rubric);
 //
-//		@Override
-//		public News read(long id) {
-//            News news = super.read(id);
-//
-//            if (news == null)
-//                return news;
-//
-//            //readOtherNewsParts(news);
+//            Collections.sort(news);
 //
 //            return news;
-//		}
-//
-//		@Override
-//		public News read(String key) {
-//            News news = super.read(key);
-//
-//            if (news == null)
-//                return news;
-//
-//            //readOtherNewsParts(news);
-//
-//            return news;
-//		}
-//
-//		@Override
-//		public News read(SQLiteType keyType,
-//				String keyColumnName, String keyValue) {
-//            News news = super.read(keyType, keyColumnName, keyValue);
-//
-//            if (news == null)
-//                return news;
-//
-//            //readOtherNewsParts(news);
-//
-//            return news;
-//		}
-//
-//		@Override
-//		public int update(News news) {
-//            int result = super.update(news);
-//
-//            //updateOtherNewsParts(news);
-//
-//            return result;
-//		}
-//
-		@Override
+//        }
+
+        @Override
 		public List<News> readForParentObject(long parentId) {
 			return null;
 		}
-//
+
 //		@Override
 //		public List<News> read(Rubrics rubric) {
 //			List<News> news = super.read(rubric);
 //
-////			for (News n : news) {
-////				readOtherNewsParts(n);
-////			}
-//
 //			Collections.sort(news);
 //
 //			return news;
 //		}
-
 	}
 }

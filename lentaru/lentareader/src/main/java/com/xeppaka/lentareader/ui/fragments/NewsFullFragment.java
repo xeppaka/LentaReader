@@ -51,7 +51,7 @@ public class NewsFullFragment extends Fragment {
     private int textSize;
     private boolean resumed;
 
-    private BitmapReference mainImageRef;
+    private int scrollY;
 
     public NewsFullFragment() {}
 
@@ -104,21 +104,34 @@ public class NewsFullFragment extends Fragment {
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
+    public void onResume() {
+        super.onResume();
 
-
+        resumed = true;
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onPause() {
+        super.onPause();
+
+        scrollY = scrollContainer.getScrollY();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
 
         if (loadedNews != null) {
             renderNewsAsync(loadedNews);
         }
+    }
 
-        resumed = true;
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        imageView.setImageBitmap(null);
+        contentView.removeAllViews();
     }
 
     @Override
@@ -174,10 +187,15 @@ public class NewsFullFragment extends Fragment {
         dateView.setText(news.getFormattedPubDate());
         rubricView.setText(" " + news.getRubric().getLabel());
 
+        new Handler().post(new Runnable() {
+            @Override
+            public void run() {
+                scrollContainer.scrollTo(0, scrollY);
+            }
+        });
+
         if (news.hasImage()) {
             final BitmapReference bitmapRef = ImageDao.newInstance(getActivity()).read(news.getImageLink());
-
-            mainImageRef = bitmapRef;
 
             if (downloadImages) {
                 bitmapRef.getBitmapAsync(imageView, new BitmapReference.LoadListener() {
