@@ -270,4 +270,12 @@ public class NewsFullFragment extends Fragment {
             }
         });
     }
+
+    public String getNewsLink() {
+        if (loadedNews != null) {
+            return loadedNews.getLink();
+        }
+
+        return null;
+    }
 }
