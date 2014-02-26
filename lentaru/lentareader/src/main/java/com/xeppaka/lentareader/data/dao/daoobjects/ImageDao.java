@@ -754,6 +754,11 @@ public class ImageDao implements DaoObservable<BitmapReference> {
 
             // download and set bitmap
             final Bitmap downloadedBitmap = downloadBitmap();
+
+            if (downloadedBitmap == null) {
+                return null;
+            }
+
             downloadedBitmap.setDensity((int)displayDensity);
 
             if (thumbnail) {
