@@ -1,14 +1,16 @@
 package com.xeppaka.lentareader.data.comments;
 
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
 /**
  * Created by nnm on 2/26/14.
  */
-public class Comment {
+public class Comment implements Comparable<Comment> {
     private String id;
     private String rootId;
     private String parentId;
@@ -21,7 +23,7 @@ public class Comment {
     private String text;
     private int depth;
 
-    private Queue<Comment> children = new PriorityQueue<Comment>();
+    private List<Comment> children = Collections.emptyList();
 
     public Comment(String id, String rootId, String parentId, String nick, long time, String accountId, int voteUp, int voteDown, int state, String text) {
         if (id == null || id.isEmpty()) {
@@ -88,7 +90,7 @@ public class Comment {
         this.depth = depth;
     }
 
-    public Queue<Comment> getChildren() {
+    public List<Comment> getChildren() {
         return children;
     }
 
@@ -98,7 +100,7 @@ public class Comment {
 
     public void addChild(Comment comment) {
         if (children == Collections.<Comment>emptyList()) {
-            children = new PriorityQueue<Comment>();
+            children = new ArrayList<Comment>();
         }
 
         children.add(comment);
@@ -106,6 +108,16 @@ public class Comment {
 
     public boolean isRoot() {
         return rootId == null && parentId == null;
+    }
+
+    @Override
+    public int compareTo(Comment another) {
+        if (time > another.time)
+            return 1;
+        else if (time < another.time)
+            return -1;
+        else
+            return 0;
     }
 
     @Override
