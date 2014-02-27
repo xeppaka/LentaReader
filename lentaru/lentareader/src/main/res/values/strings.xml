@@ -19,6 +19,8 @@
     <string name="action_refresh_run">Обновляется...</string>
     <string name="action_select_rubric">Выбрать рубрику</string>
     <string name="action_preferences">Настройки</string>
+    <string name="action_copy_link">Копировать ссылку на оригинал</string>
+    <string name="action_open_in_browser">Открыть в веб-обозревателе</string>
 
     <string name="rubric_label">Рубрика:</string>
 
@@ -45,12 +47,12 @@
     <string name="pref_news_deletion_summary">Автоматически удалять новости из кэша</string>
     <string name="pref_news_deletion_interval_summary_day">Автоматическое удаление новостей из кэша после %1s дня</string>
     <string name="pref_news_deletion_interval_summary_days">Автоматическое удаление новостей из кэша после %1s дней</string>
-    <string name="pref_news_deletion_interval_summary_days_default">Автоматическое удаление новостей из кэша после 5 дней</string>
+    <string name="pref_news_deletion_interval_summary_days_default">Автоматическое удаление новостей из кэша после 4 дней</string>
 
     <string name="news_delete_interval_header">Количество дней, после которых новость будет автоматически удалена из кэша:</string>
     <string name="news_text_size_dialog_title">Выберите размер текста:</string>
     <string name="news_text_size_example">Земля — третья от Солнца планета. Пятая по размеру среди всех планет Солнечной системы.</string>
-    <string name="news_list_text_size_summary_default">Размер текста в списке новостей — 13</string>
+    <string name="news_list_text_size_summary_default">Размер текста в списке новостей — 14</string>
     <string name="news_full_text_size_summary_default">Размер текста в открытой новости — 16</string>
     <string name="news_list_text_size_summary">Размер текста в списке новостей — %1d</string>
     <string name="news_full_text_size_summary">Размер текста в открытой новости — %1d</string>
@@ -64,4 +66,7 @@
     <string name="error_no_internet_connection_toast">Ошибка соединения с сервером.\nПроверьте ваше соединение с интернетом.</string>
     <string name="error_general_toast">Ошибка соединения с сервером.</string>
     <string name="error_open_link_toast">Невозможно перейти по ссылке. Адрес ссылки некорректен.</string>
+    <string name="info_link_copied_toast">Ссылка на новость была скопирована в буфер обмена.</string>
+    <string name="error_link_copied_toast">Произошла ошибка при копировании ссылки на новость.</string>
+    <string name="error_link_open_in_browser_toast">Произошла ошибка при открытии ссылки.</string>
 </resources>

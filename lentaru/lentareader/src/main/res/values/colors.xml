@@ -5,4 +5,5 @@
     <color name="select_rubric_border">#ff000000</color>
     <color name="select_rubric_text">#ffffffff</color>
     <color name="brief_list_item_notread">#ffff7f00</color>
+    <color name="image_loading_background">#ffd2d2d2</color>
 </resources>

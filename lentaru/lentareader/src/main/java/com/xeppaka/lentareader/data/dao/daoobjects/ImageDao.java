@@ -14,6 +14,7 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.widget.ImageView;
 
+import com.xeppaka.lentareader.R;
 import com.xeppaka.lentareader.data.dao.DaoObservable;
 import com.xeppaka.lentareader.downloader.LentaHttpImageDownloader;
 import com.xeppaka.lentareader.downloader.exceptions.HttpStatusCodeException;
@@ -70,6 +71,8 @@ public class ImageDao implements DaoObservable<BitmapReference> {
     private static int thumbnail_image_width = 90;
     private static int thumbnail_image_height = 60;
 
+    private static int image_loading_color_background;
+
     private ImageDao(Resources resources) {
         displayDensity = resources.getDisplayMetrics().density;
     }
@@ -124,6 +127,8 @@ public class ImageDao implements DaoObservable<BitmapReference> {
             full_image_height = Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, full_image_height, resources.getDisplayMetrics()));
             thumbnail_image_width = Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, thumbnail_image_width, resources.getDisplayMetrics()));
             thumbnail_image_height = Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, thumbnail_image_height, resources.getDisplayMetrics()));
+
+            image_loading_color_background = resources.getColor(R.color.image_loading_background);
 
             notAvailableImageRef = new StrongBitmapReference(createNotAvailableBitmap());
             loadingImageRef = new StrongBitmapReference(createLoadingBitmap());
@@ -435,15 +440,18 @@ public class ImageDao implements DaoObservable<BitmapReference> {
         Canvas canvas = new Canvas(result);
 
         Paint paint = new Paint();
-        paint.setColor(Color.BLACK);
+//        paint.setColor(Color.BLACK);
+        paint.setColor(image_loading_color_background);
         paint.setAntiAlias(true);
-        paint.setTextSize(30);
+//        paint.setTextSize(30);
 
-        float text1Width = paint.measureText(imageLoadingText1);
-        float text2Width = paint.measureText(imageLoadingText2);
+        canvas.drawRect(0, 0, full_image_width, full_image_height, paint);
 
-        canvas.drawText(imageLoadingText1, (full_image_width - text1Width) / 2, 70, paint);
-        canvas.drawText(imageLoadingText2, (full_image_width - text2Width) / 2, 100, paint);
+//        float text1Width = paint.measureText(imageLoadingText1);
+//        float text2Width = paint.measureText(imageLoadingText2);
+//
+//        canvas.drawText(imageLoadingText1, (full_image_width - text1Width) / 2, 70, paint);
+//        canvas.drawText(imageLoadingText2, (full_image_width - text2Width) / 2, 100, paint);
         return result;
     }
 
@@ -452,15 +460,19 @@ public class ImageDao implements DaoObservable<BitmapReference> {
         Canvas canvas = new Canvas(result);
 
         Paint paint = new Paint();
-        paint.setColor(Color.BLACK);
+//        paint.setColor(Color.BLACK);
+        paint.setColor(image_loading_color_background);
         paint.setAntiAlias(true);
-        paint.setTextSize(13);
+//        paint.setTextSize(13);
+        paint.setStyle(Paint.Style.FILL);
 
-        float text1Width = paint.measureText(imageLoadingText1);
-        float text2Width = paint.measureText(imageLoadingText2);
+        canvas.drawRect(0, 0, thumbnail_image_width, thumbnail_image_height, paint);
 
-        canvas.drawText(imageLoadingText1, (thumbnail_image_width - text1Width) / 2, 25, paint);
-        canvas.drawText(imageLoadingText2, (thumbnail_image_width - text2Width) / 2, 45, paint);
+//        float text1Width = paint.measureText(imageLoadingText1);
+//        float text2Width = paint.measureText(imageLoadingText2);
+//
+//        canvas.drawText(imageLoadingText1, (thumbnail_image_width - text1Width) / 2, 25, paint);
+//        canvas.drawText(imageLoadingText2, (thumbnail_image_width - text2Width) / 2, 45, paint);
         return result;
     }
 

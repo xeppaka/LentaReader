@@ -24,7 +24,7 @@ public class LentaConstants {
     public static int BITMAP_CACHE_TRIM_MAX_SIZE_IN_BYTES = 2 * 1024 * 1024; // 2 MB
     public static int THUMBNAILS_BITMAP_CACHE_TRIM_MAX_SIZE_IN_BYTES = 512 * 1024; // 512 KB
 
-	public static final boolean DEVELOPER_MODE = true;
+	public static final boolean DEVELOPER_MODE = false;
 
     public static final String[] MONTHS_RUS = new String[12];
     public static final String[] MONTHS_SHORT_RUS = new String[12];

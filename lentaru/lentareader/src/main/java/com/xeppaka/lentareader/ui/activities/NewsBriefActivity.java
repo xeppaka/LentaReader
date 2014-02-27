@@ -140,7 +140,7 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_actions, menu);
+        inflater.inflate(R.menu.news_list_menu_actions, menu);
 
         actionPreferences = menu.findItem(R.id.action_preferences);
         actionSelectRubric = menu.findItem(R.id.action_select_rubric);

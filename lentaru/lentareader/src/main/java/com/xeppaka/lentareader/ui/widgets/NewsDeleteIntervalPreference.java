@@ -37,7 +37,7 @@ public class NewsDeleteIntervalPreference extends DialogPreference {
         final View view = super.onCreateDialogView();
 
         daysPicker = (NumberPicker)view.findViewById(R.id.news_delete_number_picker);
-        daysPicker.setMaxValue(10);
+        daysPicker.setMaxValue(7);
         daysPicker.setMinValue(1);
         daysPicker.setValue(deleteAfterDays);
 
