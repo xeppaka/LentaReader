@@ -21,6 +21,8 @@ public class Comments implements Iterable<Comment> {
     private final List<Comment> rootComments = new ArrayList<Comment>();
     private final SimpleArrayMap<String, Comment> commentById = new SimpleArrayMap<String, Comment>();
 
+    private static final Comments emptyComments = new Comments();
+
     private static class CommentsIterator implements Iterator<Comment> {
         private List<Comment> orderedComments = new ArrayList<Comment>();
         private Iterator<Comment> iterator;
@@ -54,6 +56,10 @@ public class Comments implements Iterable<Comment> {
         public void remove() {
             iterator.remove();
         }
+    }
+
+    public static Comments getEmptyComments() {
+        return emptyComments;
     }
 
     @Override
