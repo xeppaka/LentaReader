@@ -8,6 +8,7 @@ import android.widget.ListView;
 
 import com.xeppaka.lentareader.data.NewsType;
 import com.xeppaka.lentareader.data.Rubrics;
+import com.xeppaka.lentareader.ui.adapters.NewsObjectAdapter;
 
 import java.util.HashSet;
 import java.util.Set;

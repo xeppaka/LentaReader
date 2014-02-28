@@ -21,12 +21,6 @@ public class Comments implements Iterable<Comment> {
     private final List<Comment> rootComments = new ArrayList<Comment>();
     private final SimpleArrayMap<String, Comment> commentById = new SimpleArrayMap<String, Comment>();
 
-    private static final Comments emptyComments = new Comments();
-
-    public static Comments getEmptyComments() {
-        return emptyComments;
-    }
-
     @Override
     public Iterator<Comment> iterator() {
         return getOrderedComments().iterator();

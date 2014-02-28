@@ -50,13 +50,12 @@ public class CommentsParser {
                 throw new ParseException("Error while parsing JSON with comments: server returned result = '" + result + "\'");
             }
 
+            final Comments comments = new Comments();
             final JSONArray jsonData = json.getJSONArray("data");
 
             if (jsonData.length() <= 0) {
-                return Comments.getEmptyComments();
+                return comments;
             }
-
-            final Comments comments = new Comments();
 
             String cmd;
             for (int i = 0; i < jsonData.length(); ++i) {
