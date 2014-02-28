@@ -42,7 +42,7 @@ object LentaBody {
     Downloader.download(url).flatMap(f => Some(parseNews(f)))
   }
 
-  private def parseNews(page: String): LentaNewsBody = {
+  def parseNews(page: String): LentaNewsBody = {
     val imageTitle = imageTitlePattern.findFirstIn(page) match {
       case Some(imageTitlePattern(title)) => title
       case None => ""
@@ -58,6 +58,8 @@ object LentaBody {
 
     val newsWithoutAside = newsBodyAsidePattern.replaceAllIn(page, ASIDE)
     val newsWithoutMedia = newsBodyIframePattern.replaceAllIn(newsWithoutAside, IFRAME)
+
+    println(newsWithoutMedia)
 
     val newsBody = newsBodyPattern.findFirstIn(newsWithoutMedia) match {
       case Some(newsBodyPattern(body)) => {
