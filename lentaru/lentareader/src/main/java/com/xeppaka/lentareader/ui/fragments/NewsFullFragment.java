@@ -3,6 +3,7 @@ package com.xeppaka.lentareader.ui.fragments;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -12,6 +13,7 @@ import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -22,12 +24,21 @@ import com.xeppaka.lentareader.data.News;
 import com.xeppaka.lentareader.data.body.Body;
 import com.xeppaka.lentareader.data.body.items.Item;
 import com.xeppaka.lentareader.data.body.items.ItemPreferences;
+import com.xeppaka.lentareader.data.comments.Comment;
+import com.xeppaka.lentareader.data.comments.Comments;
 import com.xeppaka.lentareader.data.dao.async.AsyncDao;
 import com.xeppaka.lentareader.data.dao.daoobjects.BitmapReference;
 import com.xeppaka.lentareader.data.dao.daoobjects.ImageDao;
 import com.xeppaka.lentareader.data.dao.daoobjects.NewsDao;
+import com.xeppaka.lentareader.downloader.LentaCommentsDownloader;
+import com.xeppaka.lentareader.downloader.exceptions.HttpStatusCodeException;
+import com.xeppaka.lentareader.parser.comments.CommentsParser;
+import com.xeppaka.lentareader.parser.exceptions.ParseException;
 import com.xeppaka.lentareader.utils.LentaTextUtils;
 import com.xeppaka.lentareader.utils.PreferencesConstants;
+
+import java.io.IOException;
+import java.util.List;
 
 public class NewsFullFragment extends Fragment {
     public static final long NO_NEWS_ID = -1;
@@ -41,8 +52,10 @@ public class NewsFullFragment extends Fragment {
     private TextView dateView;
     private TextView rubricViewTitle;
     private TextView rubricView;
+    private Button buttonLoadComments;
+    private TextView commentsView;
 
-	private long newsId = NO_NEWS_ID;
+    private long newsId = NO_NEWS_ID;
 	private News loadedNews;
 
     private AsyncDao<News> newsDao;
@@ -93,6 +106,15 @@ public class NewsFullFragment extends Fragment {
         rubricViewTitle = (TextView) activity.findViewById(R.id.full_news_rubric_title);
         rubricView = (TextView) activity.findViewById(R.id.full_news_rubric);
         contentView = (LinearLayout) activity.findViewById(R.id.full_news_content);
+
+        buttonLoadComments = (Button)view.findViewById(R.id.full_news_load_comments);
+        buttonLoadComments.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loadComments();
+            }
+        });
+        commentsView = (TextView)view.findViewById(R.id.full_news_comments);
 
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         downloadImages = preferences.getBoolean(PreferencesConstants.PREF_KEY_DOWNLOAD_IMAGE_FULL, PreferencesConstants.DOWNLOAD_IMAGE_FULL_DEFAULT);
@@ -277,5 +299,44 @@ public class NewsFullFragment extends Fragment {
         }
 
         return null;
+    }
+
+    private class LoadCommentsAsync extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                return LentaCommentsDownloader.download(loadedNews.getLink());
+            } catch (HttpStatusCodeException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            CommentsParser parser = new CommentsParser();
+
+            try {
+                Comments comments = parser.parse(s);
+                List<Comment> orderedComments = comments.getOrderedComments();
+
+                StringBuilder sb = new StringBuilder();
+                for (Comment comment : orderedComments) {
+                    sb.append(comment.getText()).append("\n");
+                }
+
+                commentsView.setText(sb.toString());
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void loadComments() {
+        AsyncTask<String, Void, String> tt = new LoadCommentsAsync();
+        tt.execute(loadedNews.getLink());
     }
 }

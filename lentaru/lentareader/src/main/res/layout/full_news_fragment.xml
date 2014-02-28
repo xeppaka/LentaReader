@@ -85,5 +85,14 @@
                 android:textSize="12sp"/>
         </LinearLayout>
 
+        <Button
+            android:id="@+id/full_news_load_comments"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Загрузить комментарии"/>
+        <TextView
+            android:id="@+id/full_news_comments"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
     </LinearLayout>
 </ScrollView>

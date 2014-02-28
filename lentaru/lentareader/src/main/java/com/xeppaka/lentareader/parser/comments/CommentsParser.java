@@ -22,7 +22,13 @@ public class CommentsParser {
     private final SimpleDateFormat commentsDateParser = new SimpleDateFormat(datePattern, Locale.US);
 
     public static final String KEY_RESULT = "result";
-    public static final String VALUE_RESULT_SUCCESS = "result";
+    public static final String VAL_RESULT_SUCCESS = "success";
+
+    public static final String KEY_CMD = "cmd";
+    public static final String VAL_CMD_AUTH_INFO = "authInfo";
+    public static final String VAL_CMD_STREAM_INFO = "streamInfo";
+
+    public static final String KEY_COMMENTS = "comments";
 
     public static final String KEY_TIME = "time";
     public static final String KEY_ID = "id";
@@ -40,27 +46,78 @@ public class CommentsParser {
             JSONObject json = new JSONObject(commentsJson);
             final String result = json.getString(KEY_RESULT);
 
-            if (!result.equalsIgnoreCase(VALUE_RESULT_SUCCESS)) {
+            if (!result.equalsIgnoreCase(VAL_RESULT_SUCCESS)) {
                 throw new ParseException("Error while parsing JSON with comments: server returned result = '" + result + "\'");
             }
 
-            final JSONArray jsonArray = json.getJSONArray("comments");
+            final JSONArray jsonData = json.getJSONArray("data");
 
-            if (jsonArray.length() <= 0) {
+            if (jsonData.length() <= 0) {
                 return Comments.getEmptyComments();
             }
 
             final Comments comments = new Comments();
-            JSONObject jsonComment;
-            for (int i = 0; i < jsonArray.length(); ++i) {
-                jsonComment = jsonArray.getJSONObject(i);
-                comments.addComment(parseComment(jsonComment));
+
+            String cmd;
+            for (int i = 0; i < jsonData.length(); ++i) {
+                final String val = jsonData.optString(i);
+
+                if (val == null) {
+                    continue;
+                }
+
+                final JSONObject object = new JSONObject(val);
+                cmd = object.getString(KEY_CMD);
+
+                if (cmd == null || cmd.isEmpty()) {
+                    continue;
+                }
+
+                try {
+                    if (cmd.equalsIgnoreCase(VAL_CMD_AUTH_INFO)) {
+                        parseAuthInfo(object, comments);
+                    } else if (cmd.equalsIgnoreCase(VAL_CMD_STREAM_INFO)) {
+                        parseComments(object, comments);
+                    }
+                } catch (JSONException e) {
+                    Log.e(LentaConstants.LoggerMainAppTag, "Error while parsing comments.", e);
+                    continue;
+                } catch (ParseException e) {
+                    Log.e(LentaConstants.LoggerMainAppTag, "Error while parsing comments.", e);
+                    continue;
+                }
             }
 
             return comments;
         } catch (JSONException e) {
             Log.e(LentaConstants.LoggerMainAppTag, "Error while parsing JSON with comments.", e);
             throw new ParseException("Error while parsing JSON with comments.", e);
+        }
+    }
+
+    private void parseAuthInfo(JSONObject jsonAuthInfo, Comments comments) throws JSONException, ParseException {
+    }
+
+    private void parseComments(JSONObject jsonComments, Comments comments) throws JSONException, ParseException {
+        JSONArray jsonCommentaArray = jsonComments.getJSONArray(KEY_COMMENTS);
+
+        if (jsonCommentaArray.length() <= 0) {
+            return;
+        }
+
+        JSONObject jsonComment;
+        for (int i = 0; i < jsonCommentaArray.length(); ++i) {
+            jsonComment = jsonCommentaArray.getJSONObject(i);
+
+            try {
+                comments.addComment(parseComment(jsonComment));
+            } catch (JSONException e) {
+                Log.e(LentaConstants.LoggerMainAppTag, "Error while parsing comment.", e);
+                continue;
+            } catch (ParseException e) {
+                Log.e(LentaConstants.LoggerMainAppTag, "Error while parsing comment.", e);
+                continue;
+            }
         }
     }
 
@@ -73,14 +130,14 @@ public class CommentsParser {
             throw new ParseException("Error while parsing time in JSON with comments. Time string: '" + timeStr + "'", e);
         }
         final String id = jsonComment.getString(KEY_ID);
-        final String parent_id = jsonComment.getString(KEY_PARENT_ID);
-        final String root_id = jsonComment.getString(KEY_ROOT_ID);
+        final String parent_id = jsonComment.optString(KEY_PARENT_ID);
+        final String root_id = jsonComment.optString(KEY_ROOT_ID);
         final String text = jsonComment.getString(KEY_TEXT);
-        final int state = jsonComment.getInt(KEY_STATE);
-        final String nick = jsonComment.getString(KEY_NICK);
-        final String acc_id = jsonComment.getString(KEY_ACCOUNT_ID);
-        final int vote_up = jsonComment.getInt(KEY_VOTE_UP);
-        final int vote_dn = jsonComment.getInt(KEY_VOTE_DOWN);
+        final int state = jsonComment.optInt(KEY_STATE, Comment.STATE_ACCEPTED);
+        final String nick = jsonComment.optString(KEY_NICK);
+        final String acc_id = jsonComment.optString(KEY_ACCOUNT_ID);
+        final int vote_up = jsonComment.optInt(KEY_VOTE_UP);
+        final int vote_dn = jsonComment.optInt(KEY_VOTE_DOWN);
 
         return new Comment(id, root_id, parent_id, nick, time, acc_id, vote_up, vote_dn, state, text);
     }

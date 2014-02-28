@@ -23,48 +23,13 @@ public class Comments implements Iterable<Comment> {
 
     private static final Comments emptyComments = new Comments();
 
-    private static class CommentsIterator implements Iterator<Comment> {
-        private List<Comment> orderedComments = new ArrayList<Comment>();
-        private Iterator<Comment> iterator;
-
-        private CommentsIterator(List<Comment> rootComments) {
-            addCommentsInTimeOrder(rootComments);
-
-            iterator = orderedComments.iterator();
-        }
-
-        private void addCommentsInTimeOrder(List<Comment> comments) {
-            Collections.sort(comments);
-
-            for (Comment comment : comments) {
-                orderedComments.add(comment);
-                addCommentsInTimeOrder(comment.getChildren());
-            }
-        }
-
-        @Override
-        public boolean hasNext() {
-            return iterator.hasNext();
-        }
-
-        @Override
-        public Comment next() {
-            return iterator.next();
-        }
-
-        @Override
-        public void remove() {
-            iterator.remove();
-        }
-    }
-
     public static Comments getEmptyComments() {
         return emptyComments;
     }
 
     @Override
     public Iterator<Comment> iterator() {
-        return new CommentsIterator(rootComments);
+        return getOrderedComments().iterator();
     }
 
     public void addComment(Comment comment) {
@@ -86,5 +51,25 @@ public class Comments implements Iterable<Comment> {
 
     public Comment getComment(String id) {
         return commentById.get(id);
+    }
+
+    public List<Comment> getOrderedComments() {
+        if (rootComments.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        final List<Comment> orderedComments = new ArrayList<Comment>();
+        addCommentsInTimeOrder(rootComments, orderedComments);
+
+        return orderedComments;
+    }
+
+    private void addCommentsInTimeOrder(List<Comment> comments, List<Comment> orderedComments) {
+        Collections.sort(comments);
+
+        for (Comment comment : comments) {
+            orderedComments.add(comment);
+            addCommentsInTimeOrder(comment.getChildren(), orderedComments);
+        }
     }
 }

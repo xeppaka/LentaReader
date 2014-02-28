@@ -11,6 +11,11 @@ import java.util.Queue;
  * Created by nnm on 2/26/14.
  */
 public class Comment implements Comparable<Comment> {
+    private static final String VAL_EMPTY_ID = "null";
+
+    public static int STATE_ACCEPTED = 1;
+    public static int STATE_DELETED = 4;
+
     private String id;
     private String rootId;
     private String parentId;
@@ -107,7 +112,7 @@ public class Comment implements Comparable<Comment> {
     }
 
     public boolean isRoot() {
-        return rootId == null && parentId == null;
+        return (rootId == null && parentId == null) || (rootId.equals(VAL_EMPTY_ID) && parentId.equals(VAL_EMPTY_ID));
     }
 
     @Override
@@ -123,7 +128,7 @@ public class Comment implements Comparable<Comment> {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || !(o instanceof Comment)) return false;
 
         Comment comment = (Comment) o;
 
