@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.xeppaka.lentareader.async.AsyncListener;
 import com.xeppaka.lentareader.data.body.items.LentaBodyItemImage;
 import com.xeppaka.lentareader.data.dao.daoobjects.BitmapReference;
 import com.xeppaka.lentareader.data.dao.daoobjects.ImageDao;
@@ -79,7 +80,7 @@ public class ImagesSwitcher extends ViewPager {
             } else {
                 currentImageView.setImageBitmap(ImageDao.getLoadingImage().getBitmapIfCached());
 
-                bitmapRef.getBitmapAsync(currentImageView, new BitmapReference.LoadListener() {
+                bitmapRef.getBitmapAsync(currentImageView, new AsyncListener<Bitmap>() {
                     @Override
                     public void onSuccess(Bitmap bitmap) {
                         currentImageView.setImageBitmap(bitmap);

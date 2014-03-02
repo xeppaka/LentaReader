@@ -4,6 +4,8 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.widget.ImageView;
 
+import com.xeppaka.lentareader.async.AsyncListener;
+
 public class StrongBitmapReference implements BitmapReference {
 	private final Bitmap bitmap;
 	
@@ -22,8 +24,8 @@ public class StrongBitmapReference implements BitmapReference {
 	}
 	
 	@Override
-	public AsyncTask<LoadListener, Void, Bitmap> getBitmapAsync(LoadListener loadListener) {
-		loadListener.onSuccess(bitmap);
+	public AsyncTask<AsyncListener<Bitmap>, Void, Bitmap> getBitmapAsync(AsyncListener<Bitmap> listener) {
+        listener.onSuccess(bitmap);
         return null;
 	}
 
@@ -38,8 +40,8 @@ public class StrongBitmapReference implements BitmapReference {
     }
 
     @Override
-    public AsyncTask getBitmapAsync(ImageView view, LoadListener loadListener) {
-        loadListener.onSuccess(bitmap);
+    public AsyncTask getBitmapAsync(ImageView view, AsyncListener<Bitmap> listener) {
+        listener.onSuccess(bitmap);
         return null;
     }
 

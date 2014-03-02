@@ -1,4 +1,4 @@
-package com.xeppaka.lentareader.asyncloaders;
+package com.xeppaka.lentareader.async.loaders;
 
 import android.content.Context;
 

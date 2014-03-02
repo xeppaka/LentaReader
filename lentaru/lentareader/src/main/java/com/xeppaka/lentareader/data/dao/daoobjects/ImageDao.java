@@ -15,6 +15,7 @@ import android.util.TypedValue;
 import android.widget.ImageView;
 
 import com.xeppaka.lentareader.R;
+import com.xeppaka.lentareader.async.AsyncListener;
 import com.xeppaka.lentareader.data.dao.DaoObservable;
 import com.xeppaka.lentareader.downloader.LentaHttpImageDownloader;
 import com.xeppaka.lentareader.downloader.exceptions.HttpStatusCodeException;
@@ -621,24 +622,24 @@ public class ImageDao implements DaoObservable<BitmapReference> {
 
         private class BitmapGetParameter {
             private ImageView view;
-            private LoadListener loadListener;
+            private AsyncListener<Bitmap> listener;
 
-            private BitmapGetParameter(ImageView view, LoadListener loadListener) {
+            private BitmapGetParameter(ImageView view, AsyncListener<Bitmap> loadListener) {
                 this.view = view;
-                this.loadListener = loadListener;
+                this.listener = loadListener;
             }
 
             public ImageView getView() {
                 return view;
             }
 
-            public LoadListener getLoadListener() {
-                return loadListener;
+            public AsyncListener<Bitmap> getLoadListener() {
+                return listener;
             }
         }
 
         private class BitmapLoadTask extends AsyncTask<BitmapGetParameter, Void, BitmapGetResult> {
-            private LoadListener listener;
+            private AsyncListener<Bitmap> listener;
             private ImageView view;
 
             @Override
@@ -850,22 +851,22 @@ public class ImageDao implements DaoObservable<BitmapReference> {
         }
 
         @Override
-        public AsyncTask getBitmapAsync(LoadListener loadListener) {
-            return getBitmapAsync(null, loadListener);
+        public AsyncTask getBitmapAsync(AsyncListener<Bitmap> listener) {
+            return getBitmapAsync(null, listener);
         }
 
         @Override
-        public AsyncTask getBitmapAsync(ImageView view, LoadListener loadListener) {
+        public AsyncTask getBitmapAsync(ImageView view, AsyncListener<Bitmap> listener) {
             if (bitmap != null) {
-                loadListener.onSuccess(seizeBitmap());
+                listener.onSuccess(seizeBitmap());
 
                 return null;
             } else {
                 AsyncTask<BitmapGetParameter, Void, BitmapGetResult> task = new BitmapLoadTask();
                 if (LentaConstants.SDK_VER >= 11)
-                    task.executeOnExecutor(downloadImageExecutor, new BitmapGetParameter(view, loadListener));
+                    task.executeOnExecutor(downloadImageExecutor, new BitmapGetParameter(view, listener));
                 else
-                    task.execute(new BitmapGetParameter(view, loadListener));
+                    task.execute(new BitmapGetParameter(view, listener));
 
                 return task;
             }

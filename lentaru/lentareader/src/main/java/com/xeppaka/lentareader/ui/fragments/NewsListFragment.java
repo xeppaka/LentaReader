@@ -1,6 +1,7 @@
 package com.xeppaka.lentareader.ui.fragments;
 
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -8,10 +9,10 @@ import android.view.View;
 import android.widget.AbsListView;
 import android.widget.ListView;
 
+import com.xeppaka.lentareader.async.AsyncListener;
 import com.xeppaka.lentareader.data.News;
 import com.xeppaka.lentareader.data.NewsType;
 import com.xeppaka.lentareader.data.dao.Dao;
-import com.xeppaka.lentareader.data.dao.async.AsyncDao.DaoReadMultiListener;
 import com.xeppaka.lentareader.data.dao.async.AsyncNODao;
 import com.xeppaka.lentareader.data.dao.daoobjects.DaoObserver;
 import com.xeppaka.lentareader.data.dao.daoobjects.NewsDao;
@@ -81,9 +82,9 @@ public class NewsListFragment extends NewsObjectListFragment implements AbsListV
     public void refresh() {
         scrolled = false;
 
-        dao.readAllIdsAsync(getCurrentRubric(), new AsyncNODao.DaoReadIdsListener() {
+        dao.readAllIdsAsync(getCurrentRubric(), new AsyncListener<List<Long>>() {
             @Override
-            public void finished(List<Long> result) {
+            public void onSuccess(List<Long> result) {
                 final List<News> news = newsAdapter.getNewsObjects();
 
                 for (int i = 0; i < news.size(); ++i) {
@@ -117,9 +118,9 @@ public class NewsListFragment extends NewsObjectListFragment implements AbsListV
 
                     showData(news);
                 } else {
-                    dao.readBriefAsync(getCurrentRubric(), new DaoReadMultiListener<News>() {
+                    dao.readBriefAsync(getCurrentRubric(), new AsyncListener<List<News>>() {
                         @Override
-                        public void finished(List<News> result) {
+                        public void onSuccess(List<News> result) {
                             if (isResumed()) {
                                 showData(result);
                             }
@@ -130,9 +131,15 @@ public class NewsListFragment extends NewsObjectListFragment implements AbsListV
                                 setLatestPubDate(result.get(0).getPubDate().getTime());
                             }
                         }
+
+                        @Override
+                        public void onFailure(Exception e) {}
                     });
                 }
             }
+
+            @Override
+            public void onFailure(Exception e) {}
         });
     }
 

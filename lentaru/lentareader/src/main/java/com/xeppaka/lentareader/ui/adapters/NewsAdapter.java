@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.xeppaka.lentareader.R;
+import com.xeppaka.lentareader.async.AsyncListener;
 import com.xeppaka.lentareader.data.News;
 import com.xeppaka.lentareader.data.dao.daoobjects.BitmapReference;
 import com.xeppaka.lentareader.data.dao.daoobjects.ImageDao;
@@ -300,7 +301,7 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
                 holder.setImage(bitmapRef);
                 holder.setImageUrl(news.getImageLink());
 
-                final AsyncTask asyncTask = bitmapRef.getBitmapAsync(newsImageView, new BitmapReference.LoadListener() {
+                final AsyncTask asyncTask = bitmapRef.getBitmapAsync(newsImageView, new AsyncListener<Bitmap>() {
                     @Override
                     public void onSuccess(Bitmap bitmap) {
                         if (position != holderForAsync.getPosition() ||

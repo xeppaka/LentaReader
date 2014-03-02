@@ -1,7 +1,9 @@
 package com.xeppaka.lentareader.data.dao.decorators;
 
+import android.database.Cursor;
 import android.os.AsyncTask;
 
+import com.xeppaka.lentareader.async.AsyncListener;
 import com.xeppaka.lentareader.data.NewsObject;
 import com.xeppaka.lentareader.data.Rubrics;
 import com.xeppaka.lentareader.data.dao.NODao;
@@ -14,9 +16,9 @@ public class AsyncNODaoDecorator<T extends NewsObject> extends AsyncDaoDecorator
 	private NODao<T> decoratedDao;
 	
 	protected class AsyncReadMultiForRubricTask extends AsyncTask<Rubrics, Void, List<T>> {
-		private AsyncDao.DaoReadMultiListener<T> listener;
+		private AsyncListener<List<T>> listener;
 		
-		public AsyncReadMultiForRubricTask(AsyncDao.DaoReadMultiListener<T> listener) {
+		public AsyncReadMultiForRubricTask(AsyncListener<List<T>> listener) {
 			this.listener = listener;
 		}
 
@@ -27,14 +29,14 @@ public class AsyncNODaoDecorator<T extends NewsObject> extends AsyncDaoDecorator
 
 		@Override
 		protected void onPostExecute(List<T> result) {
-			listener.finished(result);
+			listener.onSuccess(result);
 		}
 	}
 
     protected class AsyncReadMultiBriefForRubricTask extends AsyncTask<Rubrics, Void, List<T>> {
-        private AsyncDao.DaoReadMultiListener<T> listener;
+        private AsyncListener<List<T>> listener;
 
-        public AsyncReadMultiBriefForRubricTask(AsyncDao.DaoReadMultiListener<T> listener) {
+        public AsyncReadMultiBriefForRubricTask(AsyncListener<List<T>> listener) {
             this.listener = listener;
         }
 
@@ -45,14 +47,14 @@ public class AsyncNODaoDecorator<T extends NewsObject> extends AsyncDaoDecorator
 
         @Override
         protected void onPostExecute(List<T> result) {
-            listener.finished(result);
+            listener.onSuccess(result);
         }
     }
 
     protected class AsyncReadAllIdsForRubric extends AsyncTask<Rubrics, Void, List<Long>> {
-        private AsyncNODao.DaoReadIdsListener listener;
+        private AsyncListener<List<Long>> listener;
 
-        public AsyncReadAllIdsForRubric(AsyncNODao.DaoReadIdsListener listener) {
+        public AsyncReadAllIdsForRubric(AsyncListener<List<Long>> listener) {
             this.listener = listener;
         }
 
@@ -63,7 +65,7 @@ public class AsyncNODaoDecorator<T extends NewsObject> extends AsyncDaoDecorator
 
         @Override
         protected void onPostExecute(List<Long> result) {
-            listener.finished(result);
+            listener.onSuccess(result);
         }
     }
 
@@ -88,9 +90,9 @@ public class AsyncNODaoDecorator<T extends NewsObject> extends AsyncDaoDecorator
     }
 
     protected class AsyncReadSingleWOImageForRubricTask extends AsyncTask<ReadSingleWOImageForRubricParam, Void, T> {
-        private AsyncDao.DaoReadSingleListener<T> listener;
+        private AsyncListener<T> listener;
 
-        public AsyncReadSingleWOImageForRubricTask(AsyncDao.DaoReadSingleListener<T> listener) {
+        public AsyncReadSingleWOImageForRubricTask(AsyncListener<T> listener) {
             this.listener = listener;
         }
 
@@ -101,14 +103,14 @@ public class AsyncNODaoDecorator<T extends NewsObject> extends AsyncDaoDecorator
 
         @Override
         protected void onPostExecute(T result) {
-            listener.finished(result);
+            listener.onSuccess(result);
         }
     }
 
     protected class AsyncReadSingleLatestForRubricTask extends AsyncTask<Rubrics, Void, T> {
-        private AsyncDao.DaoReadSingleListener<T> listener;
+        private AsyncListener<T> listener;
 
-        public AsyncReadSingleLatestForRubricTask(AsyncDao.DaoReadSingleListener<T> listener) {
+        public AsyncReadSingleLatestForRubricTask(AsyncListener<T> listener) {
             this.listener = listener;
         }
 
@@ -119,14 +121,14 @@ public class AsyncNODaoDecorator<T extends NewsObject> extends AsyncDaoDecorator
 
         @Override
         protected void onPostExecute(T result) {
-            listener.finished(result);
+            listener.onSuccess(result);
         }
     }
 
     protected class AsyncClearLatestFlagTask extends AsyncTask<Rubrics, Void, Integer> {
-        private DaoUpdateListener listener;
+        private AsyncListener<Integer> listener;
 
-        public AsyncClearLatestFlagTask(DaoUpdateListener listener) {
+        public AsyncClearLatestFlagTask(AsyncListener<Integer> listener) {
             this.listener = listener;
         }
 
@@ -137,14 +139,14 @@ public class AsyncNODaoDecorator<T extends NewsObject> extends AsyncDaoDecorator
 
         @Override
         protected void onPostExecute(Integer result) {
-            listener.finished(result);
+            listener.onSuccess(result);
         }
     }
 
     protected class AsyncSetLatestFlagTask extends AsyncTask<Rubrics, Void, Integer> {
-        private DaoUpdateListener listener;
+        private AsyncListener<Integer> listener;
 
-        public AsyncSetLatestFlagTask(DaoUpdateListener listener) {
+        public AsyncSetLatestFlagTask(AsyncListener<Integer> listener) {
             this.listener = listener;
         }
 
@@ -155,14 +157,14 @@ public class AsyncNODaoDecorator<T extends NewsObject> extends AsyncDaoDecorator
 
         @Override
         protected void onPostExecute(Integer result) {
-            listener.finished(result);
+            listener.onSuccess(result);
         }
     }
 
     protected class AsyncDeleteOlderOrEqualTask extends AsyncTask<DeleteOlderOrEqualParam, Void, Integer> {
-        private AsyncDao.DaoDeleteListener listener;
+        private AsyncListener<Integer> listener;
 
-        public AsyncDeleteOlderOrEqualTask(AsyncDao.DaoDeleteListener listener) {
+        public AsyncDeleteOlderOrEqualTask(AsyncListener<Integer> listener) {
             this.listener = listener;
         }
 
@@ -173,7 +175,7 @@ public class AsyncNODaoDecorator<T extends NewsObject> extends AsyncDaoDecorator
 
         @Override
         protected void onPostExecute(Integer result) {
-            listener.finished(result);
+            listener.onSuccess(result);
         }
     }
 
@@ -194,42 +196,52 @@ public class AsyncNODaoDecorator<T extends NewsObject> extends AsyncDaoDecorator
     }
 
     @Override
-	public AsyncTask<Rubrics, Void, List<T>> readAsync(Rubrics rubric, DaoReadMultiListener<T> listener) {
+	public AsyncTask<Rubrics, Void, List<T>> readAsync(Rubrics rubric, AsyncListener<List<T>> listener) {
 		return new AsyncReadMultiForRubricTask(listener).execute(rubric);
 	}
 
     @Override
-    public AsyncTask<Rubrics, Void, List<T>> readBriefAsync(Rubrics rubric, DaoReadMultiListener<T> listener) {
+    public AsyncTask<Void, Void, Cursor> readCursorAsync(AsyncListener<Cursor> listener) {
+        return new AsyncReadCursorTask(listener).execute();
+    }
+
+    @Override
+    public AsyncTask<Long, Void, Cursor> readCursorAsync(long id, AsyncListener<Cursor> listener) {
+        return new AsyncReadCursorIdTask(listener).execute(id);
+    }
+
+    @Override
+    public AsyncTask<Rubrics, Void, List<T>> readBriefAsync(Rubrics rubric, AsyncListener<List<T>> listener) {
         return new AsyncReadMultiBriefForRubricTask(listener).execute(rubric);
     }
 
     @Override
-    public AsyncTask<Rubrics, Void, T> readLatestAsync(Rubrics rubric, DaoReadSingleListener<T> listener) {
+    public AsyncTask<Rubrics, Void, T> readLatestAsync(Rubrics rubric, AsyncListener<T> listener) {
         return new AsyncReadSingleLatestForRubricTask(listener).execute(rubric);
     }
 
     @Override
-    public AsyncTask readLatestWOImageAsync(Rubrics rubric, int limit, DaoReadSingleListener<T> listener) {
+    public AsyncTask readLatestWOImageAsync(Rubrics rubric, int limit, AsyncListener<T> listener) {
         return new AsyncReadSingleWOImageForRubricTask(listener).execute(new ReadSingleWOImageForRubricParam(rubric, limit));
     }
 
     @Override
-    public AsyncTask<Rubrics, Void, List<Long>> readAllIdsAsync(Rubrics rubric, DaoReadIdsListener listener) {
+    public AsyncTask<Rubrics, Void, List<Long>> readAllIdsAsync(Rubrics rubric, AsyncListener<List<Long>> listener) {
         return new AsyncReadAllIdsForRubric(listener).execute(rubric);
     }
 
     @Override
-    public AsyncTask<DeleteOlderOrEqualParam, Void, Integer> deleteOlderOrEqualAsync(Rubrics rubric, long date, AsyncDao.DaoDeleteListener listener) {
+    public AsyncTask<DeleteOlderOrEqualParam, Void, Integer> deleteOlderOrEqualAsync(Rubrics rubric, long date, AsyncListener<Integer> listener) {
         return new AsyncDeleteOlderOrEqualTask(listener).execute(new DeleteOlderOrEqualParam(rubric, date));
     }
 
     @Override
-    public AsyncTask<Rubrics, Void, Integer> clearLatestFlagAsync(Rubrics rubric, DaoUpdateListener listener) {
+    public AsyncTask<Rubrics, Void, Integer> clearLatestFlagAsync(Rubrics rubric, AsyncListener<Integer> listener) {
         return new AsyncClearLatestFlagTask(listener).execute(rubric);
     }
 
     @Override
-    public AsyncTask<Rubrics, Void, Integer> setLatestFlagAsync(Rubrics rubric, DaoUpdateListener listener) {
+    public AsyncTask<Rubrics, Void, Integer> setLatestFlagAsync(Rubrics rubric, AsyncListener<Integer> listener) {
         return new AsyncSetLatestFlagTask(listener).execute(rubric);
     }
 

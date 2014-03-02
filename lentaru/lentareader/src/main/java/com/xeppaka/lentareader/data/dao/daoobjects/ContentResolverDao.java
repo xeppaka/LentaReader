@@ -58,8 +58,7 @@ public abstract class ContentResolverDao<T extends DatabaseObject> implements Da
 
 	@Override
 	public List<T> read() {
-		Cursor cur = cr.query(getContentProviderUri(),
-				getProjectionAll(), null, null, getSortOrder());
+		final Cursor cur = readCursor();
 
         if (cur == null) {
             return Collections.EMPTY_LIST;
@@ -82,17 +81,15 @@ public abstract class ContentResolverDao<T extends DatabaseObject> implements Da
 		}		
 	}
 
-	@Override
+    @Override
+    public Cursor readCursor() {
+        return cr.query(getContentProviderUri(),
+                getProjectionAll(), null, null, getSortOrder());
+    }
+
+    @Override
 	public T read(long id) {
-		Uri uri = ContentUris.withAppendedId(getContentProviderUri(), id);
-		
-		Cursor cur = cr.query(
-				uri,
-				getProjectionAll(),
-				null,
-				null, 
-				null
-				);
+        final Cursor cur = readCursor(id);
 
         if (cur == null) {
             return null;
@@ -100,7 +97,7 @@ public abstract class ContentResolverDao<T extends DatabaseObject> implements Da
 
         try {
 			if (cur.getCount() > 1) {
-				Log.w(LentaConstants.LoggerMainAppTag, "There are more than one data object by using uri '" + uri + "'. Will use the first one from the list.");
+				Log.w(LentaConstants.LoggerMainAppTag, "There are more than one data object by using uri '" + ContentUris.withAppendedId(getContentProviderUri(), id) + "'. Will use the first one from the list.");
 			}
 			
 			if (cur.moveToFirst())
@@ -114,7 +111,13 @@ public abstract class ContentResolverDao<T extends DatabaseObject> implements Da
 		return null;
 	}
 
-	@Override
+    @Override
+    public Cursor readCursor(long id) {
+        final Uri uri = ContentUris.withAppendedId(getContentProviderUri(), id);
+        return cr.query(uri, getProjectionAll(), null, null, null);
+    }
+
+    @Override
 	public List<T> read(List<Long> ids) {
 		List<T> result = new ArrayList<T>(ids.size());
 		

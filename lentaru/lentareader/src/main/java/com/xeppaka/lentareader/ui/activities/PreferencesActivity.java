@@ -7,6 +7,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.MenuItem;
 
 import com.xeppaka.lentareader.R;
+import com.xeppaka.lentareader.async.AsyncListener;
 import com.xeppaka.lentareader.data.News;
 import com.xeppaka.lentareader.data.Rubrics;
 import com.xeppaka.lentareader.data.dao.async.AsyncDao;
@@ -41,9 +42,12 @@ public class PreferencesActivity extends ActionBarActivity {
 
                     if (!delete) {
                         AsyncNODao<News> nd = NewsDao.getInstance(getContentResolver());
-                        nd.setLatestFlagAsync(Rubrics.LATEST, new AsyncDao.DaoUpdateListener() {
+                        nd.setLatestFlagAsync(Rubrics.LATEST, new AsyncListener<Integer>() {
                             @Override
-                            public void finished(int rowsUpdated) {}
+                            public void onSuccess(Integer rowsUpdated) {}
+
+                            @Override
+                            public void onFailure(Exception e) {}
                         });
                     }
                 }

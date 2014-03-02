@@ -1,5 +1,7 @@
 package com.xeppaka.lentareader.data.dao.decorators;
 
+import android.database.Cursor;
+
 import com.xeppaka.lentareader.data.DatabaseObject;
 import com.xeppaka.lentareader.data.dao.Dao;
 import com.xeppaka.lentareader.data.db.SQLiteType;
@@ -142,7 +144,21 @@ public class SynchronizedDaoDecorator<T extends DatabaseObject> implements Dao<T
 		}
 	}
 
-	@Override
+    @Override
+    public Cursor readCursor() {
+        synchronized (sync) {
+            return getDecoratedDao().readCursor();
+        }
+    }
+
+    @Override
+    public Cursor readCursor(long id) {
+        synchronized (sync) {
+            return getDecoratedDao().readCursor(id);
+        }
+    }
+
+    @Override
 	public void registerContentObserver(
 			com.xeppaka.lentareader.data.dao.Dao.Observer<T> observer) {
 		getDecoratedDao().registerContentObserver(observer);

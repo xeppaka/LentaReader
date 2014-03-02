@@ -1,7 +1,9 @@
 package com.xeppaka.lentareader.data.dao.async;
 
+import android.database.Cursor;
 import android.os.AsyncTask;
 
+import com.xeppaka.lentareader.async.AsyncListener;
 import com.xeppaka.lentareader.data.dao.Dao;
 
 import java.util.Collection;
@@ -15,68 +17,6 @@ import java.util.List;
  */
 public interface AsyncDao<T> extends Dao<T> {
 	/**
-	 * Listener of creating one object in database.
-	 * 
-	 * @author nnm
-	 *
-	 * @param <T>
-	 */
-	public interface DaoCreateSingleListener<T> {	
-		void finished(Long result);
-	}
-
-	/**
-	 * Listener of creating multiple objects in database.
-	 * 
-	 * @author nnm
-	 *
-	 * @param <T>
-	 */
-	public interface DaoCreateMultiListener<T> {	
-		void finished(Collection<Long> result);
-	}
-	
-	/**
-	 * Listener of reading single object from database.
-	 * 
-	 * @author nnm
-	 *
-	 * @param <T>
-	 */
-	public interface DaoReadSingleListener<T> {	
-		void finished(T result);
-	}
-	
-	/**
-	 * Listener of reading multiple objects from database.
-	 * 
-	 * @author nnm
-	 *
-	 * @param <T>
-	 */
-	public interface DaoReadMultiListener<T> {	
-		void finished(List<T> result);
-	}
-
-	/**
-	 * Listener of deleting from database.
-	 *
-	 * @author nnm
-	 */
-	public interface DaoDeleteListener {
-		void finished(int rowsDeleted);
-	}
-
-	/**
-	 * Listener of updating objects in database.
-	 * 
-	 * @author nnm
-	 */
-	public interface DaoUpdateListener {	
-		void finished(int rowsUpdated);
-	}
-	
-	/**
 	 * Create new object in the database (row in the table).
 	 * 
 	 * @param dataObject
@@ -85,7 +25,7 @@ public interface AsyncDao<T> extends Dao<T> {
 	 *            is a listener for result.
 	 * @return database id for the newly created object.
 	 */
-	AsyncTask<T, Void, Long> createAsync(T dataObject, DaoCreateSingleListener<T> listener);
+	AsyncTask<T, Void, Long> createAsync(T dataObject, AsyncListener<Long> listener);
 
 	/**
 	 * Create new objects in the database (rows in the table).
@@ -97,7 +37,7 @@ public interface AsyncDao<T> extends Dao<T> {
 	 * @return database ids for the newly created object in the same order as
 	 *         objects were.
 	 */
-    AsyncTask<List<T>, Void, List<Long>> createAsync(List<T> dataObjects, DaoCreateMultiListener<T> listener);
+    AsyncTask<List<T>, Void, List<Long>> createAsync(List<T> dataObjects, AsyncListener<List<Long>> listener);
 	
 	/**
 	 * Read all news objects from database.
@@ -107,7 +47,7 @@ public interface AsyncDao<T> extends Dao<T> {
 	 * @return Collection of the news objects. Null if error occurred while reading
 	 *         data from the database.
 	 */
-    AsyncTask<List<Long>, Void, List<T>> readAsync(DaoReadMultiListener<T> listener);
+    AsyncTask<List<Long>, Void, List<T>> readAsync(AsyncListener<List<T>> listener);
 	
 	/**
 	 * Read some news object from the database specifying its id.
@@ -118,7 +58,7 @@ public interface AsyncDao<T> extends Dao<T> {
 	 * @return News object created from the database. Null if object is not
 	 *         found.
 	 */
-    AsyncTask<Long, Void, T> readAsync(long id, DaoReadSingleListener<T> listener);
+    AsyncTask<Long, Void, T> readAsync(long id, AsyncListener<T> listener);
 	
 	/**
 	 * Read some news objects from the database specifying its collection of
@@ -130,7 +70,7 @@ public interface AsyncDao<T> extends Dao<T> {
 	 * @return Collection of News objects created from the database. Not null.
 	 *         Could be empty.
 	 */
-    AsyncTask<List<Long>, Void, List<T>> readAsync(List<Long> ids, DaoReadMultiListener<T> listener);
+    AsyncTask<List<Long>, Void, List<T>> readAsync(List<Long> ids, AsyncListener<List<T>> listener);
 	
 	/**
 	 * Update object's information in database.
@@ -143,7 +83,7 @@ public interface AsyncDao<T> extends Dao<T> {
 	 * @param listener
 	 *            is a listener for result.
 	 */
-    AsyncTask<T, Void, Integer> updateAsync(T dataObject, DaoUpdateListener listener);
+    AsyncTask<T, Void, Integer> updateAsync(T dataObject, AsyncListener<Integer> listener);
 
 	/**
 	 * Deletes object from the database.
@@ -153,7 +93,7 @@ public interface AsyncDao<T> extends Dao<T> {
 	 *            is a listener for result.
 	 * @return async task which makes deletion.
 	 */
-    AsyncTask<Long, Void, Integer> deleteAsync(long id, DaoDeleteListener listener);
+    AsyncTask<Long, Void, Integer> deleteAsync(long id, AsyncListener<Integer> listener);
 
     /**
      * Deletes all objects from the database.
@@ -162,5 +102,8 @@ public interface AsyncDao<T> extends Dao<T> {
      *            is a listener for result.
      * @return async task which makes deletion.
      */
-    AsyncTask<Void, Void, Integer> deleteAsync(DaoDeleteListener listener);
+    AsyncTask<Void, Void, Integer> deleteAsync(AsyncListener<Integer> listener);
+
+    AsyncTask<Void, Void, Cursor> readCursorAsync(AsyncListener<Cursor> listener);
+    AsyncTask<Long, Void, Cursor> readCursorAsync(long id, AsyncListener<Cursor> listener);
 }

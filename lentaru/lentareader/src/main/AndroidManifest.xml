@@ -44,6 +44,14 @@
             android:screenOrientation="landscape">
         </activity>
 
+        <activity
+            android:name=".ui.activities.CommentsActivity"
+            android:theme="@style/Theme.AppCompat.Light.DarkActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ui.activities.NewsFullActivity" />
+        </activity>
+
         <service android:name=".service.LentaService"
             android:label="LentaService">
         </service>

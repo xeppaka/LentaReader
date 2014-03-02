@@ -49,7 +49,13 @@ object LentaBody {
     }
 
     val imageCredits = imageCreditsPattern.findFirstIn(page) match {
-      case Some(imageCreditsPattern(credits)) => URLDecoder.decode(credits, "UTF-8")
+      case Some(imageCreditsPattern(credits)) => {
+        try {
+          URLDecoder.decode(credits, "UTF-8")
+        } catch {
+          case ex: Exception  => ""
+        }
+      }
       case None => ""
     }
 

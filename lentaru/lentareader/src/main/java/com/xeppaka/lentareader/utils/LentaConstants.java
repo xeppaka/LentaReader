@@ -4,7 +4,6 @@ import java.util.Calendar;
 
 public class LentaConstants {
 	public static final int SDK_VER = android.os.Build.VERSION.SDK_INT;
-	public static final int AppVersion = 1;
 	public static final String LoggerMainAppTag = "LentaAnd";
 	public static final String LoggerServiceTag = "LentaAndService";
 	public static final String LoggerProviderTag = "LentaAndProvider";
@@ -16,7 +15,6 @@ public class LentaConstants {
     public static final String RSS_PATH_ROOT = "/rss";
     public static final String XML_PATH_ROOT = "";
 
-    public static final int DAO_CACHE_MAX_OBJECTS = 100;
     // Default values for bitmap caches
 	public static int BITMAP_CACHE_MAX_SIZE_IN_BYTES = 3 * 1024 * 1024; // 3 MB
     public static int THUMBNAILS_BITMAP_CACHE_MAX_SIZE_IN_BYTES = 1 * 1024 * 1024; // 1 MB

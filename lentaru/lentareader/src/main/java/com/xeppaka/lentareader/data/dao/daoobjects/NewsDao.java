@@ -4,7 +4,6 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
-import android.support.v4.util.LruCache;
 import android.util.Log;
 
 import com.xeppaka.lentareader.data.News;
@@ -13,8 +12,6 @@ import com.xeppaka.lentareader.data.body.Body;
 import com.xeppaka.lentareader.data.body.EmptyBody;
 import com.xeppaka.lentareader.data.dao.async.AsyncNODao;
 import com.xeppaka.lentareader.data.dao.decorators.AsyncNODaoDecorator;
-import com.xeppaka.lentareader.data.dao.decorators.CachedNODaoDecorator;
-import com.xeppaka.lentareader.data.dao.decorators.SynchronizedNODaoDecorator;
 import com.xeppaka.lentareader.data.db.NewsEntry;
 import com.xeppaka.lentareader.data.db.SQLiteType;
 import com.xeppaka.lentareader.data.provider.LentaProvider;
@@ -25,19 +22,12 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.sql.Date;
-import java.util.Collections;
 import java.util.List;
 
 public final class NewsDao {
-	private static final int CACHE_MAX_OBJECTS = LentaConstants.DAO_CACHE_MAX_OBJECTS;
-	
-//	private static final LruCache<Long, News> cacheId = new LruCache<Long, News>(CACHE_MAX_OBJECTS);
-//	private static final Object sync = new Object();
-
     private static final ConvertedBodyParser bodyParser = new ConvertedBodyParser();
 
     public final static AsyncNODao<News> getInstance(ContentResolver contentResolver) {
-		// return new AsyncNODaoDecorator<News>(new SynchronizedNODaoDecorator<News>(new CachedNODaoDecorator<News>(new ContentResolverNewsDao(contentResolver), cacheId), sync));
         return new AsyncNODaoDecorator<News>(new ContentResolverNewsDao(contentResolver));
 	}
 
