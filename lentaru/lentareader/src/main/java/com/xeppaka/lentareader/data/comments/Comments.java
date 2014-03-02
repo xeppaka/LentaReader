@@ -52,10 +52,67 @@ public class Comments implements Iterable<Comment> {
             return Collections.emptyList();
         }
 
-        final List<Comment> orderedComments = new ArrayList<Comment>();
+        final List<Comment> orderedComments = new ArrayList<Comment>(commentById.size());
         addCommentsInTimeOrder(rootComments, orderedComments);
 
         return orderedComments;
+    }
+
+    public void getExpandedOrderedComments(List<Comment> expandedComments) {
+        expandedComments.clear();
+
+        if (rootComments.isEmpty()) {
+            return;
+        }
+
+        addExpandedCommentsInTimeOrder(rootComments, expandedComments);
+    }
+
+    public List<Comment> getExpandedOrderedComments() {
+        if (rootComments.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        final List<Comment> expandedComments = new ArrayList<Comment>(commentById.size());
+        addExpandedCommentsInTimeOrder(rootComments, expandedComments);
+
+        return expandedComments;
+    }
+
+    private void addExpandedCommentsInTimeOrder(List<Comment> comments, List<Comment> orderedComments) {
+        Collections.sort(comments);
+
+        for (Comment comment : comments) {
+            orderedComments.add(comment);
+
+            if (comment.isExpanded()) {
+                addExpandedCommentsInTimeOrder(comment.getChildren(), orderedComments);
+            }
+        }
+    }
+
+    public void expand(String id) {
+        final Comment comment = commentById.get(id);
+
+        if (comment != null) {
+            comment.setExpanded(true);
+        }
+    }
+
+    public void collapse(String id) {
+        final Comment comment = commentById.get(id);
+
+        if (comment != null) {
+            comment.setExpanded(false);
+        }
+    }
+
+    public List<Comment> getRootComments() {
+        return rootComments;
+    }
+
+    public SimpleArrayMap<String, Comment> getCommentById() {
+        return commentById;
     }
 
     private void addCommentsInTimeOrder(List<Comment> comments, List<Comment> orderedComments) {
@@ -65,5 +122,9 @@ public class Comments implements Iterable<Comment> {
             orderedComments.add(comment);
             addCommentsInTimeOrder(comment.getChildren(), orderedComments);
         }
+    }
+
+    public int size() {
+        return commentById.size();
     }
 }

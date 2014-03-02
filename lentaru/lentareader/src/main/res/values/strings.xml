@@ -69,4 +69,7 @@
     <string name="info_link_copied_toast">Ссылка на новость была скопирована в буфер обмена.</string>
     <string name="error_link_copied_toast">Произошла ошибка при копировании ссылки на новость.</string>
     <string name="error_link_open_in_browser_toast">Произошла ошибка при открытии ссылки.</string>
+
+    <string name="comment_deleted">Комментарий удален</string>
+    <string name="comment_parent_text">ответ на комментарий от %1s</string>
 </resources>

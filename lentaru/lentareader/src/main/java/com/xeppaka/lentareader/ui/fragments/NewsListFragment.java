@@ -7,14 +7,17 @@ import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.AbsListView;
+import android.widget.ImageView;
 import android.widget.ListView;
 
+import com.xeppaka.lentareader.R;
 import com.xeppaka.lentareader.async.AsyncListener;
 import com.xeppaka.lentareader.data.News;
 import com.xeppaka.lentareader.data.NewsType;
 import com.xeppaka.lentareader.data.dao.Dao;
 import com.xeppaka.lentareader.data.dao.async.AsyncNODao;
 import com.xeppaka.lentareader.data.dao.daoobjects.DaoObserver;
+import com.xeppaka.lentareader.data.dao.daoobjects.ImageDao;
 import com.xeppaka.lentareader.data.dao.daoobjects.NewsDao;
 import com.xeppaka.lentareader.ui.adapters.NewsAdapter;
 import com.xeppaka.lentareader.ui.adapters.NewsObjectAdapter;
@@ -64,6 +67,14 @@ public class NewsListFragment extends NewsObjectListFragment implements AbsListV
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+
+        dao.unregisterContentObserver(newsDaoObserver);
+        saveScrollPosition();
+    }
+
+    @Override
 	public void onResume() {
 		super.onResume();
 
@@ -85,6 +96,10 @@ public class NewsListFragment extends NewsObjectListFragment implements AbsListV
         dao.readAllIdsAsync(getCurrentRubric(), new AsyncListener<List<Long>>() {
             @Override
             public void onSuccess(List<Long> result) {
+                if (!isResumed()) {
+                    return;
+                }
+
                 final List<News> news = newsAdapter.getNewsObjects();
 
                 for (int i = 0; i < news.size(); ++i) {
@@ -165,14 +180,6 @@ public class NewsListFragment extends NewsObjectListFragment implements AbsListV
             restoreScrollPosition();
         }
     }
-
-	@Override
-	public void onPause() {
-		super.onPause();
-
-        dao.unregisterContentObserver(newsDaoObserver);
-        saveScrollPosition();
-	}
 
     @Override
     public NewsType getNewsType() {

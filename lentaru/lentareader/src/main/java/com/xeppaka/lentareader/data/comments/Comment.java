@@ -27,6 +27,7 @@ public class Comment implements Comparable<Comment> {
     private int state;
     private String text;
     private int depth;
+    private boolean expanded;
 
     private List<Comment> children = Collections.emptyList();
 
@@ -99,6 +100,14 @@ public class Comment implements Comparable<Comment> {
         return children;
     }
 
+    public boolean isExpanded() {
+        return expanded;
+    }
+
+    public void setExpanded(boolean expanded) {
+        this.expanded = expanded;
+    }
+
     public int childrenSize() {
         return children.size();
     }
@@ -112,7 +121,15 @@ public class Comment implements Comparable<Comment> {
     }
 
     public boolean isRoot() {
-        return (rootId == null && parentId == null) || (rootId.equals(VAL_EMPTY_ID) && parentId.equals(VAL_EMPTY_ID));
+        return !hasParent() && !hasRoot();
+    }
+
+    public boolean hasParent() {
+        return parentId != null && !parentId.equals(VAL_EMPTY_ID);
+    }
+
+    public boolean hasRoot() {
+        return rootId != null && !rootId.equals(VAL_EMPTY_ID);
     }
 
     @Override

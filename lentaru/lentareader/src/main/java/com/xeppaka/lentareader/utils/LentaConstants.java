@@ -30,6 +30,7 @@ public class LentaConstants {
     public static final String[] DAYS_SHORT_RUS = new String[8];
 
     public static final int WITHOUT_PICTURE_LIMIT = 10;
+    public static final int COMMENT_INDENT_MARGIN = 7;
 
     static {
         MONTHS_RUS[Calendar.JANUARY] = "января";

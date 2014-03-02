@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.os.AsyncTask;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -26,23 +26,14 @@ import com.xeppaka.lentareader.data.News;
 import com.xeppaka.lentareader.data.body.Body;
 import com.xeppaka.lentareader.data.body.items.Item;
 import com.xeppaka.lentareader.data.body.items.ItemPreferences;
-import com.xeppaka.lentareader.data.comments.Comment;
-import com.xeppaka.lentareader.data.comments.Comments;
 import com.xeppaka.lentareader.data.dao.Dao;
 import com.xeppaka.lentareader.data.dao.async.AsyncDao;
 import com.xeppaka.lentareader.data.dao.daoobjects.BitmapReference;
 import com.xeppaka.lentareader.data.dao.daoobjects.ImageDao;
 import com.xeppaka.lentareader.data.dao.daoobjects.NewsDao;
-import com.xeppaka.lentareader.downloader.LentaCommentsDownloader;
-import com.xeppaka.lentareader.downloader.exceptions.HttpStatusCodeException;
-import com.xeppaka.lentareader.parser.comments.CommentsParser;
-import com.xeppaka.lentareader.parser.exceptions.ParseException;
 import com.xeppaka.lentareader.ui.activities.CommentsActivity;
 import com.xeppaka.lentareader.utils.LentaTextUtils;
 import com.xeppaka.lentareader.utils.PreferencesConstants;
-
-import java.io.IOException;
-import java.util.List;
 
 public class NewsFullFragment extends Fragment {
     private ScrollView scrollContainer;
@@ -207,9 +198,9 @@ public class NewsFullFragment extends Fragment {
             final BitmapReference bitmapRef = ImageDao.newInstance(getActivity()).read(news.getImageLink());
 
             if (downloadImages) {
-                bitmapRef.getBitmapAsync(imageView, new AsyncListener<Bitmap>() {
+                bitmapRef.getDrawableAsync(imageView, new AsyncListener<Drawable>() {
                     @Override
-                    public void onSuccess(final Bitmap bitmap) {
+                    public void onSuccess(final Drawable bitmap) {
                         if (isResumed()) {
                             setNewsImage(news, bitmap);
                         }
@@ -219,10 +210,10 @@ public class NewsFullFragment extends Fragment {
                     public void onFailure(Exception e) {}
                 });
             } else {
-                final Bitmap bitmap = bitmapRef.getBitmapIfCached(imageView);
+                final Drawable drawable = bitmapRef.getDrawableIfCached(imageView);
 
-                if (bitmap != null) {
-                    setNewsImage(news, bitmap);
+                if (drawable != null) {
+                    setNewsImage(news, drawable);
                 }
             }
         }
@@ -237,8 +228,8 @@ public class NewsFullFragment extends Fragment {
 //        });
     }
 
-    private void setNewsImage(News news, Bitmap bitmap) {
-        imageView.setImageBitmap(bitmap);
+    private void setNewsImage(News news, Drawable drawable) {
+        imageView.setImageDrawable(drawable);
         imageView.setVisibility(View.VISIBLE);
 
         if (news.hasImageCaption()) {

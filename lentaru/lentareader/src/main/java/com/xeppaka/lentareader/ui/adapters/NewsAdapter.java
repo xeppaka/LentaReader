@@ -2,6 +2,7 @@ package com.xeppaka.lentareader.ui.adapters;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
@@ -301,9 +302,9 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
                 holder.setImage(bitmapRef);
                 holder.setImageUrl(news.getImageLink());
 
-                final AsyncTask asyncTask = bitmapRef.getBitmapAsync(newsImageView, new AsyncListener<Bitmap>() {
+                final AsyncTask asyncTask = bitmapRef.getDrawableAsync(newsImageView, new AsyncListener<Drawable>() {
                     @Override
-                    public void onSuccess(Bitmap bitmap) {
+                    public void onSuccess(Drawable drawable) {
                         if (position != holderForAsync.getPosition() ||
                                 (imageUrl == null && holderForAsync.getImage() != ImageDao.getNotAvailableThumbnailImage()) ||
                                 (imageUrl != null && !imageUrl.equals(holderForAsync.getImageUrl()))) {
@@ -311,7 +312,7 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
                         }
 
                         final ImageView iv = holderForAsync.getNewsImage();
-                        iv.setImageBitmap(bitmap);
+                        iv.setImageDrawable(drawable);
                     }
 
                     @Override
@@ -338,10 +339,10 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
         } else {
             if (news.hasImage()) {
                 final BitmapReference bitmapRef = imageDao.readThumbnail(news.getImageLink());
-                final Bitmap bitmap;
+                final Drawable drawable;
 
-                if ((bitmap = bitmapRef.getBitmapIfCached(newsImageView)) != null) {
-                    newsImageView.setImageBitmap(bitmap);
+                if ((drawable = bitmapRef.getDrawableIfCached(newsImageView)) != null) {
+                    newsImageView.setImageDrawable(drawable);
                 } else {
                     newsImageView.setImageBitmap(ImageDao.getTurnedOffImagesThumbnailImageRef().getBitmapIfCached());
                 }
