@@ -3,3 +3,5 @@
 *.cache
 *.db
 *.orig
+*.iml
+.idea/misc.xml
