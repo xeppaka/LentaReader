@@ -9,13 +9,17 @@ import com.xeppaka.lentareader.downloader.exceptions.HttpStatusCodeException;
 import com.xeppaka.lentareader.utils.LentaConstants;
 import com.xeppaka.lentareader.utils.URLHelper;
 
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.util.EntityUtils;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 public class HttpPageDownloader {
 	
@@ -46,8 +50,8 @@ public class HttpPageDownloader {
 	public static String download(String url) throws HttpStatusCodeException, IOException {
 		final AndroidHttpClient client = AndroidHttpClient.newInstance(LentaConstants.UserAgent);
 		final HttpGet getRequest = new HttpGet(url);
-		//getRequest.addHeader("Accept", "text/html,application/xml");
-		//getRequest.addHeader("Accept-Encoding", "gzip");
+		getRequest.addHeader("Accept", "*/*");
+		getRequest.addHeader("Accept-Encoding", "gzip,deflate,sdch");
 		//getRequest.addHeader("Host", "lenta.ru");
 		
 		try {
@@ -61,7 +65,14 @@ public class HttpPageDownloader {
 			
 			final HttpEntity entity = response.getEntity();
 			if (entity != null) {
-                return EntityUtils.toString(entity, "UTF-8");
+//                final Header contentEncoding = response.getFirstHeader("Content-Encoding");
+//                if (contentEncoding != null && contentEncoding.getName().equalsIgnoreCase("gzip")) {
+//                    final InputStream ungzippedStream = AndroidHttpClient.getUngzippedContent(entity);
+//                    final BufferedReader reader = new BufferedReader(new InputStreamReader(ungzippedStream));
+//
+//                } else {
+                    return EntityUtils.toString(entity, "UTF-8");
+//                }
 			}
 		} finally {
 			if (client != null) {

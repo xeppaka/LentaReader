@@ -9,7 +9,7 @@ public class LentaConstants {
 	public static final String LoggerProviderTag = "LentaAndProvider";
 	public static final String LoggerAnyTag = "LentaAndAny";
 	public static final String LENTA_URL_ROOT = "http://lenta.ru";
-    public static final String OWNSERVER_URL_ROOT = "http://news.lentaru.eu";
+    public static final String OWNSERVER_URL_ROOT = "http://188.226.168.63";
 	public static final String UserAgent = "Android LentaReader";
 
     public static final String RSS_PATH_ROOT = "/rss";
