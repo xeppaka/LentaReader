@@ -47,7 +47,7 @@
     <string name="pref_news_deletion_summary">Автоматически удалять новости из кэша</string>
     <string name="pref_news_deletion_interval_summary_day">Автоматическое удаление новостей из кэша после %1s дня</string>
     <string name="pref_news_deletion_interval_summary_days">Автоматическое удаление новостей из кэша после %1s дней</string>
-    <string name="pref_news_deletion_interval_summary_days_default">Автоматическое удаление новостей из кэша после 4 дней</string>
+    <string name="pref_news_deletion_interval_summary_days_default">Автоматическое удаление новостей из кэша после 5 дней</string>
 
     <string name="news_delete_interval_header">Количество дней, после которых новость будет автоматически удалена из кэша:</string>
     <string name="news_text_size_dialog_title">Выберите размер текста:</string>
