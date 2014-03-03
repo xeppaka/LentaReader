@@ -1,8 +1,11 @@
 package com.xeppaka.lentareader.data.dao.daoobjects;
 
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.widget.ImageView;
+
+import com.xeppaka.lentareader.async.AsyncListener;
 
 /**
  * 
@@ -11,17 +14,18 @@ import android.widget.ImageView;
  *
  */
 public interface BitmapReference {
-
-	public interface LoadListener {
-		void onSuccess(Bitmap bitmap);
-        void onFailure(Exception e);
-	}
-
     Bitmap getBitmap() throws Exception;
 	Bitmap getBitmap(ImageView view) throws Exception;
 	Bitmap getBitmapIfCached();
     Bitmap getBitmapIfCached(ImageView view);
-	AsyncTask getBitmapAsync(LoadListener loadListener);
-    AsyncTask getBitmapAsync(ImageView view, LoadListener loadListener);
+	AsyncTask getBitmapAsync(AsyncListener<Bitmap> listener);
+    AsyncTask getBitmapAsync(ImageView view, AsyncListener<Bitmap> listener);
 	void releaseBitmap();
+
+    Drawable getDrawable() throws Exception;
+    Drawable getDrawable(ImageView view) throws Exception;
+    Drawable getDrawableIfCached();
+    Drawable getDrawableIfCached(ImageView view);
+    AsyncTask getDrawableAsync(AsyncListener<Drawable> listener);
+    AsyncTask getDrawableAsync(ImageView view, AsyncListener<Drawable> listener);
 }

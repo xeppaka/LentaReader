@@ -3,10 +3,8 @@ package com.xeppaka.lentareader.downloader;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.http.AndroidHttpClient;
-import android.support.v7.appcompat.R;
 import android.util.Log;
 
-import com.xeppaka.lentareader.data.dao.daoobjects.ImageDao;
 import com.xeppaka.lentareader.downloader.exceptions.HttpStatusCodeException;
 import com.xeppaka.lentareader.utils.LentaConstants;
 

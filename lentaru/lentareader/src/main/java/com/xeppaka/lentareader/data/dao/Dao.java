@@ -1,5 +1,7 @@
 package com.xeppaka.lentareader.data.dao;
 
+import android.database.Cursor;
+
 import com.xeppaka.lentareader.data.db.SQLiteType;
 
 import java.util.List;
@@ -13,6 +15,8 @@ import java.util.List;
  *            is any class which can be saved into the database.
  */
 public interface Dao<T> extends DaoObservable<T> {
+    public static int NO_ID = -1;
+
 	/**
 	 * Create new object in the database (row in the table).
 	 * 
@@ -39,6 +43,13 @@ public interface Dao<T> extends DaoObservable<T> {
 	 *         data from the database.
 	 */
     List<T> read();
+
+    /**
+     * Read all news objects from database and return cursor.
+     *
+     * @return Cursor. It is caller's responsibility to close it.
+     */
+    Cursor readCursor();
 	
 	/**
 	 * Read some news object from the database specifying its id.
@@ -49,7 +60,17 @@ public interface Dao<T> extends DaoObservable<T> {
 	 *         found.
 	 */
 	T read(long id);
-	
+
+    /**
+     * Read some news object from the database specifying its id.
+     *
+     * @param id
+     *            unique id of the object. Returned by create method.
+     * @return Cursor. It is caller's responsibility to check if cursor
+     *                 is empty and close it.
+     */
+    Cursor readCursor(long id);
+
 	/**
 	 * Read some news objects from the database specifying its list of
 	 * ids.

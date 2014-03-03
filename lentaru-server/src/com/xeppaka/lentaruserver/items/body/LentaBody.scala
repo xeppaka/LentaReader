@@ -49,7 +49,13 @@ object LentaBody {
     }
 
     val imageCredits = imageCreditsPattern.findFirstIn(page) match {
-      case Some(imageCreditsPattern(credits)) => URLDecoder.decode(credits, "UTF-8")
+      case Some(imageCreditsPattern(credits)) => {
+        try {
+          URLDecoder.decode(credits, "UTF-8")
+        } catch {
+          case ex: Exception  => ""
+        }
+      }
       case None => ""
     }
 
@@ -59,9 +65,7 @@ object LentaBody {
     val newsWithoutAside = newsBodyAsidePattern.replaceAllIn(page, ASIDE)
     val newsWithoutMedia = newsBodyIframePattern.replaceAllIn(newsWithoutAside, IFRAME)
 
-    println(newsWithoutMedia)
-
-    val newsBody = newsBodyPattern.findFirstIn(newsWithoutMedia) match {
+    val newsBody = newsBodyPattern.findFirstIn(newsWithoutAside) match {
       case Some(newsBodyPattern(body)) => {
         parseBody(body.split(SEPARATOR_PLACEHOLDER_REGEX).toList, asides, iframes)
       }

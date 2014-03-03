@@ -5,7 +5,7 @@ import android.view.LayoutInflater;
 import android.widget.BaseAdapter;
 
 import com.xeppaka.lentareader.data.NewsObject;
-import com.xeppaka.lentareader.data.dao.daoobjects.ImageDao;
+import com.xeppaka.lentareader.data.dao.daoobjects.imagedaoobjects.ImageDao;
 
 import java.util.Collections;
 import java.util.List;

@@ -1,9 +1,9 @@
 package com.xeppaka.lentareader.ui.fragments;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.os.AsyncTask;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -20,29 +20,22 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.xeppaka.lentareader.R;
+import com.xeppaka.lentareader.async.AsyncListener;
 import com.xeppaka.lentareader.data.News;
 import com.xeppaka.lentareader.data.body.Body;
 import com.xeppaka.lentareader.data.body.items.Item;
 import com.xeppaka.lentareader.data.body.items.ItemPreferences;
-import com.xeppaka.lentareader.data.comments.Comment;
-import com.xeppaka.lentareader.data.comments.Comments;
+import com.xeppaka.lentareader.data.dao.Dao;
 import com.xeppaka.lentareader.data.dao.async.AsyncDao;
 import com.xeppaka.lentareader.data.dao.daoobjects.BitmapReference;
-import com.xeppaka.lentareader.data.dao.daoobjects.ImageDao;
+import com.xeppaka.lentareader.data.dao.daoobjects.imagedaoobjects.ImageDao;
 import com.xeppaka.lentareader.data.dao.daoobjects.NewsDao;
-import com.xeppaka.lentareader.downloader.LentaCommentsDownloader;
-import com.xeppaka.lentareader.downloader.exceptions.HttpStatusCodeException;
-import com.xeppaka.lentareader.parser.comments.CommentsParser;
-import com.xeppaka.lentareader.parser.exceptions.ParseException;
+import com.xeppaka.lentareader.data.dao.daoobjects.imagedaoobjects.NewsImageKeyCreator;
+import com.xeppaka.lentareader.ui.activities.CommentsActivity;
 import com.xeppaka.lentareader.utils.LentaTextUtils;
 import com.xeppaka.lentareader.utils.PreferencesConstants;
 
-import java.io.IOException;
-import java.util.List;
-
 public class NewsFullFragment extends Fragment {
-    public static final long NO_NEWS_ID = -1;
-
     private ScrollView scrollContainer;
 	private ImageView imageView;
     private TextView imageCaption;
@@ -53,16 +46,14 @@ public class NewsFullFragment extends Fragment {
     private TextView rubricViewTitle;
     private TextView rubricView;
     private Button buttonLoadComments;
-    private TextView commentsView;
 
-    private long newsId = NO_NEWS_ID;
+    private long newsId = Dao.NO_ID;
 	private News loadedNews;
 
     private AsyncDao<News> newsDao;
 
     private boolean downloadImages;
     private int textSize;
-    private boolean resumed;
 
     private int scrollY;
 
@@ -111,25 +102,19 @@ public class NewsFullFragment extends Fragment {
         buttonLoadComments.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                loadComments();
+                if (loadedNews != null) {
+                    loadComments(loadedNews.getGuid());
+                }
             }
         });
-        commentsView = (TextView)view.findViewById(R.id.full_news_comments);
 
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         downloadImages = preferences.getBoolean(PreferencesConstants.PREF_KEY_DOWNLOAD_IMAGE_FULL, PreferencesConstants.DOWNLOAD_IMAGE_FULL_DEFAULT);
         textSize = preferences.getInt(PreferencesConstants.PREF_KEY_NEWS_FULL_TEXT_SIZE, PreferencesConstants.NEWS_FULL_TEXT_SIZE_DEFAULT);
 
-        if (newsId >= 0) {
+        if (newsId != Dao.NO_ID) {
             loadNews(newsId);
         }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        resumed = true;
     }
 
     @Override
@@ -209,20 +194,13 @@ public class NewsFullFragment extends Fragment {
         dateView.setText(news.getFormattedPubDate());
         rubricView.setText(" " + news.getRubric().getLabel());
 
-        new Handler().post(new Runnable() {
-            @Override
-            public void run() {
-                scrollContainer.scrollTo(0, scrollY);
-            }
-        });
-
         if (news.hasImage()) {
-            final BitmapReference bitmapRef = ImageDao.newInstance(getActivity()).read(news.getImageLink());
+            final BitmapReference bitmapRef = ImageDao.newInstance(getActivity()).read(news.getImageLink(), NewsImageKeyCreator.getInstance());
 
             if (downloadImages) {
-                bitmapRef.getBitmapAsync(imageView, new BitmapReference.LoadListener() {
+                bitmapRef.getDrawableAsync(imageView, new AsyncListener<Drawable>() {
                     @Override
-                    public void onSuccess(final Bitmap bitmap) {
+                    public void onSuccess(final Drawable bitmap) {
                         if (isResumed()) {
                             setNewsImage(news, bitmap);
                         }
@@ -232,17 +210,26 @@ public class NewsFullFragment extends Fragment {
                     public void onFailure(Exception e) {}
                 });
             } else {
-                final Bitmap bitmap = bitmapRef.getBitmapIfCached(imageView);
+                final Drawable drawable = bitmapRef.getDrawableIfCached(imageView);
 
-                if (bitmap != null) {
-                    setNewsImage(news, bitmap);
+                if (drawable != null) {
+                    setNewsImage(news, drawable);
                 }
             }
         }
-	}
 
-    private void setNewsImage(News news, Bitmap bitmap) {
-        imageView.setImageBitmap(bitmap);
+        scrollContainer.requestLayout();
+
+//        new Handler().post(new Runnable() {
+//            @Override
+//            public void run() {
+                scrollContainer.scrollTo(0, scrollY);
+//            }
+//        });
+    }
+
+    private void setNewsImage(News news, Drawable drawable) {
+        imageView.setImageDrawable(drawable);
         imageView.setVisibility(View.VISIBLE);
 
         if (news.hasImageCaption()) {
@@ -267,29 +254,32 @@ public class NewsFullFragment extends Fragment {
     }
 
     public void loadNews(long newsId) {
-        newsDao.readAsync(newsId, new AsyncDao.DaoReadSingleListener<News>() {
+        newsDao.readAsync(newsId, new AsyncListener<News>() {
             @Override
-            public void finished(News result) {
+            public void onSuccess(News result) {
                 loadedNews = result;
 
-                if (result != null) {
+                if (result != null && isResumed()) {
                     if (isResumed()) {
-                        if (resumed) {
-                            renderNewsAsync(loadedNews);
-                        }
+                        renderNewsAsync(loadedNews);
                     }
 
                     if (!result.isRead()) {
                         result.setRead(true);
 
-                        newsDao.updateAsync(result, new AsyncDao.DaoUpdateListener() {
+                        newsDao.updateAsync(result, new AsyncListener<Integer>() {
                             @Override
-                            public void finished(int rowsUpdated) {
-                            }
+                            public void onSuccess(Integer rowsUpdated) {}
+
+                            @Override
+                            public void onFailure(Exception e) {}
                         });
                     }
                 }
             }
+
+            @Override
+            public void onFailure(Exception e) {}
         });
     }
 
@@ -301,42 +291,10 @@ public class NewsFullFragment extends Fragment {
         return null;
     }
 
-    private class LoadCommentsAsync extends AsyncTask<String, Void, String> {
-        @Override
-        protected String doInBackground(String... params) {
-            try {
-                return LentaCommentsDownloader.download(loadedNews.getLink());
-            } catch (HttpStatusCodeException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+    private void loadComments(String xid) {
+        final Intent intent = new Intent(getActivity(), CommentsActivity.class);
+        intent.putExtra("xid", xid);
 
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            CommentsParser parser = new CommentsParser();
-
-            try {
-                Comments comments = parser.parse(s);
-                List<Comment> orderedComments = comments.getOrderedComments();
-
-                StringBuilder sb = new StringBuilder();
-                for (Comment comment : orderedComments) {
-                    sb.append(comment.getText()).append("\n");
-                }
-
-                commentsView.setText(sb.toString());
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private void loadComments() {
-        AsyncTask<String, Void, String> tt = new LoadCommentsAsync();
-        tt.execute(loadedNews.getLink());
+        startActivity(intent);
     }
 }

@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.xeppaka.lentareader.R;
+import com.xeppaka.lentareader.data.dao.Dao;
 import com.xeppaka.lentareader.ui.fragments.NewsFullFragment;
 import com.xeppaka.lentareader.utils.LentaDebugUtils;
 
@@ -30,9 +31,9 @@ public class NewsFullActivity extends ActionBarActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 		setContentView(R.layout.full_news_activity);
-		long newsId = getIntent().getLongExtra("newsId", -1);
+		long newsId = getIntent().getLongExtra("newsId", Dao.NO_ID);
 		
-		if (newsId >= 0) {
+		if (newsId != Dao.NO_ID) {
 			fullNewsFragment = new NewsFullFragment(newsId);
 			getSupportFragmentManager().beginTransaction().replace(R.id.full_news_fragment_container, fullNewsFragment).commit();
 		}

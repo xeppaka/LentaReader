@@ -8,6 +8,7 @@ import android.util.AttributeSet;
 import android.widget.Toast;
 
 import com.xeppaka.lentareader.R;
+import com.xeppaka.lentareader.async.AsyncListener;
 import com.xeppaka.lentareader.data.dao.async.AsyncDao;
 import com.xeppaka.lentareader.data.dao.daoobjects.NewsDao;
 
@@ -26,12 +27,15 @@ public class NewsDeleteCache extends Preference {
             public void onClick(final DialogInterface dialog, int which) {
                 dialog.dismiss();
 
-                NewsDao.getInstance(getContext().getContentResolver()).deleteAsync(new AsyncDao.DaoDeleteListener() {
+                NewsDao.getInstance(getContext().getContentResolver()).deleteAsync(new AsyncListener<Integer>() {
                     @Override
-                    public void finished(int rowsDeleted) {
+                    public void onSuccess(Integer rowsDeleted) {
                         final String result = getContext().getResources().getString(R.string.news_clear_cache_result);
                         Toast.makeText(getContext(), String.format(result, rowsDeleted), Toast.LENGTH_SHORT).show();
                     }
+
+                    @Override
+                    public void onFailure(Exception e) {}
                 });
             }
         };

@@ -3,8 +3,8 @@ package com.xeppaka.lentaruserver.items
 import com.xeppaka.lentaruserver.NewsType.NewsType
 import com.xeppaka.lentaruserver.Rubrics.Rubrics
 import scala.xml.XML
-import com.xeppaka.lentaruserver.{Downloader, Lenta}
 import java.util.logging.{SimpleFormatter, StreamHandler, Logger}
+import com.xeppaka.lentaruserver.{Lenta, Downloader}
 
 /**
  * Created with IntelliJ IDEA.

@@ -8,7 +8,6 @@ import java.io.{InputStreamReader, BufferedReader}
 import org.apache.http.util.EntityUtils
 import java.util.logging.{SimpleFormatter, StreamHandler, Logger, Level}
 import org.apache.http.impl.client.HttpClients
-import org.apache.http.config.{SocketConfig, ConnectionConfig}
 
 /**
  * Created by nnm on 1/16/14.
@@ -58,3 +57,5 @@ object Downloader {
     }
   }
 }
+
+class Downloader {}

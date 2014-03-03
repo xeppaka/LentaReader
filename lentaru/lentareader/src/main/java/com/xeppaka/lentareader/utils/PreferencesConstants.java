@@ -15,7 +15,7 @@ public class PreferencesConstants {
     public static final boolean DOWNLOAD_IMAGE_THUMBNAILS_DEFAULT = true;
     public static final boolean DOWNLOAD_IMAGE_FULL_DEFAULT = true;
     public static final boolean NEWS_DELETE_NEWS_DEFAULT = true;
-    public static final int NEWS_DELETE_NEWS_DAYS_DEFAULT = 4;
+    public static final int NEWS_DELETE_NEWS_DAYS_DEFAULT = 5;
     public static final int NEWS_LIST_TEXT_SIZE_DEFAULT = 14;
     public static final int NEWS_FULL_TEXT_SIZE_DEFAULT = 16;
     public static final boolean NEWS_AUTO_REFRESH_DEFAULT = true;
