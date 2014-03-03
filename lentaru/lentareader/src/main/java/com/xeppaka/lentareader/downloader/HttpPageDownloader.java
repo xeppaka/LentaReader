@@ -51,7 +51,7 @@ public class HttpPageDownloader {
 		final AndroidHttpClient client = AndroidHttpClient.newInstance(LentaConstants.UserAgent);
 		final HttpGet getRequest = new HttpGet(url);
 		getRequest.addHeader("Accept", "*/*");
-		getRequest.addHeader("Accept-Encoding", "gzip,deflate,sdch");
+		getRequest.addHeader("Accept-Encoding", "gzip");
 		//getRequest.addHeader("Host", "lenta.ru");
 		
 		try {
@@ -65,14 +65,21 @@ public class HttpPageDownloader {
 			
 			final HttpEntity entity = response.getEntity();
 			if (entity != null) {
-//                final Header contentEncoding = response.getFirstHeader("Content-Encoding");
-//                if (contentEncoding != null && contentEncoding.getName().equalsIgnoreCase("gzip")) {
-//                    final InputStream ungzippedStream = AndroidHttpClient.getUngzippedContent(entity);
-//                    final BufferedReader reader = new BufferedReader(new InputStreamReader(ungzippedStream));
-//
-//                } else {
+                final Header contentEncoding = response.getFirstHeader("Content-Encoding");
+                if (contentEncoding != null && contentEncoding.getName().equalsIgnoreCase("gzip")) {
+                    final InputStream ungzippedStream = AndroidHttpClient.getUngzippedContent(entity);
+                    final BufferedReader reader = new BufferedReader(new InputStreamReader(ungzippedStream));
+                    final StringBuilder sb = new StringBuilder();
+
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        sb.append(line);
+                    }
+
+                    return sb.toString();
+                } else {
                     return EntityUtils.toString(entity, "UTF-8");
-//                }
+                }
 			}
 		} finally {
 			if (client != null) {
