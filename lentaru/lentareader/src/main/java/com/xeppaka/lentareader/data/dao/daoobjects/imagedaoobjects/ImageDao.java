@@ -1,4 +1,4 @@
-package com.xeppaka.lentareader.data.dao.daoobjects;
+package com.xeppaka.lentareader.data.dao.daoobjects.imagedaoobjects;
 
 import android.app.ActivityManager;
 import android.content.Context;
@@ -19,6 +19,8 @@ import android.widget.ImageView;
 import com.xeppaka.lentareader.R;
 import com.xeppaka.lentareader.async.AsyncListener;
 import com.xeppaka.lentareader.data.dao.DaoObservable;
+import com.xeppaka.lentareader.data.dao.daoobjects.BitmapReference;
+import com.xeppaka.lentareader.data.dao.daoobjects.StrongBitmapReference;
 import com.xeppaka.lentareader.downloader.LentaHttpImageDownloader;
 import com.xeppaka.lentareader.downloader.exceptions.HttpStatusCodeException;
 import com.xeppaka.lentareader.utils.LentaConstants;
@@ -150,15 +152,15 @@ public class ImageDao implements DaoObservable<BitmapReference> {
         return INSTANCE;
     }
 
-    public BitmapReference read(String imageUrl) {
-        return read(imageUrl, false);
+    public BitmapReference read(String imageUrl, ImageKeyCreator keyCreator) {
+        return read(imageUrl, keyCreator, false);
     }
 
-    public BitmapReference readThumbnail(String imageUrl) {
-        return readThumbnail(imageUrl, false);
+    public BitmapReference readThumbnail(String imageUrl, ImageKeyCreator keyCreator) {
+        return readThumbnail(imageUrl, keyCreator, false);
     }
 
-    private BitmapReference readThumbnail(String imageUrl, boolean cacheOnly) {
+    private BitmapReference readThumbnail(String imageUrl, ImageKeyCreator keyCreator, boolean cacheOnly) {
         if (imageUrl == null || TextUtils.isEmpty(imageUrl)) {
             Log.d(LentaConstants.LoggerAnyTag,
                     "ImageDao trying to read image with empty URL");
@@ -173,7 +175,7 @@ public class ImageDao implements DaoObservable<BitmapReference> {
 
         String imageKey;
         try {
-            imageKey = URLHelper.getImageId(imageUrl);
+            imageKey = keyCreator.getImageKey(imageUrl);
         } catch (MalformedURLException e) {
             Log.e(LentaConstants.LoggerAnyTag, "Error getting key for image URL: " + imageUrl);
             return getNotAvailableThumbnailImage();
@@ -199,7 +201,7 @@ public class ImageDao implements DaoObservable<BitmapReference> {
         return imageRef;
     }
 
-    private BitmapReference read(String imageUrl, boolean cacheOnly) {
+    private BitmapReference read(String imageUrl, ImageKeyCreator keyCreator, boolean cacheOnly) {
         if (imageUrl == null || TextUtils.isEmpty(imageUrl)) {
             Log.d(LentaConstants.LoggerAnyTag,
                     "ImageDao trying to read image with empty URL");
@@ -212,7 +214,7 @@ public class ImageDao implements DaoObservable<BitmapReference> {
 
         String imageKey;
         try {
-            imageKey = URLHelper.getImageId(imageUrl);
+            imageKey = keyCreator.getImageKey(imageUrl);
         } catch (MalformedURLException e) {
             Log.e(LentaConstants.LoggerAnyTag, "Error getting key for image URL: " + imageUrl);
             return getNotAvailableImage();

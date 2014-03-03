@@ -1,7 +1,6 @@
 package com.xeppaka.lentareader.ui.adapters;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.text.Html;
@@ -15,7 +14,8 @@ import com.xeppaka.lentareader.R;
 import com.xeppaka.lentareader.async.AsyncListener;
 import com.xeppaka.lentareader.data.News;
 import com.xeppaka.lentareader.data.dao.daoobjects.BitmapReference;
-import com.xeppaka.lentareader.data.dao.daoobjects.ImageDao;
+import com.xeppaka.lentareader.data.dao.daoobjects.imagedaoobjects.ImageDao;
+import com.xeppaka.lentareader.data.dao.daoobjects.imagedaoobjects.NewsImageKeyCreator;
 import com.xeppaka.lentareader.utils.LentaTextUtils;
 
 public class NewsAdapter extends NewsObjectAdapter<News> {
@@ -293,7 +293,7 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
             BitmapReference bitmapRef;
 
             if (news.hasImage()) {
-                bitmapRef = imageDao.readThumbnail(news.getImageLink());
+                bitmapRef = imageDao.readThumbnail(news.getImageLink(), NewsImageKeyCreator.getInstance());
                 newsImageView.setImageBitmap(ImageDao.getLoadingThumbnailImage().getBitmapIfCached());
 
                 final ViewHolder holderForAsync = holder;
@@ -338,7 +338,7 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
             }
         } else {
             if (news.hasImage()) {
-                final BitmapReference bitmapRef = imageDao.readThumbnail(news.getImageLink());
+                final BitmapReference bitmapRef = imageDao.readThumbnail(news.getImageLink(), NewsImageKeyCreator.getInstance());
                 final Drawable drawable;
 
                 if ((drawable = bitmapRef.getDrawableIfCached(newsImageView)) != null) {

@@ -3,7 +3,6 @@ package com.xeppaka.lentareader.ui.fragments;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -29,8 +28,9 @@ import com.xeppaka.lentareader.data.body.items.ItemPreferences;
 import com.xeppaka.lentareader.data.dao.Dao;
 import com.xeppaka.lentareader.data.dao.async.AsyncDao;
 import com.xeppaka.lentareader.data.dao.daoobjects.BitmapReference;
-import com.xeppaka.lentareader.data.dao.daoobjects.ImageDao;
+import com.xeppaka.lentareader.data.dao.daoobjects.imagedaoobjects.ImageDao;
 import com.xeppaka.lentareader.data.dao.daoobjects.NewsDao;
+import com.xeppaka.lentareader.data.dao.daoobjects.imagedaoobjects.NewsImageKeyCreator;
 import com.xeppaka.lentareader.ui.activities.CommentsActivity;
 import com.xeppaka.lentareader.utils.LentaTextUtils;
 import com.xeppaka.lentareader.utils.PreferencesConstants;
@@ -195,7 +195,7 @@ public class NewsFullFragment extends Fragment {
         rubricView.setText(" " + news.getRubric().getLabel());
 
         if (news.hasImage()) {
-            final BitmapReference bitmapRef = ImageDao.newInstance(getActivity()).read(news.getImageLink());
+            final BitmapReference bitmapRef = ImageDao.newInstance(getActivity()).read(news.getImageLink(), NewsImageKeyCreator.getInstance());
 
             if (downloadImages) {
                 bitmapRef.getDrawableAsync(imageView, new AsyncListener<Drawable>() {

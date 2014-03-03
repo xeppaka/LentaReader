@@ -1,23 +1,19 @@
 package com.xeppaka.lentareader.ui.fragments;
 
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.AbsListView;
-import android.widget.ImageView;
 import android.widget.ListView;
 
-import com.xeppaka.lentareader.R;
 import com.xeppaka.lentareader.async.AsyncListener;
 import com.xeppaka.lentareader.data.News;
 import com.xeppaka.lentareader.data.NewsType;
 import com.xeppaka.lentareader.data.dao.Dao;
 import com.xeppaka.lentareader.data.dao.async.AsyncNODao;
 import com.xeppaka.lentareader.data.dao.daoobjects.DaoObserver;
-import com.xeppaka.lentareader.data.dao.daoobjects.ImageDao;
 import com.xeppaka.lentareader.data.dao.daoobjects.NewsDao;
 import com.xeppaka.lentareader.ui.adapters.NewsAdapter;
 import com.xeppaka.lentareader.ui.adapters.NewsObjectAdapter;

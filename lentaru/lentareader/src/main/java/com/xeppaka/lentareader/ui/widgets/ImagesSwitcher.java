@@ -2,7 +2,6 @@ package com.xeppaka.lentareader.ui.widgets;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -15,7 +14,8 @@ import android.widget.ImageView;
 import com.xeppaka.lentareader.async.AsyncListener;
 import com.xeppaka.lentareader.data.body.items.LentaBodyItemImage;
 import com.xeppaka.lentareader.data.dao.daoobjects.BitmapReference;
-import com.xeppaka.lentareader.data.dao.daoobjects.ImageDao;
+import com.xeppaka.lentareader.data.dao.daoobjects.imagedaoobjects.ImageDao;
+import com.xeppaka.lentareader.data.dao.daoobjects.imagedaoobjects.NewsImageKeyCreator;
 
 import java.util.List;
 
@@ -73,7 +73,7 @@ public class ImagesSwitcher extends ViewPager {
                 }
             }
 
-            final BitmapReference bitmapRef = imageDao.read(url);
+            final BitmapReference bitmapRef = imageDao.read(url, NewsImageKeyCreator.getInstance());
 
             Bitmap bitmap;
             if ((bitmap = bitmapRef.getBitmapIfCached(currentImageView)) != null) {
