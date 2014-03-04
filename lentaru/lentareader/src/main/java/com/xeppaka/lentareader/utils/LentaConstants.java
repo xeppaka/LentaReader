@@ -9,7 +9,8 @@ public class LentaConstants {
 	public static final String LoggerProviderTag = "LentaAndProvider";
 	public static final String LoggerAnyTag = "LentaAndAny";
 	public static final String LENTA_URL_ROOT = "http://lenta.ru";
-    public static final String OWNSERVER_URL_ROOT = "http://188.226.168.63";
+    public static final String OWNSERVER_URL_ROOT = "http://news.lentaru.eu";
+    public static final String OWNSERVER_URL_ROOT_JOLLA = "http://188.226.168.63";
 	public static final String UserAgent = "Android LentaReader";
 
     public static final String RSS_PATH_ROOT = "/rss";
@@ -22,7 +23,7 @@ public class LentaConstants {
     public static int BITMAP_CACHE_TRIM_MAX_SIZE_IN_BYTES = 2 * 1024 * 1024; // 2 MB
     public static int THUMBNAILS_BITMAP_CACHE_TRIM_MAX_SIZE_IN_BYTES = 512 * 1024; // 512 KB
 
-	public static final boolean DEVELOPER_MODE = false;
+	public static final boolean DEVELOPER_MODE = true;
 
     public static final String[] MONTHS_RUS = new String[12];
     public static final String[] MONTHS_SHORT_RUS = new String[12];
@@ -30,7 +31,6 @@ public class LentaConstants {
     public static final String[] DAYS_SHORT_RUS = new String[8];
 
     public static final int WITHOUT_PICTURE_LIMIT = 10;
-    public static final int COMMENT_INDENT_MARGIN = 7;
 
     static {
         MONTHS_RUS[Calendar.JANUARY] = "января";

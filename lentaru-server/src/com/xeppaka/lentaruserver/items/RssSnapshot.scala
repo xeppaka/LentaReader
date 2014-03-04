@@ -5,6 +5,9 @@ import com.xeppaka.lentaruserver.Rubrics.Rubrics
 import scala.xml.XML
 import java.util.logging.{SimpleFormatter, StreamHandler, Logger}
 import com.xeppaka.lentaruserver.{Lenta, Downloader}
+import scala.concurrent.{Await, Future, future}
+import scala.concurrent.duration._
+import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
  * Created with IntelliJ IDEA.
@@ -63,13 +66,16 @@ object RssSnapshot {
   def downloadRss(newsType: NewsType, rubric: Rubrics): Option[RssSnapshot] = {
     val url = Lenta.url(newsType, rubric)
 
-    Downloader.download(url).flatMap(v => {
-      val xml = XML.loadString(v)
-      val rawRssItems = xml \\ "item"
-      val rssItems = rawRssItems.map(item => RssItem(item)).toList.take(MAX_ITEMS)
+    val f: Future[Option[RssSnapshot]] = future { Downloader.download(url).flatMap(v => {
+        val xml = XML.loadString(v)
+        val rawRssItems = xml \\ "item"
+        val rssItems = rawRssItems.map(item => RssItem(item)).toList.take(MAX_ITEMS)
 
-      Some(RssSnapshot(newsType, rubric, rssItems))
-    })
+        Some(RssSnapshot(newsType, rubric, rssItems))
+      })
+    }
+
+    Await.result(f, Duration(10, SECONDS))
   }
 
   def apply(newsType: NewsType, rubric: Rubrics, rssItems: List[RssItem]): RssSnapshot = new RssSnapshot(newsType, rubric, rssItems)

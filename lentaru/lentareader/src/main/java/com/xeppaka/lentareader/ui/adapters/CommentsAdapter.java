@@ -23,6 +23,8 @@ import java.util.List;
  * Created by nnm on 3/1/14.
  */
 public class CommentsAdapter extends BaseAdapter {
+    public static final int COMMENT_INDENT_MARGIN = 8;
+
     private boolean downloadImages;
     private int textSize;
     private LayoutInflater inflater;
@@ -159,7 +161,7 @@ public class CommentsAdapter extends BaseAdapter {
         }
 
         final LinearLayout.LayoutParams imageViewLayoutParams = (LinearLayout.LayoutParams) imageView.getLayoutParams();
-        final int marginLeft = comment.getDepth() > 5 ? 5 * LentaConstants.COMMENT_INDENT_MARGIN : comment.getDepth() * LentaConstants.COMMENT_INDENT_MARGIN;
+        final int marginLeft = comment.getDepth() > 5 ? 5 * COMMENT_INDENT_MARGIN : comment.getDepth() * COMMENT_INDENT_MARGIN;
 
         imageViewLayoutParams.setMargins(marginLeft, 0, 0, 0);
 

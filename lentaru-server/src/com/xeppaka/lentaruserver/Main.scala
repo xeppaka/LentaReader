@@ -1,11 +1,12 @@
 package com.xeppaka.lentaruserver
 
 import com.xeppaka.lentaruserver.fs.FileSystem
-import java.nio.file.FileSystems
+import java.nio.file.{Files, FileSystems}
 import com.xeppaka.lentaruserver.items.RssSnapshot
 import com.xeppaka.lentaruserver.Rubrics.Rubrics
 import scala.None
 import java.util.logging.{SimpleFormatter, StreamHandler, Logger}
+import java.io.{InputStreamReader, BufferedReader, BufferedInputStream}
 
 object Main extends App {
   private val logger = Logger.getLogger(Main.getClass.getName)
@@ -23,6 +24,8 @@ object Main extends App {
     while (true) {
       Rubrics.values.foreach(rubric => {
         val curdir = FileSystem.createFullPath(rootPath.toString, NewsType.NEWS, rubric)
+        val curdir_tmp = FileSystem.createFullTmpPath(rootPath.toString, NewsType.NEWS, rubric)
+        val curdir_tmp2 = FileSystem.createFullTmp2Path(rootPath.toString, NewsType.NEWS, rubric)
         val cursnapshot = snapshots.get(rubric)
 
         logger.info("Downloading rss snapshot for " + rubric.toString + "... ")
@@ -66,12 +69,22 @@ object Main extends App {
               case Some(snap) => {
                 snapshots = snapshots.updated(rubric, snap)
 
-                logger.info("Deleting xmls in " + curdir.toString + "... ")
-                FileSystem.clean(curdir)
+                logger.info("Writing xmls in " + curdir_tmp.toString + "... ")
+                snap.writeXmlSet(curdir_tmp)
                 logger.info("Done")
 
-                logger.info("Writing xmls in " + curdir.toString + "... ")
-                snap.writeXmlSet(curdir)
+                logger.info("Creating gzipped xmls... ")
+                FileSystem.gzip(curdir_tmp)
+                logger.info("Done")
+
+                logger.info("Swapping directories...")
+                Files.move(curdir, curdir_tmp2)
+                Files.move(curdir_tmp, curdir)
+                Files.move(curdir_tmp2, curdir_tmp)
+                logger.info("Done")
+
+                logger.info("Deleting xmls in " + curdir_tmp.toString + "... ")
+                FileSystem.clean(curdir_tmp)
                 logger.info("Done")
               }
               case None =>

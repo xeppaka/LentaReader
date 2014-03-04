@@ -5,6 +5,9 @@ import java.util.logging.{SimpleFormatter, StreamHandler, Logger}
 import scala.util.parsing.json.JSON
 import java.net.URLDecoder
 import com.xeppaka.lentaruserver.Downloader
+import scala.concurrent.{Await, Future, future}
+import scala.concurrent.duration._
+import scala.concurrent.ExecutionContext.Implicits.global
 
 abstract class LentaBody extends ItemBase {
   val items: List[ItemBase]
@@ -39,7 +42,9 @@ object LentaBody {
   val iframeUrlPattern = "src=[\'\"](.+?)[\'\"]".r
 
   def downloadNews(url: String): Option[LentaNewsBody] = {
-    Downloader.download(url).flatMap(f => Some(parseNews(f)))
+    val f: Future[Option[LentaNewsBody]] = future { Downloader.download(url).flatMap(f => Some(parseNews(f))) }
+
+    Await.result(f, Duration(10, SECONDS))
   }
 
   def parseNews(page: String): LentaNewsBody = {

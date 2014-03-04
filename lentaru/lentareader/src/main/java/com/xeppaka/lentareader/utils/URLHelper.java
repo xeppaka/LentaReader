@@ -29,11 +29,19 @@ public class URLHelper {
 	}
 
     public static String getXmlForRubric(Rubrics rubric, NewsType type) {
-        return LentaConstants.OWNSERVER_URL_ROOT + rubric.getXmlPath(type);
+        if (LentaConstants.DEVELOPER_MODE) {
+            return LentaConstants.OWNSERVER_URL_ROOT_JOLLA + rubric.getXmlPath(type);
+        } else {
+            return LentaConstants.OWNSERVER_URL_ROOT + rubric.getXmlPath(type);
+        }
     }
 
     public static String getXmlForRubric(Rubrics rubric, NewsType type, long fromDate) {
-        return LentaConstants.OWNSERVER_URL_ROOT + rubric.getXmlPath(type) + String.valueOf(fromDate) + ".xml";
+        if (LentaConstants.DEVELOPER_MODE) {
+            return LentaConstants.OWNSERVER_URL_ROOT_JOLLA + rubric.getXmlPath(type) + String.valueOf(fromDate) + ".xml";
+        } else {
+            return LentaConstants.OWNSERVER_URL_ROOT + rubric.getXmlPath(type) + String.valueOf(fromDate) + ".xml";
+        }
     }
 
 	/**
