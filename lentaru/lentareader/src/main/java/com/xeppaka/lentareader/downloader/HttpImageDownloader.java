@@ -19,7 +19,7 @@ import org.apache.http.params.HttpParams;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class LentaHttpImageDownloader {
+public class HttpImageDownloader {
     public static Bitmap downloadBitmap(String url) throws HttpStatusCodeException, IOException {
         HttpParams httpParameters = new BasicHttpParams();
         HttpConnectionParams.setConnectionTimeout(httpParameters, 2000);

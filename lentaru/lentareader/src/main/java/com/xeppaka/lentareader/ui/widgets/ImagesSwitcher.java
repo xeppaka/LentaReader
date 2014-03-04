@@ -123,7 +123,7 @@ public class ImagesSwitcher extends ViewPager {
     public ImagesSwitcher(Context context, List<LentaBodyItemImage> images, OnClickListener onClickListener, boolean preview) {
         super(context);
 
-        this.imageDao = ImageDao.newInstance(context);
+        this.imageDao = ImageDao.getInstance(context);
         this.preview = preview;
 
         setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0));

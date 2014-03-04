@@ -21,10 +21,9 @@ import com.xeppaka.lentareader.async.AsyncListener;
 import com.xeppaka.lentareader.data.dao.DaoObservable;
 import com.xeppaka.lentareader.data.dao.daoobjects.BitmapReference;
 import com.xeppaka.lentareader.data.dao.daoobjects.StrongBitmapReference;
-import com.xeppaka.lentareader.downloader.LentaHttpImageDownloader;
+import com.xeppaka.lentareader.downloader.HttpImageDownloader;
 import com.xeppaka.lentareader.downloader.exceptions.HttpStatusCodeException;
 import com.xeppaka.lentareader.utils.LentaConstants;
-import com.xeppaka.lentareader.utils.URLHelper;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -92,7 +91,7 @@ public class ImageDao implements DaoObservable<BitmapReference> {
         return INSTANCE;
     }
 
-    public static ImageDao newInstance(Context context) {
+    public static ImageDao getInstance(Context context) {
         final Resources resources = context.getResources();
 
         if (bitmapCache == null || thumbnailsBitmapCache == null) {
@@ -152,56 +151,27 @@ public class ImageDao implements DaoObservable<BitmapReference> {
         return INSTANCE;
     }
 
+    public BitmapReference read(String imageUrl, String imageKey) {
+        return read(imageUrl, imageKey, false);
+    }
+
     public BitmapReference read(String imageUrl, ImageKeyCreator keyCreator) {
         return read(imageUrl, keyCreator, false);
     }
 
-    public BitmapReference readThumbnail(String imageUrl, ImageKeyCreator keyCreator) {
-        return readThumbnail(imageUrl, keyCreator, false);
-    }
-
-    private BitmapReference readThumbnail(String imageUrl, ImageKeyCreator keyCreator, boolean cacheOnly) {
-        if (imageUrl == null || TextUtils.isEmpty(imageUrl)) {
-            Log.d(LentaConstants.LoggerAnyTag,
-                    "ImageDao trying to read image with empty URL");
-
-            return getNotAvailableThumbnailImage();
-        }
-
-        Log.d(LentaConstants.LoggerAnyTag,
-                "ImageDao read thumbnail bitmap with URL: " + imageUrl);
-        Log.d(LentaConstants.LoggerAnyTag,
-                "Caches sizes: full bitmap cache is " + bitmapCache.size() + ", thumbnail bitmap cache is " + thumbnailsBitmapCache.size());
-
+    public BitmapReference read(String imageUrl, ImageKeyCreator keyCreator, boolean cacheOnly) {
         String imageKey;
         try {
             imageKey = keyCreator.getImageKey(imageUrl);
         } catch (MalformedURLException e) {
             Log.e(LentaConstants.LoggerAnyTag, "Error getting key for image URL: " + imageUrl);
-            return getNotAvailableThumbnailImage();
+            return getNotAvailableImage();
         }
 
-        CachedLazyLoadBitmapReference imageRef;
-        synchronized(thumbnailsBitmapCache) {
-            imageRef = thumbnailsBitmapCache.get(imageKey);
-        }
-
-        if (cacheOnly || imageRef != null) {
-            Log.d(LentaConstants.LoggerAnyTag, "Found thumbnail in cache. Bitmap size: " + imageRef.bitmapSize());
-            return imageRef;
-        }
-
-        imageRef = new CachedLazyLoadBitmapReference(imageKey, imageUrl, true);
-        synchronized(thumbnailsBitmapCache) {
-            thumbnailsBitmapCache.put(imageKey, imageRef);
-        }
-
-        Log.d(LentaConstants.LoggerAnyTag, "Created empty lazy load reference.");
-
-        return imageRef;
+        return read(imageUrl, imageKey, cacheOnly);
     }
 
-    private BitmapReference read(String imageUrl, ImageKeyCreator keyCreator, boolean cacheOnly) {
+    public BitmapReference read(String imageUrl, String imageKey, boolean cacheOnly) {
         if (imageUrl == null || TextUtils.isEmpty(imageUrl)) {
             Log.d(LentaConstants.LoggerAnyTag,
                     "ImageDao trying to read image with empty URL");
@@ -211,14 +181,6 @@ public class ImageDao implements DaoObservable<BitmapReference> {
 
         Log.d(LentaConstants.LoggerAnyTag,
                 "ImageDao read bitmap with URL: " + imageUrl);
-
-        String imageKey;
-        try {
-            imageKey = keyCreator.getImageKey(imageUrl);
-        } catch (MalformedURLException e) {
-            Log.e(LentaConstants.LoggerAnyTag, "Error getting key for image URL: " + imageUrl);
-            return getNotAvailableImage();
-        }
 
         CachedLazyLoadBitmapReference imageRef;
         synchronized(bitmapCache) {
@@ -233,6 +195,59 @@ public class ImageDao implements DaoObservable<BitmapReference> {
         imageRef = new CachedLazyLoadBitmapReference(imageKey, imageUrl);
         synchronized(bitmapCache) {
             bitmapCache.put(imageKey, imageRef);
+        }
+
+        Log.d(LentaConstants.LoggerAnyTag, "Created empty lazy load reference.");
+
+        return imageRef;
+    }
+
+    public BitmapReference readThumbnail(String imageUrl, ImageKeyCreator keyCreator) {
+        return readThumbnail(imageUrl, keyCreator, false);
+    }
+
+    public BitmapReference readThumbnail(String imageUrl, ImageKeyCreator keyCreator, boolean cacheOnly) {
+        final String imageKey;
+        try {
+            imageKey = keyCreator.getImageKey(imageUrl);
+        } catch (MalformedURLException e) {
+            Log.e(LentaConstants.LoggerAnyTag, "Error getting key for image URL: " + imageUrl);
+            return getNotAvailableThumbnailImage();
+        }
+
+        return readThumbnail(imageUrl, imageKey, cacheOnly);
+    }
+
+    public BitmapReference readThumbnail(String imageUrl, String imageKey) {
+        return readThumbnail(imageUrl, imageKey, false);
+    }
+
+    public BitmapReference readThumbnail(String imageUrl, String imageKey, boolean cacheOnly) {
+        if (imageUrl == null || TextUtils.isEmpty(imageUrl)) {
+            Log.d(LentaConstants.LoggerAnyTag,
+                    "ImageDao trying to read image with empty URL");
+
+            return getNotAvailableThumbnailImage();
+        }
+
+        Log.d(LentaConstants.LoggerAnyTag,
+                "ImageDao read thumbnail bitmap with URL: " + imageUrl);
+        Log.d(LentaConstants.LoggerAnyTag,
+                "Caches sizes: full bitmap cache is " + bitmapCache.size() + ", thumbnail bitmap cache is " + thumbnailsBitmapCache.size());
+
+        CachedLazyLoadBitmapReference imageRef;
+        synchronized(thumbnailsBitmapCache) {
+            imageRef = thumbnailsBitmapCache.get(imageKey);
+        }
+
+        if (cacheOnly || imageRef != null) {
+            Log.d(LentaConstants.LoggerAnyTag, "Found thumbnail in cache. Bitmap size: " + imageRef.bitmapSize());
+            return imageRef;
+        }
+
+        imageRef = new CachedLazyLoadBitmapReference(imageKey, imageUrl, true);
+        synchronized(thumbnailsBitmapCache) {
+            thumbnailsBitmapCache.put(imageKey, imageRef);
         }
 
         Log.d(LentaConstants.LoggerAnyTag, "Created empty lazy load reference.");
@@ -757,7 +772,7 @@ public class ImageDao implements DaoObservable<BitmapReference> {
 
         private Bitmap downloadBitmap(boolean retry) throws IOException, HttpStatusCodeException {
             try {
-                return LentaHttpImageDownloader.downloadBitmap(url);
+                return HttpImageDownloader.downloadBitmap(url);
             } catch (OutOfMemoryError oome) {
                 if (!retry) {
                     makeSpace();

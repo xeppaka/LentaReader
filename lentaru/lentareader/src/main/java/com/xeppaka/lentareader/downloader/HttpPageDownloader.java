@@ -23,30 +23,6 @@ import java.io.InputStreamReader;
 
 public class HttpPageDownloader {
 	
-//	private static class FlushedInputStream extends FilterInputStream {
-//	    public FlushedInputStream(InputStream inputStream) {
-//	        super(inputStream);
-//	    }
-//
-//		@Override
-//		public long skip(long n) throws IOException {
-//			long totalBytesSkipped = 0L;
-//			while (totalBytesSkipped < n) {
-//				long bytesSkipped = in.skip(n - totalBytesSkipped);
-//				if (bytesSkipped == 0L) {
-//					int byteRead = read();
-//					if (byteRead < 0) {
-//						break; // we reached EOF
-//					} else {
-//						bytesSkipped = 1; // we read one byte
-//					}
-//				}
-//				totalBytesSkipped += bytesSkipped;
-//			}
-//			return totalBytesSkipped;
-//		}
-//	}
-	
 	public static String download(String url) throws HttpStatusCodeException, IOException {
 		final AndroidHttpClient client = AndroidHttpClient.newInstance(LentaConstants.UserAgent);
 		final HttpGet getRequest = new HttpGet(url);

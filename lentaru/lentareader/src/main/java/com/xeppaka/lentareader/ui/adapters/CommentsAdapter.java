@@ -2,6 +2,9 @@ package com.xeppaka.lentareader.ui.adapters;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
+import android.media.Image;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,9 +14,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.xeppaka.lentareader.R;
+import com.xeppaka.lentareader.async.AsyncListener;
 import com.xeppaka.lentareader.data.comments.Comment;
 import com.xeppaka.lentareader.data.comments.Comments;
-import com.xeppaka.lentareader.utils.LentaConstants;
+import com.xeppaka.lentareader.data.dao.daoobjects.BitmapReference;
+import com.xeppaka.lentareader.data.dao.daoobjects.imagedaoobjects.ImageDao;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,15 +32,20 @@ public class CommentsAdapter extends BaseAdapter {
 
     private boolean downloadImages;
     private int textSize;
-    private LayoutInflater inflater;
-    private String commentDeleted;
-    private String parentCommentText;
+    private final String commentDeleted;
+    private final String parentCommentText;
+    private final LayoutInflater inflater;
+    private final ImageDao imageDao;
+
+    private final HypercommentsAvatarUrlBuilder hypercommentsAvatarUrlBuilder;
 
     private Comments comments;
     private List<Comment> commentsList = Collections.emptyList();
 
     public CommentsAdapter(Context context) {
         inflater = LayoutInflater.from(context);
+        imageDao = ImageDao.getInstance(context);
+        hypercommentsAvatarUrlBuilder = new HypercommentsAvatarUrlBuilder();
 
         final Resources resources = context.getResources();
         commentDeleted = resources.getString(R.string.comment_deleted);
@@ -159,6 +169,20 @@ public class CommentsAdapter extends BaseAdapter {
         } else {
             textView.setText(commentDeleted);
         }
+
+        imageView.setImageDrawable(ImageDao.getLoadingThumbnailImage().getDrawableIfCached());
+
+        final ImageView imageViewForAsync = imageView;
+        final BitmapReference bitmapRef = imageDao.read(hypercommentsAvatarUrlBuilder.build(comment.getAccountId()), comment.getAccountId());
+        bitmapRef.getDrawableAsync(new AsyncListener<Drawable>() {
+            @Override
+            public void onSuccess(Drawable value) {
+                imageViewForAsync.setImageDrawable(value);
+            }
+
+            @Override
+            public void onFailure(Exception e) {}
+        });
 
         final LinearLayout.LayoutParams imageViewLayoutParams = (LinearLayout.LayoutParams) imageView.getLayoutParams();
         final int marginLeft = comment.getDepth() > 5 ? 5 * COMMENT_INDENT_MARGIN : comment.getDepth() * COMMENT_INDENT_MARGIN;
