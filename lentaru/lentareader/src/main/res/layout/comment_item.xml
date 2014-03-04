@@ -5,17 +5,17 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="2dip">
+    android:padding="3dip">
     <ImageView
         android:id="@+id/comment_image"
         android:layout_width="45dip"
         android:layout_height="45dip"
-        android:scaleType="fitXY"
-        android:layout_marginRight="2dip"/>
+        android:scaleType="fitXY"/>
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingLeft="3dip">
         <TextView
             android:id="@+id/comment_nick"
             android:textStyle="bold"
