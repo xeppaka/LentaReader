@@ -127,4 +127,13 @@ public class Comments implements Iterable<Comment> {
     public int size() {
         return commentById.size();
     }
+
+    public boolean isEmpty() {
+        return commentById.isEmpty();
+    }
+
+    public void clear() {
+        commentById.clear();
+        rootComments.clear();
+    }
 }

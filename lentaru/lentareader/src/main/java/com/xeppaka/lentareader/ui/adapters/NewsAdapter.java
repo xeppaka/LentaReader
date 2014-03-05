@@ -294,7 +294,7 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
 
             if (news.hasImage()) {
                 bitmapRef = imageDao.readThumbnail(news.getImageLink(), NewsImageKeyCreator.getInstance());
-                newsImageView.setImageBitmap(ImageDao.getLoadingThumbnailImage().getBitmapIfCached());
+                newsImageView.setImageDrawable(ImageDao.getLoadingThumbnailImage().getDrawableIfCached());
 
                 final ViewHolder holderForAsync = holder;
                 final String imageUrl = news.getImageLink();
@@ -323,7 +323,7 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
                             return;
                         }
 
-                        holderForAsync.getNewsImage().setImageBitmap(ImageDao.getNotAvailableThumbnailImage().getBitmapIfCached());
+                        holderForAsync.getNewsImage().setImageDrawable(ImageDao.getNotAvailableThumbnailImage().getDrawableIfCached());
                     }
                 });
 
@@ -344,7 +344,7 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
                 if ((drawable = bitmapRef.getDrawableIfCached(newsImageView)) != null) {
                     newsImageView.setImageDrawable(drawable);
                 } else {
-                    newsImageView.setImageBitmap(ImageDao.getTurnedOffImagesThumbnailImageRef().getBitmapIfCached());
+                    newsImageView.setImageDrawable(ImageDao.getTurnedOffImagesThumbnailImageRef().getDrawableIfCached());
                 }
             } else {
                 newsImageView.setImageBitmap(ImageDao.getTurnedOffImagesThumbnailImageRef().getBitmapIfCached());

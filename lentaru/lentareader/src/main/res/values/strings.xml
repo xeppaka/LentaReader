@@ -71,5 +71,8 @@
     <string name="error_link_open_in_browser_toast">Произошла ошибка при открытии ссылки.</string>
 
     <string name="comment_deleted">Комментарий удален</string>
-    <string name="comment_parent_text">ответ на комментарий от %1s</string>
+    <string name="comment_parent_text">ответ на комментарий от %s</string>
+    <string name="comment_answers">ответов:</string>
+    <string name="comment_no_comments">К этой новости нет комментариев.</string>
+    <string name="comment_error_loading">Ошибка соединения с сервером.\nПроверьте ваше соединение с интернетом.</string>
 </resources>

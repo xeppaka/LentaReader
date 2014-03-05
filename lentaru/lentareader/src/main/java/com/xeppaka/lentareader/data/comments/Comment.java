@@ -108,6 +108,14 @@ public class Comment implements Comparable<Comment> {
         this.expanded = expanded;
     }
 
+    public void setExpandedRecursive(boolean expanded) {
+        this.expanded = expanded;
+
+        for (Comment child : children) {
+            child.setExpandedRecursive(expanded);
+        }
+    }
+
     public int childrenSize() {
         return children.size();
     }
@@ -130,6 +138,10 @@ public class Comment implements Comparable<Comment> {
 
     public boolean hasRoot() {
         return rootId != null && !rootId.equals(VAL_EMPTY_ID);
+    }
+
+    public boolean hasChildren() {
+        return childrenSize() > 0;
     }
 
     @Override

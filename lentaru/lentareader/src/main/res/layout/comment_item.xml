@@ -6,16 +6,35 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="3dip">
-    <ImageView
-        android:id="@+id/comment_image"
-        android:layout_width="45dip"
-        android:layout_height="45dip"
-        android:scaleType="fitXY"/>
     <LinearLayout
+        android:id="@+id/comment_image_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingLeft="3dip">
+        android:layout_marginRight="3dip">
+        <ImageView
+            android:id="@+id/comment_image"
+            android:layout_width="45dip"
+            android:layout_height="45dip"
+            android:scaleType="fitXY" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/comment_answers"
+            android:textSize="10sp"
+            android:layout_gravity="center"/>
+        <TextView
+            android:id="@+id/comments_answers_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="10sp"
+            android:layout_gravity="center"
+            android:textStyle="bold"/>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
         <TextView
             android:id="@+id/comment_nick"
             android:textStyle="bold"
@@ -30,5 +49,10 @@
             android:textSize="9sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
+        <ImageView
+            android:id="@+id/comment_image_expand"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"/>
     </LinearLayout>
 </LinearLayout>

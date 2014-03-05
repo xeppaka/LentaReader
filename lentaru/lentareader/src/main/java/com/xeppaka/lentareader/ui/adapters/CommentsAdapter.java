@@ -2,9 +2,8 @@ package com.xeppaka.lentareader.ui.adapters;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.media.Image;
+import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +18,7 @@ import com.xeppaka.lentareader.data.comments.Comment;
 import com.xeppaka.lentareader.data.comments.Comments;
 import com.xeppaka.lentareader.data.dao.daoobjects.BitmapReference;
 import com.xeppaka.lentareader.data.dao.daoobjects.imagedaoobjects.ImageDao;
+import com.xeppaka.lentareader.data.dao.daoobjects.imagedaoobjects.NewsImageKeyCreator;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,7 +28,7 @@ import java.util.List;
  * Created by nnm on 3/1/14.
  */
 public class CommentsAdapter extends BaseAdapter {
-    public static final int COMMENT_INDENT_MARGIN = 8;
+    public static final int COMMENT_INDENT_MARGIN = 9;
 
     private boolean downloadImages;
     private int textSize;
@@ -85,25 +85,32 @@ public class CommentsAdapter extends BaseAdapter {
 
     private static class ViewHolder {
         private ImageView imageView;
-        private LinearLayout.LayoutParams imageViewLayoutParams;
+        private ImageView expandView;
         private TextView nickView;
         private TextView parentView;
         private TextView textView;
+        private TextView answersCount;
+        private LinearLayout containerImage;
+        private String accountId;
+        private AsyncTask asyncTask;
 
-        private ViewHolder(ImageView imageView, LinearLayout.LayoutParams imageViewLayoutParams, TextView nickView, TextView parentView, TextView textView) {
+        private ViewHolder(ImageView imageView, ImageView expandView, TextView nickView, TextView parentView, TextView textView, TextView answersCount, LinearLayout containerImage, String accountId) {
             this.imageView = imageView;
-            this.imageViewLayoutParams = imageViewLayoutParams;
+            this.expandView = expandView;
             this.nickView = nickView;
             this.parentView = parentView;
             this.textView = textView;
+            this.answersCount = answersCount;
+            this.containerImage = containerImage;
+            this.accountId = accountId;
         }
 
         public ImageView getImageView() {
             return imageView;
         }
 
-        public LinearLayout.LayoutParams getImageViewLayoutParams() {
-            return imageViewLayoutParams;
+        public ImageView getExpandView() {
+            return expandView;
         }
 
         public TextView getNickView() {
@@ -117,39 +124,70 @@ public class CommentsAdapter extends BaseAdapter {
         public TextView getTextView() {
             return textView;
         }
+
+        public TextView getAnswersCount() {
+            return answersCount;
+        }
+
+        public LinearLayout getContainerImage() {
+            return containerImage;
+        }
+
+        public String getAccountId() {
+            return accountId;
+        }
+
+        public void setAccountId(String accountId) {
+            this.accountId = accountId;
+        }
+
+        public AsyncTask getAsyncTask() {
+            return asyncTask;
+        }
+
+        public void setAsyncTask(AsyncTask asyncTask) {
+            this.asyncTask = asyncTask;
+        }
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
         LinearLayout containerView;
+        LinearLayout containerImage;
         ImageView imageView;
+        ImageView expandView;
         TextView nickView;
         TextView parentView;
         TextView textView;
+        TextView answersCount;
 
+        final Comment comment = getItem(position);
         ViewHolder holder;
 
         if (convertView == null) {
             containerView = (LinearLayout) inflater.inflate(R.layout.comment_item, null);
             imageView = (ImageView) containerView.findViewById(R.id.comment_image);
+            expandView = (ImageView) containerView.findViewById(R.id.comment_image_expand);
             nickView = (TextView) containerView.findViewById(R.id.comment_nick);
             parentView = (TextView) containerView.findViewById(R.id.comment_parent);
             textView = (TextView) containerView.findViewById(R.id.comment_text);
+            answersCount = (TextView) containerView.findViewById(R.id.comments_answers_count);
+            containerImage = (LinearLayout) containerView.findViewById(R.id.comment_image_container);
 
-            final LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(imageView.getLayoutParams());
-
-            containerView.setTag(holder = new ViewHolder(imageView, layoutParams, nickView, parentView, textView));
+            containerView.setTag(holder = new ViewHolder(imageView, expandView, nickView, parentView, textView, answersCount, containerImage, comment.getAccountId()));
         } else {
             containerView = (LinearLayout) convertView;
             holder = (ViewHolder) containerView.getTag();
 
             imageView = holder.getImageView();
+            expandView = holder.getExpandView();
             nickView = holder.getNickView();
             parentView = holder.getParentView();
             textView = holder.getTextView();
+            answersCount = holder.getAnswersCount();
+            containerImage = holder.getContainerImage();
         }
 
-        final Comment comment = getItem(position);
         nickView.setText(comment.getNick());
 
         if (comment.hasParent()) {
@@ -170,24 +208,66 @@ public class CommentsAdapter extends BaseAdapter {
             textView.setText(commentDeleted);
         }
 
+        final int childrenSize = comment.childrenSize();
+        answersCount.setText(String.valueOf(childrenSize));
+
+        if (childrenSize <= 0) {
+            expandView.setVisibility(View.GONE);
+        } else {
+            expandView.setVisibility(View.VISIBLE);
+
+            if (comment.isExpanded()) {
+                expandView.setImageResource(R.drawable.ic_navigation_collapse);
+            } else {
+                expandView.setImageResource(R.drawable.ic_navigation_expand);
+            }
+        }
+
         imageView.setImageDrawable(ImageDao.getLoadingThumbnailImage().getDrawableIfCached());
 
-        final ImageView imageViewForAsync = imageView;
-        final BitmapReference bitmapRef = imageDao.read(hypercommentsAvatarUrlBuilder.build(comment.getAccountId()), comment.getAccountId());
-        bitmapRef.getDrawableAsync(new AsyncListener<Drawable>() {
-            @Override
-            public void onSuccess(Drawable value) {
-                imageViewForAsync.setImageDrawable(value);
+        if (isDownloadImages()) {
+            final BitmapReference bitmapRef = imageDao.read(hypercommentsAvatarUrlBuilder.build(comment.getAccountId()), comment.getAccountId());
+            imageView.setImageDrawable(ImageDao.getLoadingThumbnailImage().getDrawableIfCached());
+
+            final ViewHolder holderForAsync = holder;
+            final String accountId = holder.getAccountId();
+
+            final AsyncTask asyncTask = bitmapRef.getDrawableAsync(imageView, new AsyncListener<Drawable>() {
+                @Override
+                public void onSuccess(Drawable drawable) {
+                    if (!accountId.equals(holderForAsync.getAccountId())) {
+                        return;
+                    }
+
+                    final ImageView iv = holderForAsync.getImageView();
+                    iv.setImageDrawable(drawable);
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    if (!accountId.equals(holderForAsync.getAccountId())) {
+                        return;
+                    }
+
+                    holderForAsync.getImageView().setImageDrawable(ImageDao.getNotAvailableThumbnailImage().getDrawableIfCached());
+                }
+            });
+
+            holder.setAsyncTask(asyncTask);
+        } else {
+            final BitmapReference bitmapRef = imageDao.read(hypercommentsAvatarUrlBuilder.build(comment.getAccountId()), comment.getAccountId());
+            final Drawable drawable;
+
+            if ((drawable = bitmapRef.getDrawableIfCached(imageView)) != null) {
+                imageView.setImageDrawable(drawable);
+            } else {
+                imageView.setImageDrawable(ImageDao.getLoadingThumbnailImage().getDrawableIfCached());
             }
+        }
 
-            @Override
-            public void onFailure(Exception e) {}
-        });
-
-        final LinearLayout.LayoutParams imageViewLayoutParams = (LinearLayout.LayoutParams) imageView.getLayoutParams();
+        final LinearLayout.LayoutParams containerImageLayoutParams = (LinearLayout.LayoutParams) containerImage.getLayoutParams();
         final int marginLeft = comment.getDepth() > 5 ? 5 * COMMENT_INDENT_MARGIN : comment.getDepth() * COMMENT_INDENT_MARGIN;
-
-        imageViewLayoutParams.setMargins(marginLeft, 0, 0, 0);
+        containerImageLayoutParams.setMargins(marginLeft, containerImageLayoutParams.topMargin, containerImageLayoutParams.rightMargin, containerImageLayoutParams.bottomMargin);
 
         return containerView;
     }
@@ -204,23 +284,33 @@ public class CommentsAdapter extends BaseAdapter {
 
     @Override
     public void notifyDataSetChanged() {
-        if (commentsList == Collections.<Comment>emptyList()) {
-            commentsList = new ArrayList<Comment>(comments.size());
-        }
+        if (comments != null) {
+            if (commentsList == Collections.<Comment>emptyList()) {
+                commentsList = new ArrayList<Comment>(comments.size());
+            }
 
-        comments.getExpandedOrderedComments(commentsList);
+            comments.getExpandedOrderedComments(commentsList);
+        }
 
         super.notifyDataSetChanged();
     }
 
     @Override
     public void notifyDataSetInvalidated() {
-        if (commentsList == Collections.<Comment>emptyList()) {
-            commentsList = new ArrayList<Comment>(comments.size());
+        if (comments != null) {
+            if (commentsList == Collections.<Comment>emptyList()) {
+                commentsList = new ArrayList<Comment>(comments.size());
+            }
+
+            comments.getExpandedOrderedComments(commentsList);
         }
 
-        comments.getExpandedOrderedComments(commentsList);
-
         super.notifyDataSetInvalidated();
+    }
+
+    public void clear() {
+        if (comments != null) {
+            comments.clear();
+        }
     }
 }
