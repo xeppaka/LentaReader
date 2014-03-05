@@ -36,6 +36,7 @@ public class CommentsAdapter extends BaseAdapter {
     private final String parentCommentText;
     private final LayoutInflater inflater;
     private final ImageDao imageDao;
+    private final int itemJustExpandedColor;
 
     private final HypercommentsAvatarUrlBuilder hypercommentsAvatarUrlBuilder;
 
@@ -50,6 +51,7 @@ public class CommentsAdapter extends BaseAdapter {
         final Resources resources = context.getResources();
         commentDeleted = resources.getString(R.string.comment_deleted);
         parentCommentText = resources.getString(R.string.comment_parent_text);
+        itemJustExpandedColor = resources.getColor(R.color.comment_just_expanded);
     }
 
     public boolean isDownloadImages() {
@@ -188,6 +190,11 @@ public class CommentsAdapter extends BaseAdapter {
             containerImage = holder.getContainerImage();
         }
 
+        if (comment.isJustExpanded()) {
+            containerView.setBackgroundColor(itemJustExpandedColor);
+        } else {
+            containerView.setBackgroundColor(0x00000000);
+        }
         nickView.setText(comment.getNick());
 
         if (comment.hasParent()) {
@@ -311,6 +318,12 @@ public class CommentsAdapter extends BaseAdapter {
     public void clear() {
         if (comments != null) {
             comments.clear();
+        }
+    }
+
+    public void clearJustExpanded() {
+        for (Comment comment : commentsList) {
+            comment.setJustExpanded(false);
         }
     }
 }

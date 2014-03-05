@@ -28,6 +28,8 @@ public class Comment implements Comparable<Comment> {
     private String text;
     private int depth;
     private boolean expanded;
+    private boolean justExpanded;
+    private boolean newComment;
 
     private List<Comment> children = Collections.emptyList();
 
@@ -106,12 +108,25 @@ public class Comment implements Comparable<Comment> {
 
     public void setExpanded(boolean expanded) {
         this.expanded = expanded;
+
+        setJustExpandedForAlreadyExpanded(this, expanded);
+    }
+
+    private void setJustExpandedForAlreadyExpanded(Comment comment, boolean expanded) {
+        for (Comment child : comment.getChildren()) {
+            child.setJustExpanded(expanded);
+
+            if (child.isExpanded()) {
+                setJustExpandedForAlreadyExpanded(child, expanded);
+            }
+        }
     }
 
     public void setExpandedRecursive(boolean expanded) {
         this.expanded = expanded;
 
         for (Comment child : children) {
+            child.setJustExpanded(expanded);
             child.setExpandedRecursive(expanded);
         }
     }
@@ -152,6 +167,22 @@ public class Comment implements Comparable<Comment> {
             return -1;
         else
             return 0;
+    }
+
+    public boolean isNewComment() {
+        return newComment;
+    }
+
+    public void setNewComment(boolean newComment) {
+        this.newComment = newComment;
+    }
+
+    public boolean isJustExpanded() {
+        return justExpanded;
+    }
+
+    public void setJustExpanded(boolean justExpanded) {
+        this.justExpanded = justExpanded;
     }
 
     @Override

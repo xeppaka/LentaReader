@@ -1,12 +1,19 @@
 package com.xeppaka.lentareader.ui.fragments;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.xeppaka.lentareader.R;
@@ -26,33 +33,34 @@ public class CommentsListFragment extends ListFragment {
     private Comments loadedComments;
     private String xid;
     private String errorLoadingComments;
-    private View emptyLoadingView;
-    private View emptyLoadedView;
+    private String noCommentsText;
 
     public CommentsListFragment(String xid) {
         this.xid = xid;
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-
-        emptyLoadingView = activity.getLayoutInflater().inflate(R.layout.comments_empty_list_loading, null);
-        emptyLoadedView = activity.getLayoutInflater().inflate(R.layout.comments_empty_list_loaded, null);
-
-        final Resources resources = activity.getResources();
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        final Context context = getActivity();
+        final Resources resources = context.getResources();
+        noCommentsText = resources.getString(R.string.comment_no_comments);
         errorLoadingComments = resources.getString(R.string.comment_error_loading);
-        setListAdapter(commentsAdapter = new CommentsAdapter(activity));
+        commentsAdapter = new CommentsAdapter(context);
+
+        return super.onCreateView(inflater, container, savedInstanceState);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        setEmptyText(noCommentsText);
         final ListView listView = getListView();
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                commentsAdapter.clearJustExpanded();
+
                 final Comment comment = commentsAdapter.getItem(position);
 
                 if (comment.hasChildren()) {
@@ -66,6 +74,8 @@ public class CommentsListFragment extends ListFragment {
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                commentsAdapter.clearJustExpanded();
+
                 final Comment comment = commentsAdapter.getItem(position);
 
                 if (comment.hasChildren()) {
@@ -88,11 +98,6 @@ public class CommentsListFragment extends ListFragment {
     }
 
     private void refreshComments() {
-        setEmptyLoadingView();
-
-        commentsAdapter.clear();
-        commentsAdapter.notifyDataSetChanged();
-
         final LentaCommentsDownloader commentsDownloader = new LentaCommentsDownloader();
 
         commentsDownloader.downloadAsync(xid, new AsyncListener<String>() {
@@ -113,8 +118,6 @@ public class CommentsListFragment extends ListFragment {
             public void onFailure(Exception e) {
                 if (isResumed()) {
                     Toast.makeText(getActivity(), errorLoadingComments, Toast.LENGTH_SHORT).show();
-
-                    setEmptyViewWithText();
                 }
             }
         });
@@ -122,18 +125,6 @@ public class CommentsListFragment extends ListFragment {
 
     private void showComments() {
         commentsAdapter.setComments(loadedComments);
-        commentsAdapter.notifyDataSetChanged();
-
-        setEmptyViewWithText();
-    }
-
-    private void setEmptyLoadingView() {
-        final ListView listView = getListView();
-        listView.setEmptyView(emptyLoadingView);
-    }
-
-    private void setEmptyViewWithText() {
-        final ListView listView = getListView();
-        listView.setEmptyView(emptyLoadedView);
+        setListAdapter(commentsAdapter);
     }
 }
