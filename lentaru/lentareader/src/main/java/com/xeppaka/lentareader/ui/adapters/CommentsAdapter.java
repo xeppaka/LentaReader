@@ -30,13 +30,12 @@ import java.util.List;
 public class CommentsAdapter extends BaseAdapter {
     public static final int COMMENT_INDENT_MARGIN = 9;
 
-    private boolean downloadImages;
+    private boolean downloadImages = true;
     private int textSize;
     private final String commentDeleted;
     private final String parentCommentText;
     private final LayoutInflater inflater;
     private final ImageDao imageDao;
-    private final int itemJustExpandedColor;
 
     private final HypercommentsAvatarUrlBuilder hypercommentsAvatarUrlBuilder;
 
@@ -51,7 +50,6 @@ public class CommentsAdapter extends BaseAdapter {
         final Resources resources = context.getResources();
         commentDeleted = resources.getString(R.string.comment_deleted);
         parentCommentText = resources.getString(R.string.comment_parent_text);
-        itemJustExpandedColor = resources.getColor(R.color.comment_just_expanded);
     }
 
     public boolean isDownloadImages() {
@@ -143,12 +141,15 @@ public class CommentsAdapter extends BaseAdapter {
             this.accountId = accountId;
         }
 
-        public AsyncTask getAsyncTask() {
-            return asyncTask;
-        }
-
         public void setAsyncTask(AsyncTask asyncTask) {
             this.asyncTask = asyncTask;
+        }
+
+        public void cancelAsyncTask() {
+            if (asyncTask != null) {
+                asyncTask.cancel(true);
+                asyncTask = null;
+            }
         }
     }
 
@@ -190,10 +191,13 @@ public class CommentsAdapter extends BaseAdapter {
             containerImage = holder.getContainerImage();
         }
 
+        holder.cancelAsyncTask();
+        holder.setAccountId(comment.getAccountId());
+
         if (comment.isJustExpanded()) {
             containerView.setBackgroundResource(R.drawable.comment_just_expanded_item);
         } else {
-            containerView.setBackground(null);
+            containerView.setBackgroundColor(0x00000000);
         }
         nickView.setText(comment.getNick());
 
@@ -237,7 +241,7 @@ public class CommentsAdapter extends BaseAdapter {
             imageView.setImageDrawable(ImageDao.getLoadingThumbnailImage().getDrawableIfCached());
 
             final ViewHolder holderForAsync = holder;
-            final String accountId = holder.getAccountId();
+            final String accountId = comment.getAccountId();
 
             final AsyncTask asyncTask = bitmapRef.getDrawableAsync(imageView, new AsyncListener<Drawable>() {
                 @Override
@@ -270,6 +274,7 @@ public class CommentsAdapter extends BaseAdapter {
             } else {
                 imageView.setImageDrawable(ImageDao.getLoadingThumbnailImage().getDrawableIfCached());
             }
+            holder.setAsyncTask(null);
         }
 
         final LinearLayout.LayoutParams containerImageLayoutParams = (LinearLayout.LayoutParams) containerImage.getLayoutParams();
