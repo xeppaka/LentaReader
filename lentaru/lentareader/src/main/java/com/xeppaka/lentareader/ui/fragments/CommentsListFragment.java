@@ -25,6 +25,11 @@ import com.xeppaka.lentareader.parser.comments.CommentsParser;
 import com.xeppaka.lentareader.parser.exceptions.ParseException;
 import com.xeppaka.lentareader.ui.adapters.CommentsAdapter;
 
+import org.java_websocket.client.WebSocketClient;
+import org.java_websocket.handshake.ServerHandshake;
+
+import java.net.URI;
+
 /**
  * Created by kacpa01 on 2/28/14.
  */
@@ -33,7 +38,9 @@ public class CommentsListFragment extends ListFragment {
     private Comments loadedComments;
     private String xid;
     private String errorLoadingComments;
+    private String errorLoadingCommentsListMessage;
     private String noCommentsText;
+    private WebSocketClient wsClient;
 
     public CommentsListFragment(String xid) {
         this.xid = xid;
@@ -45,6 +52,7 @@ public class CommentsListFragment extends ListFragment {
         final Resources resources = context.getResources();
         noCommentsText = resources.getString(R.string.comment_no_comments);
         errorLoadingComments = resources.getString(R.string.comment_error_loading);
+        errorLoadingCommentsListMessage = resources.getString(R.string.comment_error_loading_list_message);
         commentsAdapter = new CommentsAdapter(context);
 
         return super.onCreateView(inflater, container, savedInstanceState);
@@ -54,7 +62,6 @@ public class CommentsListFragment extends ListFragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        setEmptyText(noCommentsText);
         final ListView listView = getListView();
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -98,6 +105,8 @@ public class CommentsListFragment extends ListFragment {
     }
 
     private void refreshComments() {
+        setEmptyText(noCommentsText);
+
         final LentaCommentsDownloader commentsDownloader = new LentaCommentsDownloader();
 
         commentsDownloader.downloadAsync(xid, new AsyncListener<String>() {
@@ -109,6 +118,10 @@ public class CommentsListFragment extends ListFragment {
                         loadedComments = parser.parse(value);
                         showComments();
                     } catch (ParseException e) {
+                        setEmptyText(errorLoadingCommentsListMessage);
+
+                        loadedComments = new Comments();
+                        showComments();
                         Toast.makeText(getActivity(), errorLoadingComments, Toast.LENGTH_SHORT).show();
                     }
                 }
@@ -117,6 +130,10 @@ public class CommentsListFragment extends ListFragment {
             @Override
             public void onFailure(Exception e) {
                 if (isResumed()) {
+                    setEmptyText(errorLoadingCommentsListMessage);
+
+                    loadedComments = new Comments();
+                    showComments();
                     Toast.makeText(getActivity(), errorLoadingComments, Toast.LENGTH_SHORT).show();
                 }
             }
@@ -126,5 +143,33 @@ public class CommentsListFragment extends ListFragment {
     private void showComments() {
         commentsAdapter.setComments(loadedComments);
         setListAdapter(commentsAdapter);
+    }
+
+    private void connectWs(String url) {
+        wsClient = new WebSocketClient(URI.create(url)) {
+            @Override
+            public void onOpen(ServerHandshake handshakedata) {}
+
+            @Override
+            public void onMessage(String message) {
+                Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT);
+            }
+
+            @Override
+            public void onClose(int code, String reason, boolean remote) {}
+
+            @Override
+            public void onError(Exception ex) {}
+        };
+
+        wsClient.connect();
+    }
+
+    private void disconnectWs() {
+        try {
+            wsClient.close();
+        } finally {
+            wsClient = null;
+        }
     }
 }
