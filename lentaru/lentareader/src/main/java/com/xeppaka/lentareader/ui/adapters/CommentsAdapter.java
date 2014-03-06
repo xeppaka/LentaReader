@@ -191,9 +191,9 @@ public class CommentsAdapter extends BaseAdapter {
         }
 
         if (comment.isJustExpanded()) {
-            containerView.setBackgroundColor(itemJustExpandedColor);
+            containerView.setBackgroundResource(R.drawable.comment_just_expanded_item);
         } else {
-            containerView.setBackgroundColor(0x00000000);
+            containerView.setBackground(null);
         }
         nickView.setText(comment.getNick());
 

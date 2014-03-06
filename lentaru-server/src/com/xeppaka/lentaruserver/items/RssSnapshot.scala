@@ -75,7 +75,11 @@ object RssSnapshot {
       })
     }
 
-    Await.result(f, Duration(10, SECONDS))
+    try {
+      Await.result(f, Duration(10, SECONDS))
+    } catch {
+      case e: Exception => None
+    }
   }
 
   def apply(newsType: NewsType, rubric: Rubrics, rssItems: List[RssItem]): RssSnapshot = new RssSnapshot(newsType, rubric, rssItems)

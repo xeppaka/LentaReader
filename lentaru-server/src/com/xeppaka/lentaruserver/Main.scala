@@ -24,8 +24,6 @@ object Main extends App {
     while (true) {
       Rubrics.values.foreach(rubric => {
         val curdir = FileSystem.createFullPath(rootPath.toString, NewsType.NEWS, rubric)
-        val curdir_tmp = FileSystem.createFullTmpPath(rootPath.toString, NewsType.NEWS, rubric)
-        val curdir_tmp2 = FileSystem.createFullTmp2Path(rootPath.toString, NewsType.NEWS, rubric)
         val cursnapshot = snapshots.get(rubric)
 
         logger.info("Downloading rss snapshot for " + rubric.toString + "... ")
@@ -69,23 +67,18 @@ object Main extends App {
               case Some(snap) => {
                 snapshots = snapshots.updated(rubric, snap)
 
-                logger.info("Writing xmls in " + curdir_tmp.toString + "... ")
-                snap.writeXmlSet(curdir_tmp)
+                logger.info("Deleting xmls in " + curdir.toString + "... ")
+                FileSystem.clean(curdir)
+                logger.info("Done")
+
+                logger.info("Writing xmls in " + curdir.toString + "... ")
+                snap.writeXmlSet(curdir)
                 logger.info("Done")
 
                 logger.info("Creating gzipped xmls... ")
-                FileSystem.gzip(curdir_tmp)
+                FileSystem.gzip(curdir)
                 logger.info("Done")
 
-                logger.info("Swapping directories...")
-                Files.move(curdir, curdir_tmp2)
-                Files.move(curdir_tmp, curdir)
-                Files.move(curdir_tmp2, curdir_tmp)
-                logger.info("Done")
-
-                logger.info("Deleting xmls in " + curdir_tmp.toString + "... ")
-                FileSystem.clean(curdir_tmp)
-                logger.info("Done")
               }
               case None =>
             }

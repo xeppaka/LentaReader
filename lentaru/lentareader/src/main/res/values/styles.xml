@@ -6,4 +6,7 @@
         <item name="android:layout_marginRight">1px</item>
         <item name="android:layout_marginBottom">1px</item>
     </style>
+    <style name="CommentJustExpandedItem" parent="@android:style/Widget.ListView">
+        <item name="android:background">@color/comment_just_expanded</item>
+    </style>
 </resources>

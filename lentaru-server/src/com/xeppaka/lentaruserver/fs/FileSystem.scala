@@ -17,17 +17,14 @@ import com.xeppaka.lentaruserver.Rubrics
  */
 object FileSystem {
 
+  val FILENAME_ROOT_PREFIX = "root"
   val FILENAME_ROOT_SNAPSHOT = "root.xml"
-  val TMP_SUFFIX = "_tmp"
-  val TMP2_SUFFIX = "_tmp2"
 
   private def createRubricFolders(dir: Path): List[Path] = {
     Rubrics.values.foldLeft(List[Path]())((z, item) => {
       val path = dir.resolve(item.toString)
-      val path_tmp = dir.resolve(item.toString + TMP_SUFFIX)
       try {
         Files.createDirectory(path)
-        Files.createDirectory(path_tmp)
         path :: z
       } catch {
         case e: FileAlreadyExistsException => z
@@ -56,8 +53,8 @@ object FileSystem {
     if (Files.exists(dir)) {
       val deleteVisitor = new SimpleFileVisitor[Path]() {
         override def visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult = {
-          // if (file.getFileName.toString != FILENAME_ROOT_SNAPSHOT)
-          Files.delete(file)
+          if (!file.getFileName.toString.startsWith(FILENAME_ROOT_PREFIX))
+            Files.delete(file)
           FileVisitResult.CONTINUE
         }
 
@@ -80,9 +77,11 @@ object FileSystem {
     if (Files.exists(dir)) {
       val deleteVisitor = new SimpleFileVisitor[Path]() {
         override def visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult = {
-          val command = "gzip -k " + file.toString
-          val p = Runtime.getRuntime.exec(command)
-          p.waitFor()
+          if (!file.getFileName.toString.endsWith(".gz")) {
+            val command = "gzip --best -kf " + file.toString
+            val p = Runtime.getRuntime.exec(command)
+            p.waitFor()
+          }
           FileVisitResult.CONTINUE
         }
 
@@ -103,13 +102,5 @@ object FileSystem {
 
   def createFullPath(root: String, newsType: NewsType, rubric: Rubrics): Path = {
     FileSystems.getDefault.getPath(root, newsType.toString, rubric.toString)
-  }
-
-  def createFullTmpPath(root: String, newsType: NewsType, rubric: Rubrics): Path = {
-    FileSystems.getDefault.getPath(root, newsType.toString, rubric.toString + TMP_SUFFIX)
-  }
-
-  def createFullTmp2Path(root: String, newsType: NewsType, rubric: Rubrics): Path = {
-    FileSystems.getDefault.getPath(root, newsType.toString, rubric.toString + TMP2_SUFFIX)
   }
 }

@@ -59,11 +59,11 @@ public class CommentsListFragment extends ListFragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                commentsAdapter.clearJustExpanded();
-
                 final Comment comment = commentsAdapter.getItem(position);
 
                 if (comment.hasChildren()) {
+                    commentsAdapter.clearJustExpanded();
+
                     comment.setExpanded(!comment.isExpanded());
                     commentsAdapter.notifyDataSetChanged();
                 }
@@ -74,11 +74,11 @@ public class CommentsListFragment extends ListFragment {
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                commentsAdapter.clearJustExpanded();
-
                 final Comment comment = commentsAdapter.getItem(position);
 
                 if (comment.hasChildren()) {
+                    commentsAdapter.clearJustExpanded();
+
                     comment.setExpandedRecursive(!comment.isExpanded());
                     commentsAdapter.notifyDataSetChanged();
                 }

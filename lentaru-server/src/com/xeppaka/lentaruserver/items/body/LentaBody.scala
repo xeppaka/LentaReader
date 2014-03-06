@@ -44,7 +44,11 @@ object LentaBody {
   def downloadNews(url: String): Option[LentaNewsBody] = {
     val f: Future[Option[LentaNewsBody]] = future { Downloader.download(url).flatMap(f => Some(parseNews(f))) }
 
-    Await.result(f, Duration(10, SECONDS))
+    try {
+      Await.result(f, Duration(10, SECONDS))
+    } catch {
+      case e: Exception => None
+    }
   }
 
   def parseNews(page: String): LentaNewsBody = {
