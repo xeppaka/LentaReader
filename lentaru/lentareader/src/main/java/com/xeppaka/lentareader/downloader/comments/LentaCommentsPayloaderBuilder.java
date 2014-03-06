@@ -1,4 +1,6 @@
-package com.xeppaka.lentareader.downloader;
+package com.xeppaka.lentareader.downloader.comments;
+
+import com.xeppaka.lentareader.utils.LentaConstants;
 
 /**
  * Created by nnm on 2/27/14.
@@ -8,7 +10,6 @@ public class LentaCommentsPayloaderBuilder {
     private static final String VAL_STREAM_START = "\"streamstart\"";
 
     private static final String KEY_WIDGET_ID = "widget_id";
-    private static final String VAL_WIDGET_ID = "5270";
 
     private static final String KEY_XID = "xid";
     private static final String KEY_LIMIT = "limit";
@@ -72,7 +73,7 @@ public class LentaCommentsPayloaderBuilder {
 
         final StringBuilder sb = new StringBuilder("{");
         addKeyValuePair(KEY_STREAM, VAL_STREAM_START, sb, true);
-        addKeyValuePair(KEY_WIDGET_ID, VAL_WIDGET_ID, sb, true);
+        addKeyValuePair(KEY_WIDGET_ID, LentaConstants.COMMENTS_WIDGET_ID, sb, true);
         addKeyValuePair(KEY_XID, xid, sb, true);
         addKeyValuePair(KEY_LIMIT, limit, sb, true);
         addKeyValuePair(KEY_FILTER, filter, sb, true);

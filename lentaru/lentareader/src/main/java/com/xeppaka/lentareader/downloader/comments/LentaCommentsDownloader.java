@@ -1,4 +1,4 @@
-package com.xeppaka.lentareader.downloader;
+package com.xeppaka.lentareader.downloader.comments;
 
 import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;

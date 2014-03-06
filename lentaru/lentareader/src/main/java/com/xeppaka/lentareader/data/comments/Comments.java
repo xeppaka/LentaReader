@@ -20,6 +20,7 @@ import java.util.Stack;
 public class Comments implements Iterable<Comment> {
     private final List<Comment> rootComments = new ArrayList<Comment>();
     private final SimpleArrayMap<String, Comment> commentById = new SimpleArrayMap<String, Comment>();
+    private String streamId;
 
     @Override
     public Iterator<Comment> iterator() {
@@ -135,5 +136,13 @@ public class Comments implements Iterable<Comment> {
     public void clear() {
         commentById.clear();
         rootComments.clear();
+    }
+
+    public String getStreamId() {
+        return streamId;
+    }
+
+    public void setStreamId(String streamId) {
+        this.streamId = streamId;
     }
 }

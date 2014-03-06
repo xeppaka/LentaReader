@@ -29,6 +29,7 @@ public class CommentsParser {
     public static final String VAL_CMD_STREAM_INFO = "streamInfo";
 
     public static final String KEY_COMMENTS = "comments";
+    public static final String KEY_STREAM_ID = "id";
 
     public static final String KEY_TIME = "time";
     public static final String KEY_ID = "id";
@@ -99,6 +100,11 @@ public class CommentsParser {
 
     private void parseComments(JSONObject jsonComments, Comments comments) throws JSONException, ParseException {
         JSONArray jsonCommentaArray = jsonComments.getJSONArray(KEY_COMMENTS);
+        String streamId = jsonComments.optString(KEY_STREAM_ID);
+
+        if (streamId != null && !streamId.isEmpty()) {
+            comments.setStreamId(streamId);
+        }
 
         if (jsonCommentaArray.length() <= 0) {
             return;

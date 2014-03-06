@@ -16,6 +16,8 @@ public class LentaConstants {
     public static final String RSS_PATH_ROOT = "/rss";
     public static final String XML_PATH_ROOT = "";
 
+    public static final String COMMENTS_WIDGET_ID = "5270";
+
     // Default values for bitmap caches
 	public static int BITMAP_CACHE_MAX_SIZE_IN_BYTES = 3 * 1024 * 1024; // 3 MB
     public static int THUMBNAILS_BITMAP_CACHE_MAX_SIZE_IN_BYTES = 1 * 1024 * 1024; // 1 MB

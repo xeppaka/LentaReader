@@ -1,34 +1,25 @@
 package com.xeppaka.lentareader.ui.fragments;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.xeppaka.lentareader.R;
 import com.xeppaka.lentareader.async.AsyncListener;
 import com.xeppaka.lentareader.data.comments.Comment;
 import com.xeppaka.lentareader.data.comments.Comments;
-import com.xeppaka.lentareader.downloader.LentaCommentsDownloader;
+import com.xeppaka.lentareader.downloader.comments.LentaCommentsDownloader;
+import com.xeppaka.lentareader.downloader.comments.LentaCommentsStream;
 import com.xeppaka.lentareader.parser.comments.CommentsParser;
 import com.xeppaka.lentareader.parser.exceptions.ParseException;
 import com.xeppaka.lentareader.ui.adapters.CommentsAdapter;
-
-import org.java_websocket.client.WebSocketClient;
-import org.java_websocket.handshake.ServerHandshake;
-
-import java.net.URI;
 
 /**
  * Created by kacpa01 on 2/28/14.
@@ -40,7 +31,7 @@ public class CommentsListFragment extends ListFragment {
     private String errorLoadingComments;
     private String errorLoadingCommentsListMessage;
     private String noCommentsText;
-    private WebSocketClient wsClient;
+    private LentaCommentsStream commentsStream = new LentaCommentsStream();
 
     public CommentsListFragment(String xid) {
         this.xid = xid;
@@ -143,33 +134,5 @@ public class CommentsListFragment extends ListFragment {
     private void showComments() {
         commentsAdapter.setComments(loadedComments);
         setListAdapter(commentsAdapter);
-    }
-
-    private void connectWs(String url) {
-        wsClient = new WebSocketClient(URI.create(url)) {
-            @Override
-            public void onOpen(ServerHandshake handshakedata) {}
-
-            @Override
-            public void onMessage(String message) {
-                Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT);
-            }
-
-            @Override
-            public void onClose(int code, String reason, boolean remote) {}
-
-            @Override
-            public void onError(Exception ex) {}
-        };
-
-        wsClient.connect();
-    }
-
-    private void disconnectWs() {
-        try {
-            wsClient.close();
-        } finally {
-            wsClient = null;
-        }
     }
 }
