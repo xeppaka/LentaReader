@@ -17,9 +17,12 @@ import com.xeppaka.lentareader.data.comments.Comment;
 import com.xeppaka.lentareader.data.comments.Comments;
 import com.xeppaka.lentareader.downloader.comments.LentaCommentsDownloader;
 import com.xeppaka.lentareader.downloader.comments.LentaCommentsStream;
+import com.xeppaka.lentareader.downloader.comments.StreamListener;
 import com.xeppaka.lentareader.parser.comments.CommentsParser;
 import com.xeppaka.lentareader.parser.exceptions.ParseException;
 import com.xeppaka.lentareader.ui.adapters.CommentsAdapter;
+
+import org.java_websocket.handshake.ServerHandshake;
 
 /**
  * Created by kacpa01 on 2/28/14.
@@ -31,7 +34,7 @@ public class CommentsListFragment extends ListFragment {
     private String errorLoadingComments;
     private String errorLoadingCommentsListMessage;
     private String noCommentsText;
-    private LentaCommentsStream commentsStream = new LentaCommentsStream();
+    private LentaCommentsStream commentsStream;
 
     public CommentsListFragment(String xid) {
         this.xid = xid;
@@ -108,6 +111,31 @@ public class CommentsListFragment extends ListFragment {
                     try {
                         loadedComments = parser.parse(value);
                         showComments();
+
+                        if (commentsStream == null && loadedComments.getStreamId() != null) {
+                            commentsStream = new LentaCommentsStream(loadedComments.getStreamId());
+                            commentsStream.connect(new StreamListener() {
+                                @Override
+                                public void onOpen(ServerHandshake handshakedata) {
+                                    Toast.makeText(getActivity(), "Web Socket connected.", Toast.LENGTH_SHORT);
+                                }
+
+                                @Override
+                                public void onMessage(String message) {
+                                    Toast.makeText(getActivity(), "Message received: " + message, Toast.LENGTH_SHORT);
+                                }
+
+                                @Override
+                                public void onClose(int code, String reason, boolean remote) {
+                                    Toast.makeText(getActivity(), "Web Socket closed.", Toast.LENGTH_SHORT);
+                                }
+
+                                @Override
+                                public void onError(Exception ex) {
+                                    Toast.makeText(getActivity(), "Web Socket error: " + ex.toString(), Toast.LENGTH_SHORT);
+                                }
+                            });
+                        }
                     } catch (ParseException e) {
                         setEmptyText(errorLoadingCommentsListMessage);
 
