@@ -45,7 +45,7 @@ public class LentaService extends Service {
     public static final int NO_REQUEST_ID = -1;
 
     private static final int POOL_SIZE = 2;
-	private static final int KEEP_ALIVE_TIME = 20;
+	private static final int KEEP_ALIVE_TIME = 10;
 	private static final TimeUnit KEEP_ALIVE_TIME_UNITS = TimeUnit.SECONDS;
 
 	private ThreadPoolExecutor executor;

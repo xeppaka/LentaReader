@@ -65,7 +65,7 @@
         <receiver android:name=".broadcast.LentaBroadcastReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
-                <action android:name="testalarm" />
+                <action android:name="intent.action.BACKGROUND_UPDATE" />
             </intent-filter>
         </receiver>
     </application>

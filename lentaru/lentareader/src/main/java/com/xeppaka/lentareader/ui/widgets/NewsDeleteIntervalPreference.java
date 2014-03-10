@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.preference.DialogPreference;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.widget.NumberPicker;
 
@@ -12,10 +11,8 @@ import com.xeppaka.lentareader.R;
 import com.xeppaka.lentareader.async.AsyncListener;
 import com.xeppaka.lentareader.data.News;
 import com.xeppaka.lentareader.data.Rubrics;
-import com.xeppaka.lentareader.data.dao.async.AsyncDao;
 import com.xeppaka.lentareader.data.dao.async.AsyncNODao;
 import com.xeppaka.lentareader.data.dao.daoobjects.NewsDao;
-import com.xeppaka.lentareader.utils.LentaConstants;
 import com.xeppaka.lentareader.utils.PreferencesConstants;
 
 /**

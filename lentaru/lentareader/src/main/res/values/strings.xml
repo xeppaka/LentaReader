@@ -65,9 +65,9 @@
     <string name="error_no_internet_connection_toast">Ошибка соединения с сервером.\nПроверьте ваше соединение с интернетом.</string>
     <string name="error_general_toast">Ошибка соединения с сервером.</string>
     <string name="error_open_link_toast">Невозможно перейти по ссылке. Адрес ссылки некорректен.</string>
-    <string name="info_link_copied_toast">Ссылка на новость была скопирована в буфер обмена.</string>
     <string name="error_link_copied_toast">Произошла ошибка при копировании ссылки на новость.</string>
     <string name="error_link_open_in_browser_toast">Произошла ошибка при открытии ссылки.</string>
+    <string name="info_link_copied_toast">Ссылка на новость была скопирована в буфер обмена.</string>
 
     <string name="comment_deleted">Комментарий удален</string>
     <string name="comment_parent_text">ответ на комментарий от %s</string>
@@ -76,5 +76,12 @@
     <string name="comment_error_loading_list_message">Ошибка соединения с сервером.\nПроверьте ваше соединение с интернетом и попробуйте обновить.</string>
     <string name="comment_error_loading">Ошибка соединения с сервером.\nПроверьте ваше соединение с интернетом.</string>
     <string name="comment_now_read">Сейчас читают:</string>
-    <string name="comment_now_read_count_default">n/a</string>
+    <string name="comment_now_read_count_default">_</string>
+
+    <string name="pref_background_update_title">Фоновые уведомления</string>
+    <string name="pref_background_update_check">Фоновая загрузка новостей</string>
+    <string name="pref_news_background_check_interval_summary">Загружать новости в фоне каждые %s минут</string>
+    <string name="pref_news_background_check_interval_summary_default">Загружать новости в фоне каждые 20 минут</string>
+    <string name="news_background_check_interval_header">Временной интервал между фоновыми загрузками новостей</string>
+    <string name="news_new_items_auto_refresh">Загружено новых новостей в фоне: %d</string>
 </resources>

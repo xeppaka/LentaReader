@@ -65,7 +65,7 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
     private MenuItem actionPreferences;
     private MenuItem actionRefresh;
     private MenuItem actionRefreshRun;
-    private boolean visible;
+    public static boolean visible;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -189,19 +189,25 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
         refreshing = true;
 
         final NewsType currentNewsType = NewsType.values()[pager.getCurrentItem()];
-        final Rubrics rubric = pagerAdapter.getFragment(pager.getCurrentItem()).getCurrentRubric();
+        final NewsObjectListFragment fragment = pagerAdapter.getFragment(pager.getCurrentItem());
+        final Rubrics rubric = fragment.getCurrentRubric();
 
+        fragment.setUpdateByUser(true);
         showActionBarRefresh(true);
 
         serviceHelper.updateRubric(currentNewsType, rubric, false, new AsyncListener<Void>() {
             @Override
             public void onSuccess(Void val) {
+                fragment.setUpdateByUser(false);
+
                 refreshing = false;
                 showActionBarRefresh(false);
             }
 
             @Override
             public void onFailure(Exception ex) {
+                fragment.setUpdateByUser(false);
+
                 refreshing = false;
                 showActionBarRefresh(false);
 
@@ -299,9 +305,5 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
         } catch (Exception e) {
             Toast.makeText(this, R.string.error_general_toast, Toast.LENGTH_SHORT).show();
         }
-    }
-
-    public boolean isVisible() {
-        return visible;
     }
 }
