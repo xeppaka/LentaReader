@@ -36,6 +36,8 @@ public class CommentsAdapter extends BaseAdapter {
     private final String parentCommentText;
     private final LayoutInflater inflater;
     private final ImageDao imageDao;
+    private final int ratingColorPositive;
+    private final int ratingColorNegative;
 
     private final HypercommentsAvatarUrlBuilder hypercommentsAvatarUrlBuilder;
 
@@ -50,6 +52,8 @@ public class CommentsAdapter extends BaseAdapter {
         final Resources resources = context.getResources();
         commentDeleted = resources.getString(R.string.comment_deleted);
         parentCommentText = resources.getString(R.string.comment_parent_text);
+        ratingColorPositive = resources.getColor(R.color.comment_rating_positive);
+        ratingColorNegative = resources.getColor(R.color.comment_rating_negative);
     }
 
     public boolean isDownloadImages() {
@@ -90,17 +94,19 @@ public class CommentsAdapter extends BaseAdapter {
         private TextView parentView;
         private TextView textView;
         private TextView answersCount;
+        private TextView ratingCount;
         private LinearLayout containerImage;
         private String accountId;
         private AsyncTask asyncTask;
 
-        private ViewHolder(ImageView imageView, ImageView expandView, TextView nickView, TextView parentView, TextView textView, TextView answersCount, LinearLayout containerImage, String accountId) {
+        private ViewHolder(ImageView imageView, ImageView expandView, TextView nickView, TextView parentView, TextView textView, TextView answersCount, TextView ratingCount, LinearLayout containerImage, String accountId) {
             this.imageView = imageView;
             this.expandView = expandView;
             this.nickView = nickView;
             this.parentView = parentView;
             this.textView = textView;
             this.answersCount = answersCount;
+            this.ratingCount = ratingCount;
             this.containerImage = containerImage;
             this.accountId = accountId;
         }
@@ -127,6 +133,10 @@ public class CommentsAdapter extends BaseAdapter {
 
         public TextView getAnswersCount() {
             return answersCount;
+        }
+
+        public TextView getRatingCount() {
+            return ratingCount;
         }
 
         public LinearLayout getContainerImage() {
@@ -163,6 +173,7 @@ public class CommentsAdapter extends BaseAdapter {
         TextView parentView;
         TextView textView;
         TextView answersCount;
+        TextView ratingCount;
 
         final Comment comment = getItem(position);
         ViewHolder holder;
@@ -175,9 +186,10 @@ public class CommentsAdapter extends BaseAdapter {
             parentView = (TextView) containerView.findViewById(R.id.comment_parent);
             textView = (TextView) containerView.findViewById(R.id.comment_text);
             answersCount = (TextView) containerView.findViewById(R.id.comments_answers_count);
+            ratingCount = (TextView) containerView.findViewById(R.id.comment_rating_count);
             containerImage = (LinearLayout) containerView.findViewById(R.id.comment_image_container);
 
-            containerView.setTag(holder = new ViewHolder(imageView, expandView, nickView, parentView, textView, answersCount, containerImage, comment.getAccountId()));
+            containerView.setTag(holder = new ViewHolder(imageView, expandView, nickView, parentView, textView, answersCount, ratingCount, containerImage, comment.getAccountId()));
         } else {
             containerView = (LinearLayout) convertView;
             holder = (ViewHolder) containerView.getTag();
@@ -189,6 +201,7 @@ public class CommentsAdapter extends BaseAdapter {
             textView = holder.getTextView();
             answersCount = holder.getAnswersCount();
             containerImage = holder.getContainerImage();
+            ratingCount = holder.getRatingCount();
         }
 
         holder.cancelAsyncTask();
@@ -221,6 +234,21 @@ public class CommentsAdapter extends BaseAdapter {
 
         final int childrenSize = comment.childrenSize();
         answersCount.setText(String.valueOf(childrenSize));
+
+        if (comment.getVoteUp() == 0 && comment.getVoteDown() == 0) {
+            ratingCount.setVisibility(View.GONE);
+        } else {
+            final int rating = comment.getVoteUp() - comment.getVoteDown();
+            ratingCount.setText(String.valueOf(rating));
+
+            if (rating < 0) {
+                ratingCount.setTextColor(ratingColorNegative);
+            } else {
+                ratingCount.setTextColor(ratingColorPositive);
+            }
+
+            ratingCount.setVisibility(View.VISIBLE);
+        }
 
         if (childrenSize <= 0) {
             expandView.setVisibility(View.GONE);

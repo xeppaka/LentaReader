@@ -30,7 +30,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class LentaService extends Service {
 
     public enum Action {
-        UPDATE_RUBRIC,
+        UPDATE_RUBRIC
     }
 
     public enum Result {
@@ -40,11 +40,12 @@ public class LentaService extends Service {
 
     public static final String INTENT_RESULT_RECEIVER_NAME = "resultReceiver";
     public static final String INTENT_REQUEST_ID_NAME = "requestId";
+    public static final String INTENT_NOTIFICATION_NAME = "notification";
 
     public static final int NO_REQUEST_ID = -1;
 
     private static final int POOL_SIZE = 2;
-	private static final int KEEP_ALIVE_TIME = 60;
+	private static final int KEEP_ALIVE_TIME = 20;
 	private static final TimeUnit KEEP_ALIVE_TIME_UNITS = TimeUnit.SECONDS;
 
 	private ThreadPoolExecutor executor;
@@ -118,10 +119,10 @@ public class LentaService extends Service {
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Log.d(LentaConstants.LoggerServiceTag, "Got the intent, checking the command");
 		
-		int requestId = intent.getIntExtra(INTENT_REQUEST_ID_NAME, NO_REQUEST_ID);
-        ResultReceiver receiver = intent.getParcelableExtra(INTENT_RESULT_RECEIVER_NAME);
-
-		Action action = Action.valueOf(intent.getAction());
+		final int requestId = intent.getIntExtra(INTENT_REQUEST_ID_NAME, NO_REQUEST_ID);
+        final ResultReceiver receiver = intent.getParcelableExtra(INTENT_RESULT_RECEIVER_NAME);
+        final boolean notification = intent.getBooleanExtra(INTENT_NOTIFICATION_NAME, false);
+		final Action action = Action.valueOf(intent.getAction());
 
         switch (action) {
             case UPDATE_RUBRIC:
@@ -134,7 +135,7 @@ public class LentaService extends Service {
                     return START_NOT_STICKY;
                 }
 
-                updateRubric(requestId, rubric, newsType, receiver);
+                updateRubric(requestId, rubric, newsType, notification, receiver);
                 break;
         }
 
@@ -160,8 +161,8 @@ public class LentaService extends Service {
         }
     }
 
-	private void updateRubric(int requestId, Rubrics rubric, NewsType newsType, ResultReceiver resultReceiver) {
-		UpdateRubricServiceCommand command = new UpdateRubricServiceCommand(requestId, newsType, rubric, getApplicationContext(), resultReceiver);
+	private void updateRubric(int requestId, Rubrics rubric, NewsType newsType, boolean notification, ResultReceiver resultReceiver) {
+		UpdateRubricServiceCommand command = new UpdateRubricServiceCommand(requestId, newsType, rubric, notification, getApplicationContext(), resultReceiver);
 		executor.execute(command);
 	}
 
@@ -179,15 +180,6 @@ public class LentaService extends Service {
         return createFailResult(null);
     }
 
-//	private void updateNewsItem(int requestId, long newsId, ContentResolver contentResolver, ExecutorService executor, ResultReceiver resultReceiver) {
-//		SyncNewsServiceCommand command = new SyncNewsServiceCommand(requestId, newsId, contentResolver, executor, resultReceiver, false);
-//		executor.execute(command);
-//	}
-	
-//	private Rubrics getRubric(Intent intent) {
-//		return Rubrics.valueOf(intent.getStringExtra(ServiceIntentKey.RUBRIC.name()));
-//	}
-	
 	@Override
 	public IBinder onBind(Intent intent) {
 		return null;

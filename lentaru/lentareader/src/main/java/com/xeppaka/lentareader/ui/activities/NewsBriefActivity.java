@@ -1,5 +1,8 @@
 package com.xeppaka.lentareader.ui.activities;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -23,9 +26,9 @@ import android.widget.Toast;
 
 import com.viewpagerindicator.TitlePageIndicator;
 import com.xeppaka.lentareader.R;
+import com.xeppaka.lentareader.async.AsyncListener;
 import com.xeppaka.lentareader.data.NewsType;
 import com.xeppaka.lentareader.data.Rubrics;
-import com.xeppaka.lentareader.service.Callback;
 import com.xeppaka.lentareader.service.ServiceHelper;
 import com.xeppaka.lentareader.service.commands.exceptions.NoInternetConnectionException;
 import com.xeppaka.lentareader.ui.fragments.NewsFullFragment;
@@ -62,6 +65,7 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
     private MenuItem actionPreferences;
     private MenuItem actionRefresh;
     private MenuItem actionRefreshRun;
+    private boolean visible;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -113,6 +117,15 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
 
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         autoRefresh = preferences.getBoolean(PreferencesConstants.PREF_KEY_NEWS_AUTO_REFRESH, PreferencesConstants.NEWS_AUTO_REFRESH_DEFAULT);
+
+        visible = true;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        visible = false;
     }
 
     private void initializeViewPager() {
@@ -180,9 +193,9 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
 
         showActionBarRefresh(true);
 
-        serviceHelper.updateRubric(currentNewsType, rubric, new Callback() {
+        serviceHelper.updateRubric(currentNewsType, rubric, false, new AsyncListener<Void>() {
             @Override
-            public void onSuccess() {
+            public void onSuccess(Void val) {
                 refreshing = false;
                 showActionBarRefresh(false);
             }
@@ -286,5 +299,9 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
         } catch (Exception e) {
             Toast.makeText(this, R.string.error_general_toast, Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public boolean isVisible() {
+        return visible;
     }
 }

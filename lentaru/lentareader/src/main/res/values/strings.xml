@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="app_name">Lenta.RU</string>
     <string name="brief_news_image_desc">Картинка к новости</string>
     <string name="full_news_image_desc">Картинка к новости</string>
@@ -76,4 +75,6 @@
     <string name="comment_no_comments">К этой новости нет комментариев :(</string>
     <string name="comment_error_loading_list_message">Ошибка соединения с сервером.\nПроверьте ваше соединение с интернетом и попробуйте обновить.</string>
     <string name="comment_error_loading">Ошибка соединения с сервером.\nПроверьте ваше соединение с интернетом.</string>
+    <string name="comment_now_read">Сейчас читают:</string>
+    <string name="comment_now_read_count_default">n/a</string>
 </resources>

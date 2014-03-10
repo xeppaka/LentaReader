@@ -1,8 +1,13 @@
 package com.xeppaka.lentareader.ui.activities;
 
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.widget.TextView;
 
 import com.xeppaka.lentareader.R;
 import com.xeppaka.lentareader.ui.fragments.CommentsListFragment;
@@ -26,11 +31,21 @@ public class CommentsActivity extends ActionBarActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         setContentView(R.layout.comments_activity);
+
+        final TextView nowReadCountView = (TextView) findViewById(R.id.comment_now_read_count);
+
         final String xid = getIntent().getStringExtra("xid");
 
         if (xid != null) {
-            commentsFragment = new CommentsListFragment(xid);
+            commentsFragment = new CommentsListFragment(xid, nowReadCountView);
             getSupportFragmentManager().beginTransaction().replace(R.id.comments_fragment_container, commentsFragment).commit();
         }
+
+        Intent in = new Intent();
+        in.setAction("testalarm");
+        PendingIntent pi = PendingIntent.getBroadcast(this, 0, in, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        AlarmManager alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+        alarmManager.setRepeating(AlarmManager.RTC, System.currentTimeMillis() + 1000, 60000, pi);
     }
 }

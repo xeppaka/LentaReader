@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.os.ResultReceiver;
 import android.util.Log;
 
+import com.xeppaka.lentareader.async.AsyncListener;
 import com.xeppaka.lentareader.data.NewsType;
 import com.xeppaka.lentareader.data.Rubrics;
 import com.xeppaka.lentareader.utils.LentaConstants;
@@ -34,16 +35,22 @@ public class ServiceHelper {
      */
     private static class ServiceRequest {
         private Intent intent;
-        private List<Callback> listeners;
+        private List<AsyncListener<Void>> listeners;
 
-        private ServiceRequest(Intent intent, Callback listener) {
+        private ServiceRequest(Intent intent, AsyncListener<Void> listener) {
             this.intent = intent;
 
-            this.listeners = new ArrayList<Callback>(4);
-            this.listeners.add(listener);
+            this.listeners = new ArrayList<AsyncListener<Void>>(1);
+            addListener(listener);
         }
 
-        public List<Callback> getListeners() {
+        public void addListener(AsyncListener<Void> listener) {
+            if (listener != null) {
+                this.listeners.add(listener);
+            }
+        }
+
+        public List<AsyncListener<Void>> getListeners() {
             return listeners;
         }
 
@@ -72,7 +79,7 @@ public class ServiceHelper {
             }
 
             LentaService.Result result = LentaService.Result.valueOf(resultData.getString(BundleConstants.RESULT.name()));
-            List<Callback> requestListeners = request.getListeners();
+            List<AsyncListener<Void>> requestListeners = request.getListeners();
 
             if (requestListeners.isEmpty()) {
                 return;
@@ -80,14 +87,14 @@ public class ServiceHelper {
 
             switch (result) {
                 case SUCCESS:
-                    for (Callback listener : requestListeners) {
-                        listener.onSuccess();
+                    for (AsyncListener<Void> listener : requestListeners) {
+                        listener.onSuccess(null);
                     }
                     break;
                 case FAILURE:
                     Exception ex = (Exception)resultData.getSerializable(BundleConstants.EXCEPTION.name());
 
-                    for (Callback listener : requestListeners) {
+                    for (AsyncListener listener : requestListeners) {
                         listener.onFailure(ex);
                     }
                     break;
@@ -103,7 +110,7 @@ public class ServiceHelper {
         this.resultReceiver = new ServiceResultReceiver(handler);
 	}
 
-	public void updateRubric(NewsType newsType, Rubrics rubric, Callback callback) {
+	public void updateRubric(NewsType newsType, Rubrics rubric, boolean withNotification, AsyncListener<Void> asyncListener) {
 		final int requestId = requestCounter.incrementAndGet();
 
         Uri uri = LentaService.BASE_URI.buildUpon().appendPath(newsType.name()).appendPath(rubric.name()).build();
@@ -111,19 +118,49 @@ public class ServiceHelper {
         intent.putExtra(LentaService.INTENT_RESULT_RECEIVER_NAME, resultReceiver);
         intent.putExtra(LentaService.INTENT_REQUEST_ID_NAME, requestId);
 
+        if (withNotification) {
+            intent.putExtra(LentaService.INTENT_NOTIFICATION_NAME, true);
+        }
+
         synchronized (sync) {
             for (ServiceRequest request : serviceRequests.values()) {
                 if (request.getIntent().filterEquals(intent)) {
-                    request.getListeners().add(callback);
+                    request.addListener(asyncListener);
                     return;
                 }
             }
 
-            serviceRequests.put(requestId, new ServiceRequest(intent, callback));
+            serviceRequests.put(requestId, new ServiceRequest(intent, asyncListener));
         }
 
         startService(intent);
 	}
+
+    public void updateRubrics(NewsType newsType, List<Rubrics> rubric, boolean withNotification, AsyncListener<Void> asyncListener) {
+//        final int requestId = requestCounter.incrementAndGet();
+//
+//        Uri uri = LentaService.BASE_URI.buildUpon().appendPath(newsType.name()).appendPath(rubric.name()).build();
+//        Intent intent = new Intent(LentaService.Action.UPDATE_RUBRIC.name(), uri, context, LentaService.class);
+//        intent.putExtra(LentaService.INTENT_RESULT_RECEIVER_NAME, resultReceiver);
+//        intent.putExtra(LentaService.INTENT_REQUEST_ID_NAME, requestId);
+//
+//        if (withNotification) {
+//            intent.putExtra(LentaService.INTENT_NOTIFICATION_NAME, true);
+//        }
+//
+//        synchronized (sync) {
+//            for (ServiceRequest request : serviceRequests.values()) {
+//                if (request.getIntent().filterEquals(intent)) {
+//                    request.addListener(asyncListener);
+//                    return;
+//                }
+//            }
+//
+//            serviceRequests.put(requestId, new ServiceRequest(intent, asyncListener));
+//        }
+//
+//        startService(intent);
+    }
 
 	private void startService(Intent intent) {
 		context.startService(intent);

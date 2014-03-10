@@ -3,12 +3,15 @@ package com.xeppaka.lentareader.ui.fragments;
 import android.content.Context;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.xeppaka.lentareader.R;
@@ -27,7 +30,7 @@ import org.java_websocket.handshake.ServerHandshake;
 /**
  * Created by kacpa01 on 2/28/14.
  */
-public class CommentsListFragment extends ListFragment {
+public class CommentsListFragment extends ListFragment implements StreamListener {
     private CommentsAdapter commentsAdapter;
     private Comments loadedComments;
     private String xid;
@@ -35,15 +38,19 @@ public class CommentsListFragment extends ListFragment {
     private String errorLoadingCommentsListMessage;
     private String noCommentsText;
     private LentaCommentsStream commentsStream;
+    private TextView nowReadCountView;
+    private int tmp;
 
-    public CommentsListFragment(String xid) {
+    public CommentsListFragment(String xid, TextView nowReadCountView) {
         this.xid = xid;
+        this.nowReadCountView = nowReadCountView;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final Context context = getActivity();
         final Resources resources = context.getResources();
+
         noCommentsText = resources.getString(R.string.comment_no_comments);
         errorLoadingComments = resources.getString(R.string.comment_error_loading);
         errorLoadingCommentsListMessage = resources.getString(R.string.comment_error_loading_list_message);
@@ -57,6 +64,7 @@ public class CommentsListFragment extends ListFragment {
         super.onViewCreated(view, savedInstanceState);
 
         final ListView listView = getListView();
+
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -98,6 +106,13 @@ public class CommentsListFragment extends ListFragment {
         }
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        disconnectWebSocket();
+    }
+
     private void refreshComments() {
         setEmptyText(noCommentsText);
 
@@ -112,29 +127,8 @@ public class CommentsListFragment extends ListFragment {
                         loadedComments = parser.parse(value);
                         showComments();
 
-                        if (commentsStream == null && loadedComments.getStreamId() != null) {
-                            commentsStream = new LentaCommentsStream(loadedComments.getStreamId());
-                            commentsStream.connect(new StreamListener() {
-                                @Override
-                                public void onOpen(ServerHandshake handshakedata) {
-                                    Toast.makeText(getActivity(), "Web Socket connected.", Toast.LENGTH_SHORT);
-                                }
-
-                                @Override
-                                public void onMessage(String message) {
-                                    Toast.makeText(getActivity(), "Message received: " + message, Toast.LENGTH_SHORT);
-                                }
-
-                                @Override
-                                public void onClose(int code, String reason, boolean remote) {
-                                    Toast.makeText(getActivity(), "Web Socket closed.", Toast.LENGTH_SHORT);
-                                }
-
-                                @Override
-                                public void onError(Exception ex) {
-                                    Toast.makeText(getActivity(), "Web Socket error: " + ex.toString(), Toast.LENGTH_SHORT);
-                                }
-                            });
+                        if (loadedComments.getStreamId() != null) {
+                            connectWebSocket(loadedComments.getStreamId());
                         }
                     } catch (ParseException e) {
                         setEmptyText(errorLoadingCommentsListMessage);
@@ -153,14 +147,67 @@ public class CommentsListFragment extends ListFragment {
 
                     loadedComments = new Comments();
                     showComments();
-                    Toast.makeText(getActivity(), errorLoadingComments, Toast.LENGTH_SHORT).show();
                 }
             }
         });
     }
 
+    private void connectWebSocket(String streamId) {
+        if (commentsStream == null) {
+            commentsStream = new LentaCommentsStream(streamId);
+            commentsStream.connect(CommentsListFragment.this);
+        }
+    }
+
+    private void disconnectWebSocket() {
+        if (commentsStream != null) {
+            commentsStream.disconnect();
+        }
+    }
+
     private void showComments() {
         commentsAdapter.setComments(loadedComments);
         setListAdapter(commentsAdapter);
+    }
+
+    @Override
+    public void onOpen(ServerHandshake handshakedata) {
+        new Handler(CommentsListFragment.this.getActivity().getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getActivity(), "Web Socket connected.", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    @Override
+    public void onMessage(final String message) {
+        new Handler(CommentsListFragment.this.getActivity().getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getActivity(), "Message received: " + message, Toast.LENGTH_SHORT).show();
+                nowReadCountView.setText(" " + tmp++);
+            }
+        });
+    }
+
+    @Override
+    public void onClose(int code, String reason, boolean remote) {
+        new Handler(CommentsListFragment.this.getActivity().getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getActivity(), "Web Socket closed.", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    @Override
+    public void onError(final Exception ex) {
+        new Handler(CommentsListFragment.this.getActivity().getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getActivity(), "Web Socket error: " + ex.toString(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

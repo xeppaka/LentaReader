@@ -7,4 +7,6 @@
     <color name="brief_list_item_notread">#ffff7f00</color>
     <color name="image_loading_background">#ffd2d2d2</color>
     <color name="comment_just_expanded">#ffd8dcde</color>
+    <color name="comment_rating_positive">#ff00a246</color>
+    <color name="comment_rating_negative">#ffe90018</color>
 </resources>
