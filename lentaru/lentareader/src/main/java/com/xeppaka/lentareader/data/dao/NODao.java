@@ -19,9 +19,12 @@ public interface NODao<T extends NewsObject> extends Dao<T> {
     T readLatest(Rubrics rubric);
     T readLatestWOImage(Rubrics rubric, int limit);
     int deleteOlderOrEqual(Rubrics rubric, long date);
-    int clearLatestFlag(Rubrics rubric);
-    int setLatestFlag(Rubrics rubric);
+    int clearUpdatedFromLatestFlag(Rubrics rubric);
+    int setUpdatedFromLatestFlag(Rubrics rubric);
     boolean hasImage(long id);
     boolean hasImage(String key);
     List<Long> readAllIds(Rubrics rubric);
+
+    int clearRecentFlag();
+    int clearUpdatedInBackgroundFlag();
 }

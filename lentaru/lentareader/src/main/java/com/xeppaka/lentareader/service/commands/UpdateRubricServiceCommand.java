@@ -1,6 +1,5 @@
 package com.xeppaka.lentareader.service.commands;
 
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -32,15 +31,15 @@ public final class UpdateRubricServiceCommand extends RunnableServiceCommand {
     private NewsType newsType;
 	private Rubrics rubric;
     private Context context;
-    private boolean notification;
+    private boolean scheduled;
 
-    public UpdateRubricServiceCommand(int requestId, NewsType newsType, Rubrics rubric, boolean notification, Context context, ResultReceiver resultReceiver) {
+    public UpdateRubricServiceCommand(int requestId, NewsType newsType, Rubrics rubric, boolean scheduled, Context context, ResultReceiver resultReceiver) {
 		super(context, requestId, resultReceiver, true);
 		
 		this.context = context;
 		this.newsType = newsType;
 		this.rubric = rubric;
-        this.notification = notification;
+        this.scheduled = scheduled;
 	}
 	
 	@Override
@@ -83,12 +82,20 @@ public final class UpdateRubricServiceCommand extends RunnableServiceCommand {
 		for (News n : news) {
 			if (!newsDao.exist(n.getGuid())) {
 				nonExistingNews.add(n);
+                n.setUpdatedInBackground(scheduled);
+                n.setRecent(true);
 			} else if (n.hasImage() && !newsDao.hasImage(n.getGuid())) {
                 withNewImage.add(n);
             }
 		}
 
 		Log.d(LentaConstants.LoggerServiceTag, "Number of new news from downloaded: " + nonExistingNews.size());
+
+        if (nonExistingNews.size() > 0) {
+            Log.d(LentaConstants.LoggerServiceTag, "Clearing UpdatedInBackground and Recent flags for all news.");
+            newsDao.clearUpdatedInBackgroundFlag();
+            newsDao.clearRecentFlag();
+        }
 
 		Collection<Long> newsIds = newsDao.create(nonExistingNews);
 		Log.d(LentaConstants.LoggerServiceTag, "Newly created news ids: " + newsIds);
@@ -107,7 +114,7 @@ public final class UpdateRubricServiceCommand extends RunnableServiceCommand {
         }
 
         if (rubric != Rubrics.LATEST) {
-            newsDao.clearLatestFlag(rubric);
+            newsDao.clearUpdatedFromLatestFlag(rubric);
         }
 
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -120,7 +127,7 @@ public final class UpdateRubricServiceCommand extends RunnableServiceCommand {
             newsDao.deleteOlderOrEqual(rubric, System.currentTimeMillis() - deleteDays * 86400000);
         }
 
-        if (notification) {
+        if (scheduled) {
             showNotification(nonExistingNews);
         }
 	}

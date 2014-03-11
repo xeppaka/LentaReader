@@ -76,8 +76,6 @@ public class NewsListFragment extends NewsObjectListFragment implements AbsListV
 
         dao.unregisterContentObserver(newsDaoObserver);
         saveScrollPosition();
-
-        setUpdateByUser(false);
     }
 
     @Override
@@ -92,15 +90,12 @@ public class NewsListFragment extends NewsObjectListFragment implements AbsListV
 
         scrolled = false;
 
-        setUpdateByUser(true);
         refresh();
 	}
 
     @Override
     public void refresh() {
         scrolled = false;
-        final boolean updateByUser = isUpdateByUser();
-        setUpdateByUser(false);
 
         dao.readAllIdsAsync(getCurrentRubric(), new AsyncListener<List<Long>>() {
             @Override
@@ -110,25 +105,15 @@ public class NewsListFragment extends NewsObjectListFragment implements AbsListV
                 }
 
                 final List<News> news = newsAdapter.getNewsObjects();
-
-                for (int i = 0; i < news.size(); ++i) {
-                    final News n = news.get(i);
-
-                    final int resultIndex = result.indexOf(n.getId());
+                final Iterator<News> iter = news.iterator();
+                while (iter.hasNext()) {
+                    final News next = iter.next();
+                    final int resultIndex = result.indexOf(next.getId());
 
                     if (resultIndex < 0) {
-                        news.set(i, null);
+                        iter.remove();
                     } else {
                         result.remove(resultIndex);
-                    }
-                }
-
-                Iterator<News> iter = news.iterator();
-                while (iter.hasNext()) {
-                    News next = iter.next();
-
-                    if (next == null) {
-                        iter.remove();
                     }
                 }
 
@@ -140,14 +125,13 @@ public class NewsListFragment extends NewsObjectListFragment implements AbsListV
                         setLatestPubDate(news.get(0).getPubDate().getTime());
                     }
 
-                    showData(news, 0, updateByUser);
+                    showData(news, countAndClearUpdatedInBackground(news));
                 } else {
-                    final int newItemsCount = result.size();
                     dao.readBriefAsync(getCurrentRubric(), new AsyncListener<List<News>>() {
                         @Override
                         public void onSuccess(List<News> result) {
                             if (isResumed()) {
-                                showData(result, result.size(), updateByUser);
+                                showData(result, countAndClearUpdatedInBackground(result));
                             }
 
                             if (result.isEmpty()) {
@@ -168,6 +152,30 @@ public class NewsListFragment extends NewsObjectListFragment implements AbsListV
         });
     }
 
+    private int countAndClearUpdatedInBackground(List<News> news) {
+        int result = 0;
+
+        for (News n : news) {
+            if (n.isUpdatedInBackground()) {
+                ++result;
+                n.setUpdatedInBackground(false);
+            }
+        }
+
+        clearUpdatedInBackgroundFlag();
+        return result;
+    }
+
+    private void clearUpdatedInBackgroundFlag() {
+        dao.clearUpdatedInBackgroundFlagAsync(new AsyncListener<Integer>() {
+            @Override
+            public void onSuccess(Integer value) {}
+
+            @Override
+            public void onFailure(Exception e) {}
+        });
+    }
+
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
@@ -178,8 +186,8 @@ public class NewsListFragment extends NewsObjectListFragment implements AbsListV
         }
     }
 
-    private void showData(List<News> data, int newItemsCount, boolean updateByUser) {
-        if (updateByUser && !data.isEmpty() && getLatestPubDate() != data.get(0).getPubDate().getTime()) {
+    private void showData(List<News> data, int updatedInBackground) {
+        if (updatedInBackground <= 0 && !data.isEmpty() && getLatestPubDate() != data.get(0).getPubDate().getTime()) {
             clearScrollPosition();
         }
 
@@ -190,8 +198,8 @@ public class NewsListFragment extends NewsObjectListFragment implements AbsListV
             restoreScrollPosition();
         }
 
-        if (!updateByUser && newItemsCount > 0) {
-            Toast.makeText(getActivity(), String.format(autoRefreshToast, newItemsCount), Toast.LENGTH_SHORT).show();
+        if (updatedInBackground > 0) {
+            Toast.makeText(getActivity(), String.format(autoRefreshToast, updatedInBackground), Toast.LENGTH_SHORT).show();
         }
     }
 

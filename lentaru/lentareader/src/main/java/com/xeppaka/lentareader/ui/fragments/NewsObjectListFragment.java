@@ -24,7 +24,6 @@ public abstract class NewsObjectListFragment extends ListFragment {
     protected ScrollerPosition[] scrollPositions = new ScrollerPosition[Rubrics.values().length];
     protected long[] latestNewsTime = new long[Rubrics.values().length];
     private ItemSelectionListener itemSelectionListener;
-    private boolean updateByUser;
 
     public interface ItemSelectionListener {
         void onItemSelected(int position, long id);
@@ -60,7 +59,6 @@ public abstract class NewsObjectListFragment extends ListFragment {
         saveScrollPosition();
         this.currentRubric = currentRubric;
 
-        setUpdateByUser(true);
         refresh();
     }
 
@@ -108,14 +106,6 @@ public abstract class NewsObjectListFragment extends ListFragment {
         if (itemSelectionListener != null) {
             itemSelectionListener.onItemSelected(position, id);
         }
-    }
-
-    public boolean isUpdateByUser() {
-        return updateByUser;
-    }
-
-    public void setUpdateByUser(boolean updateByUser) {
-        this.updateByUser = updateByUser;
     }
 
     public abstract NewsType getNewsType();

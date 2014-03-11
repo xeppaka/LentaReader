@@ -40,7 +40,7 @@ public class LentaService extends Service {
 
     public static final String INTENT_RESULT_RECEIVER_NAME = "resultReceiver";
     public static final String INTENT_REQUEST_ID_NAME = "requestId";
-    public static final String INTENT_NOTIFICATION_NAME = "notification";
+    public static final String INTENT_SCHEDULED_NAME = "scheduled";
 
     public static final int NO_REQUEST_ID = -1;
 
@@ -121,7 +121,7 @@ public class LentaService extends Service {
 		
 		final int requestId = intent.getIntExtra(INTENT_REQUEST_ID_NAME, NO_REQUEST_ID);
         final ResultReceiver receiver = intent.getParcelableExtra(INTENT_RESULT_RECEIVER_NAME);
-        final boolean notification = intent.getBooleanExtra(INTENT_NOTIFICATION_NAME, false);
+        final boolean notification = intent.getBooleanExtra(INTENT_SCHEDULED_NAME, false);
 		final Action action = Action.valueOf(intent.getAction());
 
         switch (action) {

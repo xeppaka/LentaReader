@@ -1,9 +1,5 @@
 package com.xeppaka.lentareader.ui.activities;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -14,7 +10,6 @@ import com.xeppaka.lentareader.R;
 import com.xeppaka.lentareader.async.AsyncListener;
 import com.xeppaka.lentareader.data.News;
 import com.xeppaka.lentareader.data.Rubrics;
-import com.xeppaka.lentareader.data.dao.async.AsyncDao;
 import com.xeppaka.lentareader.data.dao.async.AsyncNODao;
 import com.xeppaka.lentareader.data.dao.daoobjects.NewsDao;
 import com.xeppaka.lentareader.scheduler.LentaBackgroundScheduler;
@@ -48,12 +43,14 @@ public class PreferencesActivity extends ActionBarActivity {
 
                     if (!delete) {
                         AsyncNODao<News> nd = NewsDao.getInstance(getContentResolver());
-                        nd.setLatestFlagAsync(Rubrics.LATEST, new AsyncListener<Integer>() {
+                        nd.setUpdatedFromLatestFlagAsync(Rubrics.LATEST, new AsyncListener<Integer>() {
                             @Override
-                            public void onSuccess(Integer rowsUpdated) {}
+                            public void onSuccess(Integer rowsUpdated) {
+                            }
 
                             @Override
-                            public void onFailure(Exception e) {}
+                            public void onFailure(Exception e) {
+                            }
                         });
                     }
                 } else if (PreferencesConstants.PREF_KEY_NEWS_BACKGROUND_UPDATE.equals(key)) {

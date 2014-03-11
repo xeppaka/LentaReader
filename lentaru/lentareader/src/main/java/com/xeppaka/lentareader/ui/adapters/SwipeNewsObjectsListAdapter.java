@@ -45,6 +45,8 @@ public class SwipeNewsObjectsListAdapter extends FragmentPagerAdapter {
         switch (newsType) {
             case NEWS:
                 return fragments[position] = new NewsListFragment();
+            case ARTICLE:
+                return fragments[position] = new NewsListFragment();
             default:
                 throw new AssertionError();
         }
@@ -52,7 +54,7 @@ public class SwipeNewsObjectsListAdapter extends FragmentPagerAdapter {
 
 	@Override
 	public int getCount() {
-		return 1;//TITLES.length;
+		return 2;//TITLES.length;
 	}
 
 	@Override
@@ -64,7 +66,7 @@ public class SwipeNewsObjectsListAdapter extends FragmentPagerAdapter {
 
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
-        final NewsObjectListFragment instFragment = (NewsObjectListFragment)super.instantiateItem(container, position);
+        final NewsObjectListFragment instFragment = (NewsObjectListFragment) super.instantiateItem(container, position);
         fragments[position] = instFragment;
 
         return instFragment;

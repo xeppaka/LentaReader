@@ -52,12 +52,14 @@ public class NewsDeleteIntervalPreference extends DialogPreference {
 
             if (deleteAfterDays > oldValue) {
                 final AsyncNODao<News> nd = NewsDao.getInstance(getContext().getContentResolver());
-                nd.setLatestFlagAsync(Rubrics.LATEST, new AsyncListener<Integer>() {
+                nd.setUpdatedFromLatestFlagAsync(Rubrics.LATEST, new AsyncListener<Integer>() {
                     @Override
-                    public void onSuccess(Integer rowsUpdated) {}
+                    public void onSuccess(Integer rowsUpdated) {
+                    }
 
                     @Override
-                    public void onFailure(Exception e) {}
+                    public void onFailure(Exception e) {
+                    }
                 });
             }
 

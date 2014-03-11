@@ -7,7 +7,6 @@ import com.xeppaka.lentareader.async.AsyncListener;
 import com.xeppaka.lentareader.data.NewsObject;
 import com.xeppaka.lentareader.data.Rubrics;
 import com.xeppaka.lentareader.data.dao.NODao;
-import com.xeppaka.lentareader.data.dao.async.AsyncDao;
 import com.xeppaka.lentareader.data.dao.async.AsyncNODao;
 
 import java.util.List;
@@ -134,7 +133,43 @@ public class AsyncNODaoDecorator<T extends NewsObject> extends AsyncDaoDecorator
 
         @Override
         protected Integer doInBackground(Rubrics... rubric) {
-            return clearLatestFlag(rubric[0]);
+            return clearUpdatedFromLatestFlag(rubric[0]);
+        }
+
+        @Override
+        protected void onPostExecute(Integer result) {
+            listener.onSuccess(result);
+        }
+    }
+
+    protected class AsyncClearUpdatedInBackgroundFlagTask extends AsyncTask<Void, Void, Integer> {
+        private AsyncListener<Integer> listener;
+
+        public AsyncClearUpdatedInBackgroundFlagTask(AsyncListener<Integer> listener) {
+            this.listener = listener;
+        }
+
+        @Override
+        protected Integer doInBackground(Void... param) {
+            return clearUpdatedInBackgroundFlag();
+        }
+
+        @Override
+        protected void onPostExecute(Integer result) {
+            listener.onSuccess(result);
+        }
+    }
+
+    protected class AsyncClearRecentFlagTask extends AsyncTask<Void, Void, Integer> {
+        private AsyncListener<Integer> listener;
+
+        public AsyncClearRecentFlagTask(AsyncListener<Integer> listener) {
+            this.listener = listener;
+        }
+
+        @Override
+        protected Integer doInBackground(Void... param) {
+            return clearRecentFlag();
         }
 
         @Override
@@ -152,7 +187,7 @@ public class AsyncNODaoDecorator<T extends NewsObject> extends AsyncDaoDecorator
 
         @Override
         protected Integer doInBackground(Rubrics... rubric) {
-            return setLatestFlag(rubric[0]);
+            return setUpdatedFromLatestFlag(rubric[0]);
         }
 
         @Override
@@ -236,13 +271,23 @@ public class AsyncNODaoDecorator<T extends NewsObject> extends AsyncDaoDecorator
     }
 
     @Override
-    public AsyncTask<Rubrics, Void, Integer> clearLatestFlagAsync(Rubrics rubric, AsyncListener<Integer> listener) {
+    public AsyncTask<Rubrics, Void, Integer> clearUpdatedFromLatestFlagAsync(Rubrics rubric, AsyncListener<Integer> listener) {
         return new AsyncClearLatestFlagTask(listener).execute(rubric);
     }
 
     @Override
-    public AsyncTask<Rubrics, Void, Integer> setLatestFlagAsync(Rubrics rubric, AsyncListener<Integer> listener) {
+    public AsyncTask<Rubrics, Void, Integer> setUpdatedFromLatestFlagAsync(Rubrics rubric, AsyncListener<Integer> listener) {
         return new AsyncSetLatestFlagTask(listener).execute(rubric);
+    }
+
+    @Override
+    public AsyncTask<Void, Void, Integer> clearUpdatedInBackgroundFlagAsync(AsyncListener<Integer> listener) {
+        return new AsyncClearUpdatedInBackgroundFlagTask(listener).execute();
+    }
+
+    @Override
+    public AsyncTask<Void, Void, Integer> clearRecentFlagAsync(AsyncListener<Integer> listener) {
+        return new AsyncClearRecentFlagTask(listener).execute();
     }
 
     @Override
@@ -271,13 +316,23 @@ public class AsyncNODaoDecorator<T extends NewsObject> extends AsyncDaoDecorator
     }
 
     @Override
-    public int clearLatestFlag(Rubrics rubric) {
-        return getDecoratedDao().clearLatestFlag(rubric);
+    public int clearUpdatedFromLatestFlag(Rubrics rubric) {
+        return getDecoratedDao().clearUpdatedFromLatestFlag(rubric);
     }
 
     @Override
-    public int setLatestFlag(Rubrics rubric) {
-        return getDecoratedDao().setLatestFlag(rubric);
+    public int setUpdatedFromLatestFlag(Rubrics rubric) {
+        return getDecoratedDao().setUpdatedFromLatestFlag(rubric);
+    }
+
+    @Override
+    public int clearRecentFlag() {
+        return getDecoratedDao().clearRecentFlag();
+    }
+
+    @Override
+    public int clearUpdatedInBackgroundFlag() {
+        return getDecoratedDao().clearUpdatedInBackgroundFlag();
     }
 
     @Override

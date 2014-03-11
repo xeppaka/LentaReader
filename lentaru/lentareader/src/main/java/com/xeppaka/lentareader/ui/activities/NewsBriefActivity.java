@@ -192,22 +192,17 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
         final NewsObjectListFragment fragment = pagerAdapter.getFragment(pager.getCurrentItem());
         final Rubrics rubric = fragment.getCurrentRubric();
 
-        fragment.setUpdateByUser(true);
         showActionBarRefresh(true);
 
         serviceHelper.updateRubric(currentNewsType, rubric, false, new AsyncListener<Void>() {
             @Override
             public void onSuccess(Void val) {
-                fragment.setUpdateByUser(false);
-
                 refreshing = false;
                 showActionBarRefresh(false);
             }
 
             @Override
             public void onFailure(Exception ex) {
-                fragment.setUpdateByUser(false);
-
                 refreshing = false;
                 showActionBarRefresh(false);
 

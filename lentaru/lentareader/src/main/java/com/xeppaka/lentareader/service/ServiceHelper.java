@@ -110,7 +110,7 @@ public class ServiceHelper {
         this.resultReceiver = new ServiceResultReceiver(handler);
 	}
 
-	public void updateRubric(NewsType newsType, Rubrics rubric, boolean withNotification, AsyncListener<Void> asyncListener) {
+	public void updateRubric(NewsType newsType, Rubrics rubric, boolean scheduled, AsyncListener<Void> asyncListener) {
 		final int requestId = requestCounter.incrementAndGet();
 
         Uri uri = LentaService.BASE_URI.buildUpon().appendPath(newsType.name()).appendPath(rubric.name()).build();
@@ -118,8 +118,8 @@ public class ServiceHelper {
         intent.putExtra(LentaService.INTENT_RESULT_RECEIVER_NAME, resultReceiver);
         intent.putExtra(LentaService.INTENT_REQUEST_ID_NAME, requestId);
 
-        if (withNotification) {
-            intent.putExtra(LentaService.INTENT_NOTIFICATION_NAME, true);
+        if (scheduled) {
+            intent.putExtra(LentaService.INTENT_SCHEDULED_NAME, true);
         }
 
         synchronized (sync) {
@@ -145,7 +145,7 @@ public class ServiceHelper {
 //        intent.putExtra(LentaService.INTENT_REQUEST_ID_NAME, requestId);
 //
 //        if (withNotification) {
-//            intent.putExtra(LentaService.INTENT_NOTIFICATION_NAME, true);
+//            intent.putExtra(LentaService.INTENT_SCHEDULED_NAME, true);
 //        }
 //
 //        synchronized (sync) {

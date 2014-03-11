@@ -82,6 +82,6 @@
     <string name="pref_background_update_check">Фоновая загрузка новостей</string>
     <string name="pref_news_background_check_interval_summary">Загружать новости в фоне каждые %s минут</string>
     <string name="pref_news_background_check_interval_summary_default">Загружать новости в фоне каждые 20 минут</string>
-    <string name="news_background_check_interval_header">Временной интервал между фоновыми загрузками новостей</string>
+    <string name="news_background_check_interval_header">Временной интервал между фоновыми загрузками новостей:</string>
     <string name="news_new_items_auto_refresh">Загружено новых новостей в фоне: %d</string>
 </resources>

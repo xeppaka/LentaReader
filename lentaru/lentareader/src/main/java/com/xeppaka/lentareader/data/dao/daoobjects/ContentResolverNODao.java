@@ -22,17 +22,22 @@ import java.util.List;
 public abstract class ContentResolverNODao<T extends NewsObject> extends ContentResolverDao<T> implements NODao<T> {
 
     private final static String[] projectionImage = { BaseColumns._ID, NewsObjectEntry.COLUMN_NAME_IMAGELINK };
-    private final static ContentValues clearLatestFlagValues;
-    private final static ContentValues setLatestFlagValues;
+    private final static ContentValues clearUpdatedFromLatestFlagValues;
+    private final static ContentValues setUpdatedFromLatestFlagValues;
+    private final static ContentValues clearUpdatedInBackgroundFlagValues;
+    private final static ContentValues clearRecentFlagValues;
 
     private final static String sortOrder = NewsObjectEntry.COLUMN_NAME_PUBDATE + " DESC";
 
     static {
-        clearLatestFlagValues = new ContentValues();
-        clearLatestFlagValues.put(NewsEntry.COLUMN_NAME_UPDATED_FROM_LATEST, 0);
-
-        setLatestFlagValues = new ContentValues();
-        setLatestFlagValues.put(NewsEntry.COLUMN_NAME_UPDATED_FROM_LATEST, 1);
+        clearUpdatedFromLatestFlagValues = new ContentValues();
+        clearUpdatedFromLatestFlagValues.put(NewsEntry.COLUMN_NAME_UPDATED_FROM_LATEST, 0);
+        setUpdatedFromLatestFlagValues = new ContentValues();
+        setUpdatedFromLatestFlagValues.put(NewsEntry.COLUMN_NAME_UPDATED_FROM_LATEST, 1);
+        clearUpdatedInBackgroundFlagValues = new ContentValues();
+        clearUpdatedInBackgroundFlagValues.put(NewsEntry.COLUMN_NAME_UPDATED_IN_BACKGROUND, 0);
+        clearRecentFlagValues = new ContentValues();
+        clearRecentFlagValues.put(NewsEntry.COLUMN_NAME_UPDATED_IN_BACKGROUND, 0);
     }
 
 	public ContentResolverNODao(ContentResolver cr) {
@@ -274,27 +279,37 @@ public abstract class ContentResolverNODao<T extends NewsObject> extends Content
     }
 
     @Override
-    public int clearLatestFlag(Rubrics rubric) {
+    public int clearUpdatedFromLatestFlag(Rubrics rubric) {
         if (rubric != Rubrics.LATEST) {
             String where = getWhereFromSQLiteType(SQLiteType.TEXT);
             String[] whereArgs = new String[] { rubric.name() };
 
-            return getContentResolver().update(getContentProviderUri(), clearLatestFlagValues, String.format(where, getRubricColumnName()), whereArgs);
+            return getContentResolver().update(getContentProviderUri(), clearUpdatedFromLatestFlagValues, String.format(where, getRubricColumnName()), whereArgs);
         } else {
-            return getContentResolver().update(getContentProviderUri(), clearLatestFlagValues, null, null);
+            return getContentResolver().update(getContentProviderUri(), clearUpdatedFromLatestFlagValues, null, null);
         }
     }
 
     @Override
-    public int setLatestFlag(Rubrics rubric) {
+    public int setUpdatedFromLatestFlag(Rubrics rubric) {
         if (rubric != Rubrics.LATEST) {
             String where = getWhereFromSQLiteType(SQLiteType.TEXT);
             String[] whereArgs = new String[] { rubric.name() };
 
-            return getContentResolver().update(getContentProviderUri(), setLatestFlagValues, String.format(where, getRubricColumnName()), whereArgs);
+            return getContentResolver().update(getContentProviderUri(), setUpdatedFromLatestFlagValues, String.format(where, getRubricColumnName()), whereArgs);
         } else {
-            return getContentResolver().update(getContentProviderUri(), setLatestFlagValues, null, null);
+            return getContentResolver().update(getContentProviderUri(), setUpdatedFromLatestFlagValues, null, null);
         }
+    }
+
+    @Override
+    public int clearUpdatedInBackgroundFlag() {
+        return getContentResolver().update(getContentProviderUri(), clearUpdatedInBackgroundFlagValues, null, null);
+    }
+
+    @Override
+    public int clearRecentFlag() {
+        return getContentResolver().update(getContentProviderUri(), clearRecentFlagValues, null, null);
     }
 
     //	@Override

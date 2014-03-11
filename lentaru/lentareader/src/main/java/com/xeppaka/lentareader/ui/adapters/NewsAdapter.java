@@ -257,6 +257,12 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
 
         News news = getItem(position);
 
+        if (news.isRecent()) {
+            view.setBackgroundResource(R.drawable.news_recent_item);
+        } else {
+            view.setBackgroundColor(0x00000000);
+        }
+
         if (!news.isRead()) {
             newsReadIndicator.setVisibility(View.VISIBLE);
         } else {

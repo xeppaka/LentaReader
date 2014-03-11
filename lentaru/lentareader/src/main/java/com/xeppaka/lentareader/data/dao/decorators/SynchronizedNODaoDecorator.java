@@ -58,16 +58,30 @@ public class SynchronizedNODaoDecorator<T extends NewsObject> extends Synchroniz
     }
 
     @Override
-    public int clearLatestFlag(Rubrics rubric) {
+    public int clearUpdatedFromLatestFlag(Rubrics rubric) {
         synchronized (getSync()) {
-            return decoratedDao.clearLatestFlag(rubric);
+            return decoratedDao.clearUpdatedFromLatestFlag(rubric);
         }
     }
 
     @Override
-    public int setLatestFlag(Rubrics rubric) {
+    public int setUpdatedFromLatestFlag(Rubrics rubric) {
         synchronized (getSync()) {
-            return decoratedDao.setLatestFlag(rubric);
+            return decoratedDao.setUpdatedFromLatestFlag(rubric);
+        }
+    }
+
+    @Override
+    public int clearRecentFlag() {
+        synchronized (getSync()) {
+            return decoratedDao.clearRecentFlag();
+        }
+    }
+
+    @Override
+    public int clearUpdatedInBackgroundFlag() {
+        synchronized (getSync()) {
+            return decoratedDao.clearUpdatedInBackgroundFlag();
         }
     }
 
