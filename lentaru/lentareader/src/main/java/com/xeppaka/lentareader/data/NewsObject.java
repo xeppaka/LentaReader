@@ -28,8 +28,10 @@ public abstract class NewsObject implements Comparable<NewsObject>, DatabaseObje
     private String formattedPubDate;
 	private Rubrics rubric;
     private String description;
-    private boolean latest;
     private boolean read;
+    private boolean updatedFromLatest;
+    private boolean updatedInBackground;
+    private boolean recent;
     private Body body;
 
     static {
@@ -47,7 +49,8 @@ public abstract class NewsObject implements Comparable<NewsObject>, DatabaseObje
 
 
     public NewsObject(long id, String guid, String title, String link, String imageLink,
-                      String imageCaption, String imageCredits, Date pubDate, Rubrics rubric, String description, boolean latest, boolean read, Body body) {
+                      String imageCaption, String imageCredits, Date pubDate, Rubrics rubric, String description,
+                      boolean read, boolean updatedFromLatest, boolean updatedInBackground, boolean recent, Body body) {
 		setId(id);
 		setGuid(guid);
 		setTitle(title);
@@ -59,15 +62,19 @@ public abstract class NewsObject implements Comparable<NewsObject>, DatabaseObje
 		setRubric(rubric);
         setDescription(description);
         setBody(body);
-        setLatest(latest);
+        setUpdatedFromLatest(updatedFromLatest);
+        setUpdatedInBackground(updatedInBackground);
+        setRecent(recent);
         setRead(read);
 
         setFormattedPubDate(dateFormat.format(getPubDate()));
 	}
 	
 	public NewsObject(String guid, String title, String link, String imageLink, String imageCaption,
-                      String imageCredits, Date pubDate, Rubrics rubric, String description, boolean latest, boolean read, Body body) {
-		this(ID_NONE, guid, title, link, imageLink, imageCaption, imageCredits, pubDate, rubric, description, latest, read, body);
+                      String imageCredits, Date pubDate, Rubrics rubric, String description,
+                      boolean read, boolean updatedFromLatest, boolean updatedInBackground, boolean recent, Body body) {
+		this(ID_NONE, guid, title, link, imageLink, imageCaption, imageCredits, pubDate, rubric, description,
+                read, updatedFromLatest, updatedInBackground, recent, body);
 	}
 	
 	public NewsObject(LentaRssItem rssItem) {
@@ -186,12 +193,12 @@ public abstract class NewsObject implements Comparable<NewsObject>, DatabaseObje
 		this.rubric = rubric;
 	}
 
-    public boolean isLatest() {
-        return latest;
+    public boolean isUpdatedFromLatest() {
+        return updatedFromLatest;
     }
 
-    public void setLatest(boolean latest) {
-        this.latest = latest;
+    public void setUpdatedFromLatest(boolean updatedFromLatest) {
+        this.updatedFromLatest = updatedFromLatest;
     }
 
     public boolean isRead() {
@@ -218,6 +225,22 @@ public abstract class NewsObject implements Comparable<NewsObject>, DatabaseObje
         this.description = description;
     }
 
+    public boolean isRecent() {
+        return recent;
+    }
+
+    public void setRecent(boolean recent) {
+        this.recent = recent;
+    }
+
+    public boolean isUpdatedInBackground() {
+        return updatedInBackground;
+    }
+
+    public void setUpdatedInBackground(boolean updatedInBackground) {
+        this.updatedInBackground = updatedInBackground;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -226,7 +249,7 @@ public abstract class NewsObject implements Comparable<NewsObject>, DatabaseObje
         NewsObject that = (NewsObject) o;
 
         if (id != that.id) return false;
-        if (latest != that.latest) return false;
+        if (updatedFromLatest != that.updatedFromLatest) return false;
         if (!body.equals(that.body)) return false;
         if (!description.equals(that.description)) return false;
         if (!guid.equals(that.guid)) return false;
@@ -255,7 +278,7 @@ public abstract class NewsObject implements Comparable<NewsObject>, DatabaseObje
         result = 31 * result + (imageCredits != null ? imageCredits.hashCode() : 0);
         result = 31 * result + pubDate.hashCode();
         result = 31 * result + rubric.hashCode();
-        result = 31 * result + (latest ? 1 : 0);
+        result = 31 * result + (updatedFromLatest ? 1 : 0);
         result = 31 * result + description.hashCode();
         result = 31 * result + body.hashCode();
 

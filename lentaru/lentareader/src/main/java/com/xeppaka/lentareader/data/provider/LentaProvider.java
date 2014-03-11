@@ -10,9 +10,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 
+import com.xeppaka.lentareader.data.db.ArticleEntry;
 import com.xeppaka.lentareader.data.db.LentaDbHelper;
 import com.xeppaka.lentareader.data.db.NewsEntry;
-import com.xeppaka.lentareader.data.db.NewsLinksEntry;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -21,44 +21,33 @@ public class LentaProvider extends ContentProvider {
 	private static final String CONTENT_URI_STRING = "com.xeppaka.lentareader.provider";
 	private static final String PATH_NEWS = "news";
 	private static final String PATH_NEWS_ID = "news/#";
-	private static final String PATH_LINKS = "links";
-	private static final String PATH_LINKS_ID = "links/#";
-	
-	private static final String PATH_CACHED_IMAGE = "cached_image";
-	private static final String PATH_CACHED_IMAGE_ID = "cached_image/*";
-	
+    private static final String PATH_ARTICLE = "article";
+    private static final String PATH_ARTICLE_ID = "article/#";
+
 	private static final int NEWS = 1;
 	private static final int NEWS_ID = 2;
-	private static final int LINKS = 3;
-	private static final int LINKS_ID = 4;
-	private static final int CACHED_IMAGE = 5;
-	private static final int CACHED_IMAGE_ID = 6;
-	
+    private static final int ARTICLE = 3;
+    private static final int ARTICLE_ID = 4;
+
 	private static final String MIME_NEWS_ITEM = "vnd.android.cursor.item/com.xeppaka.lentareader.news";
 	private static final String MIME_NEWS_DIR = "vnd.android.cursor.dir/com.xeppaka.lentareader.news";
-	private static final String MIME_LINKS_ITEM = "vnd.android.cursor.item/com.xeppaka.lentareader.links";
-	private static final String MIME_LINKS_DIR = "vnd.android.cursor.dir/com.xeppaka.lentareader.links";
-	
-//	private static final String MIME_CACHED_IMAGE_ITEM = "vnd.android.cursor.item/cz.fit.lentaruand.cached_image";
-//	private static final String MIME_CACHED_IMAGE_DIR = "vnd.android.cursor.dir/cz.fit.lentaruand.cached_image";
-	
+    private static final String MIME_ARTICLE_ITEM = "vnd.android.cursor.item/com.xeppaka.lentareader.article";
+    private static final String MIME_ARTICLE_DIR = "vnd.android.cursor.dir/com.xeppaka.lentareader.article";
+
 	private static final UriMatcher uriMatcher;
 	
 	public static final Uri CONTENT_URI = new Uri.Builder().scheme("content").authority(CONTENT_URI_STRING).build();
 	public static final Uri CONTENT_URI_NEWS = CONTENT_URI.buildUpon().appendPath(PATH_NEWS).build();
-	public static final Uri CONTENT_URI_LINKS = CONTENT_URI.buildUpon().appendPath(PATH_LINKS).build();
-	public static final Uri CONTENT_URI_CACHED_IMAGE = CONTENT_URI.buildUpon().appendPath(PATH_CACHED_IMAGE).build();
-	
+    public static final Uri CONTENT_URI_ARTICLE = CONTENT_URI.buildUpon().appendPath(PATH_ARTICLE).build();
+
 	private LentaDbHelper dbHelper;
 
 	static {
 		uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 		uriMatcher.addURI(CONTENT_URI_STRING, PATH_NEWS, NEWS);
 		uriMatcher.addURI(CONTENT_URI_STRING, PATH_NEWS_ID, NEWS_ID);
-		uriMatcher.addURI(CONTENT_URI_STRING, PATH_LINKS, LINKS);
-		uriMatcher.addURI(CONTENT_URI_STRING, PATH_LINKS_ID, LINKS_ID);
-		uriMatcher.addURI(CONTENT_URI_STRING, PATH_CACHED_IMAGE, CACHED_IMAGE);
-		uriMatcher.addURI(CONTENT_URI_STRING, PATH_CACHED_IMAGE_ID, CACHED_IMAGE);
+        uriMatcher.addURI(CONTENT_URI_STRING, PATH_ARTICLE, ARTICLE);
+        uriMatcher.addURI(CONTENT_URI_STRING, PATH_ARTICLE_ID, ARTICLE_ID);
 	}
 
 	@Override
@@ -68,10 +57,10 @@ public class LentaProvider extends ContentProvider {
 			return MIME_NEWS_DIR;
 		case NEWS_ID:
 			return MIME_NEWS_ITEM;
-		case LINKS:
-			return MIME_LINKS_DIR;
-		case LINKS_ID:
-			return MIME_LINKS_ITEM;
+		case ARTICLE:
+			return MIME_ARTICLE_DIR;
+		case ARTICLE_ID:
+			return MIME_ARTICLE_ITEM;
 		}
 		
 		return null;
@@ -100,25 +89,19 @@ public class LentaProvider extends ContentProvider {
 		
 		switch (uriMatcher.match(uri)) {
 		case NEWS:
-			return deleteTable(NewsEntry.TABLE_NAME, selection, selectionArgs);
+			return deleteFromTable(NewsEntry.TABLE_NAME, selection, selectionArgs);
 		case NEWS_ID: {
 			String idSelection = NewsEntry._ID + " = ?";
 			String[] idSelectionArgs = {String.valueOf(ContentUris.parseId(uri))};
-			return deleteTable(NewsEntry.TABLE_NAME, idSelection, idSelectionArgs);
+			return deleteFromTable(NewsEntry.TABLE_NAME, idSelection, idSelectionArgs);
 			}
-		case LINKS:
-			return deleteTable(NewsLinksEntry.TABLE_NAME, selection, selectionArgs);
-		case LINKS_ID: {
-			String idSelection = NewsLinksEntry._ID + " = ?";
-			String[] idSelectionArgs = {String.valueOf(ContentUris.parseId(uri))};
-			return deleteTable(NewsLinksEntry.TABLE_NAME, idSelection, idSelectionArgs);
-			}
-		case CACHED_IMAGE: {
-			return deleteAllImages();
-			}
-		case CACHED_IMAGE_ID: {
-			return deleteImage(uri.getLastPathSegment());
-			}
+		case ARTICLE:
+            return deleteFromTable(ArticleEntry.TABLE_NAME, selection, selectionArgs);
+		case ARTICLE_ID: {
+            String idSelection = ArticleEntry._ID + " = ?";
+            String[] idSelectionArgs = {String.valueOf(ContentUris.parseId(uri))};
+            return deleteFromTable(ArticleEntry.TABLE_NAME, idSelection, idSelectionArgs);
+            }
 		}
 		
 		return 0;
@@ -128,9 +111,9 @@ public class LentaProvider extends ContentProvider {
 	public Uri insert(Uri uri, ContentValues values) {
 		switch (uriMatcher.match(uri)) {
 		case NEWS:
-			return insertTable(NewsEntry.TABLE_NAME, uri, values);
-		case LINKS:
-			return insertTable(NewsLinksEntry.TABLE_NAME, uri, values);
+			return insertIntoTable(NewsEntry.TABLE_NAME, uri, values);
+		case ARTICLE:
+            return insertIntoTable(ArticleEntry.TABLE_NAME, uri, values);
 		}
 
 		return null;
@@ -139,10 +122,8 @@ public class LentaProvider extends ContentProvider {
 	@Override
 	public boolean onCreate() {
 		Context context = getContext();
-		
 		dbHelper = new LentaDbHelper(context);
-		//initBitmapCache(context);
-		
+
 		return true;
 	}
 
@@ -150,19 +131,19 @@ public class LentaProvider extends ContentProvider {
 	public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
 		switch (uriMatcher.match(uri)) {
 		case NEWS:
-			return readTable(NewsEntry.TABLE_NAME, projection, selection, selectionArgs, sortOrder);
+			return readFromTable(NewsEntry.TABLE_NAME, projection, selection, selectionArgs, sortOrder);
 		case NEWS_ID: {
 			String idSelection = NewsEntry._ID + " = ?";
 			String[] idSelectionArgs = {uri.getLastPathSegment()};
-			return readTable(NewsEntry.TABLE_NAME, projection, idSelection, idSelectionArgs, sortOrder);
+			return readFromTable(NewsEntry.TABLE_NAME, projection, idSelection, idSelectionArgs, sortOrder);
 			}
-		case LINKS:
-			return readTable(NewsLinksEntry.TABLE_NAME, projection, selection, selectionArgs, sortOrder);
-		case LINKS_ID: {
-			String idSelection = NewsLinksEntry._ID + " = ?";
-			String[] idSelectionArgs = {uri.getLastPathSegment()};
-			return readTable(NewsLinksEntry.TABLE_NAME, projection, idSelection, idSelectionArgs, sortOrder);
-			}
+		case ARTICLE:
+            return readFromTable(ArticleEntry.TABLE_NAME, projection, selection, selectionArgs, sortOrder);
+		case ARTICLE_ID: {
+            String idSelection = ArticleEntry._ID + " = ?";
+            String[] idSelectionArgs = {uri.getLastPathSegment()};
+            return readFromTable(ArticleEntry.TABLE_NAME, projection, idSelection, idSelectionArgs, sortOrder);
+        }
 		}
 		
 		return null;
@@ -178,31 +159,31 @@ public class LentaProvider extends ContentProvider {
 			String[] idSelectionArgs = {uri.getLastPathSegment()};
 			return updateTable(NewsEntry.TABLE_NAME, uri, values, idSelection, idSelectionArgs);
 			}
-		case LINKS:
-			return updateTable(NewsLinksEntry.TABLE_NAME, uri, values, selection, selectionArgs);
-		case LINKS_ID: {
-			String idSelection = NewsEntry._ID + " = ?";
-			String[] idSelectionArgs = {uri.getLastPathSegment()};
-			return updateTable(NewsLinksEntry.TABLE_NAME, uri, values, idSelection, idSelectionArgs);
-			}
+		case ARTICLE:
+            return updateTable(ArticleEntry.TABLE_NAME, uri, values, selection, selectionArgs);
+		case ARTICLE_ID: {
+            String idSelection = ArticleEntry._ID + " = ?";
+            String[] idSelectionArgs = {uri.getLastPathSegment()};
+            return updateTable(ArticleEntry.TABLE_NAME, uri, values, idSelection, idSelectionArgs);
+        }
 		}
 		
 		return 0;
 	}
 	
-	private Cursor readTable(String tableName, String[] projection, String selection,
-			String[] selectionArgs, String sortOrder) {
+	private Cursor readFromTable(String tableName, String[] projection, String selection,
+                                 String[] selectionArgs, String sortOrder) {
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
 		return db.query(tableName, projection, selection,
 				selectionArgs, null, null, sortOrder);
 	}
 	
-	private int deleteTable(String tableName, String selection, String[] selectionArgs) {
+	private int deleteFromTable(String tableName, String selection, String[] selectionArgs) {
 		SQLiteDatabase db = dbHelper.getWritableDatabase();
 		return db.delete(tableName, selection, selectionArgs);
 	}
 	
-	private Uri insertTable(String tableName, Uri uri, ContentValues values) {
+	private Uri insertIntoTable(String tableName, Uri uri, ContentValues values) {
 		SQLiteDatabase db = dbHelper.getWritableDatabase();
 		long id = db.insert(tableName, null, values);
 		

@@ -114,6 +114,7 @@ public class ConvertedNewsParser extends PullParserBase implements ConvertedNews
             }
         }
 
-        return new News(guid, title, link, pubDate, image, imageTitle, imageCredits, rubric, description, false, false, body);
+        return new News(guid, title, link, pubDate, image, imageTitle, imageCredits, rubric, description,
+                false, false, false, false, body);
     }
 }

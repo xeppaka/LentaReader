@@ -36,19 +36,21 @@ public final class NewsDao {
 	
 	private static class ContentResolverNewsDao extends ContentResolverNODao<News> {
 		private static final String[] projectionAll = {
-			NewsEntry._ID,
-			NewsEntry.COLUMN_NAME_GUID,
-			NewsEntry.COLUMN_NAME_TITLE,
-			NewsEntry.COLUMN_NAME_LINK,
-			NewsEntry.COLUMN_NAME_IMAGELINK,
-			NewsEntry.COLUMN_NAME_IMAGECAPTION,
-			NewsEntry.COLUMN_NAME_IMAGECREDITS,
-			NewsEntry.COLUMN_NAME_PUBDATE,
-			NewsEntry.COLUMN_NAME_RUBRIC,
-			NewsEntry.COLUMN_NAME_DESCRIPTION,
-            NewsEntry.COLUMN_NAME_LATEST_NEWS,
-            NewsEntry.COLUMN_NAME_READ,
-			NewsEntry.COLUMN_NAME_BODY
+                NewsEntry._ID,
+                NewsEntry.COLUMN_NAME_GUID,
+                NewsEntry.COLUMN_NAME_TITLE,
+                NewsEntry.COLUMN_NAME_LINK,
+                NewsEntry.COLUMN_NAME_IMAGELINK,
+                NewsEntry.COLUMN_NAME_IMAGECAPTION,
+                NewsEntry.COLUMN_NAME_IMAGECREDITS,
+                NewsEntry.COLUMN_NAME_PUBDATE,
+                NewsEntry.COLUMN_NAME_RUBRIC,
+                NewsEntry.COLUMN_NAME_DESCRIPTION,
+                NewsEntry.COLUMN_NAME_READ,
+                NewsEntry.COLUMN_NAME_UPDATED_FROM_LATEST,
+                NewsEntry.COLUMN_NAME_UPDATED_IN_BACKGROUND,
+                NewsEntry.COLUMN_NAME_RECENT,
+                NewsEntry.COLUMN_NAME_BODY
 		};
 
         private static final String[] projectionBrief = {
@@ -62,8 +64,10 @@ public final class NewsDao {
                 NewsEntry.COLUMN_NAME_PUBDATE,
                 NewsEntry.COLUMN_NAME_RUBRIC,
                 NewsEntry.COLUMN_NAME_DESCRIPTION,
-                NewsEntry.COLUMN_NAME_LATEST_NEWS,
-                NewsEntry.COLUMN_NAME_READ
+                NewsEntry.COLUMN_NAME_READ,
+                NewsEntry.COLUMN_NAME_UPDATED_FROM_LATEST,
+                NewsEntry.COLUMN_NAME_UPDATED_IN_BACKGROUND,
+                NewsEntry.COLUMN_NAME_RECENT
         };
 		
 		public ContentResolverNewsDao(ContentResolver cr) {
@@ -96,8 +100,10 @@ public final class NewsDao {
 			values.put(NewsEntry.COLUMN_NAME_PUBDATE, news.getPubDate().getTime());
 			values.put(NewsEntry.COLUMN_NAME_RUBRIC, news.getRubric().name());
 			values.put(NewsEntry.COLUMN_NAME_DESCRIPTION, news.getDescription());
-            values.put(NewsEntry.COLUMN_NAME_LATEST_NEWS, news.isLatest());
             values.put(NewsEntry.COLUMN_NAME_READ, news.isRead());
+            values.put(NewsEntry.COLUMN_NAME_UPDATED_FROM_LATEST, news.isUpdatedFromLatest());
+            values.put(NewsEntry.COLUMN_NAME_UPDATED_IN_BACKGROUND, news.isUpdatedInBackground());
+            values.put(NewsEntry.COLUMN_NAME_RECENT, news.isRecent());
 
 			if (news.getBody() == null)
 				values.putNull(NewsEntry.COLUMN_NAME_BODY);
@@ -118,9 +124,12 @@ public final class NewsDao {
 			String imageCredits = cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_IMAGECREDITS));
 			Date pubDate = new Date(cur.getLong(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_PUBDATE)));
 			Rubrics rubric = Rubrics.valueOf(cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_RUBRIC)));
-            boolean latest = cur.getInt(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_LATEST_NEWS)) > 0;
-            boolean read = cur.getInt(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_READ)) > 0;
 			String description = cur.getString(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_DESCRIPTION));
+            boolean read = cur.getInt(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_READ)) > 0;
+            boolean updatedFromLatest = cur.getInt(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_UPDATED_FROM_LATEST)) > 0;
+            boolean updatedInBackground = cur.getInt(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_UPDATED_IN_BACKGROUND)) > 0;
+            boolean recent = cur.getInt(cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_RECENT)) > 0;
+
             Body body;
 
             try {
@@ -139,7 +148,8 @@ public final class NewsDao {
                 body = EmptyBody.getInstance();
             }
 
-            return new News(id, guidDb, title, link, pubDate, imageLink, imageCaption, imageCredits, rubric, description, latest, read, body);
+            return new News(id, guidDb, title, link, pubDate, imageLink, imageCaption, imageCredits, rubric, description,
+                    read, updatedFromLatest, updatedInBackground, recent, body);
 		}
 	
 		@Override

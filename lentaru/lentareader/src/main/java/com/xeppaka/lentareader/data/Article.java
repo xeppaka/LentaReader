@@ -12,21 +12,23 @@ public class Article extends News {
 	private String secondTitle;
 	private String author;
 
-	public Article(long id, String guid, String title, String secondTitle,
-			String author, String link, Date pubDate, String imageLink, String imageCaption,
-			String imageCredits, Rubrics rubric, String description, Body body) {
-		super(id, guid, title, link, pubDate, imageLink, imageCaption, imageCredits,
-                rubric, description, false, false, body);
+	public Article(long id, String guid, String title, String link, Date pubDate, String imageLink,
+                   String imageCaption, String imageCredits, Rubrics rubric, String description,
+                   String secondTitle, String author, boolean read, boolean updatedFromLatest,
+                   boolean updatedInBackground, boolean recent, Body body) {
+		super(id, guid, title, link, pubDate, imageLink, imageCaption, imageCredits, rubric, description,
+                read, updatedFromLatest, updatedInBackground, recent, body);
 
 		setSecondTitle(secondTitle);
 		setAuthor(author);
 	}
 
-	public Article(String guid, String title, String secondTitle,
-			String author, String link, Date pubDate, String imageLink, String imageCaption,
-			String imageCredits, Collection<Link> links, Rubrics rubric, String description, Body body) {
+	public Article(String guid, String title, String link, Date pubDate, String imageLink,
+                   String imageCaption, String imageCredits, Rubrics rubric, String description,
+                   String secondTitle, String author, boolean read, boolean updatedFromLatest,
+                   boolean updatedInBackground, boolean recent, Body body) {
 		super(guid, title, link, pubDate, imageLink, imageCaption, imageCredits, rubric, description,
-                false, false, body);
+                read, updatedFromLatest, updatedInBackground, recent, body);
 
 		setSecondTitle(secondTitle);
 		setAuthor(author);
@@ -35,7 +37,6 @@ public class Article extends News {
 	public Article(LentaRssItem rssItem) {
 		super(rssItem);
 
-		//setSecondTitle(rssItem.getAuthor());
 		setAuthor(rssItem.getAuthor());
 	}
 
@@ -57,7 +58,7 @@ public class Article extends News {
 
 	@Override
 	public NewsType getType() {
-		return /*NewsType.ARTICLE*/ null;
+		return NewsType.ARTICLE;
 	}
 
 	@Override

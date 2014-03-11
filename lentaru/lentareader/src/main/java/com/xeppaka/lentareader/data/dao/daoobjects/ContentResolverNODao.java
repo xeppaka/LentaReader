@@ -29,10 +29,10 @@ public abstract class ContentResolverNODao<T extends NewsObject> extends Content
 
     static {
         clearLatestFlagValues = new ContentValues();
-        clearLatestFlagValues.put(NewsEntry.COLUMN_NAME_LATEST_NEWS, 0);
+        clearLatestFlagValues.put(NewsEntry.COLUMN_NAME_UPDATED_FROM_LATEST, 0);
 
         setLatestFlagValues = new ContentValues();
-        setLatestFlagValues.put(NewsEntry.COLUMN_NAME_LATEST_NEWS, 1);
+        setLatestFlagValues.put(NewsEntry.COLUMN_NAME_UPDATED_FROM_LATEST, 1);
     }
 
 	public ContentResolverNODao(ContentResolver cr) {
@@ -328,7 +328,7 @@ public abstract class ContentResolverNODao<T extends NewsObject> extends Content
     }
 
     protected String getLatestColumnName() {
-        return NewsObjectEntry.COLUMN_NAME_LATEST_NEWS;
+        return NewsObjectEntry.COLUMN_NAME_UPDATED_FROM_LATEST;
     }
 
     protected String getSortOrder() {

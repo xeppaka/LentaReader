@@ -42,7 +42,7 @@ public class LentaNewsDownloader extends LentaNewsObjectDownloader<News> {
         List<News> result = parser.parse(HttpPageDownloader.download(url));
 
         for (News n : result) {
-            n.setLatest(rubric == Rubrics.LATEST);
+            n.setUpdatedFromLatest(rubric == Rubrics.LATEST);
         }
 
         return result;
@@ -56,7 +56,7 @@ public class LentaNewsDownloader extends LentaNewsObjectDownloader<News> {
         List<News> result = parser.parse(HttpPageDownloader.download(url));
 
         for (News n : result) {
-            n.setLatest(rubric == Rubrics.LATEST);
+            n.setUpdatedFromLatest(rubric == Rubrics.LATEST);
         }
 
         return result;

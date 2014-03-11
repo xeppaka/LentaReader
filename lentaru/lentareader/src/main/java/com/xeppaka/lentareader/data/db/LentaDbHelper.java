@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class LentaDbHelper extends SQLiteOpenHelper {
 
-	public static final int DATABASE_VERSION = 1;
+	public static final int DATABASE_VERSION = 2;
 	public static final String DATABASE_NAME = "LentaNews.db";
 	
 	public LentaDbHelper(Context context) {
@@ -16,20 +16,12 @@ public class LentaDbHelper extends SQLiteOpenHelper {
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		db.execSQL(NewsEntry.SQL_CREATE_TABLE);
-//		db.execSQL(NewsLinksEntry.SQL_CREATE_TABLE);
-//		db.execSQL(ArticleEntry.SQL_CREATE_TABLE);
-//		db.execSQL(ArticleLinksEntry.SQL_CREATE_TABLE);
-//		db.execSQL(PhotoEntry.SQL_CREATE_TABLE);
-//		db.execSQL(PhotoImageEntry.SQL_CREATE_TABLE);
+		db.execSQL(ArticleEntry.SQL_CREATE_TABLE);
 	}
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-//		db.execSQL(PhotoImageEntry.SQL_DELETE_TABLE);
-//		db.execSQL(PhotoEntry.SQL_DELETE_TABLE);
-//		db.execSQL(ArticleLinksEntry.SQL_DELETE_TABLE);
-//		db.execSQL(ArticleEntry.SQL_DELETE_TABLE);
-//		db.execSQL(NewsLinksEntry.SQL_DELETE_TABLE);
+		db.execSQL(ArticleEntry.SQL_DELETE_TABLE);
 		db.execSQL(NewsEntry.SQL_DELETE_TABLE);
 		onCreate(db);
 	}
