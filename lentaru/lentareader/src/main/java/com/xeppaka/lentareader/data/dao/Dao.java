@@ -17,6 +17,13 @@ import java.util.List;
 public interface Dao<T> extends DaoObservable<T> {
     public static int NO_ID = -1;
 
+    /**
+     * Count number of rows in the table.
+     *
+     * @return number of rows.
+     */
+    int count();
+
 	/**
 	 * Create new object in the database (row in the table).
 	 * 

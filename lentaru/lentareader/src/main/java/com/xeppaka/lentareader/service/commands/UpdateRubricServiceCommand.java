@@ -76,14 +76,18 @@ public final class UpdateRubricServiceCommand extends RunnableServiceCommand {
 			throw e;
 		}
 
-		List<News> nonExistingNews = new ArrayList<News>();
-        List<News> withNewImage = new ArrayList<News>();
+        final int newsBefore = newsDao.count();
+		final List<News> nonExistingNews = new ArrayList<News>();
+        final List<News> withNewImage = new ArrayList<News>();
 
 		for (News n : news) {
 			if (!newsDao.exist(n.getGuid())) {
 				nonExistingNews.add(n);
                 n.setUpdatedInBackground(scheduled);
-                n.setRecent(true);
+
+                if (rubric == Rubrics.LATEST && newsBefore > 0) {
+                    n.setRecent(true);
+                }
 			} else if (n.hasImage() && !newsDao.hasImage(n.getGuid())) {
                 withNewImage.add(n);
             }
@@ -94,7 +98,10 @@ public final class UpdateRubricServiceCommand extends RunnableServiceCommand {
         if (nonExistingNews.size() > 0) {
             Log.d(LentaConstants.LoggerServiceTag, "Clearing UpdatedInBackground and Recent flags for all news.");
             newsDao.clearUpdatedInBackgroundFlag();
-            newsDao.clearRecentFlag();
+
+            if (rubric == Rubrics.LATEST) {
+                newsDao.clearRecentFlag();
+            }
         }
 
 		Collection<Long> newsIds = newsDao.create(nonExistingNews);

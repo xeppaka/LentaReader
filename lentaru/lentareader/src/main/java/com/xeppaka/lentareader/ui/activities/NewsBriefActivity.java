@@ -262,6 +262,8 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
             case NEWS:
                 openNews(position, id);
                 break;
+            case ARTICLE:
+                break;
             default:
                 throw new AssertionError();
         }

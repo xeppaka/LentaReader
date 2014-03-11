@@ -39,7 +39,14 @@ public class SynchronizedDaoDecorator<T extends DatabaseObject> implements Dao<T
 		}
 	}
 
-	@Override
+    @Override
+    public int count() {
+        synchronized (sync) {
+            return getDecoratedDao().count();
+        }
+    }
+
+    @Override
 	public List<T> read() {
 		synchronized (sync) {
 			return getDecoratedDao().read();

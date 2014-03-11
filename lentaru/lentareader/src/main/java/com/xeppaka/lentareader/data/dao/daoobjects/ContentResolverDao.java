@@ -22,6 +22,7 @@ public abstract class ContentResolverDao<T extends DatabaseObject> implements Da
 	private final static String[] textKeyWhere;
 	private final static String[] intKeyWhere;
 	private final static String[] projectionId = { BaseColumns._ID };
+    private final static String[] projectionCount = { "count(*)" };
 
     protected static String getWhereFromSQLiteType(SQLiteType type) {
         return getWhereFromSQLiteType(type, 1);
@@ -56,7 +57,31 @@ public abstract class ContentResolverDao<T extends DatabaseObject> implements Da
 		this.cr = cr;
 	}
 
-	@Override
+    @Override
+    public int count() {
+        Cursor cur = null;
+
+        try {
+            cur = cr.query(getContentProviderUri(), projectionCount, null, null, null);
+
+            if (cur == null) {
+                return 0;
+            }
+
+            if (cur.moveToFirst()) {
+                return cur.getInt(0);
+            }
+
+            return 0;
+        } finally {
+            if (cur != null) {
+                cur.close();
+            }
+        }
+
+    }
+
+    @Override
 	public List<T> read() {
 		final Cursor cur = readCursor();
 

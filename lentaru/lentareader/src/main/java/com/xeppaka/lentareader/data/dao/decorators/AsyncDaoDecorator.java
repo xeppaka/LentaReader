@@ -268,7 +268,12 @@ public class AsyncDaoDecorator<T extends DatabaseObject> implements AsyncDao<T> 
 		return getDecoratedDao().create(dataObjects);
 	}
 
-	@Override
+    @Override
+    public int count() {
+        return getDecoratedDao().count();
+    }
+
+    @Override
 	public List<T> read() {
 		return getDecoratedDao().read();
 	}
