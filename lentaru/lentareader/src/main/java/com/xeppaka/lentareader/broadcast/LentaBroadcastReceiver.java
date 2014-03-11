@@ -15,6 +15,8 @@ import com.xeppaka.lentareader.service.ServiceHelper;
  * Created by nnm on 3/9/14.
  */
 public class LentaBroadcastReceiver extends BroadcastReceiver {
+    public static final String ACTION_BACKGROUND_UPDATE = "intent.action.BACKGROUND_UPDATE";
+
     @Override
     public void onReceive(Context context, Intent intent) {
         final ServiceHelper serviceHelper = new ServiceHelper(context, new Handler());

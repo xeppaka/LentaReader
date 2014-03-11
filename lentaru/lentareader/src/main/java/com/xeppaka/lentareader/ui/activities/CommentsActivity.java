@@ -40,12 +40,5 @@ public class CommentsActivity extends ActionBarActivity {
             commentsFragment = new CommentsListFragment(xid, nowReadCountView);
             getSupportFragmentManager().beginTransaction().replace(R.id.comments_fragment_container, commentsFragment).commit();
         }
-
-        Intent in = new Intent();
-        in.setAction("testalarm");
-        PendingIntent pi = PendingIntent.getBroadcast(this, 0, in, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        AlarmManager alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
-        alarmManager.setRepeating(AlarmManager.RTC, System.currentTimeMillis() + 1000, 60000, pi);
     }
 }

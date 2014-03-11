@@ -11,6 +11,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import com.xeppaka.lentareader.R;
 import com.xeppaka.lentareader.data.News;
 import com.xeppaka.lentareader.data.NewsType;
 import com.xeppaka.lentareader.data.Rubrics;
@@ -131,6 +132,7 @@ public final class UpdateRubricServiceCommand extends RunnableServiceCommand {
         final NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
         builder.setContentTitle("Lenta.ru новые новости")
                .setContentText("test")
+               .setSmallIcon(R.drawable.lenta_icon)
                .setNumber(news.size())
                .setAutoCancel(true)
                .setDeleteIntent(pendingIntent);

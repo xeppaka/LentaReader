@@ -1,5 +1,9 @@
 package com.xeppaka.lentareader.ui.activities;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -13,6 +17,7 @@ import com.xeppaka.lentareader.data.Rubrics;
 import com.xeppaka.lentareader.data.dao.async.AsyncDao;
 import com.xeppaka.lentareader.data.dao.async.AsyncNODao;
 import com.xeppaka.lentareader.data.dao.daoobjects.NewsDao;
+import com.xeppaka.lentareader.scheduler.LentaBackgroundScheduler;
 import com.xeppaka.lentareader.ui.fragments.LentaPreferencesFragment;
 import com.xeppaka.lentareader.utils.PreferencesConstants;
 
@@ -20,6 +25,8 @@ import com.xeppaka.lentareader.utils.PreferencesConstants;
  * Created by kacpa01 on 12/30/13.
  */
 public class PreferencesActivity extends ActionBarActivity {
+    private SharedPreferences.OnSharedPreferenceChangeListener listener;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,8 +40,7 @@ public class PreferencesActivity extends ActionBarActivity {
 
         getFragmentManager().beginTransaction().replace(R.id.preferences_fragment_container, new LentaPreferencesFragment()).commit();
 
-        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        preferences.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() {
+        listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
                 if (PreferencesConstants.PREF_KEY_NEWS_DELETE_NEWS.equals(key)) {
@@ -50,9 +56,24 @@ public class PreferencesActivity extends ActionBarActivity {
                             public void onFailure(Exception e) {}
                         });
                     }
+                } else if (PreferencesConstants.PREF_KEY_NEWS_BACKGROUND_UPDATE.equals(key)) {
+                    final boolean update = sharedPreferences.getBoolean(key, PreferencesConstants.NEWS_BACKGROUND_CHECK_DEFAULT);
+                    final int interval = sharedPreferences.getInt(PreferencesConstants.PREF_KEY_NEWS_BACKGROUND_UPDATE_INTERVAL, PreferencesConstants.NEWS_BACKGROUND_CHECK_MINUTES_DEFAULT);
+
+                    if (update) {
+                        LentaBackgroundScheduler.scheduleBackgroundCheck(PreferencesActivity.this, interval);
+                    } else {
+                        LentaBackgroundScheduler.cancelBackgroundCheck(PreferencesActivity.this);
+                    }
+                } else if (PreferencesConstants.PREF_KEY_NEWS_BACKGROUND_UPDATE_INTERVAL.equals(key)) {
+                    final int interval = sharedPreferences.getInt(PreferencesConstants.PREF_KEY_NEWS_BACKGROUND_UPDATE_INTERVAL, PreferencesConstants.NEWS_BACKGROUND_CHECK_MINUTES_DEFAULT);
+                    LentaBackgroundScheduler.scheduleBackgroundCheck(PreferencesActivity.this, interval);
                 }
             }
-        });
+        };
+
+        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        preferences.registerOnSharedPreferenceChangeListener(listener);
     }
 
     @Override

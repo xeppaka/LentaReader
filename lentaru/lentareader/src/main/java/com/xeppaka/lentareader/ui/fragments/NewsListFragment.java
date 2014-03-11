@@ -1,5 +1,6 @@
 package com.xeppaka.lentareader.ui.fragments;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
@@ -7,7 +8,9 @@ import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import com.xeppaka.lentareader.R;
 import com.xeppaka.lentareader.async.AsyncListener;
 import com.xeppaka.lentareader.data.News;
 import com.xeppaka.lentareader.data.NewsType;
@@ -34,6 +37,7 @@ public class NewsListFragment extends NewsObjectListFragment implements AbsListV
 	private AsyncNODao<News> dao;
 
     private boolean scrolled;
+    private String autoRefreshToast;
 
     private Dao.Observer<News> newsDaoObserver = new DaoObserver<News>(new Handler()) {
         @Override
@@ -51,8 +55,12 @@ public class NewsListFragment extends NewsObjectListFragment implements AbsListV
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-        dao = NewsDao.getInstance(getActivity().getContentResolver());
-		setListAdapter(newsAdapter = new NewsAdapter(getActivity()));
+        final Context context = getActivity();
+
+        autoRefreshToast = context.getResources().getString(R.string.news_new_items_auto_refresh);
+
+        dao = NewsDao.getInstance(context.getContentResolver());
+		setListAdapter(newsAdapter = new NewsAdapter(context));
 	}
 
     @Override
@@ -68,6 +76,8 @@ public class NewsListFragment extends NewsObjectListFragment implements AbsListV
 
         dao.unregisterContentObserver(newsDaoObserver);
         saveScrollPosition();
+
+        setUpdateByUser(false);
     }
 
     @Override
@@ -82,12 +92,15 @@ public class NewsListFragment extends NewsObjectListFragment implements AbsListV
 
         scrolled = false;
 
+        setUpdateByUser(true);
         refresh();
 	}
 
     @Override
     public void refresh() {
         scrolled = false;
+        final boolean updateByUser = isUpdateByUser();
+        setUpdateByUser(false);
 
         dao.readAllIdsAsync(getCurrentRubric(), new AsyncListener<List<Long>>() {
             @Override
@@ -127,13 +140,14 @@ public class NewsListFragment extends NewsObjectListFragment implements AbsListV
                         setLatestPubDate(news.get(0).getPubDate().getTime());
                     }
 
-                    showData(news);
+                    showData(news, 0, updateByUser);
                 } else {
+                    final int newItemsCount = result.size();
                     dao.readBriefAsync(getCurrentRubric(), new AsyncListener<List<News>>() {
                         @Override
                         public void onSuccess(List<News> result) {
                             if (isResumed()) {
-                                showData(result);
+                                showData(result, result.size(), updateByUser);
                             }
 
                             if (result.isEmpty()) {
@@ -164,8 +178,8 @@ public class NewsListFragment extends NewsObjectListFragment implements AbsListV
         }
     }
 
-    private void showData(List<News> data) {
-        if (!data.isEmpty() && getLatestPubDate() != data.get(0).getPubDate().getTime()) {
+    private void showData(List<News> data, int newItemsCount, boolean updateByUser) {
+        if (updateByUser && !data.isEmpty() && getLatestPubDate() != data.get(0).getPubDate().getTime()) {
             clearScrollPosition();
         }
 
@@ -174,6 +188,10 @@ public class NewsListFragment extends NewsObjectListFragment implements AbsListV
 
         if (!scrolled) {
             restoreScrollPosition();
+        }
+
+        if (!updateByUser && newItemsCount > 0) {
+            Toast.makeText(getActivity(), String.format(autoRefreshToast, newItemsCount), Toast.LENGTH_SHORT).show();
         }
     }
 

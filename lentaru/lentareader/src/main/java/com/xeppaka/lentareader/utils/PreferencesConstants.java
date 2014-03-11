@@ -11,6 +11,8 @@ public class PreferencesConstants {
     public static final String PREF_KEY_NEWS_LIST_TEXT_SIZE = "pref_key_news_list_text_size";
     public static final String PREF_KEY_NEWS_FULL_TEXT_SIZE = "pref_key_news_full_text_size";
     public static final String PREF_KEY_NEWS_AUTO_REFRESH = "pref_key_news_auto_refresh";
+    public static final String PREF_KEY_NEWS_BACKGROUND_UPDATE = "pref_key_background_update";
+    public static final String PREF_KEY_NEWS_BACKGROUND_UPDATE_INTERVAL = "pref_key_news_background_update_interval";
 
     public static final boolean DOWNLOAD_IMAGE_THUMBNAILS_DEFAULT = true;
     public static final boolean DOWNLOAD_IMAGE_FULL_DEFAULT = true;
@@ -19,4 +21,6 @@ public class PreferencesConstants {
     public static final int NEWS_LIST_TEXT_SIZE_DEFAULT = 14;
     public static final int NEWS_FULL_TEXT_SIZE_DEFAULT = 16;
     public static final boolean NEWS_AUTO_REFRESH_DEFAULT = true;
+    public static final boolean NEWS_BACKGROUND_CHECK_DEFAULT = true;
+    public static final int NEWS_BACKGROUND_CHECK_MINUTES_DEFAULT = 20;
 }
