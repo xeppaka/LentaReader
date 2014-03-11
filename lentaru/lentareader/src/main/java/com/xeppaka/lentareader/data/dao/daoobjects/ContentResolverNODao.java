@@ -37,7 +37,7 @@ public abstract class ContentResolverNODao<T extends NewsObject> extends Content
         clearUpdatedInBackgroundFlagValues = new ContentValues();
         clearUpdatedInBackgroundFlagValues.put(NewsEntry.COLUMN_NAME_UPDATED_IN_BACKGROUND, 0);
         clearRecentFlagValues = new ContentValues();
-        clearRecentFlagValues.put(NewsEntry.COLUMN_NAME_UPDATED_IN_BACKGROUND, 0);
+        clearRecentFlagValues.put(NewsEntry.COLUMN_NAME_RECENT, 0);
     }
 
 	public ContentResolverNODao(ContentResolver cr) {
