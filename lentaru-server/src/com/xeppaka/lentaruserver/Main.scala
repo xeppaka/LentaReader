@@ -7,6 +7,7 @@ import com.xeppaka.lentaruserver.Rubrics.Rubrics
 import scala.None
 import java.util.logging.{SimpleFormatter, StreamHandler, Logger}
 import java.io.{InputStreamReader, BufferedReader, BufferedInputStream}
+import com.xeppaka.lentaruserver.NewsType.NewsType
 
 object Main extends App {
   private val logger = Logger.getLogger(Main.getClass.getName)
@@ -19,15 +20,17 @@ object Main extends App {
     val rootPath = FileSystems.getDefault.getPath(args(0))
     FileSystem.createfs(rootPath)
 
-    var snapshots = Map[Rubrics, LentaSnapshot]()
+    var snapshots = Map[NewsType, Map[Rubrics, LentaSnapshot]]()
+    NewsType.values.foreach(newstype => snapshots = snapshots.updated(newstype, Map[Rubrics, LentaSnapshot]()))
 
     while (true) {
+      NewsType.values.foreach(newstype => {
       Rubrics.values.foreach(rubric => {
-        val curdir = FileSystem.createFullPath(rootPath.toString, NewsType.NEWS, rubric)
-        val cursnapshot = snapshots.get(rubric)
+        val curdir = FileSystem.createFullPath(rootPath.toString, newstype, rubric)
+        val cursnapshot = snapshots.get(newstype).get.get(rubric)
 
         logger.info("Downloading rss snapshot for " + rubric.toString + "... ")
-        val newrss = RssSnapshot.downloadRss(NewsType.NEWS, rubric)
+        val newrss = RssSnapshot.downloadRss(newstype, rubric)
         logger.info("Done")
 
         newrss match {
@@ -65,7 +68,7 @@ object Main extends App {
 
             newSnapshot match {
               case Some(snap) => {
-                snapshots = snapshots.updated(rubric, snap)
+                snapshots = snapshots.updated(newstype, snapshots.get(newstype).get.updated(rubric, snap))
 
                 logger.info("Deleting xmls in " + curdir.toString + "... ")
                 FileSystem.clean(curdir)
@@ -86,7 +89,7 @@ object Main extends App {
 
           case None =>
         }
-      })
+      })})
 
       logger.info("Sleep for 60 seconds...")
       Thread.sleep(1000 * 60)

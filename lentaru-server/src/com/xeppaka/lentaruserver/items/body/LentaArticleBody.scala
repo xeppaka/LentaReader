@@ -1,7 +1,7 @@
 package com.xeppaka.lentaruserver.items.body
 
 import com.xeppaka.lentaruserver.items.ItemBase
-import java.util.logging.{SimpleFormatter, StreamHandler, Logger}
+import java.util.logging.{StreamHandler, Logger, SimpleFormatter}
 import scala.concurrent._
 import com.xeppaka.lentaruserver.Downloader
 import scala.concurrent.duration._
@@ -17,7 +17,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
  * Time: 9:58 PM
  * To change this template use File | Settings | File Templates.
  */
-case class LentaNewsBody(imageTitle: String, imageCredits: String, items: List[ItemBase])
+case class LentaArticleBody(imageTitle: String, imageCredits: String, items: List[ItemBase])
   extends LentaBody {
 
   override def hashCode(): Int = {
@@ -33,14 +33,14 @@ case class LentaNewsBody(imageTitle: String, imageCredits: String, items: List[I
     if (!obj.isInstanceOf[LentaArticleBody])
       false
     else {
-      val other = obj.asInstanceOf[LentaNewsBody]
+      val other = obj.asInstanceOf[LentaArticleBody]
       imageTitle == other.imageTitle && imageCredits == other.imageCredits && items == other.items
     }
   }
 }
 
-object LentaNewsBody {
-  val logger = Logger.getLogger(LentaNewsBody.getClass.getName)
+object LentaArticleBody {
+  val logger = Logger.getLogger(LentaArticleBody.getClass.getName)
   logger.addHandler(new StreamHandler(System.out, new SimpleFormatter()))
 
   val SEPARATOR_PLACEHOLDER = "[[SEP]]"
@@ -62,8 +62,8 @@ object LentaNewsBody {
   val asideGalleryPattern = "(?s)data-box=\"(.+?)\"".r
   val iframeUrlPattern = "src=[\'\"](.+?)[\'\"]".r
 
-  def downloadNews(url: String): Option[LentaNewsBody] = {
-    val f: Future[Option[LentaNewsBody]] = future { Downloader.download(url).flatMap(f => Some(parseNews(f))) }
+  def downloadArticle(url: String): Option[LentaArticleBody] = {
+    val f: Future[Option[LentaArticleBody]] = future { Downloader.download(url).flatMap(f => Some(parseNews(f))) }
 
     try {
       Await.result(f, Duration(10, SECONDS))
@@ -72,7 +72,7 @@ object LentaNewsBody {
     }
   }
 
-  def parseNews(page: String): LentaNewsBody = {
+  def parseNews(page: String): LentaArticleBody = {
     val imageTitle = imageTitlePattern.findFirstIn(page) match {
       case Some(imageTitlePattern(title)) => LentaBody.fixLinks(title)
       case None => ""
@@ -98,8 +98,8 @@ object LentaNewsBody {
         val newsForParsing = LentaBody.fixLinks(newsWithoutMedia)
 
         val newsItems = parseBody(newsForParsing.split(SEPARATOR_PLACEHOLDER_REGEX).toList, asides, iframes)
-        LentaNewsBody(imageTitle, imageCredits, newsItems)
-      case None => LentaNewsBody(imageTitle, imageCredits, List[ItemBase]())
+        LentaArticleBody(imageTitle, imageCredits, newsItems)
+      case None => LentaArticleBody(imageTitle, imageCredits, List[ItemBase]())
     }
   }
 
