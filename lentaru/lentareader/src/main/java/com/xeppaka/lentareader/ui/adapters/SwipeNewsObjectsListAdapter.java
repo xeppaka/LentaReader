@@ -61,7 +61,8 @@ public class SwipeNewsObjectsListAdapter extends FragmentPagerAdapter {
 	public CharSequence getPageTitle(int position) {
         final NewsObjectListFragment currentFragment = getFragment(position);
 
-		return titles[position] + ": " + currentFragment.getCurrentRubric().getLabel();
+		return currentFragment.isActive() ? (titles[position] + ": " + currentFragment.getCurrentRubric().getLabel()) :
+               titles[position];
 	}
 
     @Override
@@ -74,5 +75,11 @@ public class SwipeNewsObjectsListAdapter extends FragmentPagerAdapter {
 
     public NewsObjectListFragment getFragment(int position) {
         return fragments[position];
+    }
+
+    public void clearActiveFragments() {
+        for (NewsObjectListFragment fragment : fragments) {
+            fragment.setActive(false);
+        }
     }
 }

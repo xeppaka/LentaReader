@@ -3,29 +3,12 @@ package com.xeppaka.lentaruserver.items.body
 import com.xeppaka.lentaruserver.items.ItemBase
 import java.util.logging.{SimpleFormatter, StreamHandler, Logger}
 import scala.concurrent._
-import com.xeppaka.lentaruserver.items.body.LentaBodyItemImage
-import com.xeppaka.lentaruserver.items.body.LentaNewsBody
-import scala.Some
-import com.xeppaka.lentaruserver.items.body.LentaBodyItemGallery
-import com.xeppaka.lentaruserver.items.body.LentaBodyItemVideo
-import com.xeppaka.lentaruserver.items.body.LentaBodyItemText
 import com.xeppaka.lentaruserver.Downloader
-import com.xeppaka.lentaruserver.items.body.LentaBodyItemImage
-import com.xeppaka.lentaruserver.items.body.LentaNewsBody
-import scala.Some
-import com.xeppaka.lentaruserver.items.body.LentaBodyItemGallery
-import com.xeppaka.lentaruserver.items.body.LentaBodyItemVideo
-import com.xeppaka.lentaruserver.items.body.LentaBodyItemText
 import scala.concurrent.duration._
-import com.xeppaka.lentaruserver.items.body.LentaBodyItemImage
-import com.xeppaka.lentaruserver.items.body.LentaNewsBody
 import scala.Some
-import com.xeppaka.lentaruserver.items.body.LentaBodyItemGallery
-import com.xeppaka.lentaruserver.items.body.LentaBodyItemVideo
-import com.xeppaka.lentaruserver.items.body.LentaBodyItemText
 import java.net.URLDecoder
 import scala.util.parsing.json.JSON
-import scala.util.matching.Regex.Match
+import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
  * Created with IntelliJ IDEA.
@@ -57,7 +40,7 @@ case class LentaNewsBody(imageTitle: String, imageCredits: String, items: List[I
 }
 
 object LentaNewsBody {
-  val logger = Logger.getLogger(LentaBody.getClass.getName)
+  val logger = Logger.getLogger(LentaNewsBody.getClass.getName)
   logger.addHandler(new StreamHandler(System.out, new SimpleFormatter()))
 
   val SEPARATOR_PLACEHOLDER = "[[SEP]]"
@@ -70,10 +53,10 @@ object LentaNewsBody {
 
   val imageTitlePattern = "<div.+?itemprop=\"description\">(.+?)</div>".r
   val imageCreditsPattern = "<div.+?itemprop=\"author\">.+?decodeURIComponent\\('(.+?)\'\\).+?</div>".r
-  val newsBodyAsidePattern = "(?s)<aside .+?</aside>\\s*".r
+  val newsBodyAsidePattern = "(?s)<aside.+?</aside>\\s*".r
   val newsBodyIframePattern = "(?s)<iframe.+?</iframe>\\s*".r
-  val newsBodyPattern = "(?s)<div.+?itemprop=\"articleBody\">(.+?)</div>".r
-  val newsBodyStartPattern = "(?s)<div.+?itemprop=\"articleBody\">".r
+  val newsBodyPattern = "(?s)<div[^<>]+?itemprop=\"articleBody\">(.+?)</div>".r
+  val newsBodyStartPattern = "(?s)<div[^<>]+?itemprop=\"articleBody\">".r
   val divPattern = "</?div>?".r
 
   val asideGalleryPattern = "(?s)data-box=\"(.+?)\"".r
@@ -91,14 +74,14 @@ object LentaNewsBody {
 
   def parseNews(page: String): LentaNewsBody = {
     val imageTitle = imageTitlePattern.findFirstIn(page) match {
-      case Some(imageTitlePattern(title)) => title
+      case Some(imageTitlePattern(title)) => LentaBody.fixLinks(title)
       case None => ""
     }
 
     val imageCredits = imageCreditsPattern.findFirstIn(page) match {
       case Some(imageCreditsPattern(credits)) =>
         try {
-          URLDecoder.decode(credits, "UTF-8")
+          LentaBody.fixLinks(URLDecoder.decode(credits, "UTF-8"))
         } catch {
           case ex: Exception  => ""
         }
@@ -112,8 +95,9 @@ object LentaNewsBody {
 
         val newsWithoutAside = newsBodyAsidePattern.replaceAllIn(body, ASIDE)
         val newsWithoutMedia = newsBodyIframePattern.replaceAllIn(newsWithoutAside, IFRAME)
+        val newsForParsing = LentaBody.fixLinks(newsWithoutMedia)
 
-        val newsItems = parseBody(newsWithoutMedia.split(SEPARATOR_PLACEHOLDER_REGEX).toList, asides, iframes)
+        val newsItems = parseBody(newsForParsing.split(SEPARATOR_PLACEHOLDER_REGEX).toList, asides, iframes)
         LentaNewsBody(imageTitle, imageCredits, newsItems)
       case None => LentaNewsBody(imageTitle, imageCredits, List[ItemBase]())
     }
@@ -121,16 +105,18 @@ object LentaNewsBody {
 
   private def findBody(page: String): Option[String] = {
     def findBodyCoundDiv(from: Int, divs: Int): Int = {
-      if (divs == 0 || from >= page.length)
+      if (divs == 0 && from <= page.length)
+        from
+      else if (from > page.length)
         page.length
       else {
         val substr = page.substring(from)
         divPattern.findFirstMatchIn(substr) match {
           case Some(mt) =>
             if (mt.matched.startsWith("</"))
-              findBodyCoundDiv(mt.end, divs - 1)
+              findBodyCoundDiv(from + mt.end, divs - 1)
             else
-              findBodyCoundDiv(mt.end, divs + 1)
+              findBodyCoundDiv(from + mt.end, divs + 1)
           case None => from
         }
       }
@@ -138,8 +124,11 @@ object LentaNewsBody {
 
     newsBodyStartPattern.findFirstMatchIn(page) match {
       case Some(mt) =>
-        val end = findBodyCoundDiv(mt.end, 1)
-        page.substring(mt.start, end)
+        val end = findBodyCoundDiv(mt.end, 1) - 6 // 6 is the size of </div>
+        if (end <= 0 || end <= mt.end)
+          None
+        else
+          Some(page.substring(mt.end, end))
       case None => None
     }
   }

@@ -133,6 +133,26 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
 
         pager = (ViewPager) findViewById(R.id.brief_news_pager);
         pager.setAdapter(pagerAdapter);
+        pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                pagerAdapter.clearActiveFragments();
+                final NewsObjectListFragment fragment = pagerAdapter.getFragment(position);
+                fragment.setActive(true);
+
+                indicator.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
 	}
 	
 	private void initializeViewIndicator() {

@@ -1,6 +1,6 @@
 package com.xeppaka.lentaruserver.items
 
-import com.xeppaka.lentaruserver.items.body.LentaBody
+import com.xeppaka.lentaruserver.items.body.{LentaNewsBody, LentaBody}
 import com.xeppaka.lentaruserver.CDataEscaper
 import org.apache.commons.lang3.StringEscapeUtils
 import com.xeppaka.lentaruserver.Rubrics.Rubrics
@@ -73,7 +73,7 @@ class LentaNews(
 
 object LentaNews {
   def apply(rssItem: RssItem): Option[LentaNews] = {
-    LentaBody.downloadNews(rssItem.link).map(newsBody => new LentaNews(rssItem.guid, rssItem.title, rssItem.link, rssItem.image, newsBody.imageTitle,
+    LentaNewsBody.downloadNews(rssItem.link).map(newsBody => new LentaNews(rssItem.guid, rssItem.title, rssItem.link, rssItem.image, newsBody.imageTitle,
       newsBody.imageCredits, rssItem.description, rssItem.pubDate, rssItem.rubric, newsBody))
   }
 }

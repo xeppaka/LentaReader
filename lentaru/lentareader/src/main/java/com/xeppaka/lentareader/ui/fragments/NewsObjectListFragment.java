@@ -24,6 +24,7 @@ public abstract class NewsObjectListFragment extends ListFragment {
     protected ScrollerPosition[] scrollPositions = new ScrollerPosition[Rubrics.values().length];
     protected long[] latestNewsTime = new long[Rubrics.values().length];
     private ItemSelectionListener itemSelectionListener;
+    private boolean active;
 
     public interface ItemSelectionListener {
         void onItemSelected(int position, long id);
@@ -106,6 +107,14 @@ public abstract class NewsObjectListFragment extends ListFragment {
         if (itemSelectionListener != null) {
             itemSelectionListener.onItemSelected(position, id);
         }
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
     public abstract NewsType getNewsType();

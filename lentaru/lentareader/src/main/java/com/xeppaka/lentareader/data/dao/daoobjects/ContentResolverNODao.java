@@ -69,7 +69,7 @@ public abstract class ContentResolverNODao<T extends NewsObject> extends Content
         }
 
         if (cur == null) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
 
         try {
@@ -260,7 +260,7 @@ public abstract class ContentResolverNODao<T extends NewsObject> extends Content
         }
 
         if (cur == null) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
 
         try {
