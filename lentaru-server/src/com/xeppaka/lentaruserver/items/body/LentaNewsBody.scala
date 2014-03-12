@@ -1,6 +1,31 @@
 package com.xeppaka.lentaruserver.items.body
 
 import com.xeppaka.lentaruserver.items.ItemBase
+import java.util.logging.{SimpleFormatter, StreamHandler, Logger}
+import scala.concurrent._
+import com.xeppaka.lentaruserver.items.body.LentaBodyItemImage
+import com.xeppaka.lentaruserver.items.body.LentaNewsBody
+import scala.Some
+import com.xeppaka.lentaruserver.items.body.LentaBodyItemGallery
+import com.xeppaka.lentaruserver.items.body.LentaBodyItemVideo
+import com.xeppaka.lentaruserver.items.body.LentaBodyItemText
+import com.xeppaka.lentaruserver.Downloader
+import com.xeppaka.lentaruserver.items.body.LentaBodyItemImage
+import com.xeppaka.lentaruserver.items.body.LentaNewsBody
+import scala.Some
+import com.xeppaka.lentaruserver.items.body.LentaBodyItemGallery
+import com.xeppaka.lentaruserver.items.body.LentaBodyItemVideo
+import com.xeppaka.lentaruserver.items.body.LentaBodyItemText
+import scala.concurrent.duration._
+import com.xeppaka.lentaruserver.items.body.LentaBodyItemImage
+import com.xeppaka.lentaruserver.items.body.LentaNewsBody
+import scala.Some
+import com.xeppaka.lentaruserver.items.body.LentaBodyItemGallery
+import com.xeppaka.lentaruserver.items.body.LentaBodyItemVideo
+import com.xeppaka.lentaruserver.items.body.LentaBodyItemText
+import java.net.URLDecoder
+import scala.util.parsing.json.JSON
+import scala.util.matching.Regex.Match
 
 /**
  * Created with IntelliJ IDEA.
@@ -9,7 +34,7 @@ import com.xeppaka.lentaruserver.items.ItemBase
  * Time: 9:58 PM
  * To change this template use File | Settings | File Templates.
  */
-case class LentaNewsBody(val imageTitle: String, val imageCredits: String, items: List[ItemBase])
+case class LentaNewsBody(imageTitle: String, imageCredits: String, items: List[ItemBase])
   extends LentaBody {
 
   override def hashCode(): Int = {
@@ -27,6 +52,187 @@ case class LentaNewsBody(val imageTitle: String, val imageCredits: String, items
     else {
       val other = obj.asInstanceOf[LentaNewsBody]
       imageTitle == other.imageTitle && imageCredits == other.imageCredits && items == other.items
+    }
+  }
+}
+
+object LentaNewsBody {
+  val logger = Logger.getLogger(LentaBody.getClass.getName)
+  logger.addHandler(new StreamHandler(System.out, new SimpleFormatter()))
+
+  val SEPARATOR_PLACEHOLDER = "[[SEP]]"
+  val ASIDE_PLACEHOLDER = "[[ASIDE]]"
+  val IFRAME_PLACEHOLDER = "[[IFRAME]]"
+  val ASIDE = SEPARATOR_PLACEHOLDER + ASIDE_PLACEHOLDER + SEPARATOR_PLACEHOLDER
+  val IFRAME = SEPARATOR_PLACEHOLDER + IFRAME_PLACEHOLDER + SEPARATOR_PLACEHOLDER
+
+  val SEPARATOR_PLACEHOLDER_REGEX: String = "\\[\\[SEP\\]\\]"
+
+  val imageTitlePattern = "<div.+?itemprop=\"description\">(.+?)</div>".r
+  val imageCreditsPattern = "<div.+?itemprop=\"author\">.+?decodeURIComponent\\('(.+?)\'\\).+?</div>".r
+  val newsBodyAsidePattern = "(?s)<aside .+?</aside>\\s*".r
+  val newsBodyIframePattern = "(?s)<iframe.+?</iframe>\\s*".r
+  val newsBodyPattern = "(?s)<div.+?itemprop=\"articleBody\">(.+?)</div>".r
+  val newsBodyStartPattern = "(?s)<div.+?itemprop=\"articleBody\">".r
+  val divPattern = "</?div>?".r
+
+  val asideGalleryPattern = "(?s)data-box=\"(.+?)\"".r
+  val iframeUrlPattern = "src=[\'\"](.+?)[\'\"]".r
+
+  def downloadNews(url: String): Option[LentaNewsBody] = {
+    val f: Future[Option[LentaNewsBody]] = future { Downloader.download(url).flatMap(f => Some(parseNews(f))) }
+
+    try {
+      Await.result(f, Duration(10, SECONDS))
+    } catch {
+      case e: Exception => None
+    }
+  }
+
+  def parseNews(page: String): LentaNewsBody = {
+    val imageTitle = imageTitlePattern.findFirstIn(page) match {
+      case Some(imageTitlePattern(title)) => title
+      case None => ""
+    }
+
+    val imageCredits = imageCreditsPattern.findFirstIn(page) match {
+      case Some(imageCreditsPattern(credits)) =>
+        try {
+          URLDecoder.decode(credits, "UTF-8")
+        } catch {
+          case ex: Exception  => ""
+        }
+      case None => ""
+    }
+
+    findBody(page) match {
+      case Some(body) =>
+        val asides = newsBodyAsidePattern.findAllMatchIn(body).map(item => parseAside(item.matched)).toList
+        val iframes = newsBodyIframePattern.findAllMatchIn(body).map(item => parseIframe(item.matched)).toList
+
+        val newsWithoutAside = newsBodyAsidePattern.replaceAllIn(body, ASIDE)
+        val newsWithoutMedia = newsBodyIframePattern.replaceAllIn(newsWithoutAside, IFRAME)
+
+        val newsItems = parseBody(newsWithoutMedia.split(SEPARATOR_PLACEHOLDER_REGEX).toList, asides, iframes)
+        LentaNewsBody(imageTitle, imageCredits, newsItems)
+      case None => LentaNewsBody(imageTitle, imageCredits, List[ItemBase]())
+    }
+  }
+
+  private def findBody(page: String): Option[String] = {
+    def findBodyCoundDiv(from: Int, divs: Int): Int = {
+      if (divs == 0 || from >= page.length)
+        page.length
+      else {
+        val substr = page.substring(from)
+        divPattern.findFirstMatchIn(substr) match {
+          case Some(mt) =>
+            if (mt.matched.startsWith("</"))
+              findBodyCoundDiv(mt.end, divs - 1)
+            else
+              findBodyCoundDiv(mt.end, divs + 1)
+          case None => from
+        }
+      }
+    }
+
+    newsBodyStartPattern.findFirstMatchIn(page) match {
+      case Some(mt) =>
+        val end = findBodyCoundDiv(mt.end, 1)
+        page.substring(mt.start, end)
+      case None => None
+    }
+  }
+
+  private def parseBody(body: List[String], asides: List[Option[ItemBase]], iframes: List[Option[ItemBase]]): List[ItemBase] = {
+    def parseBodyMergingText(body: List[String], mergedTextItem: Option[LentaBodyItemText], asides: List[Option[ItemBase]], iframes: List[Option[ItemBase]]): List[ItemBase] = {
+      body match {
+        case Nil => mergedTextItem match {
+          case Some(textItem) => textItem :: Nil
+          case None => Nil
+        }
+        case x :: xs => x match {
+          case ASIDE_PLACEHOLDER => asides.head match {
+            case Some(item) => mergedTextItem match {
+              case Some(text) => text :: item :: parseBodyMergingText(body.tail, None, asides.tail, iframes)
+              case None => item :: parseBodyMergingText(body.tail, None, asides.tail, iframes)
+            }
+            case None => parseBodyMergingText(body.tail, mergedTextItem, asides.tail, iframes)
+          }
+          case IFRAME_PLACEHOLDER => iframes.head match {
+            case Some(item) => mergedTextItem match {
+              case Some(text) => text :: item :: parseBodyMergingText(body.tail, None, asides, iframes.tail)
+              case None => item :: parseBodyMergingText(body.tail, None, asides.tail, iframes)
+            }
+            case None => parseBodyMergingText(body.tail, mergedTextItem, asides, iframes.tail)
+          }
+          case _ =>
+            mergedTextItem match {
+              case Some(textItem) => parseBodyMergingText(body.tail, Some(textItem.merge(x)), asides, iframes)
+              case None => parseBodyMergingText(body.tail, Some(new LentaBodyItemText(x)), asides, iframes)
+            }
+        }
+      }
+    }
+
+    parseBodyMergingText(body, None, asides, iframes)
+  }
+
+  private def parseAside(aside: String): Option[ItemBase] = {
+    if (aside.contains("b-inline-gallery-box")) {
+      asideGalleryPattern.findFirstIn(aside) match {
+        case Some(asideGalleryPattern(data)) =>
+          parseImagesJson(data) match {
+            case Some(images) => Some(LentaBodyItemGallery(images))
+            case None => None
+          }
+        case None => None
+      }
+    } else {
+      None
+    }
+  }
+
+  private def parseImagesJson(imagesJson: String): Option[List[LentaBodyItemImage]] = {
+    JSON.parseFull(imagesJson.replaceAll("&quot;", "\"")) match {
+      case Some(jsondata) =>
+        jsondata match {
+          case x: List[Map[String, Any]] =>
+            val result = x.map(item => {
+              val preview_url = getJsonField(item, "preview_url")
+              val original_url = getJsonField(item, "original_url")
+
+              if (original_url.isDefined && preview_url.isDefined)
+                Some(LentaBodyItemImage(preview_url.get, original_url.get, getJsonField(item, "caption"), getJsonField(item, "credits")))
+              else
+                None
+            }).flatMap(item => item)
+
+            if (result.isEmpty)
+              None
+            else
+              Some(result)
+          case _ => None
+        }
+      case None => None
+    }
+  }
+
+  private def getJsonField(values: Map[String, Any], field: String): Option[String] = {
+    values.get(field) match {
+      case Some(v) => if (v == null) None else Some(v.toString)
+      case None => None
+    }
+  }
+
+  private def parseIframe(iframe: String): Option[ItemBase] = {
+    iframeUrlPattern.findFirstIn(iframe) match {
+      case Some(iframeUrlPattern(src)) =>
+        if (src.contains("youtube"))
+          Some(LentaBodyItemVideo(src.replace("//", ""), VideoType.YOUTUBE))
+        else
+          None
+      case None => None
     }
   }
 }
