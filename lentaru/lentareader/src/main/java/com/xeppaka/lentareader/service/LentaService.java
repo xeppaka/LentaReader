@@ -83,12 +83,14 @@ public class LentaService extends Service {
     public static final Uri BASE_URI = new Uri.Builder().scheme("content").authority(URI_BASE_STRING).build();
 
     private static final int NEWS = 0;
+    private static final int ARTICLE = 1;
 
     private static final UriMatcher uriMatcher;
 
     static {
         uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
         uriMatcher.addURI(URI_BASE_STRING, NewsType.NEWS.name() + "/*", NEWS);
+        uriMatcher.addURI(URI_BASE_STRING, NewsType.ARTICLE.name() + "/*", ARTICLE);
 
         resultSuccess = new Bundle();
         resultSuccess.putString(BundleConstants.RESULT.name(), Result.SUCCESS.name());
@@ -156,6 +158,8 @@ public class LentaService extends Service {
         switch (uriMatcher.match(uri)) {
             case NEWS:
                 return NewsType.NEWS;
+            case ARTICLE:
+                return NewsType.ARTICLE;
             default:
                 return null;
         }

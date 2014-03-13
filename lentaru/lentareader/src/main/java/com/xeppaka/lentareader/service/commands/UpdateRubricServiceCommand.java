@@ -11,11 +11,14 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.xeppaka.lentareader.R;
+import com.xeppaka.lentareader.data.Article;
 import com.xeppaka.lentareader.data.News;
 import com.xeppaka.lentareader.data.NewsType;
 import com.xeppaka.lentareader.data.Rubrics;
 import com.xeppaka.lentareader.data.dao.NODao;
+import com.xeppaka.lentareader.data.dao.daoobjects.ArticleDao;
 import com.xeppaka.lentareader.data.dao.daoobjects.NewsDao;
+import com.xeppaka.lentareader.downloader.LentaArticlesDownloader;
 import com.xeppaka.lentareader.downloader.LentaNewsDownloader;
 import com.xeppaka.lentareader.downloader.exceptions.HttpStatusCodeException;
 import com.xeppaka.lentareader.ui.activities.NewsBriefActivity;
@@ -48,6 +51,9 @@ public final class UpdateRubricServiceCommand extends RunnableServiceCommand {
 		case NEWS:
 			executeNews();
 			break;
+        case ARTICLE:
+            executeArticle();
+            break;
 		default:
 			throw new UnsupportedOperationException("rubric update for news type: " + newsType.name() + " is not supported.");
 		}
@@ -153,5 +159,91 @@ public final class UpdateRubricServiceCommand extends RunnableServiceCommand {
 
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(0, builder.build());
+    }
+
+    private void executeArticle() throws Exception {
+        List<Article> articles;
+
+        NODao<Article> articleDao = ArticleDao.getInstance(context.getContentResolver());
+
+        try {
+            Article latest = articleDao.readLatestWOImage(rubric, LentaConstants.WITHOUT_PICTURE_LIMIT);
+
+            if (latest == null) {
+                articles = new LentaArticlesDownloader().download(rubric);
+            } else {
+                articles = new LentaArticlesDownloader().download(rubric, latest.getPubDate().getTime());
+            }
+
+            Log.d(LentaConstants.LoggerServiceTag, "Downloaded " + articles.size() + " articles.");
+        } catch (IOException e) {
+            Log.e(LentaConstants.LoggerServiceTag, "Error downloading page, I/O error.", e);
+            throw e;
+        } catch (HttpStatusCodeException e) {
+            Log.e(LentaConstants.LoggerServiceTag, "Error downloading page, status code returned: " + e.getHttpStatusCode() + ".", e);
+            throw e;
+        }
+
+        final int newsBefore = articleDao.count();
+        final List<Article> nonExistingNews = new ArrayList<Article>();
+        final List<Article> withNewImage = new ArrayList<Article>();
+
+        for (Article art : articles) {
+            if (!articleDao.exist(art.getGuid())) {
+                nonExistingNews.add(art);
+                art.setUpdatedInBackground(scheduled);
+
+                if (rubric == Rubrics.LATEST && newsBefore > 0) {
+                    art.setRecent(true);
+                }
+            } else if (art.hasImage() && !articleDao.hasImage(art.getGuid())) {
+                withNewImage.add(art);
+            }
+        }
+
+        Log.d(LentaConstants.LoggerServiceTag, "Number of new articles from downloaded: " + nonExistingNews.size());
+
+        if (nonExistingNews.size() > 0) {
+            Log.d(LentaConstants.LoggerServiceTag, "Clearing UpdatedInBackground and Recent flags for all articles.");
+            articleDao.clearUpdatedInBackgroundFlag();
+
+            if (rubric == Rubrics.LATEST) {
+                articleDao.clearRecentFlag();
+            }
+        }
+
+        Collection<Long> newsIds = articleDao.create(nonExistingNews);
+        Log.d(LentaConstants.LoggerServiceTag, "Newly created news ids: " + newsIds);
+
+        for (Article art : withNewImage) {
+            Article newWithImage = articleDao.read(art.getGuid());
+
+            newWithImage.setTitle(art.getTitle());
+            newWithImage.setDescription(art.getDescription());
+            newWithImage.setBody(art.getBody());
+            newWithImage.setImageLink(art.getImageLink());
+            newWithImage.setImageCredits(art.getImageCredits());
+            newWithImage.setImageCaption(art.getImageCaption());
+
+            articleDao.update(newWithImage);
+        }
+
+        if (rubric != Rubrics.LATEST) {
+            articleDao.clearUpdatedFromLatestFlag(rubric);
+        }
+
+        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        final boolean deleteOldArticles = preferences.getBoolean(PreferencesConstants.PREF_KEY_ARTICLES_DELETE_ARTICLES, PreferencesConstants.ARTICLES_DELETE_ARTICLES_DEFAULT);
+
+        if (deleteOldArticles) {
+            final int deleteDays = preferences.getInt(PreferencesConstants.PREF_KEY_NEWS_DELETE_NEWS_DAYS, PreferencesConstants.NEWS_DELETE_NEWS_DAYS_DEFAULT);
+
+            // one day is 86400000 milliseconds
+            articleDao.deleteOlderOrEqual(rubric, System.currentTimeMillis() - deleteDays * 86400000);
+        }
+
+//        if (scheduled) {
+//            showNotification(nonExistingNews);
+//        }
     }
 }

@@ -127,9 +127,6 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
         }
     }
 
-    private boolean downloadImages;
-    private int textSize;
-
     public NewsAdapter(Context context) {
 		super(context);
 	}
@@ -226,27 +223,27 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
 			}
 		}
 
-        if (newsTitleTextView.getTextSize() != LentaTextUtils.getNewsListTitleTextSize(textSize)) {
-            newsTitleTextView.setTextSize(LentaTextUtils.getNewsListTitleTextSize(textSize));
+        if (newsTitleTextView.getTextSize() != LentaTextUtils.getNewsListTitleTextSize(getTextSize())) {
+            newsTitleTextView.setTextSize(LentaTextUtils.getNewsListTitleTextSize(getTextSize()));
         }
 
-        if (newsDescriptionTextView.getTextSize() != LentaTextUtils.getNewsListDescriptionTextSize(textSize)) {
-            newsDescriptionTextView.setTextSize(LentaTextUtils.getNewsListDescriptionTextSize(textSize));
+        if (newsDescriptionTextView.getTextSize() != LentaTextUtils.getNewsListDescriptionTextSize(getTextSize())) {
+            newsDescriptionTextView.setTextSize(LentaTextUtils.getNewsListDescriptionTextSize(getTextSize()));
         }
 
-        if (newsDateTextView.getTextSize() != LentaTextUtils.getNewsListDateTextSize(textSize)) {
-            newsDateTextView.setTextSize(LentaTextUtils.getNewsListDateTextSize(textSize));
+        if (newsDateTextView.getTextSize() != LentaTextUtils.getNewsListDateTextSize(getTextSize())) {
+            newsDateTextView.setTextSize(LentaTextUtils.getNewsListDateTextSize(getTextSize()));
         }
 
-        if (newsCaptionTextView.getTextSize() != LentaTextUtils.getNewsListImageCaptionTextSize(textSize)) {
-            newsCaptionTextView.setTextSize(LentaTextUtils.getNewsListImageCaptionTextSize(textSize));
+        if (newsCaptionTextView.getTextSize() != LentaTextUtils.getNewsListImageCaptionTextSize(getTextSize())) {
+            newsCaptionTextView.setTextSize(LentaTextUtils.getNewsListImageCaptionTextSize(getTextSize()));
         }
 
-        if (newsCreditsTextView.getTextSize() != LentaTextUtils.getNewsListImageCreditsTextSize(textSize)) {
-            newsCreditsTextView.setTextSize(LentaTextUtils.getNewsListImageCreditsTextSize(textSize));
+        if (newsCreditsTextView.getTextSize() != LentaTextUtils.getNewsListImageCreditsTextSize(getTextSize())) {
+            newsCreditsTextView.setTextSize(LentaTextUtils.getNewsListImageCreditsTextSize(getTextSize()));
         }
 
-        final int rubricTextSize = LentaTextUtils.getNewsListRubricTextSize(textSize);
+        final int rubricTextSize = LentaTextUtils.getNewsListRubricTextSize(getTextSize());
         if (newsRubricTitle.getTextSize() != rubricTextSize) {
             newsRubricTitle.setTextSize(rubricTextSize);
         }
@@ -359,20 +356,4 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
 
 		return view;
 	}
-
-    public boolean isDownloadImages() {
-        return downloadImages;
-    }
-
-    public void setDownloadImages(boolean downloadImages) {
-        this.downloadImages = downloadImages;
-    }
-
-    public int getTextSize() {
-        return textSize;
-    }
-
-    public void setTextSize(int textSize) {
-        this.textSize = textSize;
-    }
 }

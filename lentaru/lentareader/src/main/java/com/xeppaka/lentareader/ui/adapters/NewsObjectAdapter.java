@@ -17,7 +17,10 @@ public abstract class NewsObjectAdapter<T extends NewsObject> extends BaseAdapte
     protected ImageDao imageDao;
 	protected LayoutInflater inflater;
 
-	public NewsObjectAdapter(Context context) {
+    private boolean downloadImages;
+    private int textSize;
+
+    public NewsObjectAdapter(Context context) {
         inflater = LayoutInflater.from(context);
         imageDao = ImageDao.getInstance(context);
 	}
@@ -66,5 +69,21 @@ public abstract class NewsObjectAdapter<T extends NewsObject> extends BaseAdapte
 
     public int size() {
         return newsObjects.size();
+    }
+
+    public boolean isDownloadImages() {
+        return downloadImages;
+    }
+
+    public void setDownloadImages(boolean downloadImages) {
+        this.downloadImages = downloadImages;
+    }
+
+    public int getTextSize() {
+        return textSize;
+    }
+
+    public void setTextSize(int textSize) {
+        this.textSize = textSize;
     }
 }

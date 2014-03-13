@@ -1,10 +1,12 @@
 package com.xeppaka.lentareader.ui.fragments;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.v4.app.ListFragment;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.ListView;
@@ -13,35 +15,55 @@ import android.widget.Toast;
 import com.xeppaka.lentareader.R;
 import com.xeppaka.lentareader.async.AsyncListener;
 import com.xeppaka.lentareader.data.News;
+import com.xeppaka.lentareader.data.NewsObject;
 import com.xeppaka.lentareader.data.NewsType;
+import com.xeppaka.lentareader.data.Rubrics;
 import com.xeppaka.lentareader.data.dao.Dao;
 import com.xeppaka.lentareader.data.dao.async.AsyncNODao;
+import com.xeppaka.lentareader.data.dao.daoobjects.ArticleDao;
 import com.xeppaka.lentareader.data.dao.daoobjects.DaoObserver;
 import com.xeppaka.lentareader.data.dao.daoobjects.NewsDao;
 import com.xeppaka.lentareader.ui.adapters.NewsAdapter;
 import com.xeppaka.lentareader.ui.adapters.NewsObjectAdapter;
 import com.xeppaka.lentareader.utils.PreferencesConstants;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 /**
- * This is general fragment that shows list of loaded news objects (News,
- * Articles, etc.). The way how item will be shown in the list depends on the
- * used list adapter that is passed as an argument in constructor.
- * 
- * @author nnm
+ * Created by nnm on 12/27/13.
  */
-public class NewsListFragment extends NewsObjectListFragment implements AbsListView.OnScrollListener {
-	private NewsAdapter newsAdapter;
-	private AsyncNODao<News> dao;
+public class NewsListFragment<T extends NewsObject> extends ListFragment implements AbsListView.OnScrollListener {
+    private NewsType newsType;
+    private Rubrics currentRubric = Rubrics.LATEST;
+
+    private NewsObjectAdapter<T> newsAdapter;
+    private AsyncNODao<T> dao;
 
     private boolean scrolled;
     private String autoRefreshToast;
 
-    private Dao.Observer<News> newsDaoObserver = new DaoObserver<News>(new Handler()) {
+    // expanded items for each rubric
+    protected Set<Long>[] expandedItemIds = new Set[Rubrics.values().length];
+    protected ScrollerPosition[] scrollPositions = new ScrollerPosition[Rubrics.values().length];
+    protected long[] latestNewsTime = new long[Rubrics.values().length];
+    private ItemSelectionListener itemSelectionListener;
+    private boolean active;
+
+    public interface ItemSelectionListener {
+        void onItemSelected(int position, long id);
+    }
+
+    private static class ScrollerPosition {
+        private int item;
+        private int top;
+    }
+
+    private Dao.Observer<T> daoObserver = new DaoObserver<T>(new Handler()) {
         @Override
-        public void onDataChanged(boolean selfChange, News dataObject) {
+        public void onDataChanged(boolean selfChange, T dataObject) {
             refresh();
         }
 
@@ -51,18 +73,34 @@ public class NewsListFragment extends NewsObjectListFragment implements AbsListV
         }
     };
 
+    public NewsListFragment(NewsType newsType) {
+        this.newsType = newsType;
+
+        for (Rubrics rubric : Rubrics.values()) {
+            expandedItemIds[rubric.ordinal()] = new HashSet<Long>();
+            scrollPositions[rubric.ordinal()] = new ScrollerPosition();
+        }
+    }
+
     @Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
         final Context context = getActivity();
 
-        autoRefreshToast = context.getResources().getString(R.string.news_new_items_auto_refresh);
-
-        dao = NewsDao.getInstance(context.getContentResolver());
-		setListAdapter(newsAdapter = new NewsAdapter(context));
-	}
-
+        switch (newsType) {
+            case NEWS:
+                autoRefreshToast = context.getResources().getString(R.string.news_new_items_auto_refresh);
+                dao = (AsyncNODao<T>) NewsDao.getInstance(context.getContentResolver());
+                setListAdapter(newsAdapter = (NewsObjectAdapter<T>) new NewsAdapter(context));
+                break;
+            case ARTICLE:
+                autoRefreshToast = context.getResources().getString(R.string.news_new_items_auto_refresh);
+                dao = (AsyncNODao<T>) ArticleDao.getInstance(context.getContentResolver());
+                setListAdapter(newsAdapter = (NewsObjectAdapter<T>) new NewsAdapter(context));
+                break;
+        }
+    }
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -74,15 +112,15 @@ public class NewsListFragment extends NewsObjectListFragment implements AbsListV
     public void onPause() {
         super.onPause();
 
-        dao.unregisterContentObserver(newsDaoObserver);
+        dao.unregisterContentObserver(daoObserver);
         saveScrollPosition();
     }
 
     @Override
-	public void onResume() {
-		super.onResume();
+    public void onResume() {
+        super.onResume();
 
-        dao.registerContentObserver(newsDaoObserver);
+        dao.registerContentObserver(daoObserver);
 
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         newsAdapter.setDownloadImages(preferences.getBoolean(PreferencesConstants.PREF_KEY_DOWNLOAD_IMAGE_THUMBNAILS, PreferencesConstants.DOWNLOAD_IMAGE_THUMBNAILS_DEFAULT));
@@ -91,9 +129,82 @@ public class NewsListFragment extends NewsObjectListFragment implements AbsListV
         scrolled = false;
 
         refresh();
-	}
+    }
 
     @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        final Activity activity = getActivity();
+        if (activity instanceof ItemSelectionListener) {
+            setItemSelectionListener((ItemSelectionListener)activity);
+        }
+    }
+
+    public Rubrics getCurrentRubric() {
+        return currentRubric;
+    }
+
+    public void setCurrentRubric(Rubrics currentRubric) {
+        saveScrollPosition();
+        this.currentRubric = currentRubric;
+
+        refresh();
+    }
+
+    public Set<Long> getExpandedItemIds() {
+        return expandedItemIds[currentRubric.ordinal()];
+    }
+
+    public void saveScrollPosition() {
+        final int item = getListView().getFirstVisiblePosition();
+        final View childView = getListView().getChildAt(0);
+        final int top = childView == null ? 0 : childView.getTop();
+
+        scrollPositions[currentRubric.ordinal()].item = item;
+        scrollPositions[currentRubric.ordinal()].top = top;
+    }
+
+    public void restoreScrollPosition() {
+        if (scrollPositions[currentRubric.ordinal()].item < getListAdapter().getCount()) {
+            getListView().setSelectionFromTop(scrollPositions[currentRubric.ordinal()].item, scrollPositions[currentRubric.ordinal()].top);
+        } else {
+            clearScrollPosition();
+        }
+    }
+
+    public void clearScrollPosition() {
+        scrollPositions[currentRubric.ordinal()].item = scrollPositions[currentRubric.ordinal()].top = 0;
+    }
+
+    public Long getLatestPubDate() {
+        return latestNewsTime[currentRubric.ordinal()];
+    }
+
+    public void setLatestPubDate(long date) {
+        latestNewsTime[currentRubric.ordinal()] = date;
+    }
+
+    public void setItemSelectionListener(ItemSelectionListener itemSelectionListener) {
+        this.itemSelectionListener = itemSelectionListener;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public NewsType getNewsType() {
+        return newsType;
+    }
+
+    public NewsObjectAdapter<T> getDataObjectsAdapter() {
+        return newsAdapter;
+    }
+
     public void refresh() {
         scrolled = false;
 
@@ -104,10 +215,10 @@ public class NewsListFragment extends NewsObjectListFragment implements AbsListV
                     return;
                 }
 
-                final List<News> news = newsAdapter.getNewsObjects();
-                final Iterator<News> iter = news.iterator();
+                final List<T> news = newsAdapter.getNewsObjects();
+                final Iterator<T> iter = news.iterator();
                 while (iter.hasNext()) {
-                    final News next = iter.next();
+                    final T next = iter.next();
                     final int resultIndex = result.indexOf(next.getId());
 
                     if (resultIndex < 0) {
@@ -127,9 +238,9 @@ public class NewsListFragment extends NewsObjectListFragment implements AbsListV
 
                     showData(news, countAndClearUpdatedInBackground(news));
                 } else {
-                    dao.readBriefAsync(getCurrentRubric(), new AsyncListener<List<News>>() {
+                    dao.readBriefAsync(getCurrentRubric(), new AsyncListener<List<T>>() {
                         @Override
-                        public void onSuccess(List<News> result) {
+                        public void onSuccess(List<T> result) {
                             if (isResumed()) {
                                 showData(result, countAndClearUpdatedInBackground(result));
                             }
@@ -152,10 +263,10 @@ public class NewsListFragment extends NewsObjectListFragment implements AbsListV
         });
     }
 
-    private int countAndClearUpdatedInBackground(List<News> news) {
+    private int countAndClearUpdatedInBackground(List<T> news) {
         int result = 0;
 
-        for (News n : news) {
+        for (T n : news) {
             if (n.isUpdatedInBackground()) {
                 ++result;
                 n.setUpdatedInBackground(false);
@@ -180,13 +291,17 @@ public class NewsListFragment extends NewsObjectListFragment implements AbsListV
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
 
-        final News news = newsAdapter.getItem(position);
+        if (itemSelectionListener != null) {
+            itemSelectionListener.onItemSelected(position, id);
+        }
+
+        final T news = newsAdapter.getItem(position);
         if (!news.isRead()) {
             news.setRead(true);
         }
     }
 
-    private void showData(List<News> data, int updatedInBackground) {
+    private void showData(List<T> data, int updatedInBackground) {
         if (updatedInBackground <= 0 && !data.isEmpty() && getLatestPubDate() != data.get(0).getPubDate().getTime()) {
             clearScrollPosition();
         }
@@ -201,16 +316,6 @@ public class NewsListFragment extends NewsObjectListFragment implements AbsListV
         if (updatedInBackground > 0) {
             Toast.makeText(getActivity(), String.format(autoRefreshToast, updatedInBackground), Toast.LENGTH_SHORT).show();
         }
-    }
-
-    @Override
-    public NewsType getNewsType() {
-        return NewsType.NEWS;
-    }
-
-    @Override
-    public NewsObjectAdapter getDataObjectsAdapter() {
-        return newsAdapter;
     }
 
     @Override

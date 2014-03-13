@@ -13,6 +13,7 @@ public class PreferencesConstants {
     public static final String PREF_KEY_NEWS_AUTO_REFRESH = "pref_key_news_auto_refresh";
     public static final String PREF_KEY_NEWS_BACKGROUND_UPDATE = "pref_key_background_update";
     public static final String PREF_KEY_NEWS_BACKGROUND_UPDATE_INTERVAL = "pref_key_news_background_update_interval";
+    public static final String PREF_KEY_ARTICLES_DELETE_ARTICLES = "pref_key_articles_delete";
 
     public static final boolean DOWNLOAD_IMAGE_THUMBNAILS_DEFAULT = true;
     public static final boolean DOWNLOAD_IMAGE_FULL_DEFAULT = true;
@@ -23,4 +24,5 @@ public class PreferencesConstants {
     public static final boolean NEWS_AUTO_REFRESH_DEFAULT = true;
     public static final boolean NEWS_BACKGROUND_CHECK_DEFAULT = true;
     public static final int NEWS_BACKGROUND_CHECK_MINUTES_DEFAULT = 20;
+    public static final boolean ARTICLES_DELETE_ARTICLES_DEFAULT = true;
 }
