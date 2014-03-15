@@ -28,9 +28,9 @@ import com.xeppaka.lentareader.data.NewsType;
 import com.xeppaka.lentareader.data.Rubrics;
 import com.xeppaka.lentareader.service.ServiceHelper;
 import com.xeppaka.lentareader.service.commands.exceptions.NoInternetConnectionException;
+import com.xeppaka.lentareader.ui.adapters.SwipeNewsObjectsListAdapter;
 import com.xeppaka.lentareader.ui.fragments.NewsFullFragment;
 import com.xeppaka.lentareader.ui.fragments.NewsListFragment;
-import com.xeppaka.lentareader.ui.adapters.SwipeNewsObjectsListAdapter;
 import com.xeppaka.lentareader.ui.widgets.SelectRubricDialog;
 import com.xeppaka.lentareader.utils.LentaDebugUtils;
 import com.xeppaka.lentareader.utils.PreferencesConstants;
@@ -280,6 +280,7 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
                 openNews(position, id);
                 break;
             case ARTICLE:
+                openArticle(position, id);
                 break;
             default:
                 throw new AssertionError();
@@ -301,6 +302,20 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
         if (newsFullFragment == null) {
             final Intent intent = new Intent(this, NewsFullActivity.class);
             intent.putExtra("newsId", id);
+
+            startActivity(intent);
+        } else {
+            final NewsListFragment fragment = pagerAdapter.getFragment(pager.getCurrentItem());
+            fragment.setSelection(position);
+
+            newsFullFragment.loadNews(id);
+        }
+    }
+
+    private void openArticle(int position, long id) {
+        if (newsFullFragment == null) {
+            final Intent intent = new Intent(this, NewsFullActivity.class);
+            intent.putExtra("articleId", id);
 
             startActivity(intent);
         } else {

@@ -13,11 +13,13 @@ import android.widget.Toast;
 
 import com.xeppaka.lentareader.R;
 import com.xeppaka.lentareader.data.dao.Dao;
+import com.xeppaka.lentareader.ui.fragments.ArticleFullFragment;
 import com.xeppaka.lentareader.ui.fragments.NewsFullFragment;
+import com.xeppaka.lentareader.ui.fragments.NewsObjectFullFragment;
 import com.xeppaka.lentareader.utils.LentaDebugUtils;
 
 public class NewsFullActivity extends ActionBarActivity {
-	private NewsFullFragment fullNewsFragment;
+	private NewsObjectFullFragment<?> fullFragment;
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -31,12 +33,20 @@ public class NewsFullActivity extends ActionBarActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 		setContentView(R.layout.full_news_activity);
-		long newsId = getIntent().getLongExtra("newsId", Dao.NO_ID);
+
+		final long newsId = getIntent().getLongExtra("newsId", Dao.NO_ID);
 		
 		if (newsId != Dao.NO_ID) {
-			fullNewsFragment = new NewsFullFragment(newsId);
-			getSupportFragmentManager().beginTransaction().replace(R.id.full_news_fragment_container, fullNewsFragment).commit();
-		}
+            fullFragment = new NewsFullFragment(newsId);
+			getSupportFragmentManager().beginTransaction().replace(R.id.full_news_fragment_container, fullFragment).commit();
+		} else {
+            final long articleId = getIntent().getLongExtra("articleId", Dao.NO_ID);
+
+            if (articleId != Dao.NO_ID) {
+                fullFragment = new ArticleFullFragment(articleId);
+                getSupportFragmentManager().beginTransaction().replace(R.id.full_news_fragment_container, fullFragment).commit();
+            }
+        }
     }
 
     @Override
@@ -57,7 +67,8 @@ public class NewsFullActivity extends ActionBarActivity {
                 finish();
                 return true;
             case R.id.action_copy_link:
-                link = fullNewsFragment.getNewsLink();
+                link = fullFragment.getLink();
+
                 if (link != null) {
                     final ClipboardManager clipboardManager = (ClipboardManager)getSystemService(CLIPBOARD_SERVICE);
                     final ClipData clip = ClipData.newPlainText("URL", link);
@@ -70,7 +81,8 @@ public class NewsFullActivity extends ActionBarActivity {
 
                 break;
             case R.id.action_open_in_browser:
-                link = fullNewsFragment.getNewsLink();
+                link = fullFragment.getLink();
+
                 if (link != null) {
                     final Intent intent = new Intent(Intent.ACTION_VIEW);
                     intent.setData(Uri.parse(link));

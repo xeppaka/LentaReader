@@ -64,6 +64,16 @@ public final class UpdateRubricServiceCommand extends RunnableServiceCommand {
 
         NODao<News> newsDao = NewsDao.getInstance(context.getContentResolver());
 
+        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        final boolean deleteOldNews = preferences.getBoolean(PreferencesConstants.PREF_KEY_NEWS_DELETE_NEWS, PreferencesConstants.NEWS_DELETE_NEWS_DEFAULT);
+
+        if (deleteOldNews) {
+            final int deleteDays = preferences.getInt(PreferencesConstants.PREF_KEY_NEWS_DELETE_NEWS_DAYS, PreferencesConstants.NEWS_DELETE_NEWS_DAYS_DEFAULT);
+
+            // one day is 86400000 milliseconds
+            newsDao.deleteOlderOrEqual(rubric, System.currentTimeMillis() - deleteDays * 86400000);
+        }
+
         try {
             News latest = newsDao.readLatestWOImage(rubric, LentaConstants.WITHOUT_PICTURE_LIMIT);
 
@@ -130,16 +140,6 @@ public final class UpdateRubricServiceCommand extends RunnableServiceCommand {
             newsDao.clearUpdatedFromLatestFlag(rubric);
         }
 
-        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        final boolean deleteOldNews = preferences.getBoolean(PreferencesConstants.PREF_KEY_NEWS_DELETE_NEWS, PreferencesConstants.NEWS_DELETE_NEWS_DEFAULT);
-
-        if (deleteOldNews) {
-            final int deleteDays = preferences.getInt(PreferencesConstants.PREF_KEY_NEWS_DELETE_NEWS_DAYS, PreferencesConstants.NEWS_DELETE_NEWS_DAYS_DEFAULT);
-
-            // one day is 86400000 milliseconds
-            newsDao.deleteOlderOrEqual(rubric, System.currentTimeMillis() - deleteDays * 86400000);
-        }
-
         if (scheduled) {
             showNotification(nonExistingNews);
         }
@@ -165,6 +165,16 @@ public final class UpdateRubricServiceCommand extends RunnableServiceCommand {
         List<Article> articles;
 
         NODao<Article> articleDao = ArticleDao.getInstance(context.getContentResolver());
+
+        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        final boolean deleteOldArticles = preferences.getBoolean(PreferencesConstants.PREF_KEY_ARTICLES_DELETE_ARTICLES, PreferencesConstants.ARTICLES_DELETE_ARTICLES_DEFAULT);
+
+        if (deleteOldArticles) {
+            final int deleteDays = preferences.getInt(PreferencesConstants.PREF_KEY_NEWS_DELETE_NEWS_DAYS, PreferencesConstants.NEWS_DELETE_NEWS_DAYS_DEFAULT);
+
+            // one day is 86400000 milliseconds
+            articleDao.deleteOlderOrEqual(rubric, System.currentTimeMillis() - deleteDays * 86400000);
+        }
 
         try {
             Article latest = articleDao.readLatestWOImage(rubric, LentaConstants.WITHOUT_PICTURE_LIMIT);
@@ -230,16 +240,6 @@ public final class UpdateRubricServiceCommand extends RunnableServiceCommand {
 
         if (rubric != Rubrics.LATEST) {
             articleDao.clearUpdatedFromLatestFlag(rubric);
-        }
-
-        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        final boolean deleteOldArticles = preferences.getBoolean(PreferencesConstants.PREF_KEY_ARTICLES_DELETE_ARTICLES, PreferencesConstants.ARTICLES_DELETE_ARTICLES_DEFAULT);
-
-        if (deleteOldArticles) {
-            final int deleteDays = preferences.getInt(PreferencesConstants.PREF_KEY_NEWS_DELETE_NEWS_DAYS, PreferencesConstants.NEWS_DELETE_NEWS_DAYS_DEFAULT);
-
-            // one day is 86400000 milliseconds
-            articleDao.deleteOlderOrEqual(rubric, System.currentTimeMillis() - deleteDays * 86400000);
         }
 
 //        if (scheduled) {

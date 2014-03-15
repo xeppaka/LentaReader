@@ -14,7 +14,6 @@ import android.widget.Toast;
 
 import com.xeppaka.lentareader.R;
 import com.xeppaka.lentareader.async.AsyncListener;
-import com.xeppaka.lentareader.data.News;
 import com.xeppaka.lentareader.data.NewsObject;
 import com.xeppaka.lentareader.data.NewsType;
 import com.xeppaka.lentareader.data.Rubrics;

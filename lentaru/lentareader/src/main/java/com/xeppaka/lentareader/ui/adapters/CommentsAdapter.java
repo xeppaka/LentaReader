@@ -18,7 +18,6 @@ import com.xeppaka.lentareader.data.comments.Comment;
 import com.xeppaka.lentareader.data.comments.Comments;
 import com.xeppaka.lentareader.data.dao.daoobjects.BitmapReference;
 import com.xeppaka.lentareader.data.dao.daoobjects.imagedaoobjects.ImageDao;
-import com.xeppaka.lentareader.data.dao.daoobjects.imagedaoobjects.NewsImageKeyCreator;
 
 import java.util.ArrayList;
 import java.util.Collections;

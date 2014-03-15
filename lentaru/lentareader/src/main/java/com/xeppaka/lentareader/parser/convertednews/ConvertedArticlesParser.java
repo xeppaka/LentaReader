@@ -93,7 +93,7 @@ public class ConvertedArticlesParser extends PullParserBase implements Converted
             } else if (name.equals("title")) {
                 title = readValue(parser, "title", ns);
             } else if (name.equals("secondTitle")) {
-                title = readValue(parser, "secondTitle", ns);
+                secondTitle = readValue(parser, "secondTitle", ns);
             } else if (name.equals("link")) {
                 link = readValue(parser, "link", ns);
             } else if (name.equals("image")) {
@@ -105,7 +105,7 @@ public class ConvertedArticlesParser extends PullParserBase implements Converted
             } else if (name.equals("description")) {
                 description = readValue(parser, "description", ns);
             } else if (name.equals("author")) {
-                description = readValue(parser, "author", ns);
+                author = readValue(parser, "author", ns);
             } else if (name.equals("pubDate")) {
                 pubDate = new Date(Long.parseLong(readValue(parser, "pubDate", ns)));
             } else if (name.equals("lentabody")) {
