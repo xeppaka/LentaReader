@@ -83,9 +83,9 @@ public class ImageDao implements DaoObservable<BitmapReference> {
         this.resources = resources;
     }
 
-    public static ImageDao newInstance() {
+    public static ImageDao getInstance() {
         if (INSTANCE == null) {
-            throw new IllegalStateException("ImageDao is not initialized previously.");
+            throw new IllegalStateException("ImageDao is not initialized previously. Use getInstance(Context) first time.");
         }
 
         return INSTANCE;

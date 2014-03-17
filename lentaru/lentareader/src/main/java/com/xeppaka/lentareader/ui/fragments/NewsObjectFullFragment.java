@@ -21,7 +21,6 @@ import com.xeppaka.lentareader.async.AsyncListener;
 import com.xeppaka.lentareader.data.NewsObject;
 import com.xeppaka.lentareader.data.body.Body;
 import com.xeppaka.lentareader.data.body.items.Item;
-import com.xeppaka.lentareader.data.body.items.ItemPreferences;
 import com.xeppaka.lentareader.data.dao.Dao;
 import com.xeppaka.lentareader.data.dao.async.AsyncDao;
 import com.xeppaka.lentareader.data.dao.daoobjects.BitmapReference;

@@ -1,8 +1,12 @@
 package com.xeppaka.lentareader.data.body.items;
 
 import android.content.Context;
+import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.view.View;
+
+import com.xeppaka.lentareader.ui.widgets.fullnews.FullNewsListElement;
+import com.xeppaka.lentareader.ui.widgets.fullnews.ListElementOptions;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 
@@ -57,8 +61,8 @@ public class LentaBodyItemImage implements Item, Serializable {
     }
 
     @Override
-    public View createView(Context context, ItemPreferences preferences) {
-        throw new UnsupportedOperationException("Operation is not supported.");
+    public FullNewsListElement createFullNewsListElement(Context context, Fragment fragment) {
+        return null;
     }
 
     public boolean hasCaption() {

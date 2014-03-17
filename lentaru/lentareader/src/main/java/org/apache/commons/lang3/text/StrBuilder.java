@@ -2514,7 +2514,7 @@ public class StrBuilder implements CharSequence, Appendable {
 //            buf = null;
 //            size = -1;
 //            nullText = null;
-//            return (String) con.newInstance(
+//            return (String) con.getInstance(
 //                new Object[] {Integer.valueOf(0), Integer.valueOf(size), buffer});
 //            
 //        } catch (Exception ex) {

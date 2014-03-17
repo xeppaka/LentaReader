@@ -15,11 +15,13 @@ import com.xeppaka.lentareader.R;
 import com.xeppaka.lentareader.data.dao.Dao;
 import com.xeppaka.lentareader.ui.fragments.ArticleFullFragment;
 import com.xeppaka.lentareader.ui.fragments.NewsFullFragment;
+import com.xeppaka.lentareader.ui.fragments.NewsFullListFragment;
 import com.xeppaka.lentareader.ui.fragments.NewsObjectFullFragment;
 import com.xeppaka.lentareader.utils.LentaDebugUtils;
 
 public class NewsFullActivity extends ActionBarActivity {
-	private NewsObjectFullFragment<?> fullFragment;
+	// private NewsObjectFullFragment<?> fullFragment;
+    private NewsFullListFragment fullFragment;
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -37,15 +39,15 @@ public class NewsFullActivity extends ActionBarActivity {
 		final long newsId = getIntent().getLongExtra("newsId", Dao.NO_ID);
 		
 		if (newsId != Dao.NO_ID) {
-            fullFragment = new NewsFullFragment(newsId);
+            fullFragment = new NewsFullListFragment(newsId);
 			getSupportFragmentManager().beginTransaction().replace(R.id.full_news_fragment_container, fullFragment).commit();
 		} else {
-            final long articleId = getIntent().getLongExtra("articleId", Dao.NO_ID);
-
-            if (articleId != Dao.NO_ID) {
-                fullFragment = new ArticleFullFragment(articleId);
-                getSupportFragmentManager().beginTransaction().replace(R.id.full_news_fragment_container, fullFragment).commit();
-            }
+//            final long articleId = getIntent().getLongExtra("articleId", Dao.NO_ID);
+//
+//            if (articleId != Dao.NO_ID) {
+//                fullFragment = new ArticleFullFragment(articleId);
+//                getSupportFragmentManager().beginTransaction().replace(R.id.full_news_fragment_container, fullFragment).commit();
+//            }
         }
     }
 

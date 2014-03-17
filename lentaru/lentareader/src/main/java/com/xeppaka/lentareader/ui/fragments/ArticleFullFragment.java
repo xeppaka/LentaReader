@@ -5,7 +5,6 @@ import android.app.Activity;
 import com.xeppaka.lentareader.data.Article;
 import com.xeppaka.lentareader.data.dao.async.AsyncDao;
 import com.xeppaka.lentareader.data.dao.daoobjects.ArticleDao;
-import com.xeppaka.lentareader.data.dao.daoobjects.NewsDao;
 
 public class ArticleFullFragment extends NewsObjectFullFragment<Article> {
     private AsyncDao<Article> dao;

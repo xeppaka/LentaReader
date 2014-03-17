@@ -1,9 +1,12 @@
 package com.xeppaka.lentareader.data.body.items;
 
 import android.content.Context;
+import android.support.v4.app.Fragment;
 import android.view.View;
 
 import com.xeppaka.lentareader.ui.widgets.ImagesGallery;
+import com.xeppaka.lentareader.ui.widgets.fullnews.FullNewsListElement;
+import com.xeppaka.lentareader.ui.widgets.fullnews.ListElementOptions;
 
 import java.util.Iterator;
 import java.util.List;
@@ -38,8 +41,8 @@ public class LentaBodyItemImageGallery implements Item, Iterable<LentaBodyItemIm
     }
 
     @Override
-    public View createView(Context context, ItemPreferences preferences) {
-        return new ImagesGallery(context, this, preferences.isDownloadImages(), preferences.getTextSize());
+    public FullNewsListElement createFullNewsListElement(Context context, Fragment fragment) {
+        return null;
     }
 
     @Override
