@@ -29,7 +29,6 @@ import com.xeppaka.lentareader.data.Rubrics;
 import com.xeppaka.lentareader.service.ServiceHelper;
 import com.xeppaka.lentareader.service.commands.exceptions.NoInternetConnectionException;
 import com.xeppaka.lentareader.ui.adapters.SwipeNewsObjectsListAdapter;
-import com.xeppaka.lentareader.ui.fragments.NewsFullFragment;
 import com.xeppaka.lentareader.ui.fragments.NewsListFragment;
 import com.xeppaka.lentareader.ui.widgets.SelectRubricDialog;
 import com.xeppaka.lentareader.utils.LentaDebugUtils;
@@ -50,7 +49,7 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
     private ServiceHelper serviceHelper;
     private TitlePageIndicator indicator;
 
-    private NewsFullFragment newsFullFragment;
+    // private NewsFullFragment newsFullFragment;
 
     private boolean refreshing;
     private boolean autoRefresh;
@@ -100,7 +99,7 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
         final View fullNewsContainer = findViewById(R.id.full_news_fragment_container_large);
         if (fullNewsContainer != null) {
             final FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.beginTransaction().replace(R.id.full_news_fragment_container_large, newsFullFragment = new NewsFullFragment()).commit();
+            // fragmentManager.beginTransaction().replace(R.id.full_news_fragment_container_large, newsFullFragment = new NewsFullFragment()).commit();
         }
 
         serviceHelper = new ServiceHelper(this, new Handler());
@@ -299,31 +298,31 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
     }
 
     private void openNews(int position, long id) {
-        if (newsFullFragment == null) {
+//        if (newsFullFragment == null) {
             final Intent intent = new Intent(this, NewsFullActivity.class);
             intent.putExtra("newsId", id);
 
             startActivity(intent);
-        } else {
-            final NewsListFragment fragment = pagerAdapter.getFragment(pager.getCurrentItem());
-            fragment.setSelection(position);
-
-            newsFullFragment.loadNews(id);
-        }
+//        } else {
+//            final NewsListFragment fragment = pagerAdapter.getFragment(pager.getCurrentItem());
+//            fragment.setSelection(position);
+//
+//            newsFullFragment.loadNews(id);
+//        }
     }
 
     private void openArticle(int position, long id) {
-        if (newsFullFragment == null) {
+//        if (newsFullFragment == null) {
             final Intent intent = new Intent(this, NewsFullActivity.class);
             intent.putExtra("articleId", id);
 
             startActivity(intent);
-        } else {
-            final NewsListFragment fragment = pagerAdapter.getFragment(pager.getCurrentItem());
-            fragment.setSelection(position);
-
-            newsFullFragment.loadNews(id);
-        }
+//        } else {
+//            final NewsListFragment fragment = pagerAdapter.getFragment(pager.getCurrentItem());
+//            fragment.setSelection(position);
+//
+//            newsFullFragment.loadNews(id);
+//        }
     }
 
     private void showServiceErrorToast(Exception ex) {

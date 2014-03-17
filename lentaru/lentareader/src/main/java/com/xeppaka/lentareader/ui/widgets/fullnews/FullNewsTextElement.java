@@ -27,7 +27,11 @@ public class FullNewsTextElement extends FullNewsListElementBase {
         final TextView textView = new TextView(inflater.getContext());
         textView.setText(text);
 
-        textView.setTextSize(LentaTextUtils.getNewsFullTextSize(getTextSize()));
+        final ListElementOptions options = getOptions();
+        if (options != null) {
+            textView.setTextSize(LentaTextUtils.getNewsFullTextSize(options.getTextSize()));
+        }
+
         textView.setText(Html.fromHtml(text));
         textView.setTextIsSelectable(true);
         textView.setMovementMethod(SafeLinkMovementMethodDecorator.getInstance(inflater.getContext()));

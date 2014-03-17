@@ -47,23 +47,29 @@ public class FullNewsListHeader extends FullNewsListElementBase {
 
     @Override
     public void becomeVisible() {
-        final BitmapReference bitmapReference = imageDao.read(imageLink, NewsImageKeyCreator.getInstance());
+        final ListElementOptions options = getOptions();
 
-        bitmapReference.getDrawableAsync(imageView, new AsyncListener<Drawable>() {
-            @Override
-            public void onSuccess(Drawable value) {
-                if (getFragment().isResumed()) {
-                    imageView.setImageDrawable(value);
-                    imageView.setVisibility(View.VISIBLE);
+        if (options != null && options.isDownloadImages()) {
+            final BitmapReference bitmapReference = imageDao.read(imageLink, NewsImageKeyCreator.getInstance());
+
+            bitmapReference.getDrawableAsync(imageView, new AsyncListener<Drawable>() {
+                @Override
+                public void onSuccess(Drawable value) {
+                    if (getFragment().isResumed()) {
+                        imageView.setImageDrawable(value);
+                        imageView.setVisibility(View.VISIBLE);
+                    }
                 }
-            }
 
-            @Override
-            public void onFailure(Exception e) {
-                imageView.setImageDrawable(null);
-                imageView.setVisibility(View.GONE);
-            }
-        });
+                @Override
+                public void onFailure(Exception e) {
+                    if (getFragment().isResumed()) {
+                        imageView.setImageDrawable(null);
+                        imageView.setVisibility(View.GONE);
+                    }
+                }
+            });
+        }
     }
 
     @Override
@@ -80,6 +86,7 @@ public class FullNewsListHeader extends FullNewsListElementBase {
         final TextView imageCreditsView = (TextView) header.findViewById(R.id.full_news_image_credits);
         final TextView titleView = (TextView) header.findViewById(R.id.full_news_title);
 
+        // TODO: set text sizes
         if (imageCaption != null && !imageCaption.isEmpty()) {
             imageCaptionView.setVisibility(View.VISIBLE);
             imageCaptionView.setText(Html.fromHtml(imageCaption));
