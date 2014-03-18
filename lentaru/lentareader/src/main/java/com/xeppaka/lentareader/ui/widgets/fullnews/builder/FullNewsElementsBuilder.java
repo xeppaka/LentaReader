@@ -6,10 +6,10 @@ import android.support.v4.app.Fragment;
 import com.xeppaka.lentareader.data.News;
 import com.xeppaka.lentareader.data.body.Body;
 import com.xeppaka.lentareader.data.body.items.Item;
-import com.xeppaka.lentareader.ui.widgets.fullnews.FullNewsListElement;
-import com.xeppaka.lentareader.ui.widgets.fullnews.FullNewsListFooter;
-import com.xeppaka.lentareader.ui.widgets.fullnews.FullNewsListHeader;
-import com.xeppaka.lentareader.ui.widgets.fullnews.ListElementOptions;
+import com.xeppaka.lentareader.ui.widgets.fullnews.ElementOptions;
+import com.xeppaka.lentareader.ui.widgets.fullnews.FullNewsElement;
+import com.xeppaka.lentareader.ui.widgets.fullnews.FullNewsHeader;
+import com.xeppaka.lentareader.ui.widgets.fullnews.FullNewsFooter;
 
 import java.util.Collection;
 
@@ -18,7 +18,7 @@ import java.util.Collection;
  */
 public class FullNewsElementsBuilder extends FullNewsObjectElementsBuilderBase<News> {
     private final News news;
-    private ListElementOptions options;
+    private ElementOptions options;
 
     public FullNewsElementsBuilder(News news, Context context, Fragment fragment) {
         super(context, fragment);
@@ -26,26 +26,26 @@ public class FullNewsElementsBuilder extends FullNewsObjectElementsBuilderBase<N
         this.news = news;
     }
 
-    public FullNewsElementsBuilder setOptions(ListElementOptions options) {
+    public FullNewsElementsBuilder setOptions(ElementOptions options) {
         this.options = options;
 
         return this;
     }
 
     @Override
-    protected void buildHeader(Collection<FullNewsListElement> appendTo) {
-        final FullNewsListHeader header = new FullNewsListHeader(news, getContext(), getFragment());
+    protected void buildHeader(Collection<FullNewsElement> appendTo) {
+        final FullNewsHeader header = new FullNewsHeader(news, getContext(), getFragment());
         header.setOptions(options);
 
         appendTo.add(header);
     }
 
     @Override
-    protected void buildBody(Collection<FullNewsListElement> appendTo) {
+    protected void buildBody(Collection<FullNewsElement> appendTo) {
         final Body body = news.getBody();
 
         for (Item item : body.getItems()) {
-            final FullNewsListElement element = item.createFullNewsListElement(getContext(), getFragment());
+            final FullNewsElement element = item.createFullNewsListElement(getContext(), getFragment());
             element.setOptions(options);
 
             appendTo.add(element);
@@ -53,8 +53,8 @@ public class FullNewsElementsBuilder extends FullNewsObjectElementsBuilderBase<N
     }
 
     @Override
-    protected void buildFooter(Collection<FullNewsListElement> appendTo) {
-        final FullNewsListFooter footer = new FullNewsListFooter(news, getContext(), getFragment());
+    protected void buildFooter(Collection<FullNewsElement> appendTo) {
+        final FullNewsFooter footer = new FullNewsFooter(news, getContext(), getFragment());
         footer.setOptions(options);
 
         appendTo.add(footer);

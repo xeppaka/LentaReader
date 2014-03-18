@@ -13,7 +13,7 @@ import com.xeppaka.lentareader.utils.LentaTextUtils;
 /**
  * Created by nnm on 3/15/14.
  */
-public class FullNewsTextElement extends FullNewsListElementBase {
+public class FullNewsTextElement extends FullNewsElementBase {
     private String text;
 
     public FullNewsTextElement(String text, Context context, Fragment fragment) {
@@ -25,13 +25,10 @@ public class FullNewsTextElement extends FullNewsListElementBase {
     @Override
     protected View createRootView(LayoutInflater inflater) {
         final TextView textView = new TextView(inflater.getContext());
+        final ElementOptions options = getOptions();
+
         textView.setText(text);
-
-        final ListElementOptions options = getOptions();
-        if (options != null) {
-            textView.setTextSize(LentaTextUtils.getNewsFullTextSize(options.getTextSize()));
-        }
-
+        textView.setTextSize(LentaTextUtils.getNewsFullTextSize(options.getTextSize()));
         textView.setText(Html.fromHtml(text));
         textView.setTextIsSelectable(true);
         textView.setMovementMethod(SafeLinkMovementMethodDecorator.getInstance(inflater.getContext()));

@@ -4,7 +4,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
-import com.xeppaka.lentareader.ui.widgets.fullnews.FullNewsListElement;
+import com.xeppaka.lentareader.ui.widgets.fullnews.FullNewsElement;
 
 import java.util.List;
 
@@ -12,13 +12,13 @@ import java.util.List;
  * Created by kacpa01 on 3/17/14.
  */
 public abstract class FullNewsAdapterBase extends BaseAdapter {
-    private List<FullNewsListElement> elementList;
+    private List<FullNewsElement> elementList;
 
-    protected FullNewsAdapterBase(List<FullNewsListElement> elementList) {
+    protected FullNewsAdapterBase(List<FullNewsElement> elementList) {
         this.elementList = elementList;
     }
 
-    public List<FullNewsListElement> getElementList() {
+    public List<FullNewsElement> getElementList() {
         return elementList;
     }
 
@@ -28,7 +28,7 @@ public abstract class FullNewsAdapterBase extends BaseAdapter {
     }
 
     @Override
-    public FullNewsListElement getItem(int i) {
+    public FullNewsElement getItem(int i) {
         return elementList.get(i);
     }
 
@@ -39,7 +39,7 @@ public abstract class FullNewsAdapterBase extends BaseAdapter {
 
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
-        final FullNewsListElement element = getItem(i);
+        final FullNewsElement element = getItem(i);
         final View result = element.getView();
         element.becomeVisible();
 
@@ -47,13 +47,13 @@ public abstract class FullNewsAdapterBase extends BaseAdapter {
     }
 
     public void becomeVisible() {
-        for (FullNewsListElement element : elementList) {
+        for (FullNewsElement element : elementList) {
             element.becomeVisible();
         }
     }
 
     public void becomeInvisible() {
-        for (FullNewsListElement element : elementList) {
+        for (FullNewsElement element : elementList) {
             element.becomeInvisible();
         }
     }

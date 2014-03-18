@@ -8,14 +8,14 @@ import android.view.View;
 /**
  * Created by nnm on 3/15/14.
  */
-public abstract class FullNewsListElementBase implements FullNewsListElement {
+public abstract class FullNewsElementBase implements FullNewsElement {
     private Fragment fragment;
     private LayoutInflater inflater;
     private View rootView;
 
-    private ListElementOptions options;
+    private ElementOptions options;
 
-    public FullNewsListElementBase(Context context, Fragment fragment) {
+    public FullNewsElementBase(Context context, Fragment fragment) {
         this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         this.fragment = fragment;
     }
@@ -37,11 +37,11 @@ public abstract class FullNewsListElementBase implements FullNewsListElement {
     @Override
     public void becomeInvisible() {}
 
-    public ListElementOptions getOptions() {
+    public ElementOptions getOptions() {
         return options;
     }
 
-    public void setOptions(ListElementOptions options) {
+    public void setOptions(ElementOptions options) {
         this.options = options;
     }
 

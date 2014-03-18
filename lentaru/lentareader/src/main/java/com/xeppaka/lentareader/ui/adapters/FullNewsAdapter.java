@@ -1,6 +1,6 @@
 package com.xeppaka.lentareader.ui.adapters;
 
-import com.xeppaka.lentareader.ui.widgets.fullnews.FullNewsListElement;
+import com.xeppaka.lentareader.ui.widgets.fullnews.FullNewsElement;
 
 import java.util.List;
 
@@ -8,7 +8,7 @@ import java.util.List;
  * Created by kacpa01 on 3/17/14.
  */
 public class FullNewsAdapter extends FullNewsAdapterBase {
-    public FullNewsAdapter(List<FullNewsListElement> elementList) {
+    public FullNewsAdapter(List<FullNewsElement> elementList) {
         super(elementList);
     }
 }

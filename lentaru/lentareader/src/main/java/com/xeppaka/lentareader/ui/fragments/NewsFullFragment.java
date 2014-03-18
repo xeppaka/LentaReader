@@ -16,8 +16,7 @@ import com.xeppaka.lentareader.data.News;
 import com.xeppaka.lentareader.data.dao.async.AsyncDao;
 import com.xeppaka.lentareader.data.dao.daoobjects.NewsDao;
 import com.xeppaka.lentareader.ui.adapters.FullNewsAdapter;
-import com.xeppaka.lentareader.ui.adapters.FullNewsAdapterBase;
-import com.xeppaka.lentareader.ui.widgets.fullnews.ListElementOptions;
+import com.xeppaka.lentareader.ui.widgets.fullnews.ElementOptions;
 import com.xeppaka.lentareader.ui.widgets.fullnews.builder.FullNewsElementsBuilder;
 import com.xeppaka.lentareader.utils.PreferencesConstants;
 
@@ -27,7 +26,7 @@ import com.xeppaka.lentareader.utils.PreferencesConstants;
 public class NewsFullFragment extends ListFragment {
     private long id;
     private String link;
-    private ListElementOptions options;
+    private ElementOptions options;
 
     public NewsFullFragment(long id) {
         this.id = id;
@@ -76,7 +75,7 @@ public class NewsFullFragment extends ListFragment {
         final boolean downloadImages = preferences.getBoolean(PreferencesConstants.PREF_KEY_DOWNLOAD_IMAGE_FULL, PreferencesConstants.DOWNLOAD_IMAGE_FULL_DEFAULT);
         final int textSize = preferences.getInt(PreferencesConstants.PREF_KEY_NEWS_FULL_TEXT_SIZE, PreferencesConstants.NEWS_FULL_TEXT_SIZE_DEFAULT);
 
-        options = new ListElementOptions(textSize, downloadImages);
+        options = new ElementOptions(textSize, downloadImages);
     }
 
     public String getLink() {

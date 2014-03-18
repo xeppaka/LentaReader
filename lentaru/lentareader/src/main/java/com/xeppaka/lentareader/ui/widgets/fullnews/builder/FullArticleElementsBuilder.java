@@ -2,11 +2,9 @@ package com.xeppaka.lentareader.ui.widgets.fullnews.builder;
 
 import android.content.Context;
 import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
 
 import com.xeppaka.lentareader.data.Article;
-import com.xeppaka.lentareader.data.News;
-import com.xeppaka.lentareader.ui.widgets.fullnews.FullNewsListElement;
+import com.xeppaka.lentareader.ui.widgets.fullnews.FullNewsElement;
 
 import java.util.Collection;
 
@@ -23,17 +21,17 @@ public class FullArticleElementsBuilder extends FullNewsElementsBuilder {
     }
 
     @Override
-    protected void buildHeader(Collection<FullNewsListElement> appendTo) {
+    protected void buildHeader(Collection<FullNewsElement> appendTo) {
 
     }
 
     @Override
-    protected void buildBody(Collection<FullNewsListElement> appendTo) {
+    protected void buildBody(Collection<FullNewsElement> appendTo) {
 
     }
 
     @Override
-    protected void buildFooter(Collection<FullNewsListElement> appendTo) {
+    protected void buildFooter(Collection<FullNewsElement> appendTo) {
 
     }
 }

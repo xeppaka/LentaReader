@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.xeppaka.lentareader.data.body.items.LentaBodyItemImage;
 import com.xeppaka.lentareader.data.body.items.LentaBodyItemImageGallery;
+import com.xeppaka.lentareader.data.body.items.SafeLinkMovementMethodDecorator;
 import com.xeppaka.lentareader.ui.activities.ImagesFullActivity;
 import com.xeppaka.lentareader.utils.LentaTextUtils;
 
@@ -67,7 +68,7 @@ public class ImagesGallery extends LinearLayout implements ViewPager.OnPageChang
     private TextView createDescriptionTextView(Context context, int textSize) {
         final TextView textView = new TextView(context);
         textView.setTextSize(textSize);
-        textView.setMovementMethod(LinkMovementMethod.getInstance());
+        textView.setMovementMethod(SafeLinkMovementMethodDecorator.getInstance(context));
 
         return textView;
     }

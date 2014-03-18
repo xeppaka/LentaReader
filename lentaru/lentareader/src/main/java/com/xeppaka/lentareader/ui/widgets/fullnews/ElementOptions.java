@@ -3,11 +3,11 @@ package com.xeppaka.lentareader.ui.widgets.fullnews;
 /**
  * Created by nnm on 3/16/14.
  */
-public class ListElementOptions {
+public class ElementOptions {
     private int textSize;
     private boolean downloadImages;
 
-    public ListElementOptions(int textSize, boolean downloadImages) {
+    public ElementOptions(int textSize, boolean downloadImages) {
         this.textSize = textSize;
         this.downloadImages = downloadImages;
     }

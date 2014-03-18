@@ -10,8 +10,8 @@ import com.xeppaka.lentareader.data.Article;
 /**
  * Created by nnm on 3/15/14.
  */
-public class FullArticleListSecondHeader extends FullNewsListElementBase {
-    public FullArticleListSecondHeader(Article article, Context context, Fragment fragment) {
+public class FullArticleSecondHeader extends FullNewsElementBase {
+    public FullArticleSecondHeader(Article article, Context context, Fragment fragment) {
         super(context, fragment);
     }
 
