@@ -18,7 +18,6 @@ import java.util.Collection;
  */
 public class FullNewsElementsBuilder extends FullNewsObjectElementsBuilderBase<News> {
     private final News news;
-    private ElementOptions options;
 
     public FullNewsElementsBuilder(News news, Context context, Fragment fragment) {
         super(context, fragment);
@@ -26,16 +25,10 @@ public class FullNewsElementsBuilder extends FullNewsObjectElementsBuilderBase<N
         this.news = news;
     }
 
-    public FullNewsElementsBuilder setOptions(ElementOptions options) {
-        this.options = options;
-
-        return this;
-    }
-
     @Override
     protected void buildHeader(Collection<FullNewsElement> appendTo) {
         final FullNewsHeader header = new FullNewsHeader(news, getContext(), getFragment());
-        header.setOptions(options);
+        header.setOptions(getOptions());
 
         appendTo.add(header);
     }
@@ -46,16 +39,18 @@ public class FullNewsElementsBuilder extends FullNewsObjectElementsBuilderBase<N
 
         for (Item item : body.getItems()) {
             final FullNewsElement element = item.createFullNewsListElement(getContext(), getFragment());
-            element.setOptions(options);
 
-            appendTo.add(element);
+            if (element != null) {
+                element.setOptions(getOptions());
+                appendTo.add(element);
+            }
         }
     }
 
     @Override
     protected void buildFooter(Collection<FullNewsElement> appendTo) {
         final FullNewsFooter footer = new FullNewsFooter(news, getContext(), getFragment());
-        footer.setOptions(options);
+        footer.setOptions(getOptions());
 
         appendTo.add(footer);
     }

@@ -74,7 +74,14 @@ public class NewsListFragment<T extends NewsObject> extends ListFragment impleme
 
     public NewsListFragment(NewsType newsType) {
         this.newsType = newsType;
+        init();
+    }
 
+    public NewsListFragment() {
+        init();
+    }
+
+    private void init() {
         for (Rubrics rubric : Rubrics.values()) {
             expandedItemIds[rubric.ordinal()] = new HashSet<Long>();
             scrollPositions[rubric.ordinal()] = new ScrollerPosition();
@@ -84,6 +91,10 @@ public class NewsListFragment<T extends NewsObject> extends ListFragment impleme
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (savedInstanceState != null) {
+            newsType = NewsType.valueOf(savedInstanceState.getString("newsType"));
+        }
 
         final Context context = getActivity();
 
@@ -100,6 +111,14 @@ public class NewsListFragment<T extends NewsObject> extends ListFragment impleme
                 break;
         }
     }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putString("newsType", newsType.name());
+    }
+
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);

@@ -21,7 +21,7 @@
     <string name="action_copy_link">Копировать ссылку на оригинал</string>
     <string name="action_open_in_browser">Открыть в веб-обозревателе</string>
 
-    <string name="rubric_label">Рубрика:</string>
+    <string name="rubric_label">Рубрика: </string>
 
     <string name="rubric_latest">Последние</string>
     <string name="rubric_russia">Россия</string>

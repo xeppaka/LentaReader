@@ -60,7 +60,7 @@ public class LentaBodyItemImage implements Item, Serializable {
 
     @Override
     public FullNewsElement createFullNewsListElement(Context context, Fragment fragment) {
-        return null;
+        throw new UnsupportedOperationException("Should not be called.");
     }
 
     public boolean hasCaption() {

@@ -39,7 +39,11 @@ public class SwipeNewsObjectsListAdapter extends FragmentPagerAdapter {
 
     @Override
 	public NewsListFragment getItem(int position) {
-        return fragments[position] = new NewsListFragment(NewsType.values()[position]);
+        if (fragments[position] != null) {
+            return fragments[position];
+        } else {
+            return fragments[position] = new NewsListFragment(NewsType.values()[position]);
+        }
 	}
 
 	@Override

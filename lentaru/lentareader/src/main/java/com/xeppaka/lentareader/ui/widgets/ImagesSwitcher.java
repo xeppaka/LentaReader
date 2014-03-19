@@ -18,6 +18,7 @@ import com.xeppaka.lentareader.data.dao.daoobjects.imagedaoobjects.ImageDao;
 import com.xeppaka.lentareader.data.dao.daoobjects.imagedaoobjects.NewsImageKeyCreator;
 
 import java.util.List;
+import java.util.Stack;
 
 /**
  * Created by nnm on 12/15/13.
@@ -25,38 +26,41 @@ import java.util.List;
 public class ImagesSwitcher extends ViewPager {
     private final ImageDao imageDao;
     private final boolean preview;
+    private final GalleryViewPagerAdapter adapter;
 
     private class GalleryViewPagerAdapter extends PagerAdapter {
         private List<LentaBodyItemImage> images;
-        private ImageView[] imageViews;
+        private Stack<ImageView> imageViews;
+        private final OnClickListener onClickListener;
 
         private GalleryViewPagerAdapter(List<LentaBodyItemImage> images, OnClickListener onClickListener) {
             this.images = images;
+            this.onClickListener = onClickListener;
 
             final int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 220, getResources().getDisplayMetrics());
             setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height));
 
-            createViews(onClickListener);
+            imageViews = new Stack<ImageView>();
+
+            imageViews.push(createImageView(onClickListener));
+            imageViews.push(createImageView(onClickListener));
+            imageViews.push(createImageView(onClickListener));
         }
 
-        private void createViews(View.OnClickListener onClickListener) {
-            this.imageViews = new ImageView[images.size()];
+        private ImageView createImageView(View.OnClickListener onClickListener) {
+            final ImageView imageView = new ImageView(getContext());
+            imageView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+            imageView.setScaleType(ImageView.ScaleType.FIT_XY);
+            imageView.setAdjustViewBounds(true);
 
-            for (int i = 0; i < images.size(); ++i) {
-                final ImageView imageView = new ImageView(getContext());
-                imageView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-                imageView.setScaleType(ImageView.ScaleType.FIT_XY);
-                imageView.setAdjustViewBounds(true);
+            imageView.setOnClickListener(onClickListener);
 
-                imageView.setOnClickListener(onClickListener);
-
-                imageViews[i] = imageView;
-            }
+            return imageView;
         }
 
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
-            final ImageView currentImageView = imageViews[position];
+            final ImageView currentImageView = imageViews.peek() == null ? createImageView(onClickListener) : imageViews.pop();
 
             container.addView(currentImageView);
 
@@ -75,11 +79,11 @@ public class ImagesSwitcher extends ViewPager {
 
             final BitmapReference bitmapRef = imageDao.read(url, NewsImageKeyCreator.getInstance());
 
-            Bitmap bitmap;
-            if ((bitmap = bitmapRef.getBitmapIfCached(currentImageView)) != null) {
-                currentImageView.setImageBitmap(bitmap);
+            Drawable drawable;
+            if ((drawable = bitmapRef.getDrawableIfCached(currentImageView)) != null) {
+                currentImageView.setImageDrawable(drawable);
             } else {
-                currentImageView.setImageBitmap(ImageDao.getLoadingImage().getBitmapIfCached());
+                currentImageView.setImageDrawable(ImageDao.getLoadingImage().getDrawableIfCached());
 
                 bitmapRef.getDrawableAsync(currentImageView, new AsyncListener<Drawable>() {
                     @Override
@@ -103,6 +107,8 @@ public class ImagesSwitcher extends ViewPager {
             view.setImageBitmap(null);
 
             container.removeView(view);
+
+            imageViews.push(view);
         }
 
         @Override
@@ -114,6 +120,14 @@ public class ImagesSwitcher extends ViewPager {
         public int getCount() {
             return images.size();
         }
+
+        public void becomeVisible() {
+            for (ImageView imageView : imageViews) {
+                imageView.setImageDrawable(null);
+            }
+        }
+
+        public void becomeInvisible() {}
     }
 
     public ImagesSwitcher(Context context, List<LentaBodyItemImage> images, boolean preview) {
@@ -127,6 +141,14 @@ public class ImagesSwitcher extends ViewPager {
         this.preview = preview;
 
         setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0));
-        setAdapter(new GalleryViewPagerAdapter(images, onClickListener));
+        setAdapter(adapter = new GalleryViewPagerAdapter(images, onClickListener));
+    }
+
+    public void becomeVisible() {
+        adapter.becomeVisible();
+    }
+
+    public void becomeInvisible() {
+        adapter.becomeInvisible();
     }
 }

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.v4.app.Fragment;
 
 import com.xeppaka.lentareader.ui.widgets.fullnews.FullNewsElement;
+import com.xeppaka.lentareader.ui.widgets.fullnews.FullNewsImageGallery;
 
 import java.util.Iterator;
 import java.util.List;
@@ -39,7 +40,7 @@ public class LentaBodyItemImageGallery implements Item, Iterable<LentaBodyItemIm
 
     @Override
     public FullNewsElement createFullNewsListElement(Context context, Fragment fragment) {
-        return null;
+        return new FullNewsImageGallery(this, context, fragment);
     }
 
     @Override

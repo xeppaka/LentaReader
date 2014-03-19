@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.v4.app.Fragment;
 
 import com.xeppaka.lentareader.data.NewsObject;
+import com.xeppaka.lentareader.ui.widgets.fullnews.ElementOptions;
 import com.xeppaka.lentareader.ui.widgets.fullnews.FullNewsElement;
 
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ public abstract class FullNewsObjectElementsBuilderBase<T extends NewsObject> im
     private List<FullNewsElement> appendTo;
     private Context context;
     private Fragment fragment;
+    private ElementOptions options;
 
     protected FullNewsObjectElementsBuilderBase(Context context, Fragment fragment) {
         this.context = context;
@@ -35,8 +37,22 @@ public abstract class FullNewsObjectElementsBuilderBase<T extends NewsObject> im
     protected abstract void buildBody(Collection<FullNewsElement> appendTo);
     protected abstract void buildFooter(Collection<FullNewsElement> appendTo);
 
+    public FullNewsObjectElementsBuilderBase setOptions(ElementOptions options) {
+        this.options = options;
+
+        return this;
+    }
+
+    public ElementOptions getOptions() {
+        return options;
+    }
+
     @Override
     public List<FullNewsElement> build() {
+        if (options == null) {
+            throw new NullPointerException("Options are not set.");
+        }
+
         final List<FullNewsElement> result = getAppendTo() == null ? new ArrayList<FullNewsElement>() : getAppendTo();
 
         buildHeader(result);

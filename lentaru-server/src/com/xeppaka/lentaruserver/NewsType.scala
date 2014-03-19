@@ -20,7 +20,7 @@ object NewsType extends Enumeration {
 
   implicit def valueToNewsTypeValue(x: Value) = x.asInstanceOf[NewsTypeValue]
 
-//  val NEWS = NewsTypeValue("/news")
+  val NEWS = NewsTypeValue("/news")
   val ARTICLE = NewsTypeValue("/articles")
 //  val COLUMN = NewsTypeValue("/column")
 //  val PHOTO = NewsTypeValue("/photo")

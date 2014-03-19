@@ -12,11 +12,13 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 
 import com.xeppaka.lentareader.async.AsyncListener;
+import com.xeppaka.lentareader.data.Article;
 import com.xeppaka.lentareader.data.News;
-import com.xeppaka.lentareader.data.NewsObject;
 import com.xeppaka.lentareader.data.dao.Dao;
 import com.xeppaka.lentareader.data.dao.async.AsyncDao;
+import com.xeppaka.lentareader.data.dao.daoobjects.ArticleDao;
 import com.xeppaka.lentareader.data.dao.daoobjects.NewsDao;
+import com.xeppaka.lentareader.ui.adapters.FullArticleAdapter;
 import com.xeppaka.lentareader.ui.adapters.FullNewsAdapter;
 import com.xeppaka.lentareader.ui.widgets.fullnews.ElementOptions;
 import com.xeppaka.lentareader.ui.widgets.fullnews.builder.FullNewsElementsBuilder;
@@ -25,14 +27,14 @@ import com.xeppaka.lentareader.utils.PreferencesConstants;
 /**
  * Created by nnm on 3/16/14.
  */
-public class NewsFullFragment extends FullFragmentBase {
-    private FullNewsAdapter adapter;
+public class ArticleFullFragment extends FullFragmentBase {
+    private FullArticleAdapter adapter;
 
-    public NewsFullFragment(long id) {
+    public ArticleFullFragment(long id) {
         super(id);
     }
 
-    public NewsFullFragment() {}
+    public ArticleFullFragment() {}
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -46,7 +48,7 @@ public class NewsFullFragment extends FullFragmentBase {
         super.onCreate(savedInstanceState);
 
         if (savedInstanceState != null) {
-            setDbId(savedInstanceState.getLong("id", Dao.NO_ID));
+            setDbId(savedInstanceState.getLong("id"));
         }
     }
 
@@ -57,18 +59,18 @@ public class NewsFullFragment extends FullFragmentBase {
 
         if (id != Dao.NO_ID) {
             final Activity activity = getActivity();
-            final AsyncDao<News> dao = NewsDao.getInstance(activity.getContentResolver());
+            final AsyncDao<Article> dao = ArticleDao.getInstance(activity.getContentResolver());
 
-            dao.readAsync(id, new AsyncListener<News>() {
+            dao.readAsync(id, new AsyncListener<Article>() {
                 @Override
-                public void onSuccess(News news) {
+                public void onSuccess(Article article) {
                     if (isResumed()) {
-                        setLink(news.getLink());
+                        setLink(article.getLink());
 
-                        final FullNewsElementsBuilder builder = new FullNewsElementsBuilder(news, getActivity(), NewsFullFragment.this);
+                        final FullNewsElementsBuilder builder = new FullNewsElementsBuilder(article, getActivity(), ArticleFullFragment.this);
                         builder.setOptions(getOptions());
 
-                        setListAdapter(adapter = new FullNewsAdapter(builder.build()));
+                        setListAdapter(adapter = new FullArticleAdapter(builder.build()));
                     }
                 }
 

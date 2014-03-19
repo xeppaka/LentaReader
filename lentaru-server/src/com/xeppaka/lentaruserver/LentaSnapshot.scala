@@ -72,7 +72,7 @@ class LentaSnapshot(val newsType: NewsType, val rubric: Rubrics, val items: List
   def oldestWithoutPicture(maxOffset: Int): Long = {
     if (isEmpty) 0 else {
       items.take(maxOffset).filter((item) => (item.image == null || item.image.isEmpty)) match {
-        case Nil => items.head.pubDate + 1
+        case Nil => Long.MaxValue
         case l: List[LentaItem] => l.last.pubDate
       }
     }
