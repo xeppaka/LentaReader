@@ -45,11 +45,13 @@ public class FullNewsImageGallery extends FullNewsElementBase {
 
     @Override
     public void becomeVisible() {
-        super.becomeVisible();
+        final boolean visible = isVisible();
 
-        if (!isVisible() && imagesGallery != null) {
+        if (!visible && imagesGallery != null) {
             imagesGallery.becomeVisible();
         }
+
+        super.becomeVisible();
     }
 
     @Override

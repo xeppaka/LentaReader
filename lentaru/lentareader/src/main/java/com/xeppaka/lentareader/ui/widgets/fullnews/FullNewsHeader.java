@@ -77,7 +77,7 @@ public class FullNewsHeader extends FullNewsElementBase {
                 });
             }
         }
-        
+
         super.becomeVisible();
     }
 
