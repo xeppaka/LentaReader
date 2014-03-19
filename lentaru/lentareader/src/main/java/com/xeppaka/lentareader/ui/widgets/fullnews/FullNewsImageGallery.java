@@ -36,4 +36,18 @@ public class FullNewsImageGallery extends FullNewsElementBase {
 
         return wrapper;
     }
+
+    @Override
+    public void becomeVisible() {
+        super.becomeVisible();
+
+        imagesGallery.becomeVisible();
+    }
+
+    @Override
+    public void becomeInvisible() {
+        super.becomeInvisible();
+
+        imagesGallery.becomeInvisible();
+    }
 }

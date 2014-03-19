@@ -28,8 +28,9 @@ import com.xeppaka.lentareader.data.NewsType;
 import com.xeppaka.lentareader.data.Rubrics;
 import com.xeppaka.lentareader.service.ServiceHelper;
 import com.xeppaka.lentareader.service.commands.exceptions.NoInternetConnectionException;
-import com.xeppaka.lentareader.ui.adapters.SwipeNewsObjectsListAdapter;
+import com.xeppaka.lentareader.ui.adapters.SwipeNewsFragmentsAdapter;
 import com.xeppaka.lentareader.ui.fragments.NewsListFragment;
+import com.xeppaka.lentareader.ui.fragments.NewsListFragmentBase;
 import com.xeppaka.lentareader.ui.widgets.SelectRubricDialog;
 import com.xeppaka.lentareader.utils.LentaDebugUtils;
 import com.xeppaka.lentareader.utils.PreferencesConstants;
@@ -42,7 +43,7 @@ import com.xeppaka.lentareader.utils.PreferencesConstants;
  * 
  */
 public class NewsBriefActivity extends ActionBarActivity implements DialogInterface.OnDismissListener, NewsListFragment.ItemSelectionListener {
-	private SwipeNewsObjectsListAdapter pagerAdapter;
+	private SwipeNewsFragmentsAdapter pagerAdapter;
 	private ViewPager pager;
     private SelectRubricDialog selectRubricDialog;
 
@@ -125,7 +126,7 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
     }
 
     private void initializeViewPager() {
-        pagerAdapter = new SwipeNewsObjectsListAdapter(getSupportFragmentManager(), this);
+        pagerAdapter = new SwipeNewsFragmentsAdapter(getSupportFragmentManager(), this);
 
         pager = (ViewPager) findViewById(R.id.brief_news_pager);
         pager.setAdapter(pagerAdapter);
@@ -152,7 +153,7 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
             @Override
             public void onPageSelected(int position) {
                 pagerAdapter.clearActiveFragments();
-                final NewsListFragment fragment = pagerAdapter.getFragment(position);
+                final NewsListFragmentBase fragment = pagerAdapter.getFragment(position);
                 fragment.setActive(true);
 
                 indicator.notifyDataSetChanged();
@@ -202,7 +203,7 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
         refreshing = true;
 
         final NewsType currentNewsType = NewsType.values()[pager.getCurrentItem()];
-        final NewsListFragment fragment = pagerAdapter.getFragment(pager.getCurrentItem());
+        final NewsListFragmentBase fragment = pagerAdapter.getFragment(pager.getCurrentItem());
         final Rubrics rubric = fragment.getCurrentRubric();
 
         showActionBarRefresh(true);
@@ -255,7 +256,7 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
     }
 
     private void selectRubric(Rubrics rubric) {
-        final NewsListFragment fragment = pagerAdapter.getFragment(pager.getCurrentItem());
+        final NewsListFragmentBase fragment = pagerAdapter.getFragment(pager.getCurrentItem());
 
         if (fragment != null && fragment.getCurrentRubric() != rubric) {
             fragment.setCurrentRubric(rubric);
@@ -291,7 +292,7 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
             if (++listFragments == NewsType.values().length && autoRefresh) {
                 onRefresh();
 
-                final NewsListFragment currentFragment = pagerAdapter.getFragment(pager.getCurrentItem());
+                final NewsListFragmentBase currentFragment = pagerAdapter.getFragment(pager.getCurrentItem());
                 currentFragment.setActive(true);
             }
         }

@@ -37,8 +37,10 @@ object Main extends App {
           case Some(rss) => {
             val newSnapshot = cursnapshot match {
               case Some(memsnapshot) => {
-                // with zeroed seconds
-                val oldestWOImage = (memsnapshot.oldestWithoutPicture(10) / 60000) * 60000
+                val oldestDate = memsnapshot.oldestWithoutPicture(10)
+
+                // -1 means we don't have without images. Otherwise we clear seconds in oldestDate
+                val oldestWOImage = if (oldestDate == -1) memsnapshot.latestDate() + 1 else (oldestDate / 60000) * 60000
 
                 logger.info("Downloaded rss lentgh: " + rss.items.length + " items")
                 logger.info("Oldest without image: " + oldestWOImage)

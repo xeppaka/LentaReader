@@ -48,15 +48,18 @@ public class FullNewsHeader extends FullNewsElementBase {
     @Override
     public void becomeVisible() {
         final ElementOptions options = getOptions();
+        final BitmapReference bitmapReference = imageDao.read(imageLink, NewsImageKeyCreator.getInstance());
+        final Drawable drawable = bitmapReference.getDrawableIfCached(imageView);
 
-        if (options != null && options.isDownloadImages()) {
-            final BitmapReference bitmapReference = imageDao.read(imageLink, NewsImageKeyCreator.getInstance());
-
+        if (drawable != null) {
+            imageView.setImageDrawable(drawable);
+            imageView.setVisibility(View.VISIBLE);
+        } else if (options != null && options.isDownloadImages()) {
             bitmapReference.getDrawableAsync(imageView, new AsyncListener<Drawable>() {
                 @Override
-                public void onSuccess(Drawable value) {
+                public void onSuccess(Drawable drawable) {
                     if (getFragment().isResumed()) {
-                        imageView.setImageDrawable(value);
+                        imageView.setImageDrawable(drawable);
                         imageView.setVisibility(View.VISIBLE);
                     }
                 }
