@@ -30,7 +30,7 @@ import com.xeppaka.lentareader.service.ServiceHelper;
 import com.xeppaka.lentareader.service.commands.exceptions.NoInternetConnectionException;
 import com.xeppaka.lentareader.ui.adapters.SwipeNewsFragmentsAdapter;
 import com.xeppaka.lentareader.ui.fragments.NewsListFragment;
-import com.xeppaka.lentareader.ui.fragments.NewsListFragmentBase;
+import com.xeppaka.lentareader.ui.fragments.ListFragmentBase;
 import com.xeppaka.lentareader.ui.widgets.SelectRubricDialog;
 import com.xeppaka.lentareader.utils.LentaDebugUtils;
 import com.xeppaka.lentareader.utils.PreferencesConstants;
@@ -153,10 +153,12 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
             @Override
             public void onPageSelected(int position) {
                 pagerAdapter.clearActiveFragments();
-                final NewsListFragmentBase fragment = pagerAdapter.getFragment(position);
-                fragment.setActive(true);
+                final ListFragmentBase fragment = pagerAdapter.getFragment(position);
+                if (fragment != null) {
+                    fragment.setActive(true);
+                }
 
-                indicator.notifyDataSetChanged();
+                // indicator.notifyDataSetChanged();
             }
 
             @Override
@@ -186,7 +188,7 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
         switch (item.getItemId()) {
             case R.id.action_refresh:
                 showServiceErrorToast = true;
-                onRefresh();
+                onRefreshClick();
                 return true;
             case R.id.action_select_rubric:
                 onSelectRubric();
@@ -199,16 +201,19 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
         }
     }
 
-    private void onRefresh() {
-        refreshing = true;
-
+    private void onRefreshClick() {
         final NewsType currentNewsType = NewsType.values()[pager.getCurrentItem()];
-        final NewsListFragmentBase fragment = pagerAdapter.getFragment(pager.getCurrentItem());
+        final ListFragmentBase fragment = pagerAdapter.getFragment(pager.getCurrentItem());
         final Rubrics rubric = fragment.getCurrentRubric();
 
+        refresh(currentNewsType, rubric);
+    }
+
+    private void refresh(NewsType newsType, Rubrics rubric) {
+        refreshing = true;
         showActionBarRefresh(true);
 
-        serviceHelper.updateRubric(currentNewsType, rubric, false, new AsyncListener<Void>() {
+        serviceHelper.updateRubric(newsType, rubric, false, new AsyncListener<Void>() {
             @Override
             public void onSuccess(Void val) {
                 refreshing = false;
@@ -226,6 +231,7 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
                 }
             }
         });
+
     }
 
     private void showActionBarRefresh(boolean refreshing) {
@@ -256,14 +262,14 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
     }
 
     private void selectRubric(Rubrics rubric) {
-        final NewsListFragmentBase fragment = pagerAdapter.getFragment(pager.getCurrentItem());
+        final ListFragmentBase fragment = pagerAdapter.getFragment(pager.getCurrentItem());
 
         if (fragment != null && fragment.getCurrentRubric() != rubric) {
             fragment.setCurrentRubric(rubric);
             indicator.notifyDataSetChanged();
 
             if (autoRefresh) {
-                onRefresh();
+                onRefreshClick();
             }
         }
     }
@@ -288,11 +294,12 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
     public void onAttachFragment(Fragment fragment) {
         super.onAttachFragment(fragment);
 
-        if (fragment instanceof NewsListFragment) {
+        if (fragment instanceof ListFragmentBase<?>) {
             if (++listFragments == NewsType.values().length && autoRefresh) {
-                onRefresh();
+                refresh(NewsType.NEWS, Rubrics.LATEST);
+                refresh(NewsType.ARTICLE, Rubrics.LATEST);
 
-                final NewsListFragmentBase currentFragment = pagerAdapter.getFragment(pager.getCurrentItem());
+                final ListFragmentBase currentFragment = pagerAdapter.getFragment(pager.getCurrentItem());
                 currentFragment.setActive(true);
             }
         }

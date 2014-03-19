@@ -62,13 +62,13 @@
             android:exported="false">
         </provider>
 
-        <receiver android:name=".broadcast.LentaBroadcastReceiver">
+    <!--    <receiver android:name=".broadcast.LentaBroadcastReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
                 <action android:name="intent.action.BACKGROUND_UPDATE" />
             </intent-filter>
-        </receiver>
+        </receiver> -->
     </application>
     
     <uses-permission android:name="android.permission.INTERNET" />

@@ -8,6 +8,10 @@ public class LentaTextUtils {
         return baseTextSize + 2;
     }
 
+    public static int getArticleSecondTitleTextSize(int baseTextSize) {
+        return baseTextSize + 2;
+    }
+
     public static int getNewsFullTextSize(int baseTextSize) {
         return baseTextSize;
     }

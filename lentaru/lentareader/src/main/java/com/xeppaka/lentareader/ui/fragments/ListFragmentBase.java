@@ -35,7 +35,7 @@ import java.util.Set;
 /**
  * Created by kacpa01 on 3/19/14.
  */
-public abstract class NewsListFragmentBase<T extends NewsObject> extends ListFragment implements AbsListView.OnScrollListener {
+public abstract class ListFragmentBase<T extends NewsObject> extends ListFragment implements AbsListView.OnScrollListener {
     private Rubrics currentRubric = Rubrics.LATEST;
 
     private NewsObjectAdapter<T> newsAdapter;
@@ -72,7 +72,7 @@ public abstract class NewsListFragmentBase<T extends NewsObject> extends ListFra
         }
     };
 
-    public NewsListFragmentBase() {
+    public ListFragmentBase() {
         for (Rubrics rubric : Rubrics.values()) {
             expandedItemIds[rubric.ordinal()] = new HashSet<Long>();
             scrollPositions[rubric.ordinal()] = new ScrollerPosition();
@@ -88,10 +88,6 @@ public abstract class NewsListFragmentBase<T extends NewsObject> extends ListFra
         autoRefreshToast = createAutoRefreshToast(context);
         dao = createDao(context);
         setListAdapter(newsAdapter = createAdapter(context));
-
-                autoRefreshToast = context.getResources().getString(R.string.news_new_items_auto_refresh);
-                dao = (AsyncNODao<T>) ArticleDao.getInstance(context.getContentResolver());
-                setListAdapter(newsAdapter = (NewsObjectAdapter<T>) new NewsAdapter(context));
     }
 
 

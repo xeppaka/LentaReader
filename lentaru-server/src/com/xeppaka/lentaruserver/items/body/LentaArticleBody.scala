@@ -17,11 +17,12 @@ import scala.concurrent.ExecutionContext.Implicits.global
  * Time: 9:58 PM
  * To change this template use File | Settings | File Templates.
  */
-case class LentaArticleBody(imageTitle: String, imageCredits: String, items: List[ItemBase])
+case class LentaArticleBody(secondTitle: String, imageTitle: String, imageCredits: String, items: List[ItemBase])
   extends LentaBody {
 
   override def hashCode(): Int = {
     var hash = 1
+    hash = hash * 31 + secondTitle.hashCode
     hash = hash * 31 + imageTitle.hashCode
     hash = hash * 31 + imageCredits.hashCode
     hash = hash * 31 + items.hashCode
@@ -34,7 +35,7 @@ case class LentaArticleBody(imageTitle: String, imageCredits: String, items: Lis
       false
     else {
       val other = obj.asInstanceOf[LentaArticleBody]
-      imageTitle == other.imageTitle && imageCredits == other.imageCredits && items == other.items
+      secondTitle == other.secondTitle && imageTitle == other.imageTitle && imageCredits == other.imageCredits && items == other.items
     }
   }
 }
@@ -51,6 +52,7 @@ object LentaArticleBody {
 
   val SEPARATOR_PLACEHOLDER_REGEX: String = "\\[\\[SEP\\]\\]"
 
+  val articleSecondTitlePattern = "<h\\d.+?class=\"b-topic__rightcol\">(.+?)</h2>".r;
   val imageTitlePattern = "<div.+?itemprop=\"description\">(.+?)</div>".r
   val imageCreditsPattern = "<div.+?itemprop=\"author\">.+?decodeURIComponent\\('(.+?)\'\\).+?</div>".r
   val newsBodyAsidePattern = "(?s)<aside.+?</aside>\\s*".r
@@ -73,6 +75,11 @@ object LentaArticleBody {
   }
 
   def parseNews(page: String): LentaArticleBody = {
+    val secondTitle = articleSecondTitlePattern.findFirstIn(page) match {
+      case Some(articleSecondTitlePattern(title)) => title
+      case None => ""
+    }
+
     val imageTitle = imageTitlePattern.findFirstIn(page) match {
       case Some(imageTitlePattern(title)) => LentaBody.fixLinks(title)
       case None => ""
@@ -98,8 +105,8 @@ object LentaArticleBody {
         val newsForParsing = LentaBody.fixLinks(newsWithoutMedia)
 
         val newsItems = parseBody(newsForParsing.split(SEPARATOR_PLACEHOLDER_REGEX).toList, asides, iframes)
-        LentaArticleBody(imageTitle, imageCredits, newsItems)
-      case None => LentaArticleBody(imageTitle, imageCredits, List[ItemBase]())
+        LentaArticleBody(secondTitle, imageTitle, imageCredits, newsItems)
+      case None => LentaArticleBody(secondTitle, imageTitle, imageCredits, List[ItemBase]())
     }
   }
 

@@ -60,7 +60,7 @@ public class ImagesSwitcher extends ViewPager {
 
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
-            final ImageView currentImageView = imageViews.peek() == null ? createImageView(onClickListener) : imageViews.pop();
+            final ImageView currentImageView = imageViews.isEmpty() ? imageViews.push(createImageView(onClickListener)) : imageViews.pop();
 
             container.addView(currentImageView);
 

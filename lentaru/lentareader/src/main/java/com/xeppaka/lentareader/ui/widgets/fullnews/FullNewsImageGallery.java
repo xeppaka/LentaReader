@@ -2,11 +2,13 @@ package com.xeppaka.lentareader.ui.widgets.fullnews;
 
 import android.content.Context;
 import android.support.v4.app.Fragment;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 
 import com.xeppaka.lentareader.data.body.items.LentaBodyItemImageGallery;
 import com.xeppaka.lentareader.ui.widgets.ImagesGallery;
@@ -27,12 +29,16 @@ public class FullNewsImageGallery extends FullNewsElementBase {
     @Override
     protected View createRootView(LayoutInflater inflater) {
         final ElementOptions options = getOptions();
-        ImagesGallery imagesGallery = new ImagesGallery(inflater.getContext(), gallery, options.isDownloadImages(), options.getTextSize());
+        imagesGallery = new ImagesGallery(inflater.getContext(), gallery, options.isDownloadImages(), options.getTextSize());
 
-        final FrameLayout wrapper = new FrameLayout(inflater.getContext());
+        final LinearLayout wrapper = new LinearLayout(inflater.getContext());
         final AbsListView.LayoutParams layoutParams = new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         wrapper.setLayoutParams(layoutParams);
         wrapper.addView(imagesGallery);
+
+        int value = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5f, inflater.getContext().getResources().getDisplayMetrics());
+
+        wrapper.setPadding(0, 0, 0, value);
 
         return wrapper;
     }
@@ -41,13 +47,17 @@ public class FullNewsImageGallery extends FullNewsElementBase {
     public void becomeVisible() {
         super.becomeVisible();
 
-        imagesGallery.becomeVisible();
+        if (!isVisible() && imagesGallery != null) {
+            imagesGallery.becomeVisible();
+        }
     }
 
     @Override
     public void becomeInvisible() {
         super.becomeInvisible();
 
-        imagesGallery.becomeInvisible();
+        if (imagesGallery != null) {
+            imagesGallery.becomeInvisible();
+        }
     }
 }

@@ -71,7 +71,7 @@ class LentaArticle(
 
 object LentaArticle {
   def apply(rssItem: RssItem): Option[LentaArticle] = {
-    LentaArticleBody.downloadArticle(rssItem.link).map(articleBody => new LentaArticle(rssItem.guid, rssItem.title, "", rssItem.link, rssItem.image, articleBody.imageTitle,
-      articleBody.imageCredits, rssItem.description, "", rssItem.pubDate, rssItem.rubric, articleBody))
+    LentaArticleBody.downloadArticle(rssItem.link).map(articleBody => new LentaArticle(rssItem.guid, rssItem.title, articleBody.secondTitle, rssItem.link, rssItem.image, articleBody.imageTitle,
+      articleBody.imageCredits, rssItem.description, rssItem.author, rssItem.pubDate, rssItem.rubric, articleBody))
   }
 }

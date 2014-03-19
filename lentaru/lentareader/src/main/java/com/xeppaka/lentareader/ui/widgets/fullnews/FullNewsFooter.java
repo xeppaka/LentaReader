@@ -38,7 +38,7 @@ public class FullNewsFooter extends FullNewsElementBase {
 
         dateView.setText(date);
         dateView.setTextSize(LentaTextUtils.getNewsFullDateTextSize(options.getTextSize()));
-        rubricView.setText(rubric);
+        rubricView.setText(" " + rubric);
         rubricView.setTextSize(LentaTextUtils.getNewsFullRubricTextSize(options.getTextSize()));
 
         return footer;

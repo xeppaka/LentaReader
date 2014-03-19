@@ -10,7 +10,7 @@ import com.xeppaka.lentareader.R;
 import com.xeppaka.lentareader.data.NewsType;
 import com.xeppaka.lentareader.ui.fragments.ArticleListFragment;
 import com.xeppaka.lentareader.ui.fragments.NewsListFragment;
-import com.xeppaka.lentareader.ui.fragments.NewsListFragmentBase;
+import com.xeppaka.lentareader.ui.fragments.ListFragmentBase;
 
 /**
  * This class represents pager adapter -> it contains all page definitions
@@ -25,13 +25,14 @@ public class SwipeNewsFragmentsAdapter extends FragmentPagerAdapter {
             R.string.pager_title_photos, R.string.pager_title_videos };
 
 	private final String[] titles;
-    private final NewsListFragmentBase[] fragments;
+    private final ListFragmentBase[] fragments;
 
 	public SwipeNewsFragmentsAdapter(FragmentManager fragmentManager, Context context) {
 		super(fragmentManager);
 
-        fragments = new NewsListFragment[NewsType.values().length];
+        fragments = new ListFragmentBase[NewsType.values().length];
         titles = new String[TITLES_RESOURCES.length];
+
         final Resources resources = context.getResources();
 
         for (int i = 0; i < TITLES_RESOURCES.length; ++i) {
@@ -40,13 +41,15 @@ public class SwipeNewsFragmentsAdapter extends FragmentPagerAdapter {
     }
 
     @Override
-	public NewsListFragmentBase getItem(int position) {
+	public ListFragmentBase getItem(int position) {
         if (fragments[position] != null) {
             return fragments[position];
         } else {
             switch (position) {
                 case 0:
-                    return fragments[0] = new NewsListFragment();
+                    fragments[0] = new NewsListFragment();
+                    fragments[0].setActive(true);
+                    return fragments[0];
                 case 1:
                     return fragments[1] = new ArticleListFragment();
             }
@@ -62,7 +65,7 @@ public class SwipeNewsFragmentsAdapter extends FragmentPagerAdapter {
 
 	@Override
 	public CharSequence getPageTitle(int position) {
-        final NewsListFragmentBase currentFragment = getFragment(position);
+        final ListFragmentBase currentFragment = getFragment(position);
 
 		return currentFragment.isActive() ? (titles[position] + ": " + currentFragment.getCurrentRubric().getLabel()) :
                titles[position];
@@ -70,19 +73,21 @@ public class SwipeNewsFragmentsAdapter extends FragmentPagerAdapter {
 
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
-        final NewsListFragment instFragment = (NewsListFragment) super.instantiateItem(container, position);
+        final ListFragmentBase instFragment = (ListFragmentBase) super.instantiateItem(container, position);
         fragments[position] = instFragment;
 
         return instFragment;
     }
 
-    public NewsListFragmentBase getFragment(int position) {
+    public ListFragmentBase getFragment(int position) {
         return fragments[position];
     }
 
     public void clearActiveFragments() {
-        for (NewsListFragmentBase fragment : fragments) {
-            fragment.setActive(false);
+        for (ListFragmentBase fragment : fragments) {
+            if (fragment != null) {
+                fragment.setActive(false);
+            }
         }
     }
 }

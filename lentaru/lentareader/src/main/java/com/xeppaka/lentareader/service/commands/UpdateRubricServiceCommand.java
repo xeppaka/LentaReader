@@ -140,26 +140,26 @@ public final class UpdateRubricServiceCommand extends RunnableServiceCommand {
             newsDao.clearUpdatedFromLatestFlag(rubric);
         }
 
-        if (scheduled) {
-            showNotification(nonExistingNews);
-        }
+//        if (scheduled) {
+//            showNotification(nonExistingNews);
+//        }
 	}
 
-    private void showNotification(List<News> news) {
-        final Intent briefNewsIntent = new Intent(context, NewsBriefActivity.class);
-        final PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, briefNewsIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        final NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-        builder.setContentTitle("Lenta.ru новые новости")
-               .setContentText("test")
-               .setSmallIcon(R.drawable.lenta_icon)
-               .setNumber(news.size())
-               .setAutoCancel(true)
-               .setDeleteIntent(pendingIntent);
-
-        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(0, builder.build());
-    }
+//    private void showNotification(List<News> news) {
+//        final Intent briefNewsIntent = new Intent(context, NewsBriefActivity.class);
+//        final PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, briefNewsIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+//
+//        final NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
+//        builder.setContentTitle("Lenta.ru новые новости")
+//               .setContentText("test")
+//               .setSmallIcon(R.drawable.lenta_icon)
+//               .setNumber(news.size())
+//               .setAutoCancel(true)
+//               .setDeleteIntent(pendingIntent);
+//
+//        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+//        notificationManager.notify(0, builder.build());
+//    }
 
     private void executeArticle() throws Exception {
         List<Article> articles;
