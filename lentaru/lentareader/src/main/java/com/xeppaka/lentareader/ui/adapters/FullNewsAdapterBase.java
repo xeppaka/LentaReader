@@ -48,13 +48,17 @@ public abstract class FullNewsAdapterBase extends BaseAdapter {
 
     public void becomeVisible() {
         for (FullNewsElement element : elementList) {
-            element.becomeVisible();
+            if (element != null) {
+                element.becomeVisible();
+            }
         }
     }
 
     public void becomeInvisible() {
         for (FullNewsElement element : elementList) {
-            element.becomeInvisible();
+            if (element != null) {
+                element.becomeInvisible();
+            }
         }
     }
 }

@@ -47,9 +47,9 @@ public class FullNewsHeader extends FullNewsElementBase {
 
     @Override
     public void becomeVisible() {
-        super.becomeVisible();
+        final boolean visible = isVisible();
 
-        if (!isVisible() && imageLink != null && !imageLink.isEmpty()) {
+        if (!visible && imageLink != null && !imageLink.isEmpty()) {
             final ElementOptions options = getOptions();
             final BitmapReference bitmapReference = imageDao.read(imageLink, NewsImageKeyCreator.getInstance());
             final Drawable drawable = bitmapReference.getDrawableIfCached(imageView);
@@ -77,6 +77,8 @@ public class FullNewsHeader extends FullNewsElementBase {
                 });
             }
         }
+        
+        super.becomeVisible();
     }
 
     @Override
