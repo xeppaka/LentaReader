@@ -341,6 +341,11 @@ public class AsyncNODaoDecorator<T extends NewsObject> extends AsyncDaoDecorator
     }
 
     @Override
+    public int deleteSmallerIds(long id) {
+        return getDecoratedDao().deleteSmallerIds(id);
+    }
+
+    @Override
 	protected NODao<T> getDecoratedDao() {
 		return decoratedDao;
 	}

@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.xeppaka.lentareader.data.Article;
 import com.xeppaka.lentareader.data.body.items.SafeLinkMovementMethodDecorator;
+import com.xeppaka.lentareader.utils.LentaConstants;
 import com.xeppaka.lentareader.utils.LentaTextUtils;
 
 /**
@@ -31,12 +32,17 @@ public class FullArticleSecondHeader extends FullNewsElementBase {
         final TextView textView = new TextView(inflater.getContext());
         final ElementOptions options = getOptions();
 
-        textView.setText(secondHeader);
         textView.setTextSize(LentaTextUtils.getArticleSecondTitleTextSize(options.getTextSize()));
         textView.setTypeface(null, Typeface.ITALIC);
         textView.setText(Html.fromHtml(secondHeader));
-        textView.setTextIsSelectable(true);
+
+        if (LentaConstants.SDK_VER >= 11) {
+            textView.setTextIsSelectable(true);
+        }
         textView.setMovementMethod(SafeLinkMovementMethodDecorator.getInstance(inflater.getContext()));
+
+        final int px = getPadding();
+        textView.setPadding(0, px, 0, px);
 
         return textView;
     }

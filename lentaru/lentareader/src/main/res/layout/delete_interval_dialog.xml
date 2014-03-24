@@ -6,12 +6,12 @@
     android:layout_height="match_parent"
     android:padding="5dip">
     <TextView
+        android:id="@+id/delete_news_object_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAlignment="center"
-        android:text="@string/news_delete_interval_header"/>
+        android:textAlignment="center"/>
     <NumberPicker
-        android:id="@+id/news_delete_number_picker"
+        android:id="@+id/delete_number_picker"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"/>

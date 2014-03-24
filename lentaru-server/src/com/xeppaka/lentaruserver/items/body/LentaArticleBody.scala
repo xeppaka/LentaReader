@@ -131,7 +131,7 @@ object LentaArticleBody {
 
     newsBodyStartPattern.findFirstMatchIn(page) match {
       case Some(mt) =>
-        val end = findBodyCoundDiv(mt.end, 1) - 6 // 6 is the size of </div>
+        val end = findBodyCoundDiv(mt.end, 1) - "</div>".length
         if (end <= 0 || end <= mt.end)
           None
         else

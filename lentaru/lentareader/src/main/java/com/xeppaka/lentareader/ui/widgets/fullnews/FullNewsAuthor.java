@@ -1,9 +1,10 @@
 package com.xeppaka.lentareader.ui.widgets.fullnews;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.support.v4.app.Fragment;
 import android.text.Html;
-import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
@@ -13,15 +14,15 @@ import com.xeppaka.lentareader.utils.LentaConstants;
 import com.xeppaka.lentareader.utils.LentaTextUtils;
 
 /**
- * Created by nnm on 3/15/14.
+ * Created by nnm on 3/23/14.
  */
-public class FullNewsTextElement extends FullNewsElementBase {
-    private String text;
+public class FullNewsAuthor extends FullNewsElementBase {
+    private String author;
 
-    public FullNewsTextElement(String text, Context context, Fragment fragment) {
+    public FullNewsAuthor(String author, Context context, Fragment fragment) {
         super(context, fragment);
 
-        this.text = text;
+        this.author = author;
     }
 
     @Override
@@ -30,14 +31,14 @@ public class FullNewsTextElement extends FullNewsElementBase {
         final TextView textView = new TextView(context);
         final ElementOptions options = getOptions();
 
-        textView.setTextSize(LentaTextUtils.getNewsFullTextSize(options.getTextSize()));
-        textView.setText(Html.fromHtml(text));
+        textView.setText(author);
+        textView.setTextSize(LentaTextUtils.getArticleAuthorTextSize(options.getTextSize()));
+        textView.setTypeface(null, Typeface.BOLD);
+        textView.setGravity(Gravity.RIGHT);
 
         if (LentaConstants.SDK_VER >= 11) {
             textView.setTextIsSelectable(true);
         }
-
-        textView.setMovementMethod(SafeLinkMovementMethodDecorator.getInstance(context));
 
         final int px = getPadding();
         textView.setPadding(px, 0, px, 0);

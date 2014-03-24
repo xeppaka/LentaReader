@@ -29,7 +29,7 @@ public class FullNewsImageGallery extends FullNewsElementBase {
     @Override
     protected View createRootView(LayoutInflater inflater) {
         final ElementOptions options = getOptions();
-        imagesGallery = new ImagesGallery(inflater.getContext(), gallery, options.isDownloadImages(), options.getTextSize());
+        imagesGallery = new ImagesGallery(inflater.getContext(), gallery, options.isDownloadImages(), options.getTextSize(), getPadding());
 
         final LinearLayout wrapper = new LinearLayout(inflater.getContext());
         final AbsListView.LayoutParams layoutParams = new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -37,7 +37,6 @@ public class FullNewsImageGallery extends FullNewsElementBase {
         wrapper.addView(imagesGallery);
 
         int value = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5f, inflater.getContext().getResources().getDisplayMetrics());
-
         wrapper.setPadding(0, 0, 0, value);
 
         return wrapper;

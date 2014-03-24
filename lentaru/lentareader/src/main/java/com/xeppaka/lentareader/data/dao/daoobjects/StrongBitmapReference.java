@@ -84,4 +84,7 @@ public class StrongBitmapReference implements BitmapReference {
 
     @Override
 	public void releaseBitmap() {}
+
+    @Override
+    public void releaseImageView(ImageView view) {}
 }

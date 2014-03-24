@@ -1,8 +1,8 @@
 package com.xeppaka.lentareader.ui.widgets;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.support.v4.util.ArrayMap;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
@@ -30,21 +30,24 @@ public class ImagesSwitcher extends ViewPager {
 
     private class GalleryViewPagerAdapter extends PagerAdapter {
         private List<LentaBodyItemImage> images;
-        private Stack<ImageView> imageViews;
+        private Stack<ImageView> freeImageViews;
+        private ArrayMap<Integer, ImageView> itemsMap;
         private final OnClickListener onClickListener;
 
         private GalleryViewPagerAdapter(List<LentaBodyItemImage> images, OnClickListener onClickListener) {
             this.images = images;
             this.onClickListener = onClickListener;
 
-            final int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 220, getResources().getDisplayMetrics());
+            final int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 250, getResources().getDisplayMetrics());
             setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height));
 
-            imageViews = new Stack<ImageView>();
+            itemsMap = new ArrayMap<Integer, ImageView>(images.size());
 
-            imageViews.push(createImageView(onClickListener));
-            imageViews.push(createImageView(onClickListener));
-            imageViews.push(createImageView(onClickListener));
+            freeImageViews = new Stack<ImageView>();
+
+            freeImageViews.push(createImageView(onClickListener));
+            freeImageViews.push(createImageView(onClickListener));
+            freeImageViews.push(createImageView(onClickListener));
         }
 
         private ImageView createImageView(View.OnClickListener onClickListener) {
@@ -60,10 +63,28 @@ public class ImagesSwitcher extends ViewPager {
 
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
-            final ImageView currentImageView = imageViews.isEmpty() ? imageViews.push(createImageView(onClickListener)) : imageViews.pop();
+            final ImageView imageView = freeImageViews.isEmpty() ? freeImageViews.push(createImageView(onClickListener)) : freeImageViews.pop();
 
-            container.addView(currentImageView);
+            container.addView(imageView);
+            itemsMap.put(position, imageView);
 
+            loadBitmap(imageView, position);
+
+            return imageView;
+        }
+
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+            final ImageView view = (ImageView) object;
+            view.setImageDrawable(null);
+
+            container.removeView(view);
+
+            freeImageViews.push(view);
+            itemsMap.remove(position);
+        }
+
+        private void loadBitmap(final ImageView view, int position) {
             final LentaBodyItemImage curImage = images.get(position);
             String url;
 
@@ -80,35 +101,23 @@ public class ImagesSwitcher extends ViewPager {
             final BitmapReference bitmapRef = imageDao.read(url, NewsImageKeyCreator.getInstance());
 
             Drawable drawable;
-            if ((drawable = bitmapRef.getDrawableIfCached(currentImageView)) != null) {
-                currentImageView.setImageDrawable(drawable);
+            if ((drawable = bitmapRef.getDrawableIfCached(view)) != null) {
+                view.setImageDrawable(drawable);
             } else {
-                currentImageView.setImageDrawable(ImageDao.getLoadingImage().getDrawableIfCached());
+                view.setImageDrawable(ImageDao.getLoadingImage().getDrawableIfCached());
 
-                bitmapRef.getDrawableAsync(currentImageView, new AsyncListener<Drawable>() {
+                bitmapRef.getDrawableAsync(view, new AsyncListener<Drawable>() {
                     @Override
                     public void onSuccess(Drawable drawable) {
-                        currentImageView.setImageDrawable(drawable);
+                        view.setImageDrawable(drawable);
                     }
 
                     @Override
                     public void onFailure(Exception e) {
-                        currentImageView.setImageDrawable(ImageDao.getNotAvailableImage().getDrawableIfCached());
+                        view.setImageDrawable(ImageDao.getNotAvailableImage().getDrawableIfCached());
                     }
                 });
             }
-
-            return currentImageView;
-        }
-
-        @Override
-        public void destroyItem(ViewGroup container, int position, Object object) {
-            final ImageView view = (ImageView)object;
-            view.setImageBitmap(null);
-
-            container.removeView(view);
-
-            imageViews.push(view);
         }
 
         @Override
@@ -122,12 +131,24 @@ public class ImagesSwitcher extends ViewPager {
         }
 
         public void becomeVisible() {
-            for (ImageView imageView : imageViews) {
-                imageView.setImageDrawable(null);
+            for (int i = 0; i < images.size(); ++i) {
+                final ImageView imageView = itemsMap.get(i);
+
+                if (imageView != null) {
+                    loadBitmap(imageView, i);
+                }
             }
         }
 
-        public void becomeInvisible() {}
+        public void becomeInvisible() {
+            for (int i = 0; i < images.size(); ++i) {
+                final ImageView imageView = itemsMap.get(i);
+
+                if (imageView != null) {
+                    imageView.setImageDrawable(null);
+                }
+            }
+        }
     }
 
     public ImagesSwitcher(Context context, List<LentaBodyItemImage> images, boolean preview) {

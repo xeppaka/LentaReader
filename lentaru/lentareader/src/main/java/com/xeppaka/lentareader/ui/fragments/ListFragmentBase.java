@@ -83,6 +83,11 @@ public abstract class ListFragmentBase<T extends NewsObject> extends ListFragmen
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        if (savedInstanceState != null) {
+            active = savedInstanceState.getBoolean("active", false);
+            currentRubric = Rubrics.valueOf(savedInstanceState.getString("rubric", Rubrics.LATEST.name()));
+        }
+
         final Context context = getActivity();
 
         autoRefreshToast = createAutoRefreshToast(context);
@@ -90,6 +95,13 @@ public abstract class ListFragmentBase<T extends NewsObject> extends ListFragmen
         setListAdapter(newsAdapter = createAdapter(context));
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putBoolean("active", isActive());
+        outState.putString("rubric", getCurrentRubric().name());
+    }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {

@@ -10,7 +10,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import com.xeppaka.lentareader.R;
 import com.xeppaka.lentareader.async.AsyncListener;
 import com.xeppaka.lentareader.data.Article;
 import com.xeppaka.lentareader.data.News;
@@ -21,6 +23,7 @@ import com.xeppaka.lentareader.data.dao.daoobjects.NewsDao;
 import com.xeppaka.lentareader.ui.adapters.FullArticleAdapter;
 import com.xeppaka.lentareader.ui.adapters.FullNewsAdapter;
 import com.xeppaka.lentareader.ui.widgets.fullnews.ElementOptions;
+import com.xeppaka.lentareader.ui.widgets.fullnews.builder.FullArticleElementsBuilder;
 import com.xeppaka.lentareader.ui.widgets.fullnews.builder.FullNewsElementsBuilder;
 import com.xeppaka.lentareader.utils.PreferencesConstants;
 
@@ -67,11 +70,20 @@ public class ArticleFullFragment extends FullFragmentBase {
                     if (isResumed()) {
                         setLink(article.getLink());
 
-                        final FullNewsElementsBuilder builder = new FullNewsElementsBuilder(article, getActivity(), ArticleFullFragment.this);
+                        final FullArticleElementsBuilder builder = new FullArticleElementsBuilder(article, getActivity(), ArticleFullFragment.this);
                         builder.setOptions(getOptions());
 
                         setListAdapter(adapter = new FullArticleAdapter(builder.build()));
                     }
+
+                    article.setRead(true);
+                    dao.updateAsync(article, new AsyncListener<Integer>() {
+                        @Override
+                        public void onSuccess(Integer value) {}
+
+                        @Override
+                        public void onFailure(Exception e) {}
+                    });
                 }
 
                 @Override
@@ -114,5 +126,18 @@ public class ArticleFullFragment extends FullFragmentBase {
         if (adapter != null) {
             adapter.becomeInvisible();
         }
+    }
+
+    @Override
+    public boolean copyLinkToBuffer() {
+        final boolean copied = super.copyLinkToBuffer();
+
+        if (copied) {
+            Toast.makeText(getActivity(), R.string.info_article_link_copied_toast, Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getActivity(), R.string.error_article_link_copied_toast, Toast.LENGTH_SHORT).show();
+        }
+
+        return copied;
     }
 }

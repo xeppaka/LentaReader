@@ -47,9 +47,7 @@ public class SwipeNewsFragmentsAdapter extends FragmentPagerAdapter {
         } else {
             switch (position) {
                 case 0:
-                    fragments[0] = new NewsListFragment();
-                    fragments[0].setActive(true);
-                    return fragments[0];
+                    return fragments[0] = new NewsListFragment();
                 case 1:
                     return fragments[1] = new ArticleListFragment();
             }

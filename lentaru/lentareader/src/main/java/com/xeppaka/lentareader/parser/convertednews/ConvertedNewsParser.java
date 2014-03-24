@@ -89,6 +89,8 @@ public class ConvertedNewsParser extends PullParserBase implements ConvertedNews
                 guid = readValue(parser, "guid", ns);
             } else if (name.equals("title")) {
                 title = readValue(parser, "title", ns);
+            } else if (name.equals("title")) {
+                title = readValue(parser, "title", ns);
             } else if (name.equals("link")) {
                 link = readValue(parser, "link", ns);
             } else if (name.equals("image")) {

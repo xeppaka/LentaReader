@@ -2,24 +2,19 @@ package com.xeppaka.lentareader.ui.widgets;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.preference.DialogPreference;
 import android.util.AttributeSet;
-import android.view.View;
-import android.widget.NumberPicker;
 
 import com.xeppaka.lentareader.R;
-import com.xeppaka.lentareader.async.AsyncListener;
-import com.xeppaka.lentareader.data.News;
-import com.xeppaka.lentareader.data.Rubrics;
 import com.xeppaka.lentareader.data.dao.async.AsyncNODao;
+import com.xeppaka.lentareader.data.dao.daoobjects.ArticleDao;
 import com.xeppaka.lentareader.data.dao.daoobjects.NewsDao;
 import com.xeppaka.lentareader.utils.PreferencesConstants;
 
 /**
  * Created by kacpa01 on 1/3/14.
  */
-public class NewsDeleteIntervalPreference extends DeleteIntervalPreference {
-    public NewsDeleteIntervalPreference(Context context, AttributeSet attrs) {
+public class ArticleDeleteIntervalPreference extends DeleteIntervalPreference {
+    public ArticleDeleteIntervalPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
 
         setDialogLayoutResource(R.layout.delete_interval_dialog);
@@ -31,16 +26,16 @@ public class NewsDeleteIntervalPreference extends DeleteIntervalPreference {
 
     @Override
     protected int getDeleteAfterDaysDefault() {
-        return PreferencesConstants.NEWS_DELETE_NEWS_DAYS_DEFAULT;
+        return PreferencesConstants.ARTICLE_DELETE_ARTICLES_DAYS_DEFAULT;
     }
 
     protected void updateSummaryText() {
         final Resources resources = getContext().getResources();
         final int deleteAfterDays = getDeleteAfterDays();
         if (deleteAfterDays == 1) {
-            setSummary(String.format(resources.getString(R.string.pref_news_deletion_interval_summary_day), deleteAfterDays));
+            setSummary(String.format(resources.getString(R.string.pref_article_deletion_interval_summary_day), deleteAfterDays));
         } else {
-            setSummary(String.format(resources.getString(R.string.pref_news_deletion_interval_summary_days), deleteAfterDays));
+            setSummary(String.format(resources.getString(R.string.pref_article_deletion_interval_summary_days), deleteAfterDays));
         }
     }
 
@@ -51,16 +46,16 @@ public class NewsDeleteIntervalPreference extends DeleteIntervalPreference {
 
     @Override
     protected int getMaxValue() {
-        return 7;
+        return 30;
     }
 
     @Override
     protected AsyncNODao<?> getDao() {
-        return NewsDao.getInstance(getContext().getContentResolver());
+        return ArticleDao.getInstance(getContext().getContentResolver());
     }
 
     @Override
     protected int getTitleResId() {
-        return R.string.news_delete_interval_header;
+        return R.string.article_delete_interval_header;
     }
 }

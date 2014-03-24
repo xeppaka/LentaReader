@@ -24,6 +24,7 @@ public interface NODao<T extends NewsObject> extends Dao<T> {
     boolean hasImage(long id);
     boolean hasImage(String key);
     List<Long> readAllIds(Rubrics rubric);
+    int deleteSmallerIds(long id);
 
     int clearRecentFlag();
     int clearUpdatedInBackgroundFlag();

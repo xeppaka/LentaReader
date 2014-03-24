@@ -93,6 +93,13 @@ public class SynchronizedNODaoDecorator<T extends NewsObject> extends Synchroniz
     }
 
     @Override
+    public int deleteSmallerIds(long id) {
+        synchronized (getSync()) {
+            return decoratedDao.deleteSmallerIds(id);
+        }
+    }
+
+    @Override
     public List<Long> readAllIds(Rubrics rubric) {
         synchronized (getSync()) {
             return decoratedDao.readAllIds(rubric);

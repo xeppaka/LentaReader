@@ -10,7 +10,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import com.xeppaka.lentareader.R;
 import com.xeppaka.lentareader.async.AsyncListener;
 import com.xeppaka.lentareader.data.News;
 import com.xeppaka.lentareader.data.NewsObject;
@@ -70,6 +72,15 @@ public class NewsFullFragment extends FullFragmentBase {
 
                         setListAdapter(adapter = new FullNewsAdapter(builder.build()));
                     }
+
+                    news.setRead(true);
+                    dao.updateAsync(news, new AsyncListener<Integer>() {
+                        @Override
+                        public void onSuccess(Integer value) {}
+
+                        @Override
+                        public void onFailure(Exception e) {}
+                    });
                 }
 
                 @Override
@@ -112,5 +123,18 @@ public class NewsFullFragment extends FullFragmentBase {
         if (adapter != null) {
             adapter.becomeInvisible();
         }
+    }
+
+    @Override
+    public boolean copyLinkToBuffer() {
+        final boolean copied = super.copyLinkToBuffer();
+
+        if (copied) {
+            Toast.makeText(getActivity(), R.string.info_news_link_copied_toast, Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getActivity(), R.string.error_news_link_copied_toast, Toast.LENGTH_SHORT).show();
+        }
+
+        return copied;
     }
 }

@@ -41,7 +41,14 @@ public abstract class FullNewsAdapterBase extends BaseAdapter {
     public View getView(int i, View view, ViewGroup viewGroup) {
         final FullNewsElement element = getItem(i);
         final View result = element.getView();
+        result.setTag(element);
+
         element.becomeVisible();
+
+        if (view != null && view != result) {
+            final FullNewsElement prevElement = (FullNewsElement) view.getTag();
+            prevElement.becomeInvisible();
+        }
 
         return result;
     }

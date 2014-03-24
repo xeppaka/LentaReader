@@ -53,6 +53,7 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
     // private NewsFullFragment newsFullFragment;
 
     private boolean refreshing;
+    private int refreshCount;
     private boolean autoRefresh;
     private int listFragments;
 
@@ -154,15 +155,20 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
             public void onPageSelected(int position) {
                 pagerAdapter.clearActiveFragments();
                 final ListFragmentBase fragment = pagerAdapter.getFragment(position);
+
                 if (fragment != null) {
                     fragment.setActive(true);
                 }
-
-                // indicator.notifyDataSetChanged();
             }
 
             @Override
-            public void onPageScrollStateChanged(int state) {}
+            public void onPageScrollStateChanged(int state) {
+                if (state == ViewPager.SCROLL_STATE_IDLE) {
+                    final int position = pager.getCurrentItem();
+                    final ListFragmentBase fragment = pagerAdapter.getFragment(position);
+                    fragment.getDataObjectsAdapter().notifyDataSetChanged();
+                }
+            }
         });
 	}
 
@@ -213,17 +219,25 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
         refreshing = true;
         showActionBarRefresh(true);
 
+        ++refreshCount;
+
         serviceHelper.updateRubric(newsType, rubric, false, new AsyncListener<Void>() {
             @Override
             public void onSuccess(Void val) {
                 refreshing = false;
-                showActionBarRefresh(false);
+
+                if (--refreshCount == 0) {
+                    showActionBarRefresh(false);
+                }
             }
 
             @Override
             public void onFailure(Exception ex) {
                 refreshing = false;
-                showActionBarRefresh(false);
+
+                if (--refreshCount == 0) {
+                    showActionBarRefresh(false);
+                }
 
                 if (showServiceErrorToast) {
                     showServiceErrorToast(ex);
@@ -298,9 +312,6 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
             if (++listFragments == NewsType.values().length && autoRefresh) {
                 refresh(NewsType.NEWS, Rubrics.LATEST);
                 refresh(NewsType.ARTICLE, Rubrics.LATEST);
-
-                final ListFragmentBase currentFragment = pagerAdapter.getFragment(pager.getCurrentItem());
-                currentFragment.setActive(true);
             }
         }
     }

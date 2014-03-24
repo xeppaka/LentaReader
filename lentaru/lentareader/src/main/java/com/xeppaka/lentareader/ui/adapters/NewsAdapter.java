@@ -19,7 +19,7 @@ import com.xeppaka.lentareader.data.dao.daoobjects.imagedaoobjects.NewsImageKeyC
 import com.xeppaka.lentareader.utils.LentaTextUtils;
 
 public class NewsAdapter extends NewsObjectAdapter<News> {
-    private static class ViewHolder {
+    public static class ViewHolder {
 		private final TextView newsTitle;
         private final TextView newsDescription;
         private final TextView newsDate;
@@ -219,7 +219,7 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
 
             BitmapReference prevImageRef = holder.getImage();
 			if (prevImageRef != null) {
-				prevImageRef.releaseBitmap();
+				prevImageRef.releaseImageView(holder.getNewsImage());
 			}
 		}
 

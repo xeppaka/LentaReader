@@ -21,13 +21,14 @@
         android:layout_marginRight="1dip">
 
         <TextView
+            android:id="@+id/full_news_rubric"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/rubric_label"
             android:textSize="12sp"/>
 
         <TextView
-            android:id="@+id/full_news_rubric"
+            android:id="@+id/full_news_rubric_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="12sp"/>

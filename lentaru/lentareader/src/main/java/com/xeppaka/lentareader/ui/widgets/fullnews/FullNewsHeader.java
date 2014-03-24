@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.support.v4.app.Fragment;
 import android.text.Html;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -27,14 +28,22 @@ public class FullNewsHeader extends FullNewsElementBase {
     private final String imageCredits;
     private final String title;
 
+    private final boolean hasImage;
+    private final boolean hasImageCaption;
+    private final boolean hasImageCredits;
+
     private ImageView imageView;
     private final ImageDao imageDao;
 
-    public FullNewsHeader(String imageLink, String imageCaption, String imageCredits, String title, Context context, Fragment fragment) {
+    public FullNewsHeader(boolean hasImage, String imageLink, boolean hasImageCaption, String imageCaption,
+                          boolean hasImageCredits, String imageCredits, String title, Context context, Fragment fragment) {
         super(context, fragment);
 
+        this.hasImage = hasImage;
         this.imageLink = imageLink;
+        this.hasImageCaption = hasImageCaption;
         this.imageCaption = imageCaption;
+        this.hasImageCredits = hasImageCredits;
         this.imageCredits = imageCredits;
         this.title = title;
 
@@ -42,14 +51,15 @@ public class FullNewsHeader extends FullNewsElementBase {
     }
 
     public FullNewsHeader(News news, Context context, Fragment fragment) {
-        this(news.getImageLink(), news.getImageCaption(), news.getImageCredits(), news.getTitle(), context, fragment);
+        this(news.hasImage(), news.getImageLink(), news.hasImageCaption(), news.getImageCaption(),
+             news.hasImageCredits(), news.getImageCredits(), news.getTitle(), context, fragment);
     }
 
     @Override
     public void becomeVisible() {
         final boolean visible = isVisible();
 
-        if (!visible && imageLink != null && !imageLink.isEmpty()) {
+        if (!visible && hasImage) {
             final ElementOptions options = getOptions();
             final BitmapReference bitmapReference = imageDao.read(imageLink, NewsImageKeyCreator.getInstance());
             final Drawable drawable = bitmapReference.getDrawableIfCached(imageView);
@@ -84,8 +94,6 @@ public class FullNewsHeader extends FullNewsElementBase {
     @Override
     public void becomeInvisible() {
         super.becomeInvisible();
-
-        imageView.setImageDrawable(null);
     }
 
     @Override
@@ -98,21 +106,30 @@ public class FullNewsHeader extends FullNewsElementBase {
         final TextView imageCreditsView = (TextView) header.findViewById(R.id.full_news_image_credits);
         final TextView titleView = (TextView) header.findViewById(R.id.full_news_title);
 
-        if (imageCaption != null && !imageCaption.isEmpty()) {
+        final int px = getPadding();
+
+        if (options.isDownloadImages() && hasImageCaption) {
             imageCaptionView.setVisibility(View.VISIBLE);
             imageCaptionView.setText(Html.fromHtml(imageCaption));
             imageCaptionView.setMovementMethod(SafeLinkMovementMethodDecorator.getInstance(inflater.getContext()));
             imageCaptionView.setTextSize(LentaTextUtils.getNewsFullImageCaptionTextSize(options.getTextSize()));
+            imageCaptionView.setPadding(px, 0, px, 0);
+        } else {
+            imageCaptionView.setVisibility(View.GONE);
         }
 
-        if (imageCredits != null && !imageCredits.isEmpty()) {
+        if (options.isDownloadImages() && hasImageCredits) {
             imageCreditsView.setVisibility(View.VISIBLE);
             imageCreditsView.setText(Html.fromHtml(imageCredits));
             imageCreditsView.setMovementMethod(SafeLinkMovementMethodDecorator.getInstance(inflater.getContext()));
             imageCreditsView.setTextSize(LentaTextUtils.getNewsFullImageCreditsTextSize(options.getTextSize()));
+            imageCreditsView.setPadding(px, 0, px, 0);
+        } else {
+            imageCreditsView.setVisibility(View.GONE);
         }
 
         titleView.setText(title);
+        titleView.setTextSize(LentaTextUtils.getNewsFullTitleTextSize(options.getTextSize()));
 
         return header;
     }

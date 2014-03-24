@@ -2,6 +2,7 @@ package com.xeppaka.lentareader.ui.widgets.fullnews;
 
 import android.content.Context;
 import android.support.v4.app.Fragment;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,22 +16,21 @@ public abstract class FullNewsElementBase implements FullNewsElement {
     private LayoutInflater inflater;
     private View rootView;
     private boolean visible;
+    private int padding;
 
     private ElementOptions options;
-    // private final AbsListView.LayoutParams defaultLayoutParams;
-
 
     public FullNewsElementBase(Context context, Fragment fragment) {
-        // this.defaultLayoutParams = new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         this.fragment = fragment;
+
+        padding = Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2f, context.getResources().getDisplayMetrics()));
     }
 
     @Override
     public View getView() {
         if (rootView == null) {
             rootView = createRootView(inflater);
-            // rootView.setLayoutParams(defaultLayoutParams);
             // don't need inflater anymore
             inflater = null;
         }
@@ -68,5 +68,9 @@ public abstract class FullNewsElementBase implements FullNewsElement {
 
     public boolean isVisible() {
         return visible;
+    }
+
+    public int getPadding() {
+        return padding;
     }
 }

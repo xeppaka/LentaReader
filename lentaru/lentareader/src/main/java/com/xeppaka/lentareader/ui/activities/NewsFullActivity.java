@@ -67,30 +67,10 @@ public class NewsFullActivity extends ActionBarActivity {
                 finish();
                 return true;
             case R.id.action_copy_link:
-                link = fullFragment.getLink();
-
-                if (link != null) {
-                    final ClipboardManager clipboardManager = (ClipboardManager)getSystemService(CLIPBOARD_SERVICE);
-                    final ClipData clip = ClipData.newPlainText("URL", link);
-                    clipboardManager.setPrimaryClip(clip);
-
-                    Toast.makeText(this, R.string.info_link_copied_toast, Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(this, R.string.error_link_copied_toast, Toast.LENGTH_SHORT).show();
-                }
-
+                fullFragment.copyLinkToBuffer();
                 break;
             case R.id.action_open_in_browser:
-                link = fullFragment.getLink();
-
-                if (link != null) {
-                    final Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setData(Uri.parse(link));
-                    startActivity(intent);
-                } else {
-                    Toast.makeText(this, R.string.error_link_open_in_browser_toast, Toast.LENGTH_SHORT).show();
-                }
-
+                fullFragment.copyLinkToBuffer();
                 break;
         }
 

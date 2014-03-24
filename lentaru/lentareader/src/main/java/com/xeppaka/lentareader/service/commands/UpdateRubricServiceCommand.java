@@ -28,6 +28,8 @@ import com.xeppaka.lentareader.utils.PreferencesConstants;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public final class UpdateRubricServiceCommand extends RunnableServiceCommand {
@@ -64,15 +66,15 @@ public final class UpdateRubricServiceCommand extends RunnableServiceCommand {
 
         NODao<News> newsDao = NewsDao.getInstance(context.getContentResolver());
 
-        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        final boolean deleteOldNews = preferences.getBoolean(PreferencesConstants.PREF_KEY_NEWS_DELETE_NEWS, PreferencesConstants.NEWS_DELETE_NEWS_DEFAULT);
+//        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+//        final boolean deleteOldNews = preferences.getBoolean(PreferencesConstants.PREF_KEY_NEWS_DELETE_NEWS, PreferencesConstants.NEWS_DELETE_NEWS_DEFAULT);
 
-        if (deleteOldNews) {
-            final int deleteDays = preferences.getInt(PreferencesConstants.PREF_KEY_NEWS_DELETE_NEWS_DAYS, PreferencesConstants.NEWS_DELETE_NEWS_DAYS_DEFAULT);
-
-            // one day is 86400000 milliseconds
-            newsDao.deleteOlderOrEqual(rubric, System.currentTimeMillis() - deleteDays * 86400000);
-        }
+//        if (deleteOldNews) {
+//            final int deleteDays = preferences.getInt(PreferencesConstants.PREF_KEY_NEWS_DELETE_NEWS_DAYS, PreferencesConstants.NEWS_DELETE_NEWS_DAYS_DEFAULT);
+//
+//            // one day is 86400000 milliseconds
+//            newsDao.deleteOlderOrEqual(rubric, System.currentTimeMillis() - deleteDays * 86400000);
+//        }
 
         try {
             News latest = newsDao.readLatestWOImage(rubric, LentaConstants.WITHOUT_PICTURE_LIMIT);
@@ -136,6 +138,13 @@ public final class UpdateRubricServiceCommand extends RunnableServiceCommand {
             newsDao.update(newWithImage);
         }
 
+        List<Long> ids = newsDao.readAllIds(Rubrics.LATEST);
+        if (ids.size() > 360) {
+            Collections.sort(ids, Collections.reverseOrder());
+
+            newsDao.deleteSmallerIds(ids.get(360));
+        }
+
         if (rubric != Rubrics.LATEST) {
             newsDao.clearUpdatedFromLatestFlag(rubric);
         }
@@ -166,15 +175,15 @@ public final class UpdateRubricServiceCommand extends RunnableServiceCommand {
 
         NODao<Article> articleDao = ArticleDao.getInstance(context.getContentResolver());
 
-        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        final boolean deleteOldArticles = preferences.getBoolean(PreferencesConstants.PREF_KEY_ARTICLES_DELETE_ARTICLES, PreferencesConstants.ARTICLES_DELETE_ARTICLES_DEFAULT);
-
-        if (deleteOldArticles) {
-            final int deleteDays = preferences.getInt(PreferencesConstants.PREF_KEY_NEWS_DELETE_NEWS_DAYS, PreferencesConstants.NEWS_DELETE_NEWS_DAYS_DEFAULT);
-
-            // one day is 86400000 milliseconds
-            articleDao.deleteOlderOrEqual(rubric, System.currentTimeMillis() - deleteDays * 86400000);
-        }
+//        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+//        final boolean deleteOldArticles = preferences.getBoolean(PreferencesConstants.PREF_KEY_ARTICLE_DELETE_ARTICLES, PreferencesConstants.ARTICLE_DELETE_ARTICLES_DEFAULT);
+//
+//        if (deleteOldArticles) {
+//            final int deleteDays = preferences.getInt(PreferencesConstants.PREF_KEY_ARTICLE_DELETE_ARTICLE_DAYS, PreferencesConstants.ARTICLE_DELETE_ARTICLES_DAYS_DEFAULT);
+//
+//            // one day is 86400000 milliseconds
+//            articleDao.deleteOlderOrEqual(rubric, System.currentTimeMillis() - deleteDays * 86400000);
+//        }
 
         try {
             Article latest = articleDao.readLatestWOImage(rubric, LentaConstants.WITHOUT_PICTURE_LIMIT);
@@ -236,6 +245,13 @@ public final class UpdateRubricServiceCommand extends RunnableServiceCommand {
             newWithImage.setImageCaption(art.getImageCaption());
 
             articleDao.update(newWithImage);
+        }
+
+        List<Long> ids = articleDao.readAllIds(Rubrics.LATEST);
+        if (ids.size() > 360) {
+            Collections.sort(ids, Collections.reverseOrder());
+
+            articleDao.deleteSmallerIds(ids.get(360));
         }
 
         if (rubric != Rubrics.LATEST) {

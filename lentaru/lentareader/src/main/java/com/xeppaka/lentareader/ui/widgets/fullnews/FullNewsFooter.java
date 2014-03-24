@@ -2,6 +2,7 @@ package com.xeppaka.lentareader.ui.widgets.fullnews;
 
 import android.content.Context;
 import android.support.v4.app.Fragment;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
@@ -35,11 +36,17 @@ public class FullNewsFooter extends FullNewsElementBase {
 
         final TextView dateView = (TextView)footer.findViewById(R.id.full_news_date);
         final TextView rubricView = (TextView)footer.findViewById(R.id.full_news_rubric);
+        final TextView rubricViewLabel = (TextView)footer.findViewById(R.id.full_news_rubric_label);
 
         dateView.setText(date);
         dateView.setTextSize(LentaTextUtils.getNewsFullDateTextSize(options.getTextSize()));
-        rubricView.setText(" " + rubric);
+        rubricViewLabel.setText(" " + rubric);
+        rubricViewLabel.setTextSize(LentaTextUtils.getNewsFullRubricTextSize(options.getTextSize()));
         rubricView.setTextSize(LentaTextUtils.getNewsFullRubricTextSize(options.getTextSize()));
+
+        final int px = getPadding();
+        dateView.setPadding(px, 0, px, 0);
+        rubricView.setPadding(px, 0, px, 0);
 
         return footer;
     }

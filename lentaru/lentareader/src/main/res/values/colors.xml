@@ -9,5 +9,5 @@
     <color name="comment_just_expanded">#ffd8dcde</color>
     <color name="comment_rating_positive">#ff00a246</color>
     <color name="comment_rating_negative">#ffe90018</color>
-    <color name="news_recent">#ffd8dcde</color>
+    <color name="news_recent">#ffe5e6e7</color>
 </resources>

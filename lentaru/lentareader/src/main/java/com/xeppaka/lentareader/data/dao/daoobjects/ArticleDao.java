@@ -108,6 +108,8 @@ public final class ArticleDao {
             values.put(ArticleEntry.COLUMN_NAME_UPDATED_FROM_LATEST, article.isUpdatedFromLatest());
             values.put(ArticleEntry.COLUMN_NAME_UPDATED_IN_BACKGROUND, article.isUpdatedInBackground());
             values.put(ArticleEntry.COLUMN_NAME_RECENT, article.isRecent());
+            values.put(ArticleEntry.COLUMN_NAME_AUTHOR, article.getAuthor());
+            values.put(ArticleEntry.COLUMN_NAME_SECOND_TITLE, article.getSecondTitle());
 
             if (article.getBody() == null)
                 values.putNull(ArticleEntry.COLUMN_NAME_BODY);

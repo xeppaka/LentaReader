@@ -6,7 +6,7 @@
         <com.xeppaka.lentareader.ui.widgets.AboutProgram
             android:summary="@string/rate_program_summary" />
     </PreferenceCategory>
-    <PreferenceCategory
+<!--    <PreferenceCategory
         android:title="@string/pref_background_update_title">
         <CheckBoxPreference
             android:key="pref_key_background_update"
@@ -17,7 +17,7 @@
             android:summary="@string/pref_news_background_check_interval_summary_default"
             android:defaultValue="5"
             android:dependency="pref_key_background_update"/>
-    </PreferenceCategory>
+    </PreferenceCategory> -->
     <PreferenceCategory
         android:title="@string/pref_load_images"
         android:key="pref_key_load_images">
@@ -45,12 +45,8 @@
             android:key="pref_key_news_full_text_size"
             android:summary="@string/news_full_text_size_summary_default"
             android:defaultValue="16"/>
-        <com.xeppaka.lentareader.ui.widgets.NewsDeleteIntervalPreference
-            android:key="pref_key_news_delete_days"
-            android:summary="@string/pref_news_deletion_interval_summary_days_default"
-            android:defaultValue="5"/>
         <com.xeppaka.lentareader.ui.widgets.NewsDeleteCache
             android:key="pref_key_news_delete_cache"
-            android:summary="@string/news_cache_clear_summary"/>
+            android:summary="@string/cache_clear_summary"/>
     </PreferenceCategory>
 </PreferenceScreen>

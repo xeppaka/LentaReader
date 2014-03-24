@@ -279,6 +279,20 @@ public abstract class ContentResolverNODao<T extends NewsObject> extends Content
     }
 
     @Override
+    public int deleteSmallerIds(long id) {
+        String where = BaseColumns._ID + " < ?";
+        String[] whereArgs = { String.valueOf(id) };
+
+        final int result = getContentResolver().delete(getContentProviderUri(), where, whereArgs);
+
+        if (result > 0) {
+            getContentResolver().notifyChange(getContentProviderUri(), null);
+        }
+
+        return result;
+    }
+
+    @Override
     public int clearUpdatedFromLatestFlag(Rubrics rubric) {
         if (rubric != Rubrics.LATEST) {
             String where = getWhereFromSQLiteType(SQLiteType.TEXT);

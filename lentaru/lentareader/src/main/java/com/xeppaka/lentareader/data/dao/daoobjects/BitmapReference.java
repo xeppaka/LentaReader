@@ -21,6 +21,7 @@ public interface BitmapReference {
 	AsyncTask getBitmapAsync(AsyncListener<Bitmap> listener);
     AsyncTask getBitmapAsync(ImageView view, AsyncListener<Bitmap> listener);
 	void releaseBitmap();
+    void releaseImageView(ImageView view);
 
     Drawable getDrawable() throws Exception;
     Drawable getDrawable(ImageView view) throws Exception;

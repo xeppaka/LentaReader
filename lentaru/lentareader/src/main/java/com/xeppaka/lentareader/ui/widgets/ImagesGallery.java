@@ -30,11 +30,13 @@ public class ImagesGallery extends LinearLayout implements ViewPager.OnPageChang
     private ImagesSwitcher galleryView;
 
     private final LentaBodyItemImageGallery gallery;
+    private final int textPadding;
 
-    public ImagesGallery(Context context, LentaBodyItemImageGallery gallery, boolean downloadImages, int textSize) {
+    public ImagesGallery(Context context, LentaBodyItemImageGallery gallery, boolean downloadImages, int textSize, int textPadding) {
         super(context);
 
         this.gallery = gallery;
+        this.textPadding = textPadding;
 
         setOrientation(VERTICAL);
 
@@ -86,6 +88,7 @@ public class ImagesGallery extends LinearLayout implements ViewPager.OnPageChang
         if (image.hasCaption()) {
             imageCaption.setText(Html.fromHtml(image.getCaption()));
             imageCaption.setVisibility(VISIBLE);
+            imageCaption.setPadding(textPadding, 0, textPadding, 0);
         } else {
             imageCaption.setVisibility(GONE);
         }
@@ -93,6 +96,7 @@ public class ImagesGallery extends LinearLayout implements ViewPager.OnPageChang
         if (image.hasCredits()) {
             imageCredits.setText(Html.fromHtml(image.getCredits()));
             imageCredits.setVisibility(VISIBLE);
+            imageCredits.setPadding(textPadding, 0, textPadding, 0);
         } else {
             imageCredits.setVisibility(GONE);
         }

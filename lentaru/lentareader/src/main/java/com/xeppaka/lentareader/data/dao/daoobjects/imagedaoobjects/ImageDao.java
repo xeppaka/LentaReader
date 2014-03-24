@@ -10,10 +10,13 @@ import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.util.LruCache;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.View;
 import android.widget.ImageView;
 
 import com.xeppaka.lentareader.R;
@@ -29,6 +32,7 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -103,6 +107,8 @@ public class ImageDao implements DaoObservable<BitmapReference> {
                 @Override
                 protected void entryRemoved(boolean evicted, String key,
                                             CachedLazyLoadBitmapReference oldValue, CachedLazyLoadBitmapReference newValue) {
+                    Log.d("entryRemoved", "cache entry for full bitmap removed, key = " + key + ", evicted: " + evicted);
+
                     if ((newValue != oldValue) && evicted) {
                         oldValue.onRemoveFromCache();
                     }
@@ -118,6 +124,8 @@ public class ImageDao implements DaoObservable<BitmapReference> {
                 @Override
                 protected void entryRemoved(boolean evicted, String key,
                                             CachedLazyLoadBitmapReference oldValue, CachedLazyLoadBitmapReference newValue) {
+                    Log.d("entryRemoved", "cache entry for thumbnail bitmap removed, key = " + key + ", evicted: " + evicted);
+
                     if ((newValue != oldValue) && evicted) {
                         oldValue.onRemoveFromCache();
                     }
@@ -751,19 +759,27 @@ public class ImageDao implements DaoObservable<BitmapReference> {
         }
 
         private void setBitmap(Bitmap bitmap) {
+            Log.d("setBitmap", "--start--");
+
             if (thumbnail) {
+                Log.d("setBitmap", "setting bitmap for thumbnail, key = " + cacheKey);
+
                 synchronized(thumbnailsBitmapCache) {
                     thumbnailsBitmapCache.remove(cacheKey);
                     this.bitmap = bitmap;
                     thumbnailsBitmapCache.put(cacheKey, this);
                 }
             } else {
+                Log.d("setBitmap", "setting bitmap for full bitmap, key = " + cacheKey);
+
                 synchronized(bitmapCache) {
                     bitmapCache.remove(cacheKey);
                     this.bitmap = bitmap;
                     bitmapCache.put(cacheKey, this);
                 }
             }
+
+            Log.d("setBitmap", "--end--");
         }
 
         private Bitmap downloadBitmap() throws IOException, HttpStatusCodeException {
@@ -790,7 +806,10 @@ public class ImageDao implements DaoObservable<BitmapReference> {
 
         @Override
         public Bitmap getBitmap(ImageView view) throws IOException, HttpStatusCodeException {
+            Log.d("getBitmap", "--start--");
+
             if (bitmap != null) {
+                Log.d("getBitmap", "found bitmap in the cache, key = " + cacheKey);
                 return seizeBitmap(view);
             }
 
@@ -799,21 +818,29 @@ public class ImageDao implements DaoObservable<BitmapReference> {
                 final Bitmap scaledBitmap = createThumbnailFromFullBitmap();
 
                 if (scaledBitmap != null) {
+                    Log.d("getBitmap", "created thumbnail bitmap from full bitmap, key = " + cacheKey);
+
                     setBitmap(scaledBitmap);
                     return seizeBitmap(view);
                 }
             }
 
+            Log.d("getBitmap", "downloading bitmap...");
             // download and set bitmap
             final Bitmap downloadedBitmap = downloadBitmap();
+            Log.d("getBitmap", "downloading bitmap. done.");
 
             if (downloadedBitmap == null) {
+                Log.d("getBitmap", "downloaded bitmap is null");
+
                 return null;
             }
 
             downloadedBitmap.setDensity((int)displayDensity);
 
             if (thumbnail) {
+                Log.d("getBitmap", "create and set thumbnail bitmap from full bitmap");
+
                 final Bitmap scaledBitmap = Bitmap.createScaledBitmap(downloadedBitmap, Math.round(downloadedBitmap.getWidth() / THUMBNAIL_RATIO), Math.round(downloadedBitmap.getHeight() / THUMBNAIL_RATIO), false);
                 scaledBitmap.setDensity((int)displayDensity);
                 setBitmap(scaledBitmap);
@@ -822,7 +849,7 @@ public class ImageDao implements DaoObservable<BitmapReference> {
                 synchronized (bitmapCache) {
                     CachedLazyLoadBitmapReference fullImageRef;
 
-                    if ((fullImageRef = bitmapCache.get(url)) == null) {
+                    if ((fullImageRef = bitmapCache.get(cacheKey)) == null) {
                         fullImageRef = new CachedLazyLoadBitmapReference(cacheKey, url, downloadedBitmap);
                         bitmapCache.put(cacheKey, fullImageRef);
                         fullImageRef.releaseBitmap();
@@ -831,6 +858,7 @@ public class ImageDao implements DaoObservable<BitmapReference> {
                     }
                 }
             } else {
+                Log.d("getBitmap", "set full bitmap");
                 setBitmap(downloadedBitmap);
 //
 //                // if we downloaded full bitmap, but we don't have thumbnail,
@@ -856,7 +884,14 @@ public class ImageDao implements DaoObservable<BitmapReference> {
 //                }
             }
 
-            return seizeBitmap(view);
+            boolean test = false;
+            final Bitmap bbb = seizeBitmap(view);
+
+            if (bbb == null) {
+                test = true;
+            }
+
+            return bbb;
         }
 
         @Override
@@ -983,6 +1018,19 @@ public class ImageDao implements DaoObservable<BitmapReference> {
             }
         }
 
+        public void releaseImageView(ImageView view) {
+            final int count = views.size();
+
+            for (int i = 0; i < count; ++i) {
+                final WeakReference<ImageView> ref = views.get(i);
+                final ImageView refView = ref.get();
+
+                if (view == refView) {
+                    ref.clear();
+                }
+            }
+        }
+
         public void releaseBitmap() {
             if (bitmap != null) {
                 --bitmapReferences;
@@ -1007,35 +1055,57 @@ public class ImageDao implements DaoObservable<BitmapReference> {
         }
 
         private void onRemoveFromCache() {
-            if (!thumbnail) {
-                cleanViewsOnRemoveFromCache();
-            } else {
-//            if (bitmapReferences <= 0) {
-                recycleBitmap();
-//            }
+            cleanViewsOnRemoveFromCache();
 
-                cached = false;
-            }
+//            if (!thumbnail) {
+//            } else {
+////            if (bitmapReferences <= 0) {
+//                recycleBitmap();
+////            }
+//
+//                cached = false;
+//            }
         }
 
         private void cleanViewsOnRemoveFromCache() {
-            for (WeakReference<ImageView> reference : views) {
-                final ImageView v = reference.get();
+            final int count = views.size();
 
-                if (v != null) {
-                    v.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            v.setImageDrawable(null);
-                        }
-                    });
+            boolean used = false;
+            for (int i = 0; i < count; ++i) {
+                final WeakReference<ImageView> ref = views.get(i);
+                final ImageView view = ref.get();
+
+                if (view != null) {
+                    if (view.getDrawable() == drawable) {
+                        used = true;
+                    } else {
+                        ref.clear();
+                    }
                 }
             }
+//            new Handler(Looper.getMainLooper()).post(new Runnable() {
+//                @Override
+//                public void run() {
+//                    view.setImageDrawable(ImageDao.getLoadingThumbnailImage().getDrawableIfCached());
+//                }
+//            });
 
-            recycleBitmap();
-            cached = false;
+            if (!used) {
+                recycleBitmap();
+                cached = false;
 
-            views.clear();
+                views.clear();
+            } else {
+                if (thumbnail) {
+                    synchronized (thumbnailsBitmapCache) {
+                        thumbnailsBitmapCache.put(cacheKey, this);
+                    }
+                } else {
+                    synchronized (bitmapCache) {
+                        bitmapCache.put(cacheKey, this);
+                    }
+                }
+            }
         }
 
         private int getBytesPerPixel(Bitmap.Config config) {
