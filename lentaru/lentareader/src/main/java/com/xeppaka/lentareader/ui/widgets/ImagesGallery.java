@@ -119,10 +119,14 @@ public class ImagesGallery extends LinearLayout implements ViewPager.OnPageChang
     }
 
     public void becomeVisible() {
-        galleryView.becomeVisible();
+        if (galleryView != null) {
+            galleryView.becomeVisible();
+        }
     }
 
     public void becomeInvisible() {
-        galleryView.becomeInvisible();
+        if (galleryView != null) {
+            galleryView.becomeInvisible();
+        }
     }
 }

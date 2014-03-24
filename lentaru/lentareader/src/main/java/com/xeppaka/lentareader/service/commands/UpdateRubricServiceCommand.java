@@ -139,10 +139,10 @@ public final class UpdateRubricServiceCommand extends RunnableServiceCommand {
         }
 
         List<Long> ids = newsDao.readAllIds(Rubrics.LATEST);
-        if (ids.size() > 360) {
+        if (ids.size() > 500) {
             Collections.sort(ids, Collections.reverseOrder());
 
-            newsDao.deleteSmallerIds(ids.get(360));
+            newsDao.deleteSmallerIds(ids.get(500));
         }
 
         if (rubric != Rubrics.LATEST) {
@@ -248,10 +248,10 @@ public final class UpdateRubricServiceCommand extends RunnableServiceCommand {
         }
 
         List<Long> ids = articleDao.readAllIds(Rubrics.LATEST);
-        if (ids.size() > 360) {
+        if (ids.size() > 500) {
             Collections.sort(ids, Collections.reverseOrder());
 
-            articleDao.deleteSmallerIds(ids.get(360));
+            articleDao.deleteSmallerIds(ids.get(500));
         }
 
         if (rubric != Rubrics.LATEST) {

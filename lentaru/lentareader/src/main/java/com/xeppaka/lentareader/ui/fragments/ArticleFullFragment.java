@@ -140,4 +140,15 @@ public class ArticleFullFragment extends FullFragmentBase {
 
         return copied;
     }
+
+    @Override
+    public boolean openLinkInBrowser() {
+        final boolean opened = super.openLinkInBrowser();
+
+        if (!opened) {
+            Toast.makeText(getActivity(), R.string.error_link_open_in_browser_toast, Toast.LENGTH_SHORT).show();
+        }
+
+        return opened;
+    }
 }

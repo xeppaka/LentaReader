@@ -70,7 +70,7 @@ public class NewsFullActivity extends ActionBarActivity {
                 fullFragment.copyLinkToBuffer();
                 break;
             case R.id.action_open_in_browser:
-                fullFragment.copyLinkToBuffer();
+                fullFragment.openLinkInBrowser();
                 break;
         }
 

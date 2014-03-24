@@ -19,6 +19,8 @@
             android:layout_marginTop="2dip"
             android:layout_marginLeft="2dip"
             android:layout_marginBottom="2dip"
+            android:clickable="false"
+            android:focusableInTouchMode="false"
             android:contentDescription="@string/brief_news_image_desc"/>
 
         <LinearLayout
@@ -49,52 +51,5 @@
             android:layout_marginTop="5dip"
             android:layout_marginBottom="5dip"
             android:background="@color/brief_list_item_notread"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/brief_news_description_panel"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="2dip"
-        android:orientation="vertical"
-        android:visibility="gone">
-        <TextView
-            android:id="@+id/brief_news_image_caption"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="8sp"/>
-
-        <TextView
-            android:id="@+id/brief_news_image_credits"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="6dip"
-            android:textSize="8sp"/>
-
-        <TextView
-            android:id="@+id/brief_news_description"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="6dip"
-            android:textSize="10sp"/>
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:id="@+id/brief_news_rubric_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/rubric_label"
-                android:textSize="8sp"/>
-
-            <TextView
-                android:id="@+id/brief_news_rubric"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="8sp"/>
-        </LinearLayout>
     </LinearLayout>
 </LinearLayout>

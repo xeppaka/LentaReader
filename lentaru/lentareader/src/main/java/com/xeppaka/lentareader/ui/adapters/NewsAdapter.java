@@ -3,6 +3,7 @@ package com.xeppaka.lentareader.ui.adapters;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -19,6 +20,7 @@ import com.xeppaka.lentareader.utils.LentaTextUtils;
 public class NewsAdapter extends NewsObjectAdapter<News> {
     public static class ViewHolder {
 		private final TextView newsTitle;
+        private final TextView newsDateTextView;
         private final View newsReadIndicator;
         private final ImageView newsImage;
 		private BitmapReference imageRef;
@@ -26,9 +28,10 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
         private String imageUrl;
         private AsyncTask asyncTask;
 
-        public ViewHolder(ImageView newsImage, TextView newsTitle, View newsReadIndicator, int position) {
+        public ViewHolder(ImageView newsImage, TextView newsTitle, TextView newsDateTextView, View newsReadIndicator, int position) {
 			this.newsImage = newsImage;
 			this.newsTitle = newsTitle;
+            this.newsDateTextView = newsDateTextView;
             this.newsReadIndicator = newsReadIndicator;
             this.position = position;
 		}
@@ -36,6 +39,10 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
 		public TextView getNewsTitle() {
 			return newsTitle;
 		}
+
+        public TextView getNewsDateTextView() {
+            return newsDateTextView;
+        }
 
         public ImageView getNewsImage() {
 			return newsImage;
@@ -91,6 +98,7 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
 		ImageView newsImageView;
 		TextView newsTitleTextView;
         View newsReadIndicator;
+        TextView newsDateTextView;
 
         ViewHolder holder;
 		
@@ -101,12 +109,15 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
                 throw new AssertionError();
             }
 
-			newsTitleTextView = (TextView)view.findViewById(R.id.brief_news_title);
+			newsTitleTextView = (TextView) view.findViewById(R.id.brief_news_title);
+            newsDateTextView = (TextView) view.findViewById(R.id.brief_news_date);
             newsReadIndicator = view.findViewById(R.id.brief_news_read_indicator);
 
             newsImageView = (ImageView)view.findViewById(R.id.brief_news_image);
+            newsImageView.setEnabled(false);
+            newsImageView.setOnClickListener(null);
 
-            view.setTag(holder = new ViewHolder(newsImageView, newsTitleTextView, newsReadIndicator, position));
+            view.setTag(holder = new ViewHolder(newsImageView, newsTitleTextView, newsDateTextView, newsReadIndicator, position));
 		} else {
 			view = convertView;
 			holder = (ViewHolder)view.getTag();
@@ -115,6 +126,7 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
             holder.setPosition(position);
 
 			newsTitleTextView = holder.getNewsTitle();
+            newsDateTextView = holder.getNewsDateTextView();
 			newsImageView = holder.getNewsImage();
             newsReadIndicator = holder.getNewsReadIndicator();
 
@@ -126,6 +138,10 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
 
         if (newsTitleTextView.getTextSize() != LentaTextUtils.getNewsListTitleTextSize(getTextSize())) {
             newsTitleTextView.setTextSize(LentaTextUtils.getNewsListTitleTextSize(getTextSize()));
+        }
+
+        if (newsDateTextView.getTextSize() != LentaTextUtils.getNewsListDateTextSize(getTextSize())) {
+            newsDateTextView.setTextSize(LentaTextUtils.getNewsListDateTextSize(getTextSize()));
         }
 
         News news = getItem(position);
@@ -143,6 +159,7 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
         }
 
 		newsTitleTextView.setText(news.getTitle());
+        newsDateTextView.setText(news.getFormattedPubDate());
 
         if (isDownloadImages()) {
             BitmapReference bitmapRef;
