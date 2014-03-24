@@ -61,15 +61,6 @@ public final class ArticleDao {
                 ArticleEntry.COLUMN_NAME_TITLE,
                 ArticleEntry.COLUMN_NAME_LINK,
                 ArticleEntry.COLUMN_NAME_IMAGELINK,
-                ArticleEntry.COLUMN_NAME_IMAGECAPTION,
-                ArticleEntry.COLUMN_NAME_IMAGECREDITS,
-                ArticleEntry.COLUMN_NAME_PUBDATE,
-                ArticleEntry.COLUMN_NAME_RUBRIC,
-                ArticleEntry.COLUMN_NAME_DESCRIPTION,
-                ArticleEntry.COLUMN_NAME_AUTHOR,
-                ArticleEntry.COLUMN_NAME_SECOND_TITLE,
-                ArticleEntry.COLUMN_NAME_READ,
-                ArticleEntry.COLUMN_NAME_UPDATED_FROM_LATEST,
                 ArticleEntry.COLUMN_NAME_UPDATED_IN_BACKGROUND,
                 ArticleEntry.COLUMN_NAME_RECENT
         };
@@ -121,27 +112,29 @@ public final class ArticleDao {
 
         @Override
         protected Article createDataObject(Cursor cur) {
-            long id = cur.getLong(cur.getColumnIndexOrThrow(ArticleEntry._ID));
-            String guid = cur.getString(cur.getColumnIndexOrThrow(ArticleEntry.COLUMN_NAME_GUID));
-            String title = cur.getString(cur.getColumnIndexOrThrow(ArticleEntry.COLUMN_NAME_TITLE));
-            String link = cur.getString(cur.getColumnIndexOrThrow(ArticleEntry.COLUMN_NAME_LINK));
-            String imageLink = cur.getString(cur.getColumnIndexOrThrow(ArticleEntry.COLUMN_NAME_IMAGELINK));
-            String imageCaption = cur.getString(cur.getColumnIndexOrThrow(ArticleEntry.COLUMN_NAME_IMAGECAPTION));
-            String imageCredits = cur.getString(cur.getColumnIndexOrThrow(ArticleEntry.COLUMN_NAME_IMAGECREDITS));
-            Date pubDate = new Date(cur.getLong(cur.getColumnIndexOrThrow(ArticleEntry.COLUMN_NAME_PUBDATE)));
-            Rubrics rubric = Rubrics.valueOf(cur.getString(cur.getColumnIndexOrThrow(ArticleEntry.COLUMN_NAME_RUBRIC)));
-            String description = cur.getString(cur.getColumnIndexOrThrow(ArticleEntry.COLUMN_NAME_DESCRIPTION));
-            String secondTitle = cur.getString(cur.getColumnIndexOrThrow(ArticleEntry.COLUMN_NAME_SECOND_TITLE));
-            String author = cur.getString(cur.getColumnIndexOrThrow(ArticleEntry.COLUMN_NAME_AUTHOR));
-            boolean read = cur.getInt(cur.getColumnIndexOrThrow(ArticleEntry.COLUMN_NAME_READ)) > 0;
-            boolean updatedFromLatest = cur.getInt(cur.getColumnIndexOrThrow(ArticleEntry.COLUMN_NAME_UPDATED_FROM_LATEST)) > 0;
-            boolean updatedInBackground = cur.getInt(cur.getColumnIndexOrThrow(ArticleEntry.COLUMN_NAME_UPDATED_IN_BACKGROUND)) > 0;
-            boolean recent = cur.getInt(cur.getColumnIndexOrThrow(ArticleEntry.COLUMN_NAME_RECENT)) > 0;
+            int colIndex;
+
+            long id = (colIndex = cur.getColumnIndex(ArticleEntry._ID)) > 0 ? cur.getLong(colIndex) : -1;
+            String guid = (colIndex = cur.getColumnIndex(ArticleEntry.COLUMN_NAME_GUID)) > 0 ? cur.getString(colIndex) : null;
+            String title = (colIndex = cur.getColumnIndex(ArticleEntry.COLUMN_NAME_TITLE)) > 0 ? cur.getString(colIndex) : null;
+            String link = (colIndex = cur.getColumnIndex(ArticleEntry.COLUMN_NAME_TITLE)) > 0 ? cur.getString(colIndex) : null;
+            String imageLink = (colIndex = cur.getColumnIndex(ArticleEntry.COLUMN_NAME_IMAGELINK)) > 0 ? cur.getString(colIndex) : null;
+            String imageCaption = (colIndex = cur.getColumnIndex(ArticleEntry.COLUMN_NAME_IMAGECAPTION)) > 0 ? cur.getString(colIndex) : null;
+            String imageCredits = (colIndex = cur.getColumnIndex(ArticleEntry.COLUMN_NAME_IMAGECREDITS)) > 0 ? cur.getString(colIndex) : null;
+            Date pubDate = (colIndex = cur.getColumnIndex(ArticleEntry.COLUMN_NAME_PUBDATE)) > 0 ? new Date(cur.getLong(colIndex)) : null;
+            Rubrics rubric = (colIndex = cur.getColumnIndex(ArticleEntry.COLUMN_NAME_RUBRIC)) > 0 ? Rubrics.valueOf(cur.getString(colIndex)) : null;
+            String description = (colIndex = cur.getColumnIndex(ArticleEntry.COLUMN_NAME_DESCRIPTION)) > 0 ? cur.getString(colIndex) : null;
+            String secondTitle = (colIndex = cur.getColumnIndex(ArticleEntry.COLUMN_NAME_SECOND_TITLE)) > 0 ? cur.getString(colIndex) : null;
+            String author = (colIndex = cur.getColumnIndex(ArticleEntry.COLUMN_NAME_AUTHOR)) > 0 ? cur.getString(colIndex) : null;
+            boolean read = (colIndex = cur.getColumnIndex(ArticleEntry.COLUMN_NAME_READ)) > 0 && cur.getInt(colIndex) > 0;
+            boolean updatedFromLatest = (colIndex = cur.getColumnIndex(ArticleEntry.COLUMN_NAME_UPDATED_FROM_LATEST)) > 0 && cur.getInt(colIndex) > 0;
+            boolean updatedInBackground = (colIndex = cur.getColumnIndex(ArticleEntry.COLUMN_NAME_UPDATED_IN_BACKGROUND)) > 0 && cur.getInt(colIndex) > 0;
+            boolean recent = (colIndex = cur.getColumnIndex(ArticleEntry.COLUMN_NAME_RECENT)) > 0 && cur.getInt(colIndex) > 0;
 
             Body body;
 
             try {
-                final int colIndex = cur.getColumnIndex(ArticleEntry.COLUMN_NAME_BODY);
+                colIndex = cur.getColumnIndex(ArticleEntry.COLUMN_NAME_BODY);
 
                 if (colIndex >= 0) {
                     body = bodyParser.parse(cur.getString(colIndex));

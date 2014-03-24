@@ -19,8 +19,6 @@
             android:layout_marginTop="2dip"
             android:layout_marginLeft="2dip"
             android:layout_marginBottom="2dip"
-            android:focusable="false"
-            android:clickable="true"
             android:contentDescription="@string/brief_news_image_desc"/>
 
         <LinearLayout
