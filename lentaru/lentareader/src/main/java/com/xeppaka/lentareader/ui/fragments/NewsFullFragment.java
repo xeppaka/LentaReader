@@ -84,8 +84,7 @@ public class NewsFullFragment extends FullFragmentBase {
                 }
 
                 @Override
-                public void onFailure(Exception e) {
-                }
+                public void onFailure(Exception e) {}
             });
         }
 

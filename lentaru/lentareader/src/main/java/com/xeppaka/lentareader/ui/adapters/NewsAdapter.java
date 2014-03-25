@@ -168,6 +168,7 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
 
                         final ImageView iv = holderForAsync.getNewsImage();
                         iv.setImageDrawable(drawable);
+                        iv.setVisibility(View.VISIBLE);
                     }
 
                     @Override
@@ -178,17 +179,20 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
                             return;
                         }
 
-                        holderForAsync.getNewsImage().setImageDrawable(ImageDao.getNotAvailableThumbnailImage().getDrawableIfCached());
+                        holderForAsync.getNewsImage().setVisibility(View.GONE);
+
+                        holderForAsync.setImage(null);
+                        holderForAsync.setImageUrl(null);
+                        holderForAsync.setAsyncTask(null);
                     }
                 });
 
                 holder.setAsyncTask(asyncTask);
             } else {
-                bitmapRef = ImageDao.getNotAvailableThumbnailImage();
-                newsImageView.setImageBitmap(bitmapRef.getBitmapIfCached());
+                newsImageView.setVisibility(View.GONE);
 
-                holder.setImage(bitmapRef);
-                holder.setImageUrl(news.getImageLink());
+                holder.setImage(null);
+                holder.setImageUrl(null);
                 holder.setAsyncTask(null);
             }
         } else {
@@ -199,10 +203,14 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
                 if ((drawable = bitmapRef.getDrawableIfCached(newsImageView)) != null) {
                     newsImageView.setImageDrawable(drawable);
                 } else {
-                    newsImageView.setImageDrawable(ImageDao.getTurnedOffImagesThumbnailImageRef().getDrawableIfCached());
+                    newsImageView.setVisibility(View.GONE);
                 }
             } else {
-                newsImageView.setImageBitmap(ImageDao.getTurnedOffImagesThumbnailImageRef().getBitmapIfCached());
+                newsImageView.setVisibility(View.GONE);
+
+                holder.setImage(null);
+                holder.setImageUrl(null);
+                holder.setAsyncTask(null);
             }
         }
 
