@@ -185,6 +185,7 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
 
                         final ImageView iv = holderForAsync.getNewsImage();
                         iv.setImageDrawable(drawable);
+                        iv.setVisibility(View.VISIBLE);
                     }
 
                     @Override
@@ -195,17 +196,17 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
                             return;
                         }
 
-                        holderForAsync.getNewsImage().setImageDrawable(ImageDao.getNotAvailableThumbnailImage().getDrawableIfCached());
+                        holderForAsync.getNewsImage().setImageDrawable(null);
+                        holderForAsync.getNewsImage().setVisibility(View.GONE);
                     }
                 });
 
                 holder.setAsyncTask(asyncTask);
             } else {
-                bitmapRef = ImageDao.getNotAvailableThumbnailImage();
-                newsImageView.setImageBitmap(bitmapRef.getBitmapIfCached());
+                newsImageView.setImageBitmap(null);
 
-                holder.setImage(bitmapRef);
-                holder.setImageUrl(news.getImageLink());
+                holder.setImage(null);
+                holder.setImageUrl(null);
                 holder.setAsyncTask(null);
             }
         } else {
@@ -215,11 +216,14 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
 
                 if ((drawable = bitmapRef.getDrawableIfCached(newsImageView)) != null) {
                     newsImageView.setImageDrawable(drawable);
+                    newsImageView.setVisibility(View.VISIBLE);
                 } else {
-                    newsImageView.setImageDrawable(ImageDao.getTurnedOffImagesThumbnailImageRef().getDrawableIfCached());
+                    newsImageView.setImageDrawable(null);
+                    newsImageView.setVisibility(View.GONE);
                 }
             } else {
-                newsImageView.setImageBitmap(ImageDao.getTurnedOffImagesThumbnailImageRef().getBitmapIfCached());
+                newsImageView.setImageDrawable(null);
+                newsImageView.setVisibility(View.GONE);
             }
         }
 
