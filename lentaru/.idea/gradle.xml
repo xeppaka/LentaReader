@@ -8,10 +8,10 @@
         <option name="gradleHome" value="$USER_HOME$/myprog/gradle-1.11" />
         <option name="modules">
           <set>
-            <option value="C:\Users\kacpa01\Documents\GitHub\lentaru\lentaru" />
-            <option value="C:\Users\kacpa01\Documents\GitHub\lentaru\lentaru\lentareader" />
-            <option value="C:\Users\kacpa01\Documents\GitHub\lentaru\lentaru\libraries" />
-            <option value="C:\Users\kacpa01\Documents\GitHub\lentaru\lentaru\libraries\viewpagerindicator" />
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/lentareader" />
+            <option value="$PROJECT_DIR$/libraries" />
+            <option value="$PROJECT_DIR$/libraries/viewpagerindicator" />
           </set>
         </option>
       </GradleProjectSettings>

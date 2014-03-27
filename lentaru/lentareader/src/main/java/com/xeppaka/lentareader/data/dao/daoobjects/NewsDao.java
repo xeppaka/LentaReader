@@ -58,6 +58,7 @@ public final class NewsDao {
                 NewsEntry.COLUMN_NAME_GUID,
                 NewsEntry.COLUMN_NAME_TITLE,
                 NewsEntry.COLUMN_NAME_LINK,
+                NewsEntry.COLUMN_NAME_PUBDATE,
                 NewsEntry.COLUMN_NAME_IMAGELINK,
                 NewsEntry.COLUMN_NAME_READ,
                 NewsEntry.COLUMN_NAME_UPDATED_IN_BACKGROUND,
@@ -111,20 +112,20 @@ public final class NewsDao {
 		protected News createDataObject(Cursor cur) {
             int colIndex;
 
-            long id = (colIndex = cur.getColumnIndex(NewsEntry._ID)) > 0 ? cur.getLong(colIndex) : -1;
-            String guid = (colIndex = cur.getColumnIndex(NewsEntry.COLUMN_NAME_GUID)) > 0 ? cur.getString(colIndex) : null;
-            String title = (colIndex = cur.getColumnIndex(NewsEntry.COLUMN_NAME_TITLE)) > 0 ? cur.getString(colIndex) : null;
-            String link = (colIndex = cur.getColumnIndex(NewsEntry.COLUMN_NAME_TITLE)) > 0 ? cur.getString(colIndex) : null;
-            String imageLink = (colIndex = cur.getColumnIndex(NewsEntry.COLUMN_NAME_IMAGELINK)) > 0 ? cur.getString(colIndex) : null;
-            String imageCaption = (colIndex = cur.getColumnIndex(NewsEntry.COLUMN_NAME_IMAGECAPTION)) > 0 ? cur.getString(colIndex) : null;
-            String imageCredits = (colIndex = cur.getColumnIndex(NewsEntry.COLUMN_NAME_IMAGECREDITS)) > 0 ? cur.getString(colIndex) : null;
-            Date pubDate = (colIndex = cur.getColumnIndex(NewsEntry.COLUMN_NAME_PUBDATE)) > 0 ? new Date(cur.getLong(colIndex)) : null;
-            Rubrics rubric = (colIndex = cur.getColumnIndex(NewsEntry.COLUMN_NAME_RUBRIC)) > 0 ? Rubrics.valueOf(cur.getString(colIndex)) : null;
-            String description = (colIndex = cur.getColumnIndex(NewsEntry.COLUMN_NAME_DESCRIPTION)) > 0 ? cur.getString(colIndex) : null;
-            boolean read = (colIndex = cur.getColumnIndex(NewsEntry.COLUMN_NAME_READ)) > 0 && cur.getInt(colIndex) > 0;
-            boolean updatedFromLatest = (colIndex = cur.getColumnIndex(NewsEntry.COLUMN_NAME_UPDATED_FROM_LATEST)) > 0 && cur.getInt(colIndex) > 0;
-            boolean updatedInBackground = (colIndex = cur.getColumnIndex(NewsEntry.COLUMN_NAME_UPDATED_IN_BACKGROUND)) > 0 && cur.getInt(colIndex) > 0;
-            boolean recent = (colIndex = cur.getColumnIndex(NewsEntry.COLUMN_NAME_RECENT)) > 0 && cur.getInt(colIndex) > 0;
+            long id = (colIndex = cur.getColumnIndex(NewsEntry._ID)) >= 0 ? cur.getLong(colIndex) : -1;
+            String guid = (colIndex = cur.getColumnIndex(NewsEntry.COLUMN_NAME_GUID)) >= 0 ? cur.getString(colIndex) : null;
+            String title = (colIndex = cur.getColumnIndex(NewsEntry.COLUMN_NAME_TITLE)) >= 0 ? cur.getString(colIndex) : null;
+            String link = (colIndex = cur.getColumnIndex(NewsEntry.COLUMN_NAME_LINK)) >= 0 ? cur.getString(colIndex) : null;
+            String imageLink = (colIndex = cur.getColumnIndex(NewsEntry.COLUMN_NAME_IMAGELINK)) >= 0 ? cur.getString(colIndex) : null;
+            String imageCaption = (colIndex = cur.getColumnIndex(NewsEntry.COLUMN_NAME_IMAGECAPTION)) >= 0 ? cur.getString(colIndex) : null;
+            String imageCredits = (colIndex = cur.getColumnIndex(NewsEntry.COLUMN_NAME_IMAGECREDITS)) >= 0 ? cur.getString(colIndex) : null;
+            Date pubDate = (colIndex = cur.getColumnIndex(NewsEntry.COLUMN_NAME_PUBDATE)) >= 0 ? new Date(cur.getLong(colIndex)) : null;
+            Rubrics rubric = (colIndex = cur.getColumnIndex(NewsEntry.COLUMN_NAME_RUBRIC)) >= 0 ? Rubrics.valueOf(cur.getString(colIndex)) : null;
+            String description = (colIndex = cur.getColumnIndex(NewsEntry.COLUMN_NAME_DESCRIPTION)) >= 0 ? cur.getString(colIndex) : null;
+            boolean read = (colIndex = cur.getColumnIndex(NewsEntry.COLUMN_NAME_READ)) >= 0 && cur.getInt(colIndex) > 0;
+            boolean updatedFromLatest = (colIndex = cur.getColumnIndex(NewsEntry.COLUMN_NAME_UPDATED_FROM_LATEST)) >= 0 && cur.getInt(colIndex) > 0;
+            boolean updatedInBackground = (colIndex = cur.getColumnIndex(NewsEntry.COLUMN_NAME_UPDATED_IN_BACKGROUND)) >= 0 && cur.getInt(colIndex) > 0;
+            boolean recent = (colIndex = cur.getColumnIndex(NewsEntry.COLUMN_NAME_RECENT)) >= 0 && cur.getInt(colIndex) > 0;
 
             Body body;
 

@@ -3,6 +3,8 @@ package com.xeppaka.lentareader.ui.fragments;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.v4.app.ListFragment;
 import android.widget.Toast;
 
@@ -55,6 +57,19 @@ public abstract class FullFragmentBase extends ListFragment {
             final ClipboardManager clipboardManager = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
             final ClipData clip = ClipData.newPlainText("URL", link);
             clipboardManager.setPrimaryClip(clip);
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean openLinkInBrowser() {
+        if (link != null) {
+            final Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse(link));
+
+            startActivity(intent);
 
             return true;
         } else {

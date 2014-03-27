@@ -67,7 +67,9 @@ public abstract class NewsObject implements Comparable<NewsObject>, DatabaseObje
         setRecent(recent);
         setRead(read);
 
-        setFormattedPubDate(dateFormat.format(getPubDate()));
+        if (getPubDate() != null) {
+            setFormattedPubDate(dateFormat.format(getPubDate()));
+        }
 	}
 	
 	public NewsObject(String guid, String title, String link, String imageLink, String imageCaption,
@@ -103,9 +105,6 @@ public abstract class NewsObject implements Comparable<NewsObject>, DatabaseObje
 	}
 
 	public void setGuid(String guid) {
-		if (guid == null || (guid.length() == 0))
-			throw new IllegalArgumentException("Argument guid must not be null or empty.");
-		
 		this.guid = guid;
 	}
 
@@ -114,9 +113,6 @@ public abstract class NewsObject implements Comparable<NewsObject>, DatabaseObje
 	}
 
 	public void setTitle(String title) {
-		if (title == null || (title.length() == 0))
-			throw new IllegalArgumentException("Argument title must not be null or empty.");
-		
 		this.title = title;
 	}
 
@@ -157,9 +153,6 @@ public abstract class NewsObject implements Comparable<NewsObject>, DatabaseObje
     }
 
     public void setLink(String link) {
-		if (link == null || (link.length() == 0))
-			throw new IllegalArgumentException("Argument link must not be null or empty.");
-		
 		this.link = link;
 	}
 	
@@ -168,9 +161,6 @@ public abstract class NewsObject implements Comparable<NewsObject>, DatabaseObje
 	}
 
 	public void setPubDate(Date pubDate) {
-		if (pubDate == null)
-			throw new IllegalArgumentException("Argument pubDate must not be null.");
-		
 		this.pubDate = pubDate;
 	}
 
@@ -187,9 +177,6 @@ public abstract class NewsObject implements Comparable<NewsObject>, DatabaseObje
 	}
 
 	public void setRubric(Rubrics rubric) {
-		if (rubric == null)
-			throw new IllegalArgumentException("Argument rubric must not be null.");
-		
 		this.rubric = rubric;
 	}
 
