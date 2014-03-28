@@ -38,9 +38,9 @@ public abstract class FullNewsAdapterBase extends BaseAdapter {
     }
 
     @Override
-    public View getView(int i, View view, ViewGroup viewGroup) {
+    public View getView(int i, View view, ViewGroup parent) {
         final FullNewsElement element = getItem(i);
-        final View result = element.getView();
+        final View result = element.getView(null);
         result.setTag(element);
 
         element.becomeVisible();

@@ -27,7 +27,7 @@ public class FullNewsImageGallery extends FullNewsElementBase {
     }
 
     @Override
-    protected View createRootView(LayoutInflater inflater) {
+    protected View createRootView(LayoutInflater inflater, ViewGroup parent) {
         final ElementOptions options = getOptions();
         imagesGallery = new ImagesGallery(inflater.getContext(), gallery, options.isDownloadImages(), options.getTextSize(), getPadding());
 

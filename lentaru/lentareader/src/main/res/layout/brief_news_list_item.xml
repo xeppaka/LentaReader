@@ -1,7 +1,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minHeight="320dip"
     android:weightSum="1"
     android:padding="2dip"
     android:orientation="horizontal">
@@ -16,7 +15,6 @@
         android:layout_marginLeft="2dip"
         android:layout_marginBottom="2dip"
         android:clickable="false"
-        android:focusableInTouchMode="false"
         android:contentDescription="@string/brief_news_image_desc"/>
 
     <LinearLayout

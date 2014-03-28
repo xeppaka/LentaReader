@@ -28,7 +28,7 @@ public class FullArticleSecondHeader extends FullNewsElementBase {
     }
 
     @Override
-    protected View createRootView(LayoutInflater inflater) {
+    protected View createRootView(LayoutInflater inflater, ViewGroup parent) {
         final TextView textView = new TextView(inflater.getContext());
         final ElementOptions options = getOptions();
 

@@ -7,6 +7,7 @@ import android.text.Html;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -97,8 +98,8 @@ public class FullNewsHeader extends FullNewsElementBase {
     }
 
     @Override
-    protected View createRootView(LayoutInflater inflater) {
-        final View header = inflater.inflate(R.layout.full_news_header, null);
+    protected View createRootView(LayoutInflater inflater, ViewGroup parent) {
+        final View header = inflater.inflate(R.layout.full_news_header, parent);
         final ElementOptions options = getOptions();
 
         imageView = (ImageView) header.findViewById(R.id.full_news_image);

@@ -28,9 +28,9 @@ public abstract class FullNewsElementBase implements FullNewsElement {
     }
 
     @Override
-    public View getView() {
+    public View getView(ViewGroup parent) {
         if (rootView == null) {
-            rootView = createRootView(inflater);
+            rootView = createRootView(inflater, parent);
             // don't need inflater anymore
             inflater = null;
         }
@@ -56,7 +56,7 @@ public abstract class FullNewsElementBase implements FullNewsElement {
         this.options = options;
     }
 
-    protected abstract View createRootView(LayoutInflater inflater);
+    protected abstract View createRootView(LayoutInflater inflater, ViewGroup parent);
 
     public Fragment getFragment() {
         return fragment;

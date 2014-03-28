@@ -1,8 +1,10 @@
 package com.xeppaka.lentareader.ui.adapters;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -88,8 +90,17 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
         }
     }
 
+    private ViewGroup.LayoutParams imageViewHidden;
+    private ViewGroup.LayoutParams imageViewShown;
+
     public NewsAdapter(Context context) {
 		super(context);
+
+        final Resources res = context.getResources();
+        final int width = Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 90, res.getDisplayMetrics()));
+        final int height = Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 60, res.getDisplayMetrics()));
+        imageViewHidden = new ViewGroup.LayoutParams(width, height);
+        imageViewShown = new ViewGroup.LayoutParams(width, height);
 	}
 
     @Override
@@ -167,6 +178,8 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
             if (news.hasImage()) {
                 bitmapRef = imageDao.readThumbnail(news.getImageLink(), NewsImageKeyCreator.getInstance());
                 newsImageView.setImageDrawable(ImageDao.getLoadingThumbnailImage().getDrawableIfCached());
+                newsImageView.setLayoutParams(imageViewShown);
+                newsImageView.setVisibility(View.VISIBLE);
 
                 final ViewHolder holderForAsync = holder;
                 final String imageUrl = news.getImageLink();
@@ -178,25 +191,26 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
                     @Override
                     public void onSuccess(Drawable drawable) {
                         if (position != holderForAsync.getPosition() ||
-                                (imageUrl == null && holderForAsync.getImage() != ImageDao.getNotAvailableThumbnailImage()) ||
-                                (imageUrl != null && !imageUrl.equals(holderForAsync.getImageUrl()))) {
+                           (imageUrl != null && !imageUrl.equals(holderForAsync.getImageUrl()))) {
                             return;
                         }
 
                         final ImageView iv = holderForAsync.getNewsImage();
                         iv.setImageDrawable(drawable);
+//                        iv.setLayoutParams(imageViewShown);
                         iv.setVisibility(View.VISIBLE);
                     }
 
                     @Override
                     public void onFailure(Exception e) {
                         if (position != holderForAsync.getPosition() ||
-                                (imageUrl == null && holderForAsync.getImage() != ImageDao.getNotAvailableThumbnailImage()) ||
-                                (imageUrl != null && !imageUrl.equals(holderForAsync.getImageUrl()))) {
+                           (imageUrl != null && !imageUrl.equals(holderForAsync.getImageUrl()))) {
                             return;
                         }
 
-                        holderForAsync.getNewsImage().setVisibility(View.GONE);
+                        final ImageView imageView = holderForAsync.getNewsImage();
+//                        imageView.setLayoutParams(imageViewHidden);
+//                        imageView.setVisibility(View.INVISIBLE);
 
                         holderForAsync.setImage(null);
                         holderForAsync.setImageUrl(null);
@@ -206,7 +220,8 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
 
                 holder.setAsyncTask(asyncTask);
             } else {
-                newsImageView.setVisibility(View.GONE);
+//                newsImageView.setLayoutParams(imageViewHidden);
+//                newsImageView.setVisibility(View.INVISIBLE);
 
                 holder.setImage(null);
                 holder.setImageUrl(null);
@@ -219,12 +234,15 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
 
                 if ((drawable = bitmapRef.getDrawableIfCached(newsImageView)) != null) {
                     newsImageView.setImageDrawable(drawable);
+                    newsImageView.setLayoutParams(imageViewShown);
                     newsImageView.setVisibility(View.VISIBLE);
                 } else {
-                    newsImageView.setVisibility(View.GONE);
+//                    newsImageView.setLayoutParams(imageViewHidden);
+//                    newsImageView.setVisibility(View.INVISIBLE);
                 }
             } else {
-                newsImageView.setVisibility(View.GONE);
+//                newsImageView.setLayoutParams(imageViewHidden);
+//                newsImageView.setVisibility(View.INVISIBLE);
 
                 holder.setImage(null);
                 holder.setImageUrl(null);

@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.xeppaka.lentareader.R;
@@ -30,8 +31,8 @@ public class FullNewsFooter extends FullNewsElementBase {
     }
 
     @Override
-    protected View createRootView(LayoutInflater inflater) {
-        final View footer = inflater.inflate(R.layout.full_news_footer, null);
+    protected View createRootView(LayoutInflater inflater, ViewGroup parent) {
+        final View footer = inflater.inflate(R.layout.full_news_footer, parent);
         final ElementOptions options = getOptions();
 
         final TextView dateView = (TextView)footer.findViewById(R.id.full_news_date);
