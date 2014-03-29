@@ -52,9 +52,9 @@ public class ConvertedNewsParser extends PullParserBase implements ConvertedNews
                         entries.add(n);
                     }
                 } catch (XmlPullParserException e) {
-                    Log.d(LentaConstants.LoggerAnyTag, "Error while parsing news.", e);
+                    Log.e(LentaConstants.LoggerAnyTag, "Error while parsing news.", e);
                 } catch (IOException e) {
-                    Log.d(LentaConstants.LoggerAnyTag, "Error while parsing news.", e);
+                    Log.e(LentaConstants.LoggerAnyTag, "Error while parsing news.", e);
                 }
             } else {
                 skip(parser);

@@ -64,7 +64,7 @@ public class LentaMobilePhotoParser implements NewsParser<MobilePhoto> {
 				url = photoObjVal.get(1);
 				index = Integer.valueOf(photoObjVal.get(2));
 			} else {
-				Log.w(LentaConstants.LoggerMainAppTag, "Error parsing mobile photo for page: " + page.getUrl() + ", image url and index will be ommited for this news.");
+				Log.e(LentaConstants.LoggerMainAppTag, "Error parsing mobile photo for page: " + page.getUrl() + ", image url and index will be ommited for this news.");
 				continue;
 			}
 			

@@ -12,19 +12,13 @@ import android.widget.AbsListView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.xeppaka.lentareader.R;
 import com.xeppaka.lentareader.async.AsyncListener;
 import com.xeppaka.lentareader.data.NewsObject;
-import com.xeppaka.lentareader.data.NewsType;
 import com.xeppaka.lentareader.data.Rubrics;
 import com.xeppaka.lentareader.data.dao.Dao;
-import com.xeppaka.lentareader.data.dao.async.AsyncDao;
 import com.xeppaka.lentareader.data.dao.async.AsyncNODao;
-import com.xeppaka.lentareader.data.dao.daoobjects.ArticleDao;
 import com.xeppaka.lentareader.data.dao.daoobjects.DaoObserver;
-import com.xeppaka.lentareader.data.dao.daoobjects.NewsDao;
-import com.xeppaka.lentareader.ui.adapters.NewsAdapter;
-import com.xeppaka.lentareader.ui.adapters.NewsObjectAdapter;
+import com.xeppaka.lentareader.ui.adapters.listnews.NewsObjectAdapter;
 import com.xeppaka.lentareader.utils.PreferencesConstants;
 
 import java.util.HashSet;
@@ -234,7 +228,23 @@ public abstract class ListFragmentBase<T extends NewsObject> extends ListFragmen
                         setLatestPubDate(news.get(0).getPubDate().getTime());
                     }
 
-                    showData(news, countAndClearUpdatedInBackground(news));
+                    dao.readReadFlagAsync(getCurrentRubric(), new AsyncListener<List<Boolean>>() {
+                        @Override
+                        public void onSuccess(List<Boolean> result) {
+                            int min = Math.min(result.size(), news.size());
+
+                            for (int i = 0; i < min; ++i) {
+                                news.get(i).setRead(result.get(i));
+                            }
+
+                            showData(news, countAndClearUpdatedInBackground(news));
+                        }
+
+                        @Override
+                        public void onFailure(Exception e) {
+
+                        }
+                    });
                 } else {
                     dao.readBriefAsync(getCurrentRubric(), new AsyncListener<List<T>>() {
                         @Override

@@ -1,6 +1,5 @@
 package com.xeppaka.lentareader.data.dao.async;
 
-import android.database.Cursor;
 import android.os.AsyncTask;
 
 import com.xeppaka.lentareader.async.AsyncListener;
@@ -19,6 +18,9 @@ public interface AsyncNODao<T extends NewsObject> extends AsyncDao<T>, NODao<T> 
     AsyncTask<Rubrics, Void, Integer> setUpdatedFromLatestFlagAsync(Rubrics rubric, AsyncListener<Integer> listener);
     AsyncTask deleteOlderOrEqualAsync(Rubrics rubric, long date, AsyncListener<Integer> listener);
     AsyncTask<Rubrics, Void, List<Long>> readAllIdsAsync(Rubrics rubric, AsyncListener<List<Long>> listener);
+    AsyncTask<Rubrics, Void, List<Long>> readAllDatesAsync(Rubrics rubric, AsyncListener<List<Long>> listener);
     AsyncTask<Void, Void, Integer> clearUpdatedInBackgroundFlagAsync(AsyncListener<Integer> listener);
     AsyncTask<Void, Void, Integer> clearRecentFlagAsync(AsyncListener<Integer> listener);
+    AsyncTask<Long, Void, Integer> markReadAsync(long id, AsyncListener<Integer> listener);
+    AsyncTask<Rubrics, Void, List<Boolean>> readReadFlagAsync(Rubrics rubric, AsyncListener<List<Boolean>> listener);
 }

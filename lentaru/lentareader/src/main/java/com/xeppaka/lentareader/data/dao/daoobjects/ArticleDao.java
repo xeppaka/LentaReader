@@ -62,6 +62,7 @@ public final class ArticleDao {
                 ArticleEntry.COLUMN_NAME_LINK,
                 ArticleEntry.COLUMN_NAME_PUBDATE,
                 ArticleEntry.COLUMN_NAME_IMAGELINK,
+                ArticleEntry.COLUMN_NAME_READ,
                 ArticleEntry.COLUMN_NAME_UPDATED_IN_BACKGROUND,
                 ArticleEntry.COLUMN_NAME_RECENT
         };

@@ -189,6 +189,24 @@ public class AsyncDaoDecorator<T extends DatabaseObject> implements AsyncDao<T> 
         }
     }
 
+    protected class AsyncReadAllIdsTask extends AsyncTask<Void, Void, List<Long>> {
+        private AsyncListener<List<Long>> listener;
+
+        public AsyncReadAllIdsTask(AsyncListener<List<Long>> listener) {
+            this.listener = listener;
+        }
+
+        @Override
+        protected List<Long> doInBackground(Void... params) {
+            return readAllIds();
+        }
+
+        @Override
+        protected void onPostExecute(List<Long> result) {
+            listener.onSuccess(result);
+        }
+    }
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public AsyncTask<T, Void, Long> createAsync(T dataObject, AsyncListener<Long> listener) {
@@ -242,6 +260,11 @@ public class AsyncDaoDecorator<T extends DatabaseObject> implements AsyncDao<T> 
     @Override
     public AsyncTask<Long, Void, Cursor> readCursorAsync(long id, AsyncListener<Cursor> listener) {
         return new AsyncReadCursorIdTask(listener).execute(id);
+    }
+
+    @Override
+    public AsyncTask<Void, Void, List<Long>> readAllIdsAsync(AsyncListener<List<Long>> listener) {
+        return new AsyncReadAllIdsTask(listener).execute();
     }
 
     protected Dao<T> getDecoratedDao() {

@@ -64,7 +64,9 @@ public class LentaCommentsStream {
     private void connect(final StreamListener listener, final int retry) {
         final String uri = String.format(HYPERCOMMENTS_STREAMS[retry], streamId, LentaConstants.COMMENTS_WIDGET_ID);
 
-        Log.d(LentaConstants.LoggerMainAppTag, uri.toString());
+        if (LentaConstants.DEVELOPER_MODE) {
+            Log.d(LentaConstants.LoggerMainAppTag, uri.toString());
+        }
 
         synchronized (webSocketSync) {
             wsClient = new WebSocketClient(URI.create(uri)) {
@@ -80,7 +82,9 @@ public class LentaCommentsStream {
 
                 @Override
                 public void onClose(int code, String reason, boolean remote) {
-                    Log.d(LentaConstants.LoggerMainAppTag, "Web Socket connection closed.");
+                    if (LentaConstants.DEVELOPER_MODE) {
+                        Log.d(LentaConstants.LoggerMainAppTag, "Web Socket connection closed.");
+                    }
 
                     if (activeConnection) {
                         final Timer timer = new Timer(TIMER_RECONNECT_NAME);
@@ -97,7 +101,9 @@ public class LentaCommentsStream {
 
                 @Override
                 public void onError(Exception ex) {
-                    Log.d(LentaConstants.LoggerMainAppTag, "Web socket error.", ex);
+                    if (LentaConstants.DEVELOPER_MODE) {
+                        Log.d(LentaConstants.LoggerMainAppTag, "Web socket error.", ex);
+                    }
 
                     listener.onError(ex);
                 }

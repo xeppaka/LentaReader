@@ -1,4 +1,4 @@
-package com.xeppaka.lentareader.ui.adapters;
+package com.xeppaka.lentareader.ui.adapters.fullnews;
 
 import android.view.View;
 import android.view.ViewGroup;

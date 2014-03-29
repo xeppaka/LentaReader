@@ -32,7 +32,9 @@ public abstract class RunnableServiceCommand implements ServiceCommand {
 
 	@Override
 	public void run() {
-		Log.d(LentaConstants.LoggerServiceTag, "Command started: " + getClass().getSimpleName());
+        if (LentaConstants.DEVELOPER_MODE) {
+            Log.d(LentaConstants.LoggerServiceTag, "Command started: " + getClass().getSimpleName());
+        }
 
 		try {
             if (internetConnectionRequired) {
@@ -45,13 +47,19 @@ public abstract class RunnableServiceCommand implements ServiceCommand {
                 resultReceiver.send(requestId, LentaService.resultSuccess);
             }
 
-            Log.d(LentaConstants.LoggerServiceTag, "Command finished successfuly: " + getClass().getSimpleName());
+            if (LentaConstants.DEVELOPER_MODE) {
+                Log.d(LentaConstants.LoggerServiceTag, "Command finished successfuly: " + getClass().getSimpleName());
+            }
         } catch (Exception e) {
-			Log.d(LentaConstants.LoggerServiceTag, "Exception occured during running the command " + getClass().getSimpleName(), e);
+            if (LentaConstants.DEVELOPER_MODE) {
+                Log.d(LentaConstants.LoggerServiceTag, "Exception occured during running the command " + getClass().getSimpleName(), e);
+            }
 			
             resultReceiver.send(requestId, LentaService.createFailResult(e));
 
-			Log.d(LentaConstants.LoggerServiceTag, "Command finished with exception: " + getClass().getSimpleName());
+            if (LentaConstants.DEVELOPER_MODE) {
+                Log.d(LentaConstants.LoggerServiceTag, "Command finished with exception: " + getClass().getSimpleName());
+            }
 		}
 	}
 

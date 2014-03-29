@@ -429,7 +429,7 @@ public abstract class ContentResolverDao<T extends DatabaseObject> implements Da
 //				public void onDataChanged(boolean selfChange, Collection<T> dataObjects) {
 //					observer.onDataChanged(selfChange, dataObjects);
 //				}
-//				
+//
 //				@Override
 //				public void onDataChanged(boolean selfChange, T dataObject) {
 //					observer.onDataChanged(selfChange, dataObject);

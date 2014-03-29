@@ -44,7 +44,7 @@ public class LentaMobileNewsParser implements NewsParser<MobileNews> {
 			List<String> val = it.next();
 			text = val.get(1);
 		} else {
-			Log.w(LentaConstants.LoggerMainAppTag, "Error parsing body for page: " + page.getUrl() + ", body will be ommited for this news.");
+			Log.e(LentaConstants.LoggerMainAppTag, "Error parsing body for page: " + page.getUrl() + ", body will be ommited for this news.");
 		}
 		
 		return new MobileNews(imageCaption, imageCredits, text);

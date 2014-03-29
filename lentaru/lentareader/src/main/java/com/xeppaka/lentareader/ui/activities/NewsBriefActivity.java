@@ -28,7 +28,7 @@ import com.xeppaka.lentareader.data.NewsType;
 import com.xeppaka.lentareader.data.Rubrics;
 import com.xeppaka.lentareader.service.ServiceHelper;
 import com.xeppaka.lentareader.service.commands.exceptions.NoInternetConnectionException;
-import com.xeppaka.lentareader.ui.adapters.SwipeNewsFragmentsAdapter;
+import com.xeppaka.lentareader.ui.adapters.listnews.SwipeNewsFragmentsAdapter;
 import com.xeppaka.lentareader.ui.fragments.NewsListFragment;
 import com.xeppaka.lentareader.ui.fragments.ListFragmentBase;
 import com.xeppaka.lentareader.ui.widgets.SelectRubricDialog;
@@ -291,13 +291,14 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
     @Override
     public void onItemSelected(int position, long id) {
         final NewsType currentNewsType = NewsType.values()[pager.getCurrentItem()];
+        final Rubrics rubric = pagerAdapter.getFragment(pager.getCurrentItem()).getCurrentRubric();
 
         switch (currentNewsType) {
             case NEWS:
-                openNews(position, id);
+                openNews(position, id, rubric);
                 break;
             case ARTICLE:
-                openArticle(position, id);
+                openArticle(position, id, rubric);
                 break;
             default:
                 throw new AssertionError();
@@ -310,15 +311,17 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
 
         if (fragment instanceof ListFragmentBase<?>) {
             if (++listFragments == NewsType.values().length && autoRefresh) {
-                refresh(NewsType.NEWS, Rubrics.LATEST);
                 refresh(NewsType.ARTICLE, Rubrics.LATEST);
+                refresh(NewsType.NEWS, Rubrics.LATEST);
             }
         }
     }
 
-    private void openNews(int position, long id) {
+    private void openNews(int position, long id, Rubrics rubric) {
+
 //        if (newsFullFragment == null) {
             final Intent intent = new Intent(this, NewsFullActivity.class);
+            intent.putExtra("rubric", rubric.name());
             intent.putExtra("newsId", id);
 
             startActivity(intent);
@@ -330,9 +333,12 @@ public class NewsBriefActivity extends ActionBarActivity implements DialogInterf
 //        }
     }
 
-    private void openArticle(int position, long id) {
+    private void openArticle(int position, long id, Rubrics rubric) {
+        final ListFragmentBase fragment = pagerAdapter.getFragment(pager.getCurrentItem());
+
 //        if (newsFullFragment == null) {
             final Intent intent = new Intent(this, NewsFullActivity.class);
+            intent.putExtra("rubric", rubric.name());
             intent.putExtra("articleId", id);
 
             startActivity(intent);

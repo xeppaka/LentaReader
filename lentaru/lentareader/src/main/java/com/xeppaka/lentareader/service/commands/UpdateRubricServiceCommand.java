@@ -85,7 +85,9 @@ public final class UpdateRubricServiceCommand extends RunnableServiceCommand {
                 news = new LentaNewsDownloader().download(rubric, latest.getPubDate().getTime());
             }
 
-			Log.d(LentaConstants.LoggerServiceTag, "Downloaded " + news.size() + " news.");
+            if (LentaConstants.DEVELOPER_MODE) {
+                Log.d(LentaConstants.LoggerServiceTag, "Downloaded " + news.size() + " news.");
+            }
 		} catch (IOException e) {
 			Log.e(LentaConstants.LoggerServiceTag, "Error downloading page, I/O error.", e);
 			throw e;
@@ -111,10 +113,14 @@ public final class UpdateRubricServiceCommand extends RunnableServiceCommand {
             }
 		}
 
-		Log.d(LentaConstants.LoggerServiceTag, "Number of new news from downloaded: " + nonExistingNews.size());
+        if (LentaConstants.DEVELOPER_MODE) {
+            Log.d(LentaConstants.LoggerServiceTag, "Number of new news from downloaded: " + nonExistingNews.size());
+        }
 
         if (nonExistingNews.size() > 0) {
-            Log.d(LentaConstants.LoggerServiceTag, "Clearing UpdatedInBackground and Recent flags for all news.");
+            if (LentaConstants.DEVELOPER_MODE) {
+                Log.d(LentaConstants.LoggerServiceTag, "Clearing UpdatedInBackground and Recent flags for all news.");
+            }
             newsDao.clearUpdatedInBackgroundFlag();
 
             if (rubric == Rubrics.LATEST) {
@@ -123,7 +129,9 @@ public final class UpdateRubricServiceCommand extends RunnableServiceCommand {
         }
 
 		Collection<Long> newsIds = newsDao.create(nonExistingNews);
-		Log.d(LentaConstants.LoggerServiceTag, "Newly created news ids: " + newsIds);
+        if (LentaConstants.DEVELOPER_MODE) {
+            Log.d(LentaConstants.LoggerServiceTag, "Newly created news ids: " + newsIds);
+        }
 
         for (News n : withNewImage) {
             News newWithImage = newsDao.read(n.getGuid());
@@ -138,11 +146,10 @@ public final class UpdateRubricServiceCommand extends RunnableServiceCommand {
             newsDao.update(newWithImage);
         }
 
-        List<Long> ids = newsDao.readAllIds(Rubrics.LATEST);
+        // ids are already sorted by date desc
+        List<Long> ids = newsDao.readAllDates(Rubrics.LATEST);
         if (ids.size() > 500) {
-            Collections.sort(ids, Collections.reverseOrder());
-
-            newsDao.deleteSmallerIds(ids.get(500));
+            newsDao.deleteOlderOrEqual(Rubrics.LATEST, ids.get(500));
         }
 
         if (rubric != Rubrics.LATEST) {
@@ -194,7 +201,9 @@ public final class UpdateRubricServiceCommand extends RunnableServiceCommand {
                 articles = new LentaArticlesDownloader().download(rubric, latest.getPubDate().getTime());
             }
 
-            Log.d(LentaConstants.LoggerServiceTag, "Downloaded " + articles.size() + " articles.");
+            if (LentaConstants.DEVELOPER_MODE) {
+                Log.d(LentaConstants.LoggerServiceTag, "Downloaded " + articles.size() + " articles.");
+            }
         } catch (IOException e) {
             Log.e(LentaConstants.LoggerServiceTag, "Error downloading page, I/O error.", e);
             throw e;
@@ -220,10 +229,14 @@ public final class UpdateRubricServiceCommand extends RunnableServiceCommand {
             }
         }
 
-        Log.d(LentaConstants.LoggerServiceTag, "Number of new articles from downloaded: " + nonExistingNews.size());
+        if (LentaConstants.DEVELOPER_MODE) {
+            Log.d(LentaConstants.LoggerServiceTag, "Number of new articles from downloaded: " + nonExistingNews.size());
+        }
 
         if (nonExistingNews.size() > 0) {
-            Log.d(LentaConstants.LoggerServiceTag, "Clearing UpdatedInBackground and Recent flags for all articles.");
+            if (LentaConstants.DEVELOPER_MODE) {
+                Log.d(LentaConstants.LoggerServiceTag, "Clearing UpdatedInBackground and Recent flags for all articles.");
+            }
             articleDao.clearUpdatedInBackgroundFlag();
 
             if (rubric == Rubrics.LATEST) {
@@ -232,7 +245,9 @@ public final class UpdateRubricServiceCommand extends RunnableServiceCommand {
         }
 
         Collection<Long> newsIds = articleDao.create(nonExistingNews);
-        Log.d(LentaConstants.LoggerServiceTag, "Newly created news ids: " + newsIds);
+        if (LentaConstants.DEVELOPER_MODE) {
+            Log.d(LentaConstants.LoggerServiceTag, "Newly created news ids: " + newsIds);
+        }
 
         for (Article art : withNewImage) {
             Article newWithImage = articleDao.read(art.getGuid());
@@ -247,11 +262,10 @@ public final class UpdateRubricServiceCommand extends RunnableServiceCommand {
             articleDao.update(newWithImage);
         }
 
-        List<Long> ids = articleDao.readAllIds(Rubrics.LATEST);
+        // ids are already sorted by date desc
+        List<Long> ids = articleDao.readAllDates(Rubrics.LATEST);
         if (ids.size() > 500) {
-            Collections.sort(ids, Collections.reverseOrder());
-
-            articleDao.deleteSmallerIds(ids.get(500));
+            articleDao.deleteOlderOrEqual(Rubrics.LATEST, ids.get(500));
         }
 
         if (rubric != Rubrics.LATEST) {

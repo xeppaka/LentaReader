@@ -1,4 +1,4 @@
-package com.xeppaka.lentareader.ui.adapters;
+package com.xeppaka.lentareader.ui.adapters.listnews;
 
 import android.content.Context;
 import android.view.LayoutInflater;

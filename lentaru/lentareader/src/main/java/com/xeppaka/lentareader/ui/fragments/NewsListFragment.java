@@ -1,16 +1,13 @@
 package com.xeppaka.lentareader.ui.fragments;
 
 import android.content.Context;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.ListView;
 
 import com.xeppaka.lentareader.R;
 import com.xeppaka.lentareader.data.News;
 import com.xeppaka.lentareader.data.dao.async.AsyncNODao;
 import com.xeppaka.lentareader.data.dao.daoobjects.NewsDao;
-import com.xeppaka.lentareader.ui.adapters.NewsAdapter;
-import com.xeppaka.lentareader.ui.adapters.NewsObjectAdapter;
+import com.xeppaka.lentareader.ui.adapters.listnews.NewsAdapter;
+import com.xeppaka.lentareader.ui.adapters.listnews.NewsObjectAdapter;
 
 /**
  * Created by nnm on 12/27/13.

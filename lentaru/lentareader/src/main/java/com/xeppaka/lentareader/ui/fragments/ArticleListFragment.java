@@ -6,8 +6,8 @@ import com.xeppaka.lentareader.R;
 import com.xeppaka.lentareader.data.Article;
 import com.xeppaka.lentareader.data.dao.async.AsyncNODao;
 import com.xeppaka.lentareader.data.dao.daoobjects.ArticleDao;
-import com.xeppaka.lentareader.ui.adapters.NewsAdapter;
-import com.xeppaka.lentareader.ui.adapters.NewsObjectAdapter;
+import com.xeppaka.lentareader.ui.adapters.listnews.NewsAdapter;
+import com.xeppaka.lentareader.ui.adapters.listnews.NewsObjectAdapter;
 
 /**
  * Created by nnm on 12/27/13.

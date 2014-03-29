@@ -76,4 +76,7 @@ public abstract class FullFragmentBase extends ListFragment {
             return false;
         }
     }
+
+    public abstract void markRead();
+    public abstract void update();
 }

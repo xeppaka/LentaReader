@@ -42,7 +42,7 @@ public class FullArticleSecondHeader extends FullNewsElementBase {
         textView.setMovementMethod(SafeLinkMovementMethodDecorator.getInstance(inflater.getContext()));
 
         final int px = getPadding();
-        textView.setPadding(0, px, 0, px);
+        textView.setPadding(px, 0, px, 0);
 
         return textView;
     }

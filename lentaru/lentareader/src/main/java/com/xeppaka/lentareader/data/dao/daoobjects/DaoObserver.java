@@ -13,7 +13,7 @@ public abstract class DaoObserver<T> implements DaoObservable.Observer<T> {
 	public DaoObserver(Handler handler) {
         contentObserver = new ContentObserver(handler) {
             /**
-             * this code added at API level 16
+             * this code added in API level 16
              */
 
 //			@Override

@@ -1,4 +1,4 @@
-package com.xeppaka.lentareader.ui.adapters;
+package com.xeppaka.lentareader.ui.adapters.fullnews;
 
 import com.xeppaka.lentareader.ui.widgets.fullnews.FullNewsElement;
 

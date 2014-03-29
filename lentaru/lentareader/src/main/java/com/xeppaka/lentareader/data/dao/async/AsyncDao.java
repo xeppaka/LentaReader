@@ -48,7 +48,9 @@ public interface AsyncDao<T> extends Dao<T> {
 	 *         data from the database.
 	 */
     AsyncTask<List<Long>, Void, List<T>> readAsync(AsyncListener<List<T>> listener);
-	
+
+    AsyncTask<Void, Void, List<Long>> readAllIdsAsync(AsyncListener<List<Long>> listener);
+
 	/**
 	 * Read some news object from the database specifying its id.
 	 * 

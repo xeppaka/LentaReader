@@ -5,26 +5,20 @@ import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.ListFragment;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.xeppaka.lentareader.R;
 import com.xeppaka.lentareader.async.AsyncListener;
 import com.xeppaka.lentareader.data.Article;
-import com.xeppaka.lentareader.data.News;
 import com.xeppaka.lentareader.data.dao.Dao;
 import com.xeppaka.lentareader.data.dao.async.AsyncDao;
+import com.xeppaka.lentareader.data.dao.async.AsyncNODao;
 import com.xeppaka.lentareader.data.dao.daoobjects.ArticleDao;
-import com.xeppaka.lentareader.data.dao.daoobjects.NewsDao;
-import com.xeppaka.lentareader.ui.adapters.FullArticleAdapter;
-import com.xeppaka.lentareader.ui.adapters.FullNewsAdapter;
+import com.xeppaka.lentareader.ui.adapters.fullnews.FullArticleAdapter;
 import com.xeppaka.lentareader.ui.widgets.fullnews.ElementOptions;
 import com.xeppaka.lentareader.ui.widgets.fullnews.builder.FullArticleElementsBuilder;
-import com.xeppaka.lentareader.ui.widgets.fullnews.builder.FullNewsElementsBuilder;
 import com.xeppaka.lentareader.utils.PreferencesConstants;
 
 /**
@@ -32,6 +26,8 @@ import com.xeppaka.lentareader.utils.PreferencesConstants;
  */
 public class ArticleFullFragment extends FullFragmentBase {
     private FullArticleAdapter adapter;
+    private boolean read;
+    private AsyncNODao<Article> dao;
 
     public ArticleFullFragment(long id) {
         super(id);
@@ -51,19 +47,32 @@ public class ArticleFullFragment extends FullFragmentBase {
         super.onCreate(savedInstanceState);
 
         if (savedInstanceState != null) {
-            setDbId(savedInstanceState.getLong("id"));
+            setDbId(savedInstanceState.getLong("id", Dao.NO_ID));
         }
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        final View view = super.onCreateView(inflater, container, savedInstanceState);
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
+        dao = ArticleDao.getInstance(activity.getContentResolver());
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        final ListView listView = getListView();
+        listView.setSelector(new ColorDrawable(0x00000000));
+        listView.setDividerHeight(0);
+    }
+
+    private void loadNews() {
+        setListAdapter(null);
+
         final long id = getDbId();
 
-        if (id != Dao.NO_ID) {
-            final Activity activity = getActivity();
-            final AsyncDao<Article> dao = ArticleDao.getInstance(activity.getContentResolver());
-
+        if (id != Dao.NO_ID && dao != null) {
             dao.readAsync(id, new AsyncListener<Article>() {
                 @Override
                 public void onSuccess(Article article) {
@@ -76,32 +85,13 @@ public class ArticleFullFragment extends FullFragmentBase {
                         setListAdapter(adapter = new FullArticleAdapter(builder.build()));
                     }
 
-                    article.setRead(true);
-                    dao.updateAsync(article, new AsyncListener<Integer>() {
-                        @Override
-                        public void onSuccess(Integer value) {}
-
-                        @Override
-                        public void onFailure(Exception e) {}
-                    });
+                    read = article.isRead();
                 }
 
                 @Override
-                public void onFailure(Exception e) {
-                }
+                public void onFailure(Exception e) {}
             });
         }
-
-        return view;
-    }
-
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        final ListView listView = getListView();
-        listView.setSelector(new ColorDrawable(0x00000000));
-        listView.setDividerHeight(0);
     }
 
     @Override
@@ -129,6 +119,28 @@ public class ArticleFullFragment extends FullFragmentBase {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+
+        if (adapter == null) {
+            loadNews();
+        }
+    }
+
+    @Override
+    public void markRead() {
+        if (dao != null) {
+            dao.markReadAsync(getDbId(), new AsyncListener<Integer>() {
+                @Override
+                public void onSuccess(Integer value) {}
+
+                @Override
+                public void onFailure(Exception e) {}
+            });
+        }
+    }
+
+    @Override
     public boolean copyLinkToBuffer() {
         final boolean copied = super.copyLinkToBuffer();
 
@@ -150,5 +162,10 @@ public class ArticleFullFragment extends FullFragmentBase {
         }
 
         return opened;
+    }
+
+    @Override
+    public void update() {
+        loadNews();
     }
 }

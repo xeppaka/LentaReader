@@ -63,7 +63,9 @@ public class LentaService extends Service {
 			super.run();
 			
 			if (threads.decrementAndGet() == 0) {
-				Log.d(LentaConstants.LoggerServiceTag, "Stopping service: no working threads are active.");
+                if (LentaConstants.DEVELOPER_MODE) {
+                    Log.d(LentaConstants.LoggerServiceTag, "Stopping service: no working threads are active.");
+                }
 				stopSelf();
 			}
 		}
@@ -114,12 +116,17 @@ public class LentaService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		Log.d(LentaConstants.LoggerServiceTag, "Starting service.");
+
+        if (LentaConstants.DEVELOPER_MODE) {
+            Log.d(LentaConstants.LoggerServiceTag, "Starting service.");
+        }
 	}
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		Log.d(LentaConstants.LoggerServiceTag, "Got the intent, checking the command");
+        if (LentaConstants.DEVELOPER_MODE) {
+            Log.d(LentaConstants.LoggerServiceTag, "Got the intent, checking the command");
+        }
 		
 		final int requestId = intent.getIntExtra(INTENT_REQUEST_ID_NAME, NO_REQUEST_ID);
         final ResultReceiver receiver = intent.getParcelableExtra(INTENT_RESULT_RECEIVER_NAME);

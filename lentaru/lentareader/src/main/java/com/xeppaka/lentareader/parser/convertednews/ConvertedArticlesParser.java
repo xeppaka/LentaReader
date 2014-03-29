@@ -53,9 +53,9 @@ public class ConvertedArticlesParser extends PullParserBase implements Converted
                         entries.add(n);
                     }
                 } catch (XmlPullParserException e) {
-                    Log.d(LentaConstants.LoggerAnyTag, "Error while parsing articles.", e);
+                    Log.e(LentaConstants.LoggerAnyTag, "Error while parsing articles.", e);
                 } catch (IOException e) {
-                    Log.d(LentaConstants.LoggerAnyTag, "Error while parsing articles.", e);
+                    Log.e(LentaConstants.LoggerAnyTag, "Error while parsing articles.", e);
                 }
             } else {
                 skip(parser);

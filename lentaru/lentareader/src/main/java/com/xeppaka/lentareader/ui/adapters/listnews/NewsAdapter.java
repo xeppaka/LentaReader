@@ -1,14 +1,14 @@
-package com.xeppaka.lentareader.ui.adapters;
+package com.xeppaka.lentareader.ui.adapters.listnews;
 
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.util.TypedValue;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.xeppaka.lentareader.R;
@@ -90,8 +90,8 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
         }
     }
 
-    private ViewGroup.LayoutParams imageViewHidden;
-    private ViewGroup.LayoutParams imageViewShown;
+    private LinearLayout.LayoutParams imageViewHidden;
+    private LinearLayout.LayoutParams imageViewShown;
 
     public NewsAdapter(Context context) {
 		super(context);
@@ -99,8 +99,11 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
         final Resources res = context.getResources();
         final int width = Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 90, res.getDisplayMetrics()));
         final int height = Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 60, res.getDisplayMetrics()));
-        imageViewHidden = new ViewGroup.LayoutParams(width, height);
-        imageViewShown = new ViewGroup.LayoutParams(width, height);
+        imageViewHidden = new LinearLayout.LayoutParams(0, height);
+        imageViewShown = new LinearLayout.LayoutParams(width, height);
+
+        final int marginRight = Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, res.getDisplayMetrics()));
+        imageViewShown.setMargins(0, 0, marginRight, 0);
 	}
 
     @Override
@@ -178,8 +181,11 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
             if (news.hasImage()) {
                 bitmapRef = imageDao.readThumbnail(news.getImageLink(), NewsImageKeyCreator.getInstance());
                 newsImageView.setImageDrawable(ImageDao.getLoadingThumbnailImage().getDrawableIfCached());
-                newsImageView.setLayoutParams(imageViewShown);
-                newsImageView.setVisibility(View.VISIBLE);
+                if (newsImageView.getLayoutParams() != imageViewShown) {
+                    newsImageView.setLayoutParams(imageViewShown);
+                    newsImageView.setVisibility(View.VISIBLE);
+                    newsImageView.requestLayout();
+                }
 
                 final ViewHolder holderForAsync = holder;
                 final String imageUrl = news.getImageLink();
@@ -197,8 +203,11 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
 
                         final ImageView iv = holderForAsync.getNewsImage();
                         iv.setImageDrawable(drawable);
-//                        iv.setLayoutParams(imageViewShown);
-                        iv.setVisibility(View.VISIBLE);
+                        if (iv.getLayoutParams() != imageViewShown) {
+                            iv.setLayoutParams(imageViewShown);
+                            iv.setVisibility(View.VISIBLE);
+                            iv.requestLayout();
+                        }
                     }
 
                     @Override
@@ -209,8 +218,12 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
                         }
 
                         final ImageView imageView = holderForAsync.getNewsImage();
-//                        imageView.setLayoutParams(imageViewHidden);
-//                        imageView.setVisibility(View.INVISIBLE);
+                        imageView.setImageDrawable(null);
+                        if (imageView.getLayoutParams() != imageViewShown) {
+                            imageView.setLayoutParams(imageViewShown);
+                            imageView.setVisibility(View.VISIBLE);
+                            imageView.requestLayout();
+                        }
 
                         holderForAsync.setImage(null);
                         holderForAsync.setImageUrl(null);
@@ -220,8 +233,13 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
 
                 holder.setAsyncTask(asyncTask);
             } else {
-//                newsImageView.setLayoutParams(imageViewHidden);
-//                newsImageView.setVisibility(View.INVISIBLE);
+                newsImageView.setImageDrawable(null);
+
+                if (newsImageView.getLayoutParams() != imageViewShown) {
+                    newsImageView.setLayoutParams(imageViewShown);
+                    newsImageView.setVisibility(View.VISIBLE);
+                    newsImageView.requestLayout();
+                }
 
                 holder.setImage(null);
                 holder.setImageUrl(null);
@@ -234,15 +252,27 @@ public class NewsAdapter extends NewsObjectAdapter<News> {
 
                 if ((drawable = bitmapRef.getDrawableIfCached(newsImageView)) != null) {
                     newsImageView.setImageDrawable(drawable);
-                    newsImageView.setLayoutParams(imageViewShown);
-                    newsImageView.setVisibility(View.VISIBLE);
+
+                    if (newsImageView.getLayoutParams() != imageViewShown) {
+                        newsImageView.setLayoutParams(imageViewShown);
+                        newsImageView.setVisibility(View.VISIBLE);
+                        view.requestLayout();
+                    }
                 } else {
-//                    newsImageView.setLayoutParams(imageViewHidden);
-//                    newsImageView.setVisibility(View.INVISIBLE);
+                    if (newsImageView.getLayoutParams() != imageViewHidden) {
+                        newsImageView.setLayoutParams(imageViewHidden);
+                        newsImageView.setVisibility(View.INVISIBLE);
+                        view.requestLayout();
+                    }
                 }
+
+                view.requestLayout();
             } else {
-//                newsImageView.setLayoutParams(imageViewHidden);
-//                newsImageView.setVisibility(View.INVISIBLE);
+                if (newsImageView.getLayoutParams() != imageViewHidden) {
+                    newsImageView.setLayoutParams(imageViewHidden);
+                    newsImageView.setVisibility(View.INVISIBLE);
+                    view.requestLayout();
+                }
 
                 holder.setImage(null);
                 holder.setImageUrl(null);

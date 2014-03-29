@@ -26,6 +26,7 @@ public abstract class ContentResolverNODao<T extends NewsObject> extends Content
     private final static ContentValues setUpdatedFromLatestFlagValues;
     private final static ContentValues clearUpdatedInBackgroundFlagValues;
     private final static ContentValues clearRecentFlagValues;
+    private final static ContentValues markReadValues;
 
     private final static String sortOrder = NewsObjectEntry.COLUMN_NAME_PUBDATE + " DESC";
 
@@ -38,6 +39,8 @@ public abstract class ContentResolverNODao<T extends NewsObject> extends Content
         clearUpdatedInBackgroundFlagValues.put(NewsEntry.COLUMN_NAME_UPDATED_IN_BACKGROUND, 0);
         clearRecentFlagValues = new ContentValues();
         clearRecentFlagValues.put(NewsEntry.COLUMN_NAME_RECENT, 0);
+        markReadValues = new ContentValues();
+        markReadValues.put(NewsEntry.COLUMN_NAME_READ, 1);
     }
 
 	public ContentResolverNODao(ContentResolver cr) {
@@ -266,8 +269,9 @@ public abstract class ContentResolverNODao<T extends NewsObject> extends Content
         try {
             List<Long> result = new ArrayList<Long>();
 
+            final int columnIndex = cur.getColumnIndexOrThrow(BaseColumns._ID);
             while (cur.moveToNext()) {
-                result.add(cur.getLong(cur.getColumnIndexOrThrow(BaseColumns._ID)));
+                result.add(cur.getLong(columnIndex));
             }
 
             return result;
@@ -279,17 +283,85 @@ public abstract class ContentResolverNODao<T extends NewsObject> extends Content
     }
 
     @Override
-    public int deleteSmallerIds(long id) {
-        String where = BaseColumns._ID + " < ?";
-        String[] whereArgs = { String.valueOf(id) };
+    public List<Long> readAllDates(Rubrics rubric) {
+        final String[] projectionIdOnly = { NewsEntry.COLUMN_NAME_PUBDATE };
 
-        final int result = getContentResolver().delete(getContentProviderUri(), where, whereArgs);
+        Cursor cur;
 
-        if (result > 0) {
-            getContentResolver().notifyChange(getContentProviderUri(), null);
+        if (rubric != Rubrics.LATEST) {
+            final String where = getWhereFromSQLiteType(SQLiteType.TEXT, 1);
+            final String[] whereArgs = { rubric.name() };
+
+            cur = getContentResolver().query(getContentProviderUri(),
+                    projectionIdOnly, String.format(where, getRubricColumnName()), whereArgs, NewsObjectEntry.COLUMN_NAME_PUBDATE + " desc");
+        } else {
+            cur = getContentResolver().query(getContentProviderUri(),
+                    projectionIdOnly, null, null, NewsObjectEntry.COLUMN_NAME_PUBDATE + " desc");
         }
 
-        return result;
+        if (cur == null) {
+            return Collections.emptyList();
+        }
+
+        try {
+            List<Long> result = new ArrayList<Long>();
+
+            final int columnIndex = cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_PUBDATE);
+            while (cur.moveToNext()) {
+                result.add(cur.getLong(columnIndex));
+            }
+
+            return result;
+        } finally {
+            if (cur != null) {
+                cur.close();
+            }
+        }
+    }
+
+    @Override
+    public List<Boolean> readReadFlag(Rubrics rubric) {
+        final String[] projectionReadOnly = { NewsObjectEntry.COLUMN_NAME_READ, NewsObjectEntry.COLUMN_NAME_PUBDATE };
+
+        Cursor cur;
+
+        if (rubric != Rubrics.LATEST) {
+            final String where = getWhereFromSQLiteType(SQLiteType.TEXT, 1);
+            final String[] whereArgs = { rubric.name() };
+
+            cur = getContentResolver().query(getContentProviderUri(),
+                    projectionReadOnly, String.format(where, getRubricColumnName()), whereArgs, NewsObjectEntry.COLUMN_NAME_PUBDATE + " desc");
+        } else {
+            cur = getContentResolver().query(getContentProviderUri(),
+                    projectionReadOnly, null, null, NewsObjectEntry.COLUMN_NAME_PUBDATE + " desc");
+        }
+
+        if (cur == null) {
+            return Collections.emptyList();
+        }
+
+        try {
+            List<Boolean> result = new ArrayList<Boolean>();
+
+            final int columnIndex = cur.getColumnIndexOrThrow(NewsEntry.COLUMN_NAME_READ);
+            while (cur.moveToNext()) {
+                result.add(cur.getInt(columnIndex) > 0);
+            }
+
+            return result;
+        } finally {
+            if (cur != null) {
+                cur.close();
+            }
+        }
+    }
+
+    @Override
+    public int markRead(long id) {
+        String where = getWhereFromSQLiteType(SQLiteType.INTEGER);
+        String[] whereArgs = new String[] { String.valueOf(id) };
+
+        return getContentResolver().update(getContentProviderUri(), markReadValues, String.format(where, BaseColumns._ID), whereArgs);
     }
 
     @Override

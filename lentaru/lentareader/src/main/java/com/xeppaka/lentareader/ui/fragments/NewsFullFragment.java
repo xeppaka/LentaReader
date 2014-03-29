@@ -5,21 +5,18 @@ import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.ListFragment;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.xeppaka.lentareader.R;
 import com.xeppaka.lentareader.async.AsyncListener;
 import com.xeppaka.lentareader.data.News;
-import com.xeppaka.lentareader.data.NewsObject;
 import com.xeppaka.lentareader.data.dao.Dao;
 import com.xeppaka.lentareader.data.dao.async.AsyncDao;
+import com.xeppaka.lentareader.data.dao.async.AsyncNODao;
 import com.xeppaka.lentareader.data.dao.daoobjects.NewsDao;
-import com.xeppaka.lentareader.ui.adapters.FullNewsAdapter;
+import com.xeppaka.lentareader.ui.adapters.fullnews.FullNewsAdapter;
 import com.xeppaka.lentareader.ui.widgets.fullnews.ElementOptions;
 import com.xeppaka.lentareader.ui.widgets.fullnews.builder.FullNewsElementsBuilder;
 import com.xeppaka.lentareader.utils.PreferencesConstants;
@@ -29,6 +26,8 @@ import com.xeppaka.lentareader.utils.PreferencesConstants;
  */
 public class NewsFullFragment extends FullFragmentBase {
     private FullNewsAdapter adapter;
+    private boolean read;
+    private AsyncNODao<News> dao;
 
     public NewsFullFragment(long id) {
         super(id);
@@ -53,14 +52,27 @@ public class NewsFullFragment extends FullFragmentBase {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        final View view = super.onCreateView(inflater, container, savedInstanceState);
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        final ListView listView = getListView();
+        listView.setSelector(new ColorDrawable(0x00000000));
+        listView.setDividerHeight(0);
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
+        dao = NewsDao.getInstance(activity.getContentResolver());
+    }
+
+    private void loadNews() {
+        setListAdapter(null);
+
         final long id = getDbId();
 
-        if (id != Dao.NO_ID) {
-            final Activity activity = getActivity();
-            final AsyncDao<News> dao = NewsDao.getInstance(activity.getContentResolver());
-
+        if (id != Dao.NO_ID && dao != null) {
             dao.readAsync(id, new AsyncListener<News>() {
                 @Override
                 public void onSuccess(News news) {
@@ -73,31 +85,13 @@ public class NewsFullFragment extends FullFragmentBase {
                         setListAdapter(adapter = new FullNewsAdapter(builder.build()));
                     }
 
-                    news.setRead(true);
-                    dao.updateAsync(news, new AsyncListener<Integer>() {
-                        @Override
-                        public void onSuccess(Integer value) {}
-
-                        @Override
-                        public void onFailure(Exception e) {}
-                    });
+                    read = news.isRead();
                 }
 
                 @Override
                 public void onFailure(Exception e) {}
             });
         }
-
-        return view;
-    }
-
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        final ListView listView = getListView();
-        listView.setSelector(new ColorDrawable(0x00000000));
-        listView.setDividerHeight(0);
     }
 
     @Override
@@ -125,6 +119,22 @@ public class NewsFullFragment extends FullFragmentBase {
     }
 
     @Override
+    public void onDetach() {
+        super.onDetach();
+
+        setListAdapter(adapter = null);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (adapter == null) {
+            loadNews();
+        }
+    }
+
+    @Override
     public boolean copyLinkToBuffer() {
         final boolean copied = super.copyLinkToBuffer();
 
@@ -146,5 +156,22 @@ public class NewsFullFragment extends FullFragmentBase {
         }
 
         return opened;
+    }
+
+    @Override
+    public void markRead() {
+        if (dao != null) {
+            dao.markReadAsync(getDbId(), new AsyncListener<Integer>() {
+                @Override
+                public void onSuccess(Integer value) {}
+
+                @Override
+                public void onFailure(Exception e) {}
+            });
+        }
+    }
+
+    public void update() {
+        loadNews();
     }
 }

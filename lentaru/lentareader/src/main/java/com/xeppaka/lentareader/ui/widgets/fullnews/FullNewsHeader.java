@@ -94,6 +94,13 @@ public class FullNewsHeader extends FullNewsElementBase {
 
     @Override
     public void becomeInvisible() {
+        final boolean visible = isVisible();
+
+        if (visible) {
+            imageView.setImageDrawable(null);
+            imageView.setVisibility(View.GONE);
+        }
+
         super.becomeInvisible();
     }
 
