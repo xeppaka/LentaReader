@@ -9,8 +9,8 @@ import android.view.ViewGroup;
 import com.xeppaka.lentareader.R;
 import com.xeppaka.lentareader.data.NewsType;
 import com.xeppaka.lentareader.ui.fragments.ArticleListFragment;
-import com.xeppaka.lentareader.ui.fragments.NewsListFragment;
 import com.xeppaka.lentareader.ui.fragments.ListFragmentBase;
+import com.xeppaka.lentareader.ui.fragments.NewsListFragment;
 
 /**
  * This class represents pager adapter -> it contains all page definitions

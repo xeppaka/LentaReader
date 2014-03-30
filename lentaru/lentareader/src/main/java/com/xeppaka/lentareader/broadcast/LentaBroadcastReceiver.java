@@ -1,6 +1,5 @@
 package com.xeppaka.lentareader.broadcast;
 
-import android.app.AlarmManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -8,7 +7,6 @@ import android.content.SharedPreferences;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 
-import com.xeppaka.lentareader.async.AsyncListener;
 import com.xeppaka.lentareader.data.NewsType;
 import com.xeppaka.lentareader.data.Rubrics;
 import com.xeppaka.lentareader.scheduler.LentaBackgroundScheduler;

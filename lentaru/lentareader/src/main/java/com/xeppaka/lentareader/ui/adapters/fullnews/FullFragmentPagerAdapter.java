@@ -1,7 +1,6 @@
 package com.xeppaka.lentareader.ui.adapters.fullnews;
 
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.util.ArrayMap;
 import android.view.ViewGroup;
@@ -32,11 +31,20 @@ public abstract class FullFragmentPagerAdapter extends FragmentStatePagerAdapter
         if (fragment == null) {
             fragment = createFragment();
             fragment.setDbId(ids.get(position));
-
-            positionMap.put(position, fragment);
         }
 
         return fragment;
+    }
+
+    @Override
+    public Object instantiateItem(ViewGroup container, int position) {
+        Object result = super.instantiateItem(container, position);
+
+        if (result instanceof FullFragmentBase) {
+            positionMap.put(position, (FullFragmentBase) result);
+        }
+
+        return result;
     }
 
     @Override
@@ -49,6 +57,10 @@ public abstract class FullFragmentPagerAdapter extends FragmentStatePagerAdapter
     @Override
     public int getCount() {
         return ids.size();
+    }
+
+    public void setIds(List<Long> ids) {
+        this.ids = ids;
     }
 
     public abstract FullFragmentBase createFragment();

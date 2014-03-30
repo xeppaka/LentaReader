@@ -1,18 +1,11 @@
 package com.xeppaka.lentareader.data.comments;
 
 import android.support.v4.util.SimpleArrayMap;
-import android.util.ArrayMap;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.Stack;
 
 /**
  * Created by nnm on 2/26/14.

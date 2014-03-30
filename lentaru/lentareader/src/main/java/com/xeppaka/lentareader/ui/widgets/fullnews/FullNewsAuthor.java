@@ -3,14 +3,12 @@ package com.xeppaka.lentareader.ui.widgets.fullnews;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.support.v4.app.Fragment;
-import android.text.Html;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.xeppaka.lentareader.data.body.items.SafeLinkMovementMethodDecorator;
 import com.xeppaka.lentareader.utils.LentaConstants;
 import com.xeppaka.lentareader.utils.LentaTextUtils;
 

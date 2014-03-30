@@ -3,7 +3,6 @@ package com.xeppaka.lentareader.data;
 import com.xeppaka.lentareader.data.body.Body;
 import com.xeppaka.lentareader.parser.rss.LentaRssItem;
 
-import java.util.Collection;
 import java.util.Date;
 
 public class Article extends News {

@@ -1,9 +1,9 @@
 package org.java_websocket;
 
+import org.java_websocket.drafts.Draft;
+
 import java.net.Socket;
 import java.util.List;
-
-import org.java_websocket.drafts.Draft;
 
 public interface WebSocketFactory {
 	public WebSocket createWebSocket( WebSocketAdapter a, Draft d, Socket s );

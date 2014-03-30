@@ -4,11 +4,9 @@ import android.content.Context;
 import android.support.v4.app.Fragment;
 
 import com.xeppaka.lentareader.data.Article;
-import com.xeppaka.lentareader.ui.fragments.FullFragmentBase;
 import com.xeppaka.lentareader.ui.widgets.fullnews.FullArticleSecondHeader;
 import com.xeppaka.lentareader.ui.widgets.fullnews.FullNewsAuthor;
 import com.xeppaka.lentareader.ui.widgets.fullnews.FullNewsElement;
-import com.xeppaka.lentareader.ui.widgets.fullnews.FullNewsTextElement;
 
 import java.util.Collection;
 

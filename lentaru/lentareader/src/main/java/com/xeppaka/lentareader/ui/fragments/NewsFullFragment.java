@@ -13,7 +13,6 @@ import com.xeppaka.lentareader.R;
 import com.xeppaka.lentareader.async.AsyncListener;
 import com.xeppaka.lentareader.data.News;
 import com.xeppaka.lentareader.data.dao.Dao;
-import com.xeppaka.lentareader.data.dao.async.AsyncDao;
 import com.xeppaka.lentareader.data.dao.async.AsyncNODao;
 import com.xeppaka.lentareader.data.dao.daoobjects.NewsDao;
 import com.xeppaka.lentareader.ui.adapters.fullnews.FullNewsAdapter;
@@ -26,7 +25,6 @@ import com.xeppaka.lentareader.utils.PreferencesConstants;
  */
 public class NewsFullFragment extends FullFragmentBase {
     private FullNewsAdapter adapter;
-    private boolean read;
     private AsyncNODao<News> dao;
 
     public NewsFullFragment(long id) {
@@ -84,8 +82,6 @@ public class NewsFullFragment extends FullFragmentBase {
 
                         setListAdapter(adapter = new FullNewsAdapter(builder.build()));
                     }
-
-                    read = news.isRead();
                 }
 
                 @Override

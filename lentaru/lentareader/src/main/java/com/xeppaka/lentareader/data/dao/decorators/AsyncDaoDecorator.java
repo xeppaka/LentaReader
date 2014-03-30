@@ -1,6 +1,5 @@
 package com.xeppaka.lentareader.data.dao.decorators;
 
-import android.app.ListFragment;
 import android.database.Cursor;
 import android.os.AsyncTask;
 

@@ -1,16 +1,11 @@
 package com.xeppaka.lentareader.ui.activities;
 
-import android.content.ClipData;
-import android.content.ClipboardManager;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.xeppaka.lentareader.R;
 import com.xeppaka.lentareader.async.AsyncListener;
@@ -18,18 +13,16 @@ import com.xeppaka.lentareader.data.Article;
 import com.xeppaka.lentareader.data.News;
 import com.xeppaka.lentareader.data.Rubrics;
 import com.xeppaka.lentareader.data.dao.Dao;
-import com.xeppaka.lentareader.data.dao.async.AsyncDao;
 import com.xeppaka.lentareader.data.dao.async.AsyncNODao;
 import com.xeppaka.lentareader.data.dao.daoobjects.ArticleDao;
 import com.xeppaka.lentareader.data.dao.daoobjects.NewsDao;
 import com.xeppaka.lentareader.ui.adapters.fullnews.FullArticleFragmentPagerAdapter;
 import com.xeppaka.lentareader.ui.adapters.fullnews.FullFragmentPagerAdapter;
 import com.xeppaka.lentareader.ui.adapters.fullnews.FullNewsFragmentPagerAdapter;
-import com.xeppaka.lentareader.ui.fragments.ArticleFullFragment;
 import com.xeppaka.lentareader.ui.fragments.FullFragmentBase;
-import com.xeppaka.lentareader.ui.fragments.NewsFullFragment;
 import com.xeppaka.lentareader.utils.LentaDebugUtils;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -39,6 +32,8 @@ public class NewsFullActivity extends ActionBarActivity {
 
     private String idKey;
     private Rubrics rubric;
+
+    private List<FullFragmentBase> rotatedFragments = new ArrayList<FullFragmentBase>(3);
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -101,11 +96,14 @@ public class NewsFullActivity extends ActionBarActivity {
                 final long idAsync = id;
                 idKey = "articleId";
 
+                adapter = new FullArticleFragmentPagerAdapter(getSupportFragmentManager(), Collections.<Long>emptyList());
+
                 AsyncNODao<Article> dao = ArticleDao.getInstance(getContentResolver());
                 dao.readAllIdsAsync(rubric, new AsyncListener<List<Long>>() {
                     @Override
                     public void onSuccess(List<Long> result) {
-                        pager.setAdapter(adapter = new FullArticleFragmentPagerAdapter(getSupportFragmentManager(), result));
+                        adapter.setIds(result);
+                        pager.setAdapter(adapter);
 
                         final int currentItem = result.indexOf(idAsync);
 

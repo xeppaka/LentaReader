@@ -6,10 +6,9 @@ import android.support.v4.app.Fragment;
 import com.xeppaka.lentareader.data.News;
 import com.xeppaka.lentareader.data.body.Body;
 import com.xeppaka.lentareader.data.body.items.Item;
-import com.xeppaka.lentareader.ui.widgets.fullnews.ElementOptions;
 import com.xeppaka.lentareader.ui.widgets.fullnews.FullNewsElement;
-import com.xeppaka.lentareader.ui.widgets.fullnews.FullNewsHeader;
 import com.xeppaka.lentareader.ui.widgets.fullnews.FullNewsFooter;
+import com.xeppaka.lentareader.ui.widgets.fullnews.FullNewsHeader;
 
 import java.util.Collection;
 

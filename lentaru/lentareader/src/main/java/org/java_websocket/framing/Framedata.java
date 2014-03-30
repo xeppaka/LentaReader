@@ -1,8 +1,8 @@
 package org.java_websocket.framing;
 
-import java.nio.ByteBuffer;
-
 import org.java_websocket.exceptions.InvalidFrameException;
+
+import java.nio.ByteBuffer;
 
 public interface Framedata {
 	public enum Opcode {

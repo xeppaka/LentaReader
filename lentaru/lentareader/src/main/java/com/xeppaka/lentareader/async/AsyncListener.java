@@ -1,7 +1,5 @@
 package com.xeppaka.lentareader.async;
 
-import android.graphics.Bitmap;
-
 /**
  * Created by nnm on 3/1/14.
  */

@@ -6,7 +6,6 @@ import com.xeppaka.lentareader.data.NewsType;
 import com.xeppaka.lentareader.data.Rubrics;
 import com.xeppaka.lentareader.downloader.exceptions.HttpStatusCodeException;
 import com.xeppaka.lentareader.parser.convertednews.ConvertedArticlesParser;
-import com.xeppaka.lentareader.parser.convertednews.ConvertedNewsParser;
 import com.xeppaka.lentareader.parser.exceptions.ParseWithRegexException;
 import com.xeppaka.lentareader.parser.originalnews.LentaMobileArticleParser;
 import com.xeppaka.lentareader.parser.originalnews.MobileArticle;
@@ -17,7 +16,6 @@ import com.xeppaka.lentareader.utils.URLHelper;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
 
 public class LentaArticlesDownloader extends LentaNewsObjectDownloader<Article> {

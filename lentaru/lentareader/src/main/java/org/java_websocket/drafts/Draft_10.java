@@ -1,12 +1,4 @@
 package org.java_websocket.drafts;
-import java.math.BigInteger;
-import java.nio.ByteBuffer;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
 
 import org.java_websocket.WebSocket.Role;
 import org.java_websocket.exceptions.InvalidDataException;
@@ -27,6 +19,15 @@ import org.java_websocket.handshake.ServerHandshake;
 import org.java_websocket.handshake.ServerHandshakeBuilder;
 import org.java_websocket.util.Base64;
 import org.java_websocket.util.Charsetfunctions;
+
+import java.math.BigInteger;
+import java.nio.ByteBuffer;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
 
 public class Draft_10 extends Draft {
 

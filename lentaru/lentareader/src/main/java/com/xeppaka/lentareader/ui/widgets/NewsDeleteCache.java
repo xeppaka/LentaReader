@@ -9,7 +9,6 @@ import android.widget.Toast;
 
 import com.xeppaka.lentareader.R;
 import com.xeppaka.lentareader.async.AsyncListener;
-import com.xeppaka.lentareader.data.Article;
 import com.xeppaka.lentareader.data.dao.daoobjects.ArticleDao;
 import com.xeppaka.lentareader.data.dao.daoobjects.NewsDao;
 

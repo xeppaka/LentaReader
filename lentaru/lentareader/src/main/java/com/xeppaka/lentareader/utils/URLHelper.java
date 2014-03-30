@@ -3,8 +3,6 @@ package com.xeppaka.lentareader.utils;
 import com.xeppaka.lentareader.data.NewsType;
 import com.xeppaka.lentareader.data.Rubrics;
 
-import java.net.MalformedURLException;
-
 /**
  * URLHelper helps to get URLs from which news can be downloaded (e.g. get URL
  * for some rubric or get URL to mobile version of article from URL to full

@@ -241,9 +241,7 @@ public abstract class ListFragmentBase<T extends NewsObject> extends ListFragmen
                         }
 
                         @Override
-                        public void onFailure(Exception e) {
-
-                        }
+                        public void onFailure(Exception e) {}
                     });
                 } else {
                     dao.readBriefAsync(getCurrentRubric(), new AsyncListener<List<T>>() {

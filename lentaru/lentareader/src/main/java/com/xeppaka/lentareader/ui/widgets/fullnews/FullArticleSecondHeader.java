@@ -7,10 +7,8 @@ import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.TextView;
 
-import com.xeppaka.lentareader.data.Article;
 import com.xeppaka.lentareader.data.body.items.SafeLinkMovementMethodDecorator;
 import com.xeppaka.lentareader.utils.LentaConstants;
 import com.xeppaka.lentareader.utils.LentaTextUtils;

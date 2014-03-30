@@ -4,7 +4,6 @@ import android.util.Log;
 import android.util.Xml;
 
 import com.xeppaka.lentareader.data.Article;
-import com.xeppaka.lentareader.data.News;
 import com.xeppaka.lentareader.data.Rubrics;
 import com.xeppaka.lentareader.data.body.Body;
 import com.xeppaka.lentareader.utils.LentaConstants;

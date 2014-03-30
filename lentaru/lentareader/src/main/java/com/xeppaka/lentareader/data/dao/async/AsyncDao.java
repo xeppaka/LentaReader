@@ -6,7 +6,6 @@ import android.os.AsyncTask;
 import com.xeppaka.lentareader.async.AsyncListener;
 import com.xeppaka.lentareader.data.dao.Dao;
 
-import java.util.Collection;
 import java.util.List;
 
 /**

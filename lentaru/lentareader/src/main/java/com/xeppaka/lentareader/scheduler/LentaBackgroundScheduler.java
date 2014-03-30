@@ -1,11 +1,6 @@
 package com.xeppaka.lentareader.scheduler;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
-
-import com.xeppaka.lentareader.broadcast.LentaBroadcastReceiver;
 
 /**
  * Created by nnm on 3/10/14.

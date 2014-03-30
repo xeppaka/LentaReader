@@ -7,7 +7,6 @@ import android.util.AttributeSet;
 import com.xeppaka.lentareader.R;
 import com.xeppaka.lentareader.data.dao.async.AsyncNODao;
 import com.xeppaka.lentareader.data.dao.daoobjects.ArticleDao;
-import com.xeppaka.lentareader.data.dao.daoobjects.NewsDao;
 import com.xeppaka.lentareader.utils.PreferencesConstants;
 
 /**

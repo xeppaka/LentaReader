@@ -6,9 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.app.ListFragment;
-import android.widget.Toast;
 
-import com.xeppaka.lentareader.R;
 import com.xeppaka.lentareader.data.dao.Dao;
 import com.xeppaka.lentareader.ui.widgets.fullnews.ElementOptions;
 

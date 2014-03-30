@@ -1,10 +1,5 @@
 package com.xeppaka.lentareader.data.dao.daoobjects.imagedaoobjects;
 
-import android.util.Log;
-
-import com.xeppaka.lentareader.utils.LentaConstants;
-import com.xeppaka.lentareader.utils.URLHelper;
-
 import java.net.MalformedURLException;
 
 /**

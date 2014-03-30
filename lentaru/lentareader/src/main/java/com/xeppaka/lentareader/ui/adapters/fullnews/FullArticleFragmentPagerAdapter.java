@@ -4,7 +4,6 @@ import android.support.v4.app.FragmentManager;
 
 import com.xeppaka.lentareader.ui.fragments.ArticleFullFragment;
 import com.xeppaka.lentareader.ui.fragments.FullFragmentBase;
-import com.xeppaka.lentareader.ui.fragments.NewsFullFragment;
 
 import java.util.List;
 

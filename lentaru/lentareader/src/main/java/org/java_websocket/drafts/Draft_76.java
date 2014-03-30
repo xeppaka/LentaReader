@@ -1,14 +1,5 @@
 package org.java_websocket.drafts;
 
-import java.nio.BufferUnderflowException;
-import java.nio.ByteBuffer;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
-
 import org.java_websocket.WebSocket.Role;
 import org.java_websocket.exceptions.IncompleteHandshakeException;
 import org.java_websocket.exceptions.InvalidDataException;
@@ -24,6 +15,15 @@ import org.java_websocket.handshake.HandshakeBuilder;
 import org.java_websocket.handshake.Handshakedata;
 import org.java_websocket.handshake.ServerHandshake;
 import org.java_websocket.handshake.ServerHandshakeBuilder;
+
+import java.nio.BufferUnderflowException;
+import java.nio.ByteBuffer;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
 
 public class Draft_76 extends Draft_75 {
 	private boolean failed = false;

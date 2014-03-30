@@ -1,11 +1,10 @@
 package org.java_websocket;
 
+import org.java_websocket.WebSocket.Role;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ByteChannel;
-import java.nio.channels.spi.AbstractSelectableChannel;
-
-import org.java_websocket.WebSocket.Role;
 
 public class SocketChannelIOHelper {
 
