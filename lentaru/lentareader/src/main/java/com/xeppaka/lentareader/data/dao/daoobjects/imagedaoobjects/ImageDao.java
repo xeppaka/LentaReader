@@ -667,12 +667,18 @@ public class ImageDao implements DaoObservable<BitmapReference> {
         }
 
         private class AsyncGetParameter<T> {
-            private ImageView view;
-            private AsyncListener<T> listener;
+            private final ImageView view;
+            private final AsyncListener<T> listener;
+            private final int retryCount;
 
-            private AsyncGetParameter(ImageView view, AsyncListener<T> loadListener) {
+            private AsyncGetParameter(int retryCount, ImageView view, AsyncListener<T> loadListener) {
+                this.retryCount = retryCount;
                 this.view = view;
                 this.listener = loadListener;
+            }
+
+            public int getRetryCount() {
+                return retryCount;
             }
 
             public ImageView getView() {
@@ -687,11 +693,13 @@ public class ImageDao implements DaoObservable<BitmapReference> {
         private class BitmapLoadTask extends AsyncTask<AsyncGetParameter<Bitmap>, Void, AsyncGetResult<Bitmap>> {
             private AsyncListener<Bitmap> listener;
             private ImageView view;
+            private int retryCount;
 
             @Override
             protected AsyncGetResult<Bitmap> doInBackground(AsyncGetParameter<Bitmap>... params) {
                 listener = params[0].getLoadListener();
                 view = params[0].getView();
+                retryCount = params[0].getRetryCount();
 
                 try {
                     return new AsyncGetResult<Bitmap>(getBitmap(view));
@@ -708,19 +716,26 @@ public class ImageDao implements DaoObservable<BitmapReference> {
             protected void onPostExecute(AsyncGetResult<Bitmap> result) {
                     if (result.getValue() != null)
                         listener.onSuccess(result.getValue());
-                    else
-                        listener.onFailure(result.getException());
+                    else {
+                        if (retryCount >= 2) {
+                            listener.onFailure(result.getException());
+                        } else {
+                            getBitmapAsyncRetry(retryCount + 1, view, listener);
+                        }
+                    }
             }
         }
 
         private class DrawableLoadTask extends AsyncTask<AsyncGetParameter<Drawable>, Void, AsyncGetResult<Drawable>> {
             private AsyncListener<Drawable> listener;
             private ImageView view;
+            private int retryCount;
 
             @Override
             protected AsyncGetResult<Drawable> doInBackground(AsyncGetParameter<Drawable>... params) {
                 listener = params[0].getLoadListener();
                 view = params[0].getView();
+                retryCount = params[0].getRetryCount();
 
                 try {
                     return new AsyncGetResult<Drawable>(getDrawable(view));
@@ -737,8 +752,13 @@ public class ImageDao implements DaoObservable<BitmapReference> {
             protected void onPostExecute(AsyncGetResult<Drawable> result) {
                 if (result.getValue() != null)
                     listener.onSuccess(result.getValue());
-                else
-                    listener.onFailure(result.getException());
+                else {
+                    if (retryCount >= 2) {
+                        listener.onFailure(result.getException());
+                    } else {
+                        getDrawableAsyncRetry(retryCount + 1, view, listener);
+                    }
+                }
             }
         }
 
@@ -860,7 +880,7 @@ public class ImageDao implements DaoObservable<BitmapReference> {
                 Log.d("getBitmap", "downloading bitmap...");
             }
             // download and set bitmap
-            final Bitmap downloadedBitmap = downloadBitmap();
+            Bitmap downloadedBitmap = downloadBitmap();
 
             if (LentaConstants.DEVELOPER_MODE) {
                 Log.d("getBitmap", "downloading bitmap. done.");
@@ -926,14 +946,7 @@ public class ImageDao implements DaoObservable<BitmapReference> {
 //                }
             }
 
-            boolean test = false;
-            final Bitmap bbb = seizeBitmap(view);
-
-            if (bbb == null) {
-                test = true;
-            }
-
-            return bbb;
+            return seizeBitmap(view);
         }
 
         @Override
@@ -1012,13 +1025,7 @@ public class ImageDao implements DaoObservable<BitmapReference> {
             return drawable;
         }
 
-        @Override
-        public AsyncTask getBitmapAsync(AsyncListener<Bitmap> listener) {
-            return getBitmapAsync(null, listener);
-        }
-
-        @Override
-        public AsyncTask getBitmapAsync(ImageView view, AsyncListener<Bitmap> listener) {
+        private AsyncTask getBitmapAsyncRetry(int retry, ImageView view, AsyncListener<Bitmap> listener) {
             final Bitmap localBitmap = getBitmapIfCached(view);
 
             if (localBitmap != null) {
@@ -1028,12 +1035,22 @@ public class ImageDao implements DaoObservable<BitmapReference> {
             } else {
                 AsyncTask<AsyncGetParameter<Bitmap>, Void, AsyncGetResult<Bitmap>> task = new BitmapLoadTask();
                 if (LentaConstants.SDK_VER >= 11)
-                    task.executeOnExecutor(downloadImageExecutor, new AsyncGetParameter<Bitmap>(view, listener));
+                    task.executeOnExecutor(downloadImageExecutor, new AsyncGetParameter<Bitmap>(retry, view, listener));
                 else
-                    task.execute(new AsyncGetParameter<Bitmap>(view, listener));
+                    task.execute(new AsyncGetParameter<Bitmap>(retry, view, listener));
 
                 return task;
             }
+        }
+
+        @Override
+        public AsyncTask getBitmapAsync(AsyncListener<Bitmap> listener) {
+            return getBitmapAsync(null, listener);
+        }
+
+        @Override
+        public AsyncTask getBitmapAsync(ImageView view, AsyncListener<Bitmap> listener) {
+            return getBitmapAsyncRetry(0, view, listener);
         }
 
         @Override
@@ -1041,8 +1058,7 @@ public class ImageDao implements DaoObservable<BitmapReference> {
             return getDrawableAsync(null, listener);
         }
 
-        @Override
-        public AsyncTask getDrawableAsync(ImageView view, AsyncListener<Drawable> listener) {
+        private AsyncTask getDrawableAsyncRetry(int retry, ImageView view, AsyncListener<Drawable> listener) {
             final Drawable localDrawable = getDrawableIfCached(view);
 
             if (localDrawable != null) {
@@ -1052,12 +1068,17 @@ public class ImageDao implements DaoObservable<BitmapReference> {
             } else {
                 AsyncTask<AsyncGetParameter<Drawable>, Void, AsyncGetResult<Drawable>> task = new DrawableLoadTask();
                 if (LentaConstants.SDK_VER >= 11)
-                    task.executeOnExecutor(downloadImageExecutor, new AsyncGetParameter<Drawable>(view, listener));
+                    task.executeOnExecutor(downloadImageExecutor, new AsyncGetParameter<Drawable>(retry, view, listener));
                 else
-                    task.execute(new AsyncGetParameter<Drawable>(view, listener));
+                    task.execute(new AsyncGetParameter<Drawable>(retry, view, listener));
 
                 return task;
             }
+        }
+
+        @Override
+        public AsyncTask getDrawableAsync(ImageView view, AsyncListener<Drawable> listener) {
+            return getDrawableAsyncRetry(0, view, listener);
         }
 
         public void releaseImageView(ImageView view) {

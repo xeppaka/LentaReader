@@ -11,7 +11,7 @@ public class LentaConstants {
 	public static final String LENTA_URL_ROOT = "http://lenta.ru";
     public static final String OWNSERVER_URL_ROOT = "http://news.lentaru.eu";
     public static final String OWNSERVER_URL_ROOT_JOLLA = "http://188.226.168.63";
-	public static final String UserAgent = "Android LentaReader";
+	public static final String UserAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.152 Safari/537.36";
 
     public static final String RSS_PATH_ROOT = "/rss";
     public static final String XML_PATH_ROOT = "";
