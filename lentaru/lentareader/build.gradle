@@ -1,0 +1,42 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.10.+'
+    }
+}
+apply plugin: 'android'
+
+repositories {
+    mavenCentral()
+}
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion '19.0.3'
+    defaultConfig {
+        minSdkVersion 15
+        targetSdkVersion 19
+    }
+    signingConfigs {
+        release {
+            storeFile file('/home/nnm/android_key.jks')
+            storePassword '***'
+            keyAlias 'PK'
+            keyPassword '***'
+        }
+    }
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            debuggable false
+        }
+    }
+}
+
+dependencies {
+    compile project(':libraries:viewpagerindicator')
+    compile 'com.android.support:support-v4:19.1.+'
+    compile 'com.android.support:appcompat-v7:19.1.+'
+}
